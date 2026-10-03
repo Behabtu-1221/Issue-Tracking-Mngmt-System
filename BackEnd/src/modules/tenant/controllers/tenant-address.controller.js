@@ -7,7 +7,7 @@ export const tenantAddressController = {
   async getAddresses(req, res, next) {
     try {
       const queryParams = getQuery(req);
-      const result = await tenantAddressService.getAddresses(queryParams);
+      const result = await tenantAddressService.getAddresses(queryParams, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -17,7 +17,7 @@ export const tenantAddressController = {
   async getAddressById(req, res, next) {
     try {
       const { id } = getParams(req);
-      const address = await tenantAddressService.getAddressById(id);
+      const address = await tenantAddressService.getAddressById(id, req.actor);
       sendSuccess(res, address);
     } catch (err) {
       next(err);
@@ -28,7 +28,7 @@ export const tenantAddressController = {
     try {
       const actorId = req.actor?.userId || 1;
       const dto = new CreateTenantAddressDTO(req.body);
-      const address = await tenantAddressService.createAddress(dto, actorId);
+      const address = await tenantAddressService.createAddress(dto, actorId, req.actor);
       sendCreated(res, address);
     } catch (err) {
       next(err);
@@ -40,7 +40,7 @@ export const tenantAddressController = {
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
       const dto = new UpdateTenantAddressDTO(req.body);
-      const address = await tenantAddressService.updateAddress(id, dto, actorId);
+      const address = await tenantAddressService.updateAddress(id, dto, actorId, req.actor);
       sendSuccess(res, address);
     } catch (err) {
       next(err);
@@ -51,7 +51,7 @@ export const tenantAddressController = {
     try {
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
-      const result = await tenantAddressService.deleteAddress(id, actorId);
+      const result = await tenantAddressService.deleteAddress(id, actorId, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);

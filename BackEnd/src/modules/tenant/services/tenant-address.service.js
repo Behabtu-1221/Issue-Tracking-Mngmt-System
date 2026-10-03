@@ -2,20 +2,39 @@ import tenantAddressRepository from '../repositories/tenant-address.repository.j
 import tenantRepository from '../repositories/tenant.repository.js';
 import AppError from '../../../shared/errors/AppError.js';
 
+const isParkAdminActor = (actor) => {
+  if (!actor) return false;
+  const code = (actor?.userTypeCode || '').toUpperCase();
+  const role = (actor?.role || actor?.primaryRole || '').toUpperCase();
+  const adminCodes = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN', 'ADMIN'];
+  if (adminCodes.includes(code) || adminCodes.includes(role)) return true;
+  if (Array.isArray(actor?.roles) && actor.roles.some(r => adminCodes.includes(String(r).toUpperCase()))) return true;
+  if (!actor?.tenantId && (code.includes('ADMIN') || role.includes('ADMIN'))) return true;
+  return false;
+};
+
 export const tenantAddressService = {
-  async getAddresses(params) {
-    return tenantAddressRepository.findAll(params);
+  async getAddresses(params = {}, actor) {
+    const filters = { ...params };
+    if (!isParkAdminActor(actor)) {
+      filters.tenantId = actor?.tenantId || -1;
+    }
+    return tenantAddressRepository.findAll(filters);
   },
 
-  async getAddressById(id) {
+  async getAddressById(id, actor) {
     const address = await tenantAddressRepository.findById(id);
-    if (!address) {
+    if (!address || (!isParkAdminActor(actor) && Number(address.TenantID) !== Number(actor?.tenantId))) {
       throw new AppError(`Tenant address with ID ${id} not found`, 404);
     }
     return address;
   },
 
-  async createAddress(data, userId) {
+  async createAddress(data, userId, actor) {
+    if (!isParkAdminActor(actor) && actor?.tenantId) {
+      data.TenantID = actor.tenantId;
+    }
+
     // Verify tenant exists
     const tenant = await tenantRepository.findById(data.TenantID);
     if (!tenant) {
@@ -37,11 +56,8 @@ export const tenantAddressService = {
     return tenantAddressRepository.findById(newId);
   },
 
-  async updateAddress(id, data, userId) {
-    const address = await tenantAddressRepository.findById(id);
-    if (!address) {
-      throw new AppError(`Tenant address with ID ${id} not found`, 404);
-    }
+  async updateAddress(id, data, userId, actor) {
+    const address = await this.getAddressById(id, actor);
 
     // If changing type to LEGAL, check for duplicates
     if (data.AddressType === 'LEGAL' && address.AddressType !== 'LEGAL') {
@@ -54,11 +70,8 @@ export const tenantAddressService = {
     return tenantAddressRepository.update(id, { ...data, ModifiedBy: userId });
   },
 
-  async deleteAddress(id, userId) {
-    const address = await tenantAddressRepository.findById(id);
-    if (!address) {
-      throw new AppError(`Tenant address with ID ${id} not found`, 404);
-    }
+  async deleteAddress(id, userId, actor) {
+    const address = await this.getAddressById(id, actor);
 
     await tenantAddressRepository.softDelete(id, userId);
     return { message: `Address (${address.AddressType}) deleted successfully` };

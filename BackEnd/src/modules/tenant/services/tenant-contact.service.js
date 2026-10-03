@@ -2,20 +2,39 @@ import tenantContactRepository from '../repositories/tenant-contact.repository.j
 import tenantRepository from '../repositories/tenant.repository.js';
 import AppError from '../../../shared/errors/AppError.js';
 
+const isParkAdminActor = (actor) => {
+  if (!actor) return false;
+  const code = (actor?.userTypeCode || '').toUpperCase();
+  const role = (actor?.role || actor?.primaryRole || '').toUpperCase();
+  const adminCodes = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN', 'ADMIN'];
+  if (adminCodes.includes(code) || adminCodes.includes(role)) return true;
+  if (Array.isArray(actor?.roles) && actor.roles.some(r => adminCodes.includes(String(r).toUpperCase()))) return true;
+  if (!actor?.tenantId && (code.includes('ADMIN') || role.includes('ADMIN'))) return true;
+  return false;
+};
+
 export const tenantContactService = {
-  async getContacts(params) {
-    return tenantContactRepository.findAll(params);
+  async getContacts(params = {}, actor) {
+    const filters = { ...params };
+    if (!isParkAdminActor(actor)) {
+      filters.tenantId = actor?.tenantId || -1;
+    }
+    return tenantContactRepository.findAll(filters);
   },
 
-  async getContactById(id) {
+  async getContactById(id, actor) {
     const contact = await tenantContactRepository.findById(id);
-    if (!contact) {
+    if (!contact || (!isParkAdminActor(actor) && Number(contact.TenantID) !== Number(actor?.tenantId))) {
       throw new AppError(`Tenant contact with ID ${id} not found`, 404);
     }
     return contact;
   },
 
-  async createContact(data, userId) {
+  async createContact(data, userId, actor) {
+    if (!isParkAdminActor(actor) && actor?.tenantId) {
+      data.TenantID = actor.tenantId;
+    }
+
     // Verify tenant exists
     const tenant = await tenantRepository.findById(data.TenantID);
     if (!tenant) {
@@ -42,11 +61,8 @@ export const tenantContactService = {
     return tenantContactRepository.findById(newId);
   },
 
-  async updateContact(id, data, userId) {
-    const contact = await tenantContactRepository.findById(id);
-    if (!contact) {
-      throw new AppError(`Tenant contact with ID ${id} not found`, 404);
-    }
+  async updateContact(id, data, userId, actor) {
+    const contact = await this.getContactById(id, actor);
 
     // If marking as primary, clear existing primary of same type first
     const effectiveType = data.ContactType || contact.ContactType;
@@ -57,11 +73,8 @@ export const tenantContactService = {
     return tenantContactRepository.update(id, { ...data, ModifiedBy: userId });
   },
 
-  async deleteContact(id, userId) {
-    const contact = await tenantContactRepository.findById(id);
-    if (!contact) {
-      throw new AppError(`Tenant contact with ID ${id} not found`, 404);
-    }
+  async deleteContact(id, userId, actor) {
+    const contact = await this.getContactById(id, actor);
 
     await tenantContactRepository.softDelete(id, userId);
     return { message: `Contact '${contact.Label}' deleted successfully` };

@@ -19,10 +19,7 @@ export const officeAllocationController = {
   async getAllocations(req, res, next) {
     try {
       const queryParams = getQuery(req);
-      if (!isParkAdminActor(req.actor) && req.actor?.tenantId) {
-        queryParams.tenantId = req.actor.tenantId;
-      }
-      const result = await officeAllocationService.getAllocations(queryParams);
+      const result = await officeAllocationService.getAllocations(queryParams, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -32,10 +29,7 @@ export const officeAllocationController = {
   async getAllocationById(req, res, next) {
     try {
       const { id } = getParams(req);
-      const allocation = await officeAllocationService.getAllocationById(id);
-      if (!isParkAdminActor(req.actor) && req.actor?.tenantId && Number(allocation?.TenantID) !== Number(req.actor.tenantId)) {
-        throw new AppError(`Office allocation with ID ${id} not found`, 404);
-      }
+      const allocation = await officeAllocationService.getAllocationById(id, req.actor);
       sendSuccess(res, allocation);
     } catch (err) {
       next(err);
@@ -45,10 +39,7 @@ export const officeAllocationController = {
   async getHistory(req, res, next) {
     try {
       const queryParams = getQuery(req);
-      if (!isParkAdminActor(req.actor) && req.actor?.tenantId) {
-        queryParams.tenantId = req.actor.tenantId;
-      }
-      const result = await officeAllocationService.getHistory(queryParams);
+      const result = await officeAllocationService.getHistory(queryParams, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -77,7 +68,7 @@ export const officeAllocationController = {
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
       const dto = new ReleaseAllocationDTO(req.body);
-      const allocation = await officeAllocationService.releaseAllocation(id, dto.Remarks, actorId);
+      const allocation = await officeAllocationService.releaseAllocation(id, dto.Remarks, actorId, req.actor);
       sendSuccess(res, allocation);
     } catch (err) {
       next(err);
@@ -91,7 +82,7 @@ export const officeAllocationController = {
       }
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
-      const result = await officeAllocationService.deleteAllocation(id, actorId);
+      const result = await officeAllocationService.deleteAllocation(id, actorId, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);

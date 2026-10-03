@@ -7,7 +7,7 @@ export const subTenantController = {
   async getSubTenants(req, res, next) {
     try {
       const queryParams = getQuery(req);
-      const result = await subTenantService.getSubTenants(queryParams);
+      const result = await subTenantService.getSubTenants(queryParams, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -17,7 +17,7 @@ export const subTenantController = {
   async getSubTenantById(req, res, next) {
     try {
       const { id } = getParams(req);
-      const subTenant = await subTenantService.getSubTenantById(id);
+      const subTenant = await subTenantService.getSubTenantById(id, req.actor);
       sendSuccess(res, subTenant);
     } catch (err) {
       next(err);
@@ -26,9 +26,8 @@ export const subTenantController = {
 
   async createSubTenant(req, res, next) {
     try {
-      const actorId = req.actor?.userId || 1;
       const dto = new CreateSubTenantDTO(req.body);
-      const subTenant = await subTenantService.createSubTenant(dto, actorId);
+      const subTenant = await subTenantService.createSubTenant(dto, req.actor);
       sendCreated(res, subTenant);
     } catch (err) {
       next(err);
@@ -38,9 +37,8 @@ export const subTenantController = {
   async updateSubTenant(req, res, next) {
     try {
       const { id } = getParams(req);
-      const actorId = req.actor?.userId || 1;
       const dto = new UpdateSubTenantDTO(req.body);
-      const subTenant = await subTenantService.updateSubTenant(id, dto, actorId);
+      const subTenant = await subTenantService.updateSubTenant(id, dto, req.actor);
       sendSuccess(res, subTenant);
     } catch (err) {
       next(err);
@@ -50,8 +48,7 @@ export const subTenantController = {
   async deleteSubTenant(req, res, next) {
     try {
       const { id } = getParams(req);
-      const actorId = req.actor?.userId || 1;
-      const result = await subTenantService.deleteSubTenant(id, actorId);
+      const result = await subTenantService.deleteSubTenant(id, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);

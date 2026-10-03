@@ -104,7 +104,7 @@ export const tenantService = {
   async updateTenant(id, data, actor) {
     if (!isParkAdminActor(actor)) {
       if (!actor || Number(id) !== Number(actor.tenantId)) {
-        throw new AppError('Permission denied: You can only manage your own tenant organization', 403);
+        throw new AppError(`Tenant with ID ${id} not found`, 404);
       }
     }
     const actorId = actor?.userId || 1;

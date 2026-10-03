@@ -19,10 +19,7 @@ export const leaseController = {
   async getLeases(req, res, next) {
     try {
       const queryParams = getQuery(req);
-      if (!isParkAdminActor(req.actor) && req.actor?.tenantId) {
-        queryParams.tenantId = req.actor.tenantId;
-      }
-      const result = await leaseService.getLeases(queryParams);
+      const result = await leaseService.getLeases(queryParams, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -32,10 +29,7 @@ export const leaseController = {
   async getLeaseById(req, res, next) {
     try {
       const { id } = getParams(req);
-      const lease = await leaseService.getLeaseById(id);
-      if (!isParkAdminActor(req.actor) && req.actor?.tenantId && Number(lease?.TenantID) !== Number(req.actor.tenantId)) {
-        throw new AppError(`Lease agreement with ID ${id} not found`, 404);
-      }
+      const lease = await leaseService.getLeaseById(id, req.actor);
       sendSuccess(res, lease);
     } catch (err) {
       next(err);
@@ -45,11 +39,8 @@ export const leaseController = {
   async getExpiringSoon(req, res, next) {
     try {
       const { days } = getQuery(req);
-      const leases = await leaseService.getExpiringSoon(days);
-      const scoped = !isParkAdminActor(req.actor) && req.actor?.tenantId
-        ? (leases || []).filter(l => Number(l.TenantID) === Number(req.actor.tenantId))
-        : leases;
-      sendSuccess(res, scoped);
+      const leases = await leaseService.getExpiringSoon(days, req.actor);
+      sendSuccess(res, leases);
     } catch (err) {
       next(err);
     }
@@ -77,7 +68,7 @@ export const leaseController = {
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
       const dto = new UpdateLeaseDTO(req.body);
-      const lease = await leaseService.updateLease(id, dto, actorId);
+      const lease = await leaseService.updateLease(id, dto, actorId, req.actor);
       sendSuccess(res, lease);
     } catch (err) {
       next(err);
@@ -92,7 +83,7 @@ export const leaseController = {
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
       const dto = new UpdateLeaseStatusDTO(req.body);
-      const lease = await leaseService.updateLeaseStatus(id, dto.Status, dto.TerminationReason, actorId);
+      const lease = await leaseService.updateLeaseStatus(id, dto.Status, dto.TerminationReason, actorId, req.actor);
       sendSuccess(res, lease);
     } catch (err) {
       next(err);
@@ -106,7 +97,7 @@ export const leaseController = {
       }
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
-      const result = await leaseService.deleteLease(id, actorId);
+      const result = await leaseService.deleteLease(id, actorId, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);

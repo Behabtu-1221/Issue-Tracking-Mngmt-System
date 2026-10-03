@@ -7,11 +7,7 @@ export const tenantContactController = {
   async getContacts(req, res, next) {
     try {
       const queryParams = getQuery(req);
-      const isParkAdmin = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN'].includes((req.actor?.userTypeCode || '').toUpperCase());
-      if (!isParkAdmin && req.actor?.tenantId) {
-        queryParams.tenantId = req.actor.tenantId;
-      }
-      const result = await tenantContactService.getContacts(queryParams);
+      const result = await tenantContactService.getContacts(queryParams, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -21,7 +17,7 @@ export const tenantContactController = {
   async getContactById(req, res, next) {
     try {
       const { id } = getParams(req);
-      const contact = await tenantContactService.getContactById(id);
+      const contact = await tenantContactService.getContactById(id, req.actor);
       sendSuccess(res, contact);
     } catch (err) {
       next(err);
@@ -31,13 +27,8 @@ export const tenantContactController = {
   async createContact(req, res, next) {
     try {
       const actorId = req.actor?.userId || 1;
-      const isParkAdmin = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN'].includes((req.actor?.userTypeCode || '').toUpperCase());
-      const payload = { ...req.body };
-      if (!isParkAdmin && req.actor?.tenantId) {
-        payload.TenantID = req.actor.tenantId;
-      }
-      const dto = new CreateTenantContactDTO(payload);
-      const contact = await tenantContactService.createContact(dto, actorId);
+      const dto = new CreateTenantContactDTO(req.body);
+      const contact = await tenantContactService.createContact(dto, actorId, req.actor);
       sendCreated(res, contact);
     } catch (err) {
       next(err);
@@ -49,7 +40,7 @@ export const tenantContactController = {
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
       const dto = new UpdateTenantContactDTO(req.body);
-      const contact = await tenantContactService.updateContact(id, dto, actorId);
+      const contact = await tenantContactService.updateContact(id, dto, actorId, req.actor);
       sendSuccess(res, contact);
     } catch (err) {
       next(err);
@@ -60,7 +51,7 @@ export const tenantContactController = {
     try {
       const { id } = getParams(req);
       const actorId = req.actor?.userId || 1;
-      const result = await tenantContactService.deleteContact(id, actorId);
+      const result = await tenantContactService.deleteContact(id, actorId, req.actor);
       sendSuccess(res, result);
     } catch (err) {
       next(err);

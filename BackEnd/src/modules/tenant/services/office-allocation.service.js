@@ -4,21 +4,40 @@ import leaseRepository from '../repositories/lease.repository.js';
 import AppError from '../../../shared/errors/AppError.js';
 import { query } from '../../../database/connection.js';
 
+const isParkAdminActor = (actor) => {
+  if (!actor) return false;
+  const code = (actor.userTypeCode || '').toUpperCase();
+  const role = (actor.role || actor.primaryRole || '').toUpperCase();
+  const adminCodes = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN', 'ADMIN'];
+  if (adminCodes.includes(code) || adminCodes.includes(role)) return true;
+  if (Array.isArray(actor.roles) && actor.roles.some(r => adminCodes.includes(String(r).toUpperCase()))) return true;
+  if (!actor.tenantId && (code.includes('ADMIN') || role.includes('ADMIN'))) return true;
+  return false;
+};
+
 export const officeAllocationService = {
-  async getAllocations(params) {
-    return officeAllocationRepository.findAll(params);
+  async getAllocations(params = {}, actor) {
+    const filters = { ...params };
+    if (!isParkAdminActor(actor)) {
+      filters.tenantId = actor?.tenantId || -1;
+    }
+    return officeAllocationRepository.findAll(filters);
   },
 
-  async getAllocationById(id) {
+  async getAllocationById(id, actor) {
     const allocation = await officeAllocationRepository.findById(id);
-    if (!allocation) {
+    if (!allocation || (!isParkAdminActor(actor) && Number(allocation.TenantID) !== Number(actor?.tenantId))) {
       throw new AppError(`Office allocation with ID ${id} not found`, 404);
     }
     return allocation;
   },
 
-  async getHistory(params) {
-    return officeAllocationRepository.getHistory(params);
+  async getHistory(params = {}, actor) {
+    const filters = { ...params };
+    if (!isParkAdminActor(actor)) {
+      filters.tenantId = actor?.tenantId || -1;
+    }
+    return officeAllocationRepository.getHistory(filters);
   },
 
   /**
@@ -156,11 +175,8 @@ export const officeAllocationService = {
    * Release an office allocation.
    * Updates office status back to VACANT and records history.
    */
-  async releaseAllocation(id, remarks, userId = 1) {
-    const allocation = await officeAllocationRepository.findById(id);
-    if (!allocation) {
-      throw new AppError(`Office allocation with ID ${id} not found`, 404);
-    }
+  async releaseAllocation(id, remarks, userId = 1, actor) {
+    const allocation = await this.getAllocationById(id, actor);
 
     if (allocation.Status !== 'ACTIVE') {
       throw new AppError(
@@ -194,11 +210,8 @@ export const officeAllocationService = {
    * Delete an office allocation.
    * If ACTIVE, reverts office status back to VACANT and records history.
    */
-  async deleteAllocation(id, userId = 1) {
-    const allocation = await officeAllocationRepository.findById(id);
-    if (!allocation) {
-      throw new AppError(`Office allocation with ID ${id} not found`, 404);
-    }
+  async deleteAllocation(id, userId = 1, actor) {
+    const allocation = await this.getAllocationById(id, actor);
 
     // If allocation is ACTIVE, revert office availability back to VACANT
     if (allocation.Status === 'ACTIVE') {

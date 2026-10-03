@@ -13,21 +13,40 @@ const VALID_LEASE_TRANSITIONS = {
   ACTIVE: ['EXPIRED', 'TERMINATED']
 };
 
+const isParkAdminActor = (actor) => {
+  if (!actor) return false;
+  const code = (actor.userTypeCode || '').toUpperCase();
+  const role = (actor.role || actor.primaryRole || '').toUpperCase();
+  const adminCodes = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN', 'ADMIN'];
+  if (adminCodes.includes(code) || adminCodes.includes(role)) return true;
+  if (Array.isArray(actor.roles) && actor.roles.some(r => adminCodes.includes(String(r).toUpperCase()))) return true;
+  if (!actor.tenantId && (code.includes('ADMIN') || role.includes('ADMIN'))) return true;
+  return false;
+};
+
 export const leaseService = {
-  async getLeases(params) {
-    return leaseRepository.findAll(params);
+  async getLeases(params = {}, actor) {
+    const filters = { ...params };
+    if (!isParkAdminActor(actor)) {
+      filters.tenantId = actor?.tenantId || -1;
+    }
+    return leaseRepository.findAll(filters);
   },
 
-  async getLeaseById(id) {
+  async getLeaseById(id, actor) {
     const lease = await leaseRepository.findById(id);
-    if (!lease) {
+    if (!lease || (!isParkAdminActor(actor) && Number(lease.TenantID) !== Number(actor?.tenantId))) {
       throw new AppError(`Lease agreement with ID ${id} not found`, 404);
     }
     return lease;
   },
 
-  async getExpiringSoon(days) {
-    return leaseRepository.findExpiringSoon(days || 30);
+  async getExpiringSoon(days, actor) {
+    const leases = await leaseRepository.findExpiringSoon(days || 30);
+    if (!isParkAdminActor(actor)) {
+      return (leases || []).filter(l => Number(l.TenantID) === Number(actor?.tenantId));
+    }
+    return leases;
   },
 
   async createLease(data, userId) {
@@ -73,11 +92,8 @@ export const leaseService = {
     return leaseRepository.findById(newId);
   },
 
-  async updateLease(id, data, userId) {
-    const lease = await leaseRepository.findById(id);
-    if (!lease) {
-      throw new AppError(`Lease agreement with ID ${id} not found`, 404);
-    }
+  async updateLease(id, data, userId, actor) {
+    const lease = await this.getLeaseById(id, actor);
 
     // Only DRAFT leases can have their core terms modified
     if (lease.Status !== 'DRAFT') {
@@ -113,11 +129,8 @@ export const leaseService = {
   /**
    * Transition lease status with strict state-machine validation.
    */
-  async updateLeaseStatus(id, newStatus, terminationReason, userId) {
-    const lease = await leaseRepository.findById(id);
-    if (!lease) {
-      throw new AppError(`Lease agreement with ID ${id} not found`, 404);
-    }
+  async updateLeaseStatus(id, newStatus, terminationReason, userId, actor) {
+    const lease = await this.getLeaseById(id, actor);
 
     const currentStatus = lease.Status;
     const allowed = VALID_LEASE_TRANSITIONS[currentStatus];
@@ -165,11 +178,8 @@ export const leaseService = {
     return leaseRepository.updateStatus(id, newStatus, terminationReason, userId);
   },
 
-  async deleteLease(id, userId) {
-    const lease = await leaseRepository.findById(id);
-    if (!lease) {
-      throw new AppError(`Lease agreement with ID ${id} not found`, 404);
-    }
+  async deleteLease(id, userId, actor) {
+    const lease = await this.getLeaseById(id, actor);
 
     // Only DRAFT leases can be deleted
     if (lease.Status !== 'DRAFT') {
