@@ -20,6 +20,7 @@ import userAccountRepository from '../repositories/userAccount.repository.js';
 import userRepository from '../repositories/user.repository.js';
 import userSessionRepository from '../repositories/userSession.repository.js';
 import loginHistoryRepository from '../repositories/loginHistory.repository.js';
+import passwordResetTokenRepository from '../repositories/passwordResetToken.repository.js';
 
 const buildTokenPayload = (account, sessionId) => ({
   userId: account.UserID,
@@ -405,157 +406,78 @@ class AuthService {
 
   async forgotPassword(usernameOrEmail) {
     const identifier = (usernameOrEmail || '').trim();
-    const account = await userAccountRepository.findByUsername(identifier);
+    const account = identifier ? await userAccountRepository.findByUsername(identifier) : null;
 
-    // Standard security practice: return neutral message to prevent username enumeration
-    if (!account || !account.Email) {
+    // Timing attack defense: perform dummy bcrypt work if account not found
+    if (!account || !account.Email || !account.IsActive) {
+      await bcrypt.hash('dummy_timing_mitigation_secret_value', 10);
       return {
-        message: 'If an account matching the provided credentials exists, recovery instructions and temporary access details have been sent to the registered email address.'
+        message: 'If an account matching the provided credentials exists, password recovery instructions have been sent to the registered email address.'
       };
     }
 
-    // 1. Generate strong compliant temporary password & hash it
-    const temporaryPassword = generateSecureTemporaryPassword();
-    const tempPasswordHash = await bcrypt.hash(temporaryPassword, 10);
+    // 1. Generate cryptographically secure random token (32 bytes = 64 hex characters)
+    const rawResetToken = crypto.randomBytes(32).toString('hex');
+    const hashedResetToken = hashToken(rawResetToken);
 
-    // 2. Update user account: set temporary password, flag MUST_CHANGE_PASSWORD, clear lockout
-    await db.query(
-      `UPDATE UserAccount
-       SET PasswordHash = ?,
-           AccountStatusCode = 'MUST_CHANGE_PASSWORD',
-           FailedLoginAttempts = 0,
-           LockoutEndDateTime = NULL,
-           IsActive = 1,
-           ModifiedBy = ?,
-           ModifiedDate = CURRENT_TIMESTAMP(6)
-       WHERE UserAccountID = ?`,
-      [tempPasswordHash, account.UserID || account.UserAccountID, account.UserAccountID]
-    );
+    // 2. Invalidate old tokens and store hashed token in database with 15-minute expiry
+    await passwordResetTokenRepository.create({
+      userAccountId: account.UserAccountID,
+      hashedToken: hashedResetToken,
+      expiryMinutes: 15,
+      actorUserId: account.UserID || account.UserAccountID
+    });
 
-    // 3. Invalidate all active sessions for security
-    await userSessionRepository.revokeAllForAccount(account.UserAccountID, account.UserID || account.UserAccountID);
-
-    // 4. Generate direct 1-click reset token (30 minutes expiry)
-    const resetToken = jwt.sign(
-      { userAccountId: account.UserAccountID, username: account.Username, type: 'PASSWORD_RESET' },
-      process.env.JWT_SECRET || 'secret-key-12345',
-      { expiresIn: '30m' }
-    );
-
-    // 5. Build and send professional instructions email to registered email
+    // 3. Dispatch reset link with raw token ONLY by email
     try {
       const emailServiceModule = await import('../../notification/services/email.service.js');
       const emailService = emailServiceModule.default || emailServiceModule.emailService;
 
       const clientBaseUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-      const loginUrl = `${clientBaseUrl}/?username=${encodeURIComponent(account.Username)}`;
-      const resetUrl = `${clientBaseUrl}/reset-password?token=${resetToken}`;
+      const resetUrl = `${clientBaseUrl}/reset-password?token=${rawResetToken}`;
       const fullName = account.FirstName
         ? `${account.FirstName} ${account.LastName || ''}`.trim()
         : account.Username;
 
-      const emailSubject = '🔐 Enterprise ITMS — Password Reset & Temporary Credentials';
+      const emailSubject = '🔐 Enterprise ITMS — Password Reset Request';
       const emailBody = emailService.wrapInHtmlEmail(
-        'Password Reset & Access Recovery',
+        'Password Reset Request',
         `
         <div style="font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;line-height:1.6">
           <p style="font-size:15px;margin-top:0">Dear <strong>${fullName}</strong>,</p>
           <p style="font-size:14px;color:#334155">
-            A password reset request was received for your Enterprise ITMS account. As part of our identity verification and security protocol, your password has been reset to a secure temporary credential.
+            We received a request to reset the password for your Enterprise ITMS account (<strong>${account.Username}</strong>).
           </p>
-
-          <!-- Account Details Box -->
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px;margin:20px 0">
-            <table style="width:100%;font-size:13px;border-collapse:collapse">
-              <tr>
-                <td style="padding:6px 0;color:#64748b;width:140px"><strong>Username:</strong></td>
-                <td style="padding:6px 0;color:#0f172a;font-weight:600;font-family:monospace;font-size:14px">${account.Username}</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0;color:#64748b"><strong>Registered Email:</strong></td>
-                <td style="padding:6px 0;color:#0f172a">${account.Email}</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0;color:#64748b"><strong>Request Date:</strong></td>
-                <td style="padding:6px 0;color:#0f172a">${new Date().toUTCString()}</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0;color:#64748b"><strong>Security Status:</strong></td>
-                <td style="padding:6px 0"><span style="background:rgba(234,179,8,0.15);color:#b45309;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700">MANDATORY UPDATE REQUIRED</span></td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- Temporary Credential Banner -->
-          <div style="background:linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%);border:2px dashed #6366f1;border-radius:12px;padding:22px;text-align:center;margin:24px 0">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4f46e5;margin-bottom:8px">
-              Your Temporary Password
-            </div>
-            <div style="font-family:'Courier New',Courier,monospace;font-size:24px;font-weight:800;letter-spacing:2px;color:#1e1b4b;background:#ffffff;padding:12px 24px;border-radius:8px;display:inline-block;border:1px solid #c7d2fe;box-shadow:0 2px 8px rgba(99,102,241,0.15)">
-              ${temporaryPassword}
-            </div>
-            <div style="font-size:12px;color:#6366f1;margin-top:10px;font-weight:600">
-              ⚠️ For your security, this temporary password must be changed immediately upon login.
-            </div>
-          </div>
-
-          <!-- Step-by-Step Instructions -->
-          <h4 style="margin:24px 0 12px;color:#0f172a;font-size:15px;display:flex;align-items:center;gap:8px">
-            📋 Instructions to Complete Your Sign-In:
-          </h4>
-          <ol style="padding-left:20px;margin:0 0 24px;font-size:13.5px;color:#334155;line-height:1.8">
-            <li>Click the primary button below to navigate to the <strong>Enterprise ITMS Sign In</strong> portal.</li>
-            <li>Log in using your username (<code>${account.Username}</code>) and the temporary password above.</li>
-            <li>Because your account is flagged for mandatory password update, you will be automatically directed to the <strong>Password Change</strong> screen.</li>
-            <li>Enter your temporary password as the current password, then type and confirm your new permanent password.</li>
-            <li>Once submitted, your temporary password is permanently revoked, and you will enter the system with full access.</li>
-          </ol>
-
-          <!-- Primary CTA Button -->
+          <p style="font-size:14px;color:#334155">
+            Click the button below to choose a new password. This secure link is valid for <strong>15 minutes</strong> and can only be used once.
+          </p>
           <div style="text-align:center;margin:28px 0">
-            <a href="${loginUrl}" style="background:linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%);color:#ffffff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;box-shadow:0 6px 20px rgba(2,132,199,0.35)">
-              Sign In With Temporary Password ➔
+            <a href="${resetUrl}" style="background:linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%);color:#ffffff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;box-shadow:0 6px 20px rgba(2,132,199,0.35)">
+              Reset Password ➔
             </a>
           </div>
-
-          <!-- Direct Reset Option Divider -->
-          <div style="border-top:1px solid #e2e8f0;margin:28px 0 20px;padding-top:20px;text-align:center">
-            <p style="font-size:12px;color:#64748b;margin:0 0 10px">
-              Prefer to set your permanent password directly without logging in first?
-            </p>
-            <a href="${resetUrl}" style="color:#0284c7;font-weight:600;font-size:13px;text-decoration:underline">
-              Click here to set your new password directly (Valid for 30 minutes)
-            </a>
-          </div>
-
-          <!-- Security Advisory -->
+          <p style="font-size:12px;color:#64748b">
+            If the button doesn't work, copy and paste this link into your browser:<br/>
+            <span style="word-break:break-all;color:#0284c7">${resetUrl}</span>
+          </p>
           <div style="background:#fef2f2;border:1px solid #fee2e2;border-radius:8px;padding:12px 16px;margin-top:24px;font-size:12px;color:#991b1b">
-            <strong>Security Notice:</strong> If you did not initiate this request, please contact your Enterprise IT Security Administrator immediately. Do not share this temporary password with anyone.
+            <strong>Security Notice:</strong> If you did not request this password reset, please ignore this email or contact your administrator. Your password will remain unchanged.
           </div>
         </div>
         `
       );
 
       const plainText = `
-Enterprise ITMS — Password Reset & Temporary Credentials
+Enterprise ITMS — Password Reset Request
 
 Dear ${fullName},
 
-A password reset request was received for your account (${account.Username}).
-Your password has been reset to the following temporary password:
-
-Temporary Password: ${temporaryPassword}
-
-Instructions:
-1. Open the login portal at ${loginUrl}
-2. Sign in with username: "${account.Username}" and the temporary password above.
-3. You will be prompted immediately to set your new secure permanent password.
-
-Or reset your password directly within 30 minutes via:
+We received a request to reset your password.
+Use the link below to set a new password within 15 minutes:
 ${resetUrl}
 
-If you did not request this, please contact your IT Administrator immediately.
-      `;
+If you did not request this, please ignore this email.
+      `.trim();
 
       await emailService.sendEmail({
         to: account.Email,
@@ -563,39 +485,77 @@ If you did not request this, please contact your IT Administrator immediately.
         html: emailBody,
         text: plainText
       });
-      console.log(`📧 Successfully dispatched password reset & temporary credentials to ${account.Email} (${account.Username})`);
     } catch (err) {
-      console.error('📧 Error dispatching password reset email:', err);
+      console.error('Email dispatch error in forgotPassword:', err.message);
     }
 
     return {
-      message: 'If an account matching the provided credentials exists, recovery instructions and temporary access details have been sent to the registered email address.'
+      message: 'If an account matching the provided credentials exists, password recovery instructions have been sent to the registered email address.'
     };
   }
 
-  async resetPassword(token, newPassword) {
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret-key-12345');
-    } catch (err) {
+  async resetPassword(rawToken, newPassword) {
+    if (!rawToken || typeof rawToken !== 'string') {
       throw new AppError('Invalid or expired reset token', 400);
     }
 
-    if (decoded.type !== 'PASSWORD_RESET') {
-      throw new AppError('Invalid reset token type', 400);
+    // 1. Hash incoming token with SHA-256 to look up in DB
+    const hashedToken = hashToken(rawToken);
+    const tokenRecord = await passwordResetTokenRepository.findByHashedToken(hashedToken);
+
+    if (!tokenRecord) {
+      throw new AppError('Invalid or expired reset token', 400);
     }
 
-    const newHash = await bcrypt.hash(newPassword, 10);
-    await userAccountRepository.updatePassword(decoded.userAccountId, newHash, decoded.userAccountId);
+    // 2. Check if already used or deleted
+    if (tokenRecord.IsUsed || tokenRecord.IsDeleted) {
+      throw new AppError('This password reset link has already been used or invalidated. Please request a new one.', 400);
+    }
 
+    // 3. Check expiration
+    if (new Date(tokenRecord.ExpiryDateTime) <= new Date()) {
+      await passwordResetTokenRepository.markUsed(tokenRecord.PasswordResetTokenID, tokenRecord.UserID || tokenRecord.UserAccountID);
+      throw new AppError('This password reset link has expired. Please request a new one.', 400);
+    }
+
+    // 4. Validate user account status
+    if (!tokenRecord.AccountIsActive || tokenRecord.AccountStatusCode === ACCOUNT_STATUS.SUSPENDED) {
+      throw new AppError('User account is inactive or suspended', 403);
+    }
+
+    // 5. Enforce password complexity policy
+    const passwordPolicyRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,128}$/;
+    if (!passwordPolicyRegex.test(newPassword)) {
+      throw new AppError('Password must be 8-128 characters long and include uppercase, lowercase, number, and special character (@$!%*?&#)', 400);
+    }
+
+    // 6. Hash new password with bcrypt (10 rounds)
+    const newHash = await bcrypt.hash(newPassword, 10);
+    const actorId = tokenRecord.UserID || tokenRecord.UserAccountID;
+
+    // 7. Update password and activate account
+    await userAccountRepository.updatePassword(tokenRecord.UserAccountID, newHash, actorId);
     await db.query(
-      `UPDATE UserAccount SET AccountStatusCode = 'ACTIVE', ModifiedBy = ?, ModifiedDate = CURRENT_TIMESTAMP(6) WHERE UserAccountID = ?`,
-      [decoded.userAccountId, decoded.userAccountId]
+      `UPDATE UserAccount
+       SET AccountStatusCode = 'ACTIVE',
+           FailedLoginAttempts = 0,
+           LockoutEndDateTime = NULL,
+           ModifiedBy = ?,
+           ModifiedDate = CURRENT_TIMESTAMP(6)
+       WHERE UserAccountID = ?`,
+      [actorId, tokenRecord.UserAccountID]
     );
 
-    await userSessionRepository.revokeAllForAccount(decoded.userAccountId, decoded.userAccountId);
+    // 8. Mark token used (single-use) and invalidate all other pending reset tokens
+    await passwordResetTokenRepository.markUsed(tokenRecord.PasswordResetTokenID, actorId);
+    await passwordResetTokenRepository.invalidateAllForAccount(tokenRecord.UserAccountID, actorId);
 
-    return { message: 'Password has been reset successfully. You may now sign in with your new password.' };
+    // 9. Invalidate all existing active sessions / refresh tokens
+    await userSessionRepository.revokeAllForAccount(tokenRecord.UserAccountID, actorId);
+
+    return {
+      message: 'Password has been reset successfully. You may now sign in with your new password.'
+    };
   }
 
   async updateProfile(userId, profileData) {

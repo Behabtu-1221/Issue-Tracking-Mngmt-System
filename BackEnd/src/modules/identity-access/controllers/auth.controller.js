@@ -44,7 +44,8 @@ const authController = {
   }),
 
   forgotPassword: asyncHandler(async (req, res) => {
-    const result = await authService.forgotPassword(req.body.username);
+    const identifier = req.body.username || req.body.email;
+    const result = await authService.forgotPassword(identifier);
     sendSuccess(res, result);
   }),
 
