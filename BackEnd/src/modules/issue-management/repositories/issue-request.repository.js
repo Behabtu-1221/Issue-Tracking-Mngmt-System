@@ -1,4 +1,5 @@
 import { query } from '../../../database/connection.js';
+import { OptimisticLockError, NotFoundError } from '../../../shared/errors/AppError.js';
 
 function applyDataScopeSQL(dataScope, baseSql, params) {
   if (!dataScope) return { sql: baseSql, params };
@@ -51,6 +52,7 @@ export const issueRequestRepository = {
     const offset = (page - 1) * limit;
     let sql = `
       SELECT ir.*,
+        CAST(ir.RowVersion AS CHAR) AS RowVersion,
         t.CompanyName AS TenantName,
         s.ServiceName,
         sc.CategoryName,
@@ -161,9 +163,10 @@ export const issueRequestRepository = {
   /**
    * Find issue request by ID with full details.
    */
-  async findById(id, dataScope) {
+  async findById(id, dataScope = null, tx = null) {
     let sql = `
       SELECT ir.*,
+        CAST(ir.RowVersion AS CHAR) AS RowVersion,
         t.CompanyName AS TenantName,
         s.ServiceName,
         s.ServiceCode,
@@ -205,18 +208,20 @@ export const issueRequestRepository = {
     let params = [id];
 
     const scoped = applyDataScopeSQL(dataScope, sql, params);
-    const rows = await query(scoped.sql, scoped.params);
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const rows = await runner(scoped.sql, scoped.params);
     return rows[0] || null;
   },
 
   /**
    * Generate next unique RequestNumber (e.g. REQ-20260727-0001).
    */
-  async generateRequestNumber() {
+  async generateRequestNumber(tx = null) {
     const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const prefix = `REQ-${todayStr}-`;
     const sql = `SELECT RequestNumber FROM IssueRequest WHERE RequestNumber LIKE ? ORDER BY IssueRequestID DESC LIMIT 1`;
-    const rows = await query(sql, [`${prefix}%`]);
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const rows = await runner(sql, [`${prefix}%`]);
 
     let seq = 1;
     if (rows.length > 0) {
@@ -230,19 +235,21 @@ export const issueRequestRepository = {
   },
 
   /**
-   * Create a new issue request.
+   * Create a new issue request within an optional transaction.
    */
-  async create(data) {
-    const requestNumber = await this.generateRequestNumber();
+  async create(data, tx = null) {
+    const requestNumber = await this.generateRequestNumber(tx);
     const sql = `
       INSERT INTO IssueRequest (
         TenantID, ServiceID, RequestNumber, Title, Description, RequestTypeCode,
         PriorityCode, StatusCode, RequestChannelCode, CategoryCode, SubCategoryCode,
         RequestSourceCode, RequesterUserID, BuildingID, OfficeSpaceID, AssignedDepartmentID,
-        TargetResolutionDateTime, IsMajorIncident, CustomFieldsDataJson, CreatedBy
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        TargetResolutionDateTime, ResponseDueAt, ResolutionDueAt,
+        IsMajorIncident, CustomFieldsDataJson, CreatedBy
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const result = await query(sql, [
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const result = await runner(sql, [
       data.TenantID ?? null,
       data.ServiceID,
       requestNumber,
@@ -260,18 +267,23 @@ export const issueRequestRepository = {
       data.OfficeSpaceID ?? null,
       data.AssignedDepartmentID ?? null,
       data.TargetResolutionDateTime ?? null,
+      data.ResponseDueAt ?? null,
+      data.ResolutionDueAt ?? null,
       data.IsMajorIncident !== undefined ? Number(data.IsMajorIncident) : 0,
       data.CustomFieldsDataJson ? JSON.stringify(data.CustomFieldsDataJson) : null,
       data.CreatedBy || data.RequesterUserID || 1
     ]);
-    return this.findById(result.insertId);
+    return this.findById(result.insertId, null, tx);
   },
 
   /**
-   * Update issue request fields.
+   * Update issue request fields with optional optimistic locking via expectedRowVersion.
    */
-  async update(id, data) {
-    const sql = `
+  async update(id, data, tx = null) {
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const expectedRowVersion = data.expectedRowVersion || data.RowVersion || null;
+
+    let sql = `
       UPDATE IssueRequest SET
         Title = COALESCE(?, Title),
         Description = COALESCE(?, Description),
@@ -284,12 +296,18 @@ export const issueRequestRepository = {
         CancellationReason = COALESCE(?, CancellationReason),
         ActualResolutionDateTime = COALESCE(?, ActualResolutionDateTime),
         ClosedDateTime = COALESCE(?, ClosedDateTime),
+        ResponseDueAt = COALESCE(?, ResponseDueAt),
+        ResolutionDueAt = COALESCE(?, ResolutionDueAt),
+        SLAWarningSentAt = COALESCE(?, SLAWarningSentAt),
+        SLAResponseBreachedAt = COALESCE(?, SLAResponseBreachedAt),
+        SLAResolutionBreachedAt = COALESCE(?, SLAResolutionBreachedAt),
         CustomFieldsDataJson = COALESCE(?, CustomFieldsDataJson),
         ModifiedBy = ?,
         ModifiedDate = CURRENT_TIMESTAMP(6)
       WHERE IssueRequestID = ? AND IsDeleted = 0
     `;
-    await query(sql, [
+
+    const params = [
       data.Title ?? null,
       data.Description ?? null,
       data.PriorityCode ?? null,
@@ -301,17 +319,41 @@ export const issueRequestRepository = {
       data.CancellationReason ?? null,
       data.ActualResolutionDateTime ?? null,
       data.ClosedDateTime ?? null,
+      data.ResponseDueAt ?? null,
+      data.ResolutionDueAt ?? null,
+      data.SLAWarningSentAt ?? null,
+      data.SLAResponseBreachedAt ?? null,
+      data.SLAResolutionBreachedAt ?? null,
       data.CustomFieldsDataJson ? JSON.stringify(data.CustomFieldsDataJson) : null,
       data.ModifiedBy || 1,
       id
-    ]);
-    return this.findById(id);
+    ];
+
+    if (expectedRowVersion) {
+      sql += ` AND RowVersion = ?`;
+      params.push(expectedRowVersion);
+    }
+
+    const result = await runner(sql, params);
+
+    // Optimistic concurrency check: if 0 rows modified, verify cause
+    if (result.affectedRows === 0 && expectedRowVersion) {
+      const existing = await runner(`SELECT IssueRequestID FROM IssueRequest WHERE IssueRequestID = ? AND IsDeleted = 0`, [id]);
+      if (existing && existing.length > 0) {
+        throw new OptimisticLockError(`Issue request #${id} was updated by another concurrent transaction. Please reload.`);
+      } else {
+        throw new NotFoundError(`Issue request with ID ${id} not found.`);
+      }
+    }
+
+    return this.findById(id, null, tx);
   },
 
   /**
    * Soft delete an issue request.
    */
-  async softDelete(id, userId) {
+  async softDelete(id, userId, tx = null) {
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
     const sql = `
       UPDATE IssueRequest SET
         IsDeleted = 1,
@@ -319,7 +361,7 @@ export const issueRequestRepository = {
         DeletedDate = CURRENT_TIMESTAMP(6)
       WHERE IssueRequestID = ? AND IsDeleted = 0
     `;
-    await query(sql, [userId || 1, id]);
+    await runner(sql, [userId || 1, id]);
     return true;
   },
 

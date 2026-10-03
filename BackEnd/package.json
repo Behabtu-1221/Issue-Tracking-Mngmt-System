@@ -3,7 +3,10 @@
     "scripts": {
         "dev": "nodemon index.js",
         "start": "node index.js",
-        "test": "node tests/security-hardening.test.js && node tests/authorization-isolation.test.js"
+        "migrate": "node src/database/migrator.js migrate",
+        "migrate:status": "node src/database/migrator.js status",
+        "migrate:check": "node src/database/migrator.js check",
+        "test": "node tests/security-hardening.test.js && node tests/authorization-isolation.test.js && node tests/system-integrity.test.js"
     },
     "dependencies": {
         "bcryptjs": "^3.0.3",

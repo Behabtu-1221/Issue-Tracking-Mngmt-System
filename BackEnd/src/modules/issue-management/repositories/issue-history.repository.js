@@ -12,13 +12,13 @@ export const issueHistoryRepository = {
     return query(sql, [issueRequestId]);
   },
 
-  async create(data) {
+  async create(data, tx = null) {
     const sql = `
       INSERT INTO IssueRequestHistory (
         IssueRequestID, UserID, FieldName, OldValue, NewValue, ActionTypeCode, Remarks, CreatedBy
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const result = await query(sql, [
+    const params = [
       data.IssueRequestID,
       data.UserID || 1,
       data.FieldName ?? null,
@@ -27,7 +27,9 @@ export const issueHistoryRepository = {
       data.ActionTypeCode || 'DETAILS_MODIFIED',
       data.Remarks ?? null,
       data.CreatedBy || data.UserID || 1
-    ]);
+    ];
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const result = await runner(sql, params);
     return result.insertId;
   }
 };

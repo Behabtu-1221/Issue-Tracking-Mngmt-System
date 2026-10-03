@@ -3,8 +3,9 @@ import issueRequestRepository from '../../issue-management/repositories/issue-re
 import issueHistoryRepository from '../../issue-management/repositories/issue-history.repository.js';
 import { notificationService } from '../../notification/services/notification.service.js';
 import { slaClockService } from '../../sla/services/sla-clock.service.js';
-import { query } from '../../../database/connection.js';
-import AppError from '../../../shared/errors/AppError.js';
+import AppError, { OptimisticLockError } from '../../../shared/errors/AppError.js';
+import unitOfWork from '../../../shared/database/unitOfWork.js';
+import outboxService from '../../../shared/outbox/outbox.service.js';
 
 export const assignmentService = {
   async getUserDepartmentId(userId) {
@@ -150,82 +151,87 @@ export const assignmentService = {
     }
 
     // 5. Transactional Execution: Create / Update Assignment
-    const existing = await assignmentRepository.findByRequestId(RequestID);
-    let assignmentId;
-    const now = new Date();
+    const expectedRowVersion = Remarks?.expectedRowVersion || issue.RowVersion || null;
 
-    if (existing) {
-      assignmentId = existing.AssignmentID;
-      await assignmentRepository.updateAssignment(assignmentId, {
-        AssignedUserID: AssignedUserID || null,
-        AssignedTeamID: AssignedTeamID || null,
-        AssignmentStatusCode: 'ASSIGNED',
+    return await unitOfWork.execute(async (tx) => {
+      const existing = await assignmentRepository.findByRequestId(RequestID);
+      let assignmentId;
+      const now = new Date();
+
+      if (existing) {
+        assignmentId = existing.AssignmentID;
+        await assignmentRepository.updateAssignment(assignmentId, {
+          AssignedUserID: AssignedUserID || null,
+          AssignedTeamID: AssignedTeamID || null,
+          AssignmentStatusCode: 'ASSIGNED',
+          ModifiedBy: actionUserId
+        }, tx);
+      } else {
+        assignmentId = await assignmentRepository.createAssignment({
+          RequestID,
+          AssignedUserID: AssignedUserID || null,
+          AssignedTeamID: AssignedTeamID || null,
+          AssignmentStatusCode: 'ASSIGNED',
+          CreatedBy: actionUserId
+        }, tx);
+      }
+
+      // 6. Transition IssueRequest to ASSIGNED with Optimistic Locking check
+      await issueRequestRepository.update(RequestID, {
+        StatusCode: 'ASSIGNED',
+        expectedRowVersion,
         ModifiedBy: actionUserId
-      });
-    } else {
-      assignmentId = await assignmentRepository.createAssignment({
-        RequestID,
-        AssignedUserID: AssignedUserID || null,
-        AssignedTeamID: AssignedTeamID || null,
-        AssignmentStatusCode: 'ASSIGNED',
+      }, tx);
+
+      const assignTargetDesc = AssignedUserID ? `Technician ${technicianName} (#${AssignedUserID})` : `Technical Team '${teamName}' (#${AssignedTeamID})`;
+      const assignRemarks = Remarks || `Assigned to ${assignTargetDesc} by department manager/dispatcher.`;
+
+      // 7. Audit Histories
+      await assignmentRepository.createHistory({
+        AssignmentID: assignmentId,
+        ActionUserID: actionUserId,
+        ActionTypeCode: 'ASSIGNED_MANUALLY',
+        Remarks: assignRemarks,
         CreatedBy: actionUserId
+      }, tx);
+
+      await issueHistoryRepository.create({
+        IssueRequestID: RequestID,
+        UserID: actionUserId,
+        FieldName: 'StatusCode',
+        OldValue: 'APPROVED',
+        NewValue: 'ASSIGNED',
+        ActionTypeCode: 'ASSIGNED',
+        Remarks: assignRemarks
+      }, tx);
+
+      // 8. Start / update SLA timers
+      try {
+        await slaClockService.startClockForIssue(RequestID, 1, issue.PriorityCode || 'MEDIUM', actionUserId);
+      } catch (slaErr) {
+        console.warn('SLA Clock notice upon assignment:', slaErr.message);
+      }
+
+      // 9. Notify Assigned Technician / Team & Requester via Transactional Outbox
+      await outboxService.emit(tx, {
+        aggregateType: 'Assignment',
+        aggregateId: assignmentId,
+        eventType: 'ISSUE_ASSIGNED',
+        payload: {
+          issue,
+          requestId: RequestID,
+          title: issue.Title,
+          requestNumber: issue.RequestNumber,
+          priority: issue.PriorityCode,
+          assignedUserId: AssignedUserID || null,
+          assignedTeamId: AssignedTeamID || null,
+          remarks: Remarks,
+          actorUserId: actionUserId
+        }
       });
-    }
 
-    // 6. Transition IssueRequest to ASSIGNED
-    await query(
-      `UPDATE IssueRequest SET StatusCode = 'ASSIGNED', ModifiedBy = ?, ModifiedDate = CURRENT_TIMESTAMP(6) WHERE IssueRequestID = ?`,
-      [actionUserId, RequestID]
-    );
-
-    const assignTargetDesc = AssignedUserID ? `Technician ${technicianName} (#${AssignedUserID})` : `Technical Team '${teamName}' (#${AssignedTeamID})`;
-    const assignRemarks = Remarks || `Assigned to ${assignTargetDesc} by department manager/dispatcher.`;
-
-    // 7. Audit Histories
-    await assignmentRepository.createHistory({
-      AssignmentID: assignmentId,
-      ActionUserID: actionUserId,
-      ActionTypeCode: 'ASSIGNED_MANUALLY',
-      Remarks: assignRemarks,
-      CreatedBy: actionUserId
+      return assignmentRepository.findById(assignmentId);
     });
-
-    await issueHistoryRepository.create({
-      IssueRequestID: RequestID,
-      UserID: actionUserId,
-      FieldName: 'StatusCode',
-      OldValue: 'APPROVED',
-      NewValue: 'ASSIGNED',
-      ActionTypeCode: 'ASSIGNED',
-      Remarks: assignRemarks
-    });
-
-    // 8. Start / update SLA timers
-    try {
-      await slaClockService.startClockForIssue(RequestID, 1, issue.PriorityCode || 'MEDIUM', actionUserId);
-    } catch (slaErr) {
-      console.warn('SLA Clock notice upon assignment:', slaErr.message);
-    }
-
-    // 9. Notify Assigned Technician / Team & Requester via Centralized Event
-    try {
-      await notificationService.notifyEvent('ISSUE_ASSIGNED', {
-        issue,
-        requestId: RequestID,
-        title: issue.Title,
-        requestNumber: issue.RequestNumber,
-        priority: issue.PriorityCode,
-        assignedUserId: AssignedUserID || null,
-        assignedTeamId: AssignedTeamID || null,
-        remarks: Remarks,
-        TriggeredByTable: 'Assignment',
-        TriggeredByID: assignmentId
-      }, actionUserId);
-    } catch (notifErr) {
-      console.warn('Assignment notification notice:', notifErr.message);
-    }
-
-    return assignmentRepository.findById(assignmentId);
   },
 
   async autoAssign(RequestID, actionUserId = 1) {
@@ -380,78 +386,83 @@ export const assignmentService = {
 
     const workNotes = typeof bodyOrNotes === 'string' ? bodyOrNotes : (bodyOrNotes?.workNotes || bodyOrNotes?.ResolutionSummary || 'Field work completed successfully by technician');
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const expectedRowVersion = typeof bodyOrNotes === 'object' ? (bodyOrNotes?.expectedRowVersion || bodyOrNotes?.RowVersion) : null;
 
-    await assignmentRepository.updateAssignment(assignmentId, {
-      AssignmentStatusCode: 'COMPLETED',
-      CompleteDateTime: now,
-      ModifiedBy: userId
-    });
+    return await unitOfWork.execute(async (tx) => {
+      await assignmentRepository.updateAssignment(assignmentId, {
+        AssignmentStatusCode: 'COMPLETED',
+        CompleteDateTime: now,
+        ModifiedBy: userId
+      }, tx);
 
-    // Update IssueRequest status to RESOLVED
-    await query(
-      `UPDATE IssueRequest SET StatusCode = 'RESOLVED', ActualResolutionDateTime = ?, ModifiedBy = ?, ModifiedDate = CURRENT_TIMESTAMP(6) WHERE IssueRequestID = ?`,
-      [now, userId, assignment.RequestID]
-    );
+      // Update IssueRequest status to RESOLVED with optimistic concurrency check
+      await issueRequestRepository.update(assignment.RequestID, {
+        StatusCode: 'RESOLVED',
+        ActualResolutionDateTime: now,
+        expectedRowVersion,
+        ModifiedBy: userId
+      }, tx);
 
-    // If structured resolution details were provided, insert into Resolution table
-    if (typeof bodyOrNotes === 'object' && bodyOrNotes !== null && bodyOrNotes.ResolutionSummary) {
-      try {
-        await query(
-          `INSERT INTO Resolution (IssueRequestID, ResolverUserID, ResolutionTypeCode, ResolutionSummary, ActionStepsTaken, VerificationNotes, CreatedBy)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [
-            assignment.RequestID,
-            userId,
-            bodyOrNotes.ResolutionTypeCode || 'PERMANENT_FIX',
-            bodyOrNotes.ResolutionSummary,
-            bodyOrNotes.ActionStepsTaken || null,
-            bodyOrNotes.VerificationNotes || null,
-            userId
-          ]
-        );
-      } catch (resErr) {
-        console.warn('Optional Resolution insert warning:', resErr.message);
+      // If structured resolution details were provided, insert into Resolution table
+      if (typeof bodyOrNotes === 'object' && bodyOrNotes !== null && bodyOrNotes.ResolutionSummary) {
+        try {
+          await tx.query(
+            `INSERT INTO Resolution (IssueRequestID, ResolverUserID, ResolutionTypeCode, ResolutionSummary, ActionStepsTaken, VerificationNotes, CreatedBy)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [
+              assignment.RequestID,
+              userId,
+              bodyOrNotes.ResolutionTypeCode || 'PERMANENT_FIX',
+              bodyOrNotes.ResolutionSummary,
+              bodyOrNotes.ActionStepsTaken || null,
+              bodyOrNotes.VerificationNotes || null,
+              userId
+            ]
+          );
+        } catch (resErr) {
+          console.warn('Optional Resolution insert warning:', resErr.message);
+        }
       }
-    }
 
-    await assignmentRepository.createHistory({
-      AssignmentID: assignmentId,
-      ActionUserID: userId,
-      ActionTypeCode: 'WORK_COMPLETED',
-      Remarks: workNotes,
-      CreatedBy: userId
+      await assignmentRepository.createHistory({
+        AssignmentID: assignmentId,
+        ActionUserID: userId,
+        ActionTypeCode: 'WORK_COMPLETED',
+        Remarks: workNotes,
+        CreatedBy: userId
+      }, tx);
+
+      await issueHistoryRepository.create({
+        IssueRequestID: assignment.RequestID,
+        UserID: userId,
+        FieldName: 'StatusCode',
+        OldValue: 'IN_PROGRESS',
+        NewValue: 'RESOLVED',
+        ActionTypeCode: 'STATUS_CHANGED',
+        Remarks: `Work completed by technician. ${workNotes}`
+      }, tx);
+
+      // Stop SLA clock on resolution
+      try {
+        await slaClockService.stopClockForIssue(assignment.RequestID, userId);
+      } catch (slaErr) {
+        console.warn('SLA Clock stop notice on resolution:', slaErr.message);
+      }
+
+      // Enqueue notification via Transactional Outbox
+      await outboxService.emit(tx, {
+        aggregateType: 'IssueRequest',
+        aggregateId: assignment.RequestID,
+        eventType: 'ISSUE_RESOLVED',
+        payload: {
+          requestId: assignment.RequestID,
+          remarks: workNotes,
+          actorUserId: userId
+        }
+      });
+
+      return assignmentRepository.findById(assignmentId);
     });
-
-    await issueHistoryRepository.create({
-      IssueRequestID: assignment.RequestID,
-      UserID: userId,
-      FieldName: 'StatusCode',
-      OldValue: 'IN_PROGRESS',
-      NewValue: 'RESOLVED',
-      ActionTypeCode: 'STATUS_CHANGED',
-      Remarks: `Work completed by technician. ${workNotes}`
-    });
-
-    // Stop SLA clock on resolution
-    try {
-      await slaClockService.stopClockForIssue(assignment.RequestID, userId);
-    } catch (slaErr) {
-      console.warn('SLA Clock stop notice on resolution:', slaErr.message);
-    }
-
-    // Notify requester & supervisor via Centralized Event
-    try {
-      await notificationService.notifyEvent('ISSUE_RESOLVED', {
-        requestId: assignment.RequestID,
-        remarks: workNotes,
-        TriggeredByTable: 'IssueRequest',
-        TriggeredByID: assignment.RequestID
-      }, userId);
-    } catch (notifErr) {
-      console.warn('Resolution notification notice:', notifErr.message);
-    }
-
-    return assignmentRepository.findById(assignmentId);
   },
 
   async escalateWork(assignmentId, { reason, details }, userId = 1) {

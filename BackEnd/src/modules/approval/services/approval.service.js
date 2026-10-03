@@ -8,8 +8,9 @@ import issueRequestRepository from '../../issue-management/repositories/issue-re
 import issueHistoryRepository from '../../issue-management/repositories/issue-history.repository.js';
 import { notificationService } from '../../notification/services/notification.service.js';
 import { slaClockService } from '../../sla/services/sla-clock.service.js';
-import { query } from '../../../database/connection.js';
-import AppError from '../../../shared/errors/AppError.js';
+import AppError, { OptimisticLockError } from '../../../shared/errors/AppError.js';
+import unitOfWork from '../../../shared/database/unitOfWork.js';
+import outboxService from '../../../shared/outbox/outbox.service.js';
 
 export const approvalService = {
   async getMetrics(tenantId) {
@@ -39,8 +40,8 @@ export const approvalService = {
     return approvalRepository.getPendingForUser(userId, groupIds);
   },
 
-  async createApprovalWorkflow(data, userId) {
-    const issue = await issueRequestRepository.findById(data.RequestID);
+  async createApprovalWorkflow(data, userId, tx = null) {
+    const issue = await issueRequestRepository.findById(data.RequestID, null, tx);
     if (!issue) {
       throw new AppError(`Issue request with ID ${data.RequestID} not found`, 404);
     }
@@ -61,61 +62,63 @@ export const approvalService = {
 
     const description = data.Description || (evalReasons.length > 0 ? evalReasons.join(' | ') : issue.Description);
 
-    const approvalId = await approvalRepository.createApproval({
-      RequestID: data.RequestID,
-      ApprovalRuleID: data.ApprovalRuleID || null,
-      Title: title,
-      Description: description,
-      TotalStages: stagesInput.length,
-      CreatedBy: userId || 1
-    });
-
-    for (let i = 0; i < stagesInput.length; i++) {
-      const stage = stagesInput[i];
-      await approvalRepository.createStage({
-        ApprovalID: approvalId,
-        StageNumber: stage.StageNumber || (i + 1),
-        ApproverUserID: stage.ApproverUserID || null,
-        ApproverGroupID: stage.ApproverGroupID || null,
-        SequenceNumber: stage.SequenceNumber || (i + 1),
+    return await unitOfWork.execute(async (t) => {
+      const approvalId = await approvalRepository.createApproval({
+        RequestID: data.RequestID,
+        ApprovalRuleID: data.ApprovalRuleID || null,
+        Title: title,
+        Description: description,
+        TotalStages: stagesInput.length,
         CreatedBy: userId || 1
+      }, t);
+
+      for (let i = 0; i < stagesInput.length; i++) {
+        const stage = stagesInput[i];
+        await approvalRepository.createStage({
+          ApprovalID: approvalId,
+          StageNumber: stage.StageNumber || (i + 1),
+          ApproverUserID: stage.ApproverUserID || null,
+          ApproverGroupID: stage.ApproverGroupID || null,
+          SequenceNumber: stage.SequenceNumber || (i + 1),
+          CreatedBy: userId || 1
+        }, t);
+      }
+
+      // Ensure IssueRequest status is PENDING_APPROVAL
+      await issueRequestRepository.update(data.RequestID, {
+        StatusCode: 'PENDING_APPROVAL',
+        ModifiedBy: userId || 1
+      }, t);
+
+      // Audit Trail
+      await approvalHistoryRepository.create({
+        ApprovalID: approvalId,
+        UserID: userId || 1,
+        ActionTypeCode: 'WORKFLOW_INITIATED',
+        Remarks: `Approval workflow initiated with ${stagesInput.length} stage(s). Reasons: ${evalReasons.join('; ') || 'Standard department governance policy'}`
+      }, t);
+
+      // Enqueue notification event via Transactional Outbox
+      await outboxService.emit(t, {
+        aggregateType: 'Approval',
+        aggregateId: approvalId,
+        eventType: 'APPROVAL_REQUIRED',
+        payload: {
+          issue,
+          requestId: issue.IssueRequestID,
+          title: issue.Title,
+          requestNumber: issue.RequestNumber,
+          departmentName: issue.DepartmentName,
+          priority: issue.PriorityCode,
+          estimatedCost: issue.EstimatedCost,
+          TriggeredByTable: 'Approval',
+          TriggeredByID: approvalId,
+          actorUserId: userId || 1
+        }
       });
-    }
 
-    // Ensure IssueRequest status is PENDING_APPROVAL
-    await issueRequestService.updateStatus(
-      data.RequestID,
-      'PENDING_APPROVAL',
-      `Approval workflow initiated with ${stagesInput.length} stage(s): Stage 1 (Department Manager)${stagesInput.length > 1 ? ', Stage 2 (Business Park Administrator)' : ''}.`,
-      userId
-    );
-
-    // Audit Trail
-    await approvalHistoryRepository.create({
-      ApprovalID: approvalId,
-      UserID: userId || 1,
-      ActionTypeCode: 'WORKFLOW_INITIATED',
-      Remarks: `Approval workflow initiated with ${stagesInput.length} stage(s). Reasons: ${evalReasons.join('; ') || 'Standard department governance policy'}`
-    });
-
-    // Notify Stage 1 Approver (Department Manager) via Centralized Notification Service
-    try {
-      await notificationService.notifyEvent('APPROVAL_REQUIRED', {
-        issue,
-        requestId: issue.IssueRequestID,
-        title: issue.Title,
-        requestNumber: issue.RequestNumber,
-        departmentName: issue.DepartmentName,
-        priority: issue.PriorityCode,
-        estimatedCost: issue.EstimatedCost,
-        TriggeredByTable: 'Approval',
-        TriggeredByID: approvalId
-      }, userId || 1);
-    } catch (notifErr) {
-      console.warn('Initial approval notification notice:', notifErr.message);
-    }
-
-    return approvalRepository.findById(approvalId);
+      return approvalRepository.findById(approvalId, t);
+    }, { tx });
   },
 
   async submitDecision(data, userId) {
@@ -221,191 +224,211 @@ export const approvalService = {
       }
     }
 
-    // 1. Record decision in ApprovalDecision table
-    await approvalRepository.recordDecision({
-      ApprovalStageID: currentStage.ApprovalStageID,
-      DecisionUserID: decisionUserId,
-      DecisionCode: data.DecisionCode,
-      Comments: data.Comments || null,
-      CreatedBy: decisionUserId
-    });
+    return await unitOfWork.execute(async (tx) => {
+      // 1. Record decision in ApprovalDecision table
+      await approvalRepository.recordDecision({
+        ApprovalStageID: currentStage.ApprovalStageID,
+        DecisionUserID: decisionUserId,
+        DecisionCode: data.DecisionCode,
+        Comments: data.Comments || null,
+        CreatedBy: decisionUserId
+      }, tx);
 
-    const now = new Date();
+      const now = new Date();
+      const expectedRowVersion = data.expectedRowVersion || data.RowVersion || issue.RowVersion || null;
 
-    // 2. State Machine Transitions
-    if (data.DecisionCode === 'APPROVED') {
-      await approvalRepository.updateStageStatus(currentStage.ApprovalStageID, 'APPROVED', decisionUserId);
+      // 2. State Machine Transitions
+      if (data.DecisionCode === 'APPROVED') {
+        await approvalRepository.updateStageStatus(currentStage.ApprovalStageID, 'APPROVED', decisionUserId, tx);
 
-      if (approval.CurrentStageNumber >= approval.TotalStages) {
-        // FINAL STAGE APPROVED -> Workflow Completed -> Issue becomes APPROVED (assignable)
+        if (approval.CurrentStageNumber >= approval.TotalStages) {
+          // FINAL STAGE APPROVED -> Workflow Completed -> Issue becomes APPROVED (assignable)
+          await approvalRepository.updateApproval(approval.ApprovalID, {
+            ApprovalStatusCode: 'APPROVED',
+            FinalActionedByUserID: decisionUserId,
+            FinalActionedDateTime: now,
+            ModifiedBy: decisionUserId
+          }, tx);
+
+          // Set IssueRequest StatusCode to 'APPROVED' with optimistic locking check
+          await issueRequestRepository.update(approval.RequestID, {
+            StatusCode: 'APPROVED',
+            expectedRowVersion,
+            ModifiedBy: decisionUserId
+          }, tx);
+
+          // Record Issue History
+          await issueHistoryRepository.create({
+            IssueRequestID: approval.RequestID,
+            UserID: decisionUserId,
+            FieldName: 'StatusCode',
+            OldValue: issue.StatusCode,
+            NewValue: 'APPROVED',
+            ActionTypeCode: 'STATUS_CHANGED',
+            Remarks: `Full approval workflow completed (${approval.TotalStages} stage(s) approved). Authorized for dispatch assignment.`
+          }, tx);
+
+          // Record Approval History
+          await approvalHistoryRepository.create({
+            ApprovalID: approval.ApprovalID,
+            UserID: decisionUserId,
+            ActionTypeCode: 'WORKFLOW_APPROVED',
+            Remarks: `All ${approval.TotalStages} stage(s) approved. Final authorization granted. Request is now in APPROVED state awaiting technician assignment.`
+          }, tx);
+
+          // Start SLA Clock upon final approval
+          try {
+            await slaClockService.startClockForIssue(approval.RequestID, 1, issue.PriorityCode || 'MEDIUM', decisionUserId);
+          } catch (slaErr) {
+            console.warn('SLA Clock start notice upon approval:', slaErr.message);
+          }
+
+          // Emit Centralized Outbox Event
+          await outboxService.emit(tx, {
+            aggregateType: 'IssueRequest',
+            aggregateId: approval.RequestID,
+            eventType: 'APPROVAL_COMPLETED',
+            payload: {
+              issue,
+              requestId: approval.RequestID,
+              title: issue.Title,
+              requestNumber: issue.RequestNumber,
+              remarks: data.Comments,
+              actorUserId: decisionUserId
+            }
+          });
+
+        } else {
+          // ADVANCE TO NEXT STAGE
+          const nextStageNumber = approval.CurrentStageNumber + 1;
+          await approvalRepository.updateApproval(approval.ApprovalID, {
+            CurrentStageNumber: nextStageNumber,
+            ModifiedBy: decisionUserId
+          }, tx);
+
+          await approvalHistoryRepository.create({
+            ApprovalID: approval.ApprovalID,
+            UserID: decisionUserId,
+            ActionTypeCode: 'STAGE_APPROVED',
+            Remarks: `Stage ${currentStage.StageNumber} (Department Review) approved. Advanced to Stage ${nextStageNumber} for Business Park Administrator authorization.`
+          }, tx);
+
+          await issueHistoryRepository.create({
+            IssueRequestID: approval.RequestID,
+            UserID: decisionUserId,
+            FieldName: 'ApprovalStage',
+            OldValue: `Stage ${currentStage.StageNumber}`,
+            NewValue: `Stage ${nextStageNumber}`,
+            ActionTypeCode: 'STAGE_APPROVED',
+            Remarks: `Department Manager review approved. Awaiting higher-level Business Park Administrator authorization.`
+          }, tx);
+
+          // Outbox event: Department Approved / Higher-Level Required
+          await outboxService.emit(tx, {
+            aggregateType: 'Approval',
+            aggregateId: approval.ApprovalID,
+            eventType: 'DEPARTMENT_APPROVED',
+            payload: {
+              issue,
+              requestId: approval.RequestID,
+              title: issue.Title,
+              requestNumber: issue.RequestNumber,
+              remarks: data.Comments,
+              actorUserId: decisionUserId
+            }
+          });
+        }
+
+      } else if (data.DecisionCode === 'REJECTED') {
+        await approvalRepository.updateStageStatus(currentStage.ApprovalStageID, 'REJECTED', decisionUserId, tx);
+
         await approvalRepository.updateApproval(approval.ApprovalID, {
-          ApprovalStatusCode: 'APPROVED',
+          ApprovalStatusCode: 'REJECTED',
           FinalActionedByUserID: decisionUserId,
           FinalActionedDateTime: now,
           ModifiedBy: decisionUserId
-        });
+        }, tx);
 
-        // Set IssueRequest StatusCode to 'APPROVED' (ready for Department Manager assignment)
-        await issueRequestService.updateStatus(
-          approval.RequestID,
-          'APPROVED',
-          `Full approval workflow successfully completed (${approval.TotalStages} stage(s) approved). Request is authorized and awaiting technician assignment by department management.`,
-          decisionUserId
-        );
+        const rejectReason = data.Comments || 'Rejected during approval workflow';
 
-        // Record Approval History
-        await approvalHistoryRepository.create({
-          ApprovalID: approval.ApprovalID,
-          UserID: decisionUserId,
-          ActionTypeCode: 'WORKFLOW_APPROVED',
-          Remarks: `All ${approval.TotalStages} stage(s) approved. Final authorization granted. Request is now in APPROVED state awaiting technician assignment.`
-        });
-
-        // Start SLA Clock upon final approval
-        try {
-          await slaClockService.startClockForIssue(approval.RequestID, 1, issue.PriorityCode || 'MEDIUM', decisionUserId);
-        } catch (slaErr) {
-          console.warn('SLA Clock start notice upon approval:', slaErr.message);
-        }
-
-        // Notify Department Manager, Dispatcher, and Requester via Centralized Event
-        try {
-          await notificationService.notifyEvent('APPROVAL_COMPLETED', {
-            issue,
-            requestId: approval.RequestID,
-            title: issue.Title,
-            requestNumber: issue.RequestNumber,
-            remarks: data.Comments,
-            TriggeredByTable: 'IssueRequest',
-            TriggeredByID: approval.RequestID
-          }, decisionUserId);
-        } catch (notifErr) {
-          console.warn('Final approval notification notice:', notifErr.message);
-        }
-
-      } else {
-        // ADVANCE TO NEXT STAGE (e.g. from Stage 1 Department Manager to Stage 2 Business Park Administrator)
-        const nextStageNumber = approval.CurrentStageNumber + 1;
-        await approvalRepository.updateApproval(approval.ApprovalID, {
-          CurrentStageNumber: nextStageNumber,
+        // Update IssueRequest to CANCELLED with optimistic locking check
+        await issueRequestRepository.update(approval.RequestID, {
+          StatusCode: 'CANCELLED',
+          CancellationReason: `Rejected at Stage ${currentStage.StageNumber}: ${rejectReason}`,
+          expectedRowVersion,
           ModifiedBy: decisionUserId
-        });
-
-        await approvalHistoryRepository.create({
-          ApprovalID: approval.ApprovalID,
-          UserID: decisionUserId,
-          ActionTypeCode: 'STAGE_APPROVED',
-          Remarks: `Stage ${currentStage.StageNumber} (Department Review) approved. Advanced to Stage ${nextStageNumber} for Business Park Administrator authorization.`
-        });
+        }, tx);
 
         await issueHistoryRepository.create({
           IssueRequestID: approval.RequestID,
           UserID: decisionUserId,
-          FieldName: 'ApprovalStage',
-          OldValue: `Stage ${currentStage.StageNumber}`,
-          NewValue: `Stage ${nextStageNumber}`,
-          ActionTypeCode: 'STAGE_APPROVED',
-          Remarks: `Department Manager review approved. Awaiting higher-level Business Park Administrator authorization.`
+          FieldName: 'StatusCode',
+          OldValue: issue.StatusCode,
+          NewValue: 'CANCELLED',
+          ActionTypeCode: 'STATUS_CHANGED',
+          Remarks: `Issue cancelled due to rejection at Stage ${currentStage.StageNumber}. Reason: ${rejectReason}`
+        }, tx);
+
+        await approvalHistoryRepository.create({
+          ApprovalID: approval.ApprovalID,
+          UserID: decisionUserId,
+          ActionTypeCode: 'WORKFLOW_REJECTED',
+          Remarks: `Request rejected at Stage ${currentStage.StageNumber}. Remarks: ${rejectReason}`
+        }, tx);
+
+        // Emit Outbox event
+        await outboxService.emit(tx, {
+          aggregateType: 'Approval',
+          aggregateId: approval.ApprovalID,
+          eventType: 'APPROVAL_REJECTED',
+          payload: {
+            issue,
+            requestId: approval.RequestID,
+            title: issue.Title,
+            requestNumber: issue.RequestNumber,
+            remarks: rejectReason,
+            actorUserId: decisionUserId
+          }
         });
 
-        // Trigger Centralized Notifications: Department Approved + Higher-Level Approval Required
-        try {
-          await notificationService.notifyEvent('DEPARTMENT_APPROVED', {
-            issue,
-            requestId: approval.RequestID,
-            title: issue.Title,
-            requestNumber: issue.RequestNumber,
-            remarks: data.Comments,
-            TriggeredByTable: 'Approval',
-            TriggeredByID: approval.ApprovalID
-          }, decisionUserId);
+      } else if (data.DecisionCode === 'RETURNED_FOR_CORRECTION') {
+        await approvalRepository.updateStageStatus(currentStage.ApprovalStageID, 'RETURNED', decisionUserId, tx);
 
-          await notificationService.notifyEvent('HIGHER_APPROVAL_REQUIRED', {
-            issue,
-            requestId: approval.RequestID,
-            title: issue.Title,
-            requestNumber: issue.RequestNumber,
-            remarks: data.Comments,
-            approvalReasons: approval.Title,
-            TriggeredByTable: 'Approval',
-            TriggeredByID: approval.ApprovalID
-          }, decisionUserId);
-        } catch (notifErr) {
-          console.warn('Stage 2 notification notice:', notifErr.message);
-        }
+        await approvalRepository.updateApproval(approval.ApprovalID, {
+          ApprovalStatusCode: 'RETURNED',
+          FinalActionedByUserID: decisionUserId,
+          FinalActionedDateTime: now,
+          ModifiedBy: decisionUserId
+        }, tx);
+
+        const returnReason = data.Comments || 'Returned for correction';
+
+        await issueRequestRepository.update(approval.RequestID, {
+          StatusCode: 'PENDING',
+          expectedRowVersion,
+          ModifiedBy: decisionUserId
+        }, tx);
+
+        await issueHistoryRepository.create({
+          IssueRequestID: approval.RequestID,
+          UserID: decisionUserId,
+          FieldName: 'StatusCode',
+          OldValue: issue.StatusCode,
+          NewValue: 'PENDING',
+          ActionTypeCode: 'STATUS_CHANGED',
+          Remarks: `Returned for correction at Stage ${currentStage.StageNumber}. Comments: ${returnReason}`
+        }, tx);
+
+        await approvalHistoryRepository.create({
+          ApprovalID: approval.ApprovalID,
+          UserID: decisionUserId,
+          ActionTypeCode: 'RETURNED_FOR_CORRECTION',
+          Remarks: `Returned for correction at Stage ${currentStage.StageNumber}. Comments: ${returnReason}`
+        }, tx);
       }
 
-    } else if (data.DecisionCode === 'REJECTED') {
-      // REJECTION RULE: Immediately terminate workflow as REJECTED and cancel IssueRequest
-      await approvalRepository.updateStageStatus(currentStage.ApprovalStageID, 'REJECTED', decisionUserId);
-
-      await approvalRepository.updateApproval(approval.ApprovalID, {
-        ApprovalStatusCode: 'REJECTED',
-        FinalActionedByUserID: decisionUserId,
-        FinalActionedDateTime: now,
-        ModifiedBy: decisionUserId
-      });
-
-      const rejectReason = data.Comments || 'Rejected during approval workflow';
-
-      // Update IssueRequest status to CANCELLED
-      await issueRequestService.cancelIssue(
-        approval.RequestID,
-        `Rejected at Stage ${currentStage.StageNumber}: ${rejectReason}`,
-        decisionUserId
-      );
-
-      await approvalHistoryRepository.create({
-        ApprovalID: approval.ApprovalID,
-        UserID: decisionUserId,
-        ActionTypeCode: 'WORKFLOW_REJECTED',
-        Remarks: `Request rejected at Stage ${currentStage.StageNumber}. Remarks: ${rejectReason}`
-      });
-
-      // Notify Requester of Rejection
-      try {
-        await notificationService.notifyEvent('APPROVAL_REJECTED', {
-          issue,
-          requestId: approval.RequestID,
-          title: issue.Title,
-          requestNumber: issue.RequestNumber,
-          remarks: rejectReason,
-          TriggeredByTable: 'Approval',
-          TriggeredByID: approval.ApprovalID
-        }, decisionUserId);
-      } catch (notifErr) {
-        console.warn('Rejection notification notice:', notifErr.message);
-      }
-
-    } else if (data.DecisionCode === 'RETURNED_FOR_CORRECTION') {
-      // RETURNED FOR CORRECTION: Mark as RETURNED and reset issue status to PENDING
-      await approvalRepository.updateStageStatus(currentStage.ApprovalStageID, 'RETURNED', decisionUserId);
-
-      await approvalRepository.updateApproval(approval.ApprovalID, {
-        ApprovalStatusCode: 'RETURNED',
-        FinalActionedByUserID: decisionUserId,
-        FinalActionedDateTime: now,
-        ModifiedBy: decisionUserId
-      });
-
-      const returnReason = data.Comments || 'Returned for correction';
-
-      await issueRequestService.updateStatus(
-        approval.RequestID,
-        'PENDING',
-        `Returned for correction at Stage ${currentStage.StageNumber}: ${returnReason}`,
-        decisionUserId
-      );
-
-      await approvalHistoryRepository.create({
-        ApprovalID: approval.ApprovalID,
-        UserID: decisionUserId,
-        ActionTypeCode: 'RETURNED_FOR_CORRECTION',
-        Remarks: `Returned for correction at Stage ${currentStage.StageNumber}. Comments: ${returnReason}`
-      });
-    }
-
-    return approvalRepository.findById(approval.ApprovalID);
+      return approvalRepository.findById(approval.ApprovalID);
+    });
   }
 };
 

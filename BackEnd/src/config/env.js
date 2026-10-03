@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Joi from 'joi';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -8,95 +9,127 @@ const __dirname = path.dirname(__filename);
 // Load .env from BackEnd root directory
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
-const isProd = NODE_ENV === 'production';
-const isTest = NODE_ENV === 'test';
+const envSchema = Joi.object({
+  NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
+  PORT: Joi.number().port().default(5000),
 
-// Fail-fast validation helper
-const requireEnv = (key, fallback = undefined) => {
-  const val = process.env[key] || fallback;
-  if (!val && !isTest) {
-    throw new Error(`[FATAL] Missing required environment variable: "${key}". The application cannot start without it.`);
-  }
-  return val;
-};
+  // Database
+  DB_HOST: Joi.string().required().description('MySQL Database Hostname'),
+  DB_PORT: Joi.number().port().default(3306),
+  DB_USER: Joi.string().required().description('MySQL Database Username'),
+  DB_PASSWORD: Joi.string().allow('').default(''),
+  DB_NAME: Joi.string().required().description('MySQL Database Name'),
+  DB_CONNECTION_LIMIT: Joi.number().min(1).max(100).default(10),
 
-// Validate secrets are cryptographically adequate
-const validateSecret = (key, val) => {
-  if (isTest) return val || 'test-secret-at-least-32-characters-long-for-testing';
-  const INSECURE_DEFAULTS = [
-    'dev-access-secret',
-    'dev-refresh-secret',
-    'secret-key-12345',
-    'dev_secret_key',
-    'password',
-    'secret'
-  ];
-  if (INSECURE_DEFAULTS.includes(val)) {
-    if (isProd) {
-      throw new Error(`[FATAL] Insecure default secret detected in production for "${key}". You must set a cryptographically secure random value.`);
-    }
+  // JWT Security
+  JWT_SECRET: Joi.string().min(32).required().messages({
+    'string.min': 'JWT_SECRET must be at least 32 characters long for cryptographic security.'
+  }),
+  JWT_REFRESH_SECRET: Joi.string().min(32).required().messages({
+    'string.min': 'JWT_REFRESH_SECRET must be at least 32 characters long for cryptographic security.'
+  }),
+  JWT_EXPIRES_IN: Joi.string().default('1h'),
+  JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+
+  // CORS & Client
+  CORS_ALLOWED_ORIGINS: Joi.string().optional(),
+  CLIENT_URL: Joi.string().default('http://localhost:5173'),
+
+  // Rate Limiting
+  RATE_LIMIT_WINDOW_MS: Joi.number().default(60000),
+  RATE_LIMIT_MAX: Joi.number().default(100),
+  AUTH_RATE_LIMIT_WINDOW_MS: Joi.number().default(60000),
+  AUTH_RATE_LIMIT_MAX: Joi.number().default(10),
+  PASSWORD_RESET_RATE_LIMIT_WINDOW_MS: Joi.number().default(3600000),
+  PASSWORD_RESET_RATE_LIMIT_MAX: Joi.number().default(5),
+
+  // SMTP Email Dispatcher
+  SMTP_SERVICE: Joi.string().allow('').optional(),
+  SMTP_HOST: Joi.string().allow('').optional(),
+  SMTP_PORT: Joi.number().port().default(587),
+  SMTP_USER: Joi.string().allow('').optional(),
+  SMTP_PASS: Joi.string().allow('').optional(),
+  SMTP_SECURE: Joi.string().valid('true', 'false').default('false'),
+  SMTP_FROM: Joi.string().default('"Enterprise ITMS" <noreply@enterprise.com>'),
+
+  // Logging
+  LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly').default('info')
+}).unknown(true); // Allow other OS environment variables
+
+const { error, value: validatedEnv } = envSchema.validate(process.env, {
+  abortEarly: false
+});
+
+if (error) {
+  const errorDetails = error.details.map((d) => `  • ${d.message}`).join('\n');
+  console.error(`\n❌ [CONFIGURATION FATAL] Environment validation failed with ${error.details.length} error(s):\n${errorDetails}\n`);
+  // In test environment, throw error rather than exit
+  if (process.env.NODE_ENV === 'test') {
+    throw new Error(`Environment validation failed:\n${errorDetails}`);
   }
-  return val;
-};
+  process.exit(1);
+}
+
+const isProd = validatedEnv.NODE_ENV === 'production';
+const isTest = validatedEnv.NODE_ENV === 'test';
 
 export const env = {
-  NODE_ENV,
+  NODE_ENV: validatedEnv.NODE_ENV,
   isProd,
   isTest,
-  PORT: parseInt(process.env.PORT || '5000', 10),
+  PORT: validatedEnv.PORT,
 
   // Database Configuration
   db: {
-    host: requireEnv('DB_HOST', 'localhost'),
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: requireEnv('DB_USER', 'root'),
-    password: process.env.DB_PASSWORD || '',
-    database: requireEnv('DB_NAME', 'issue_tracking_system'),
-    connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT || '10', 10)
+    host: validatedEnv.DB_HOST,
+    port: validatedEnv.DB_PORT,
+    user: validatedEnv.DB_USER,
+    password: validatedEnv.DB_PASSWORD,
+    database: validatedEnv.DB_NAME,
+    connectionLimit: validatedEnv.DB_CONNECTION_LIMIT
   },
 
   // JWT & Cryptographic Security
   jwt: {
-    secret: validateSecret('JWT_SECRET', requireEnv('JWT_SECRET', isProd ? undefined : 'dev-jwt-secret-minimum-32-chars-long-local-only')),
-    refreshSecret: validateSecret('JWT_REFRESH_SECRET', requireEnv('JWT_REFRESH_SECRET', isProd ? undefined : 'dev-jwt-refresh-secret-min-32-chars-local-only')),
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
-    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
+    secret: validatedEnv.JWT_SECRET,
+    refreshSecret: validatedEnv.JWT_REFRESH_SECRET,
+    expiresIn: validatedEnv.JWT_EXPIRES_IN,
+    refreshExpiresIn: validatedEnv.JWT_REFRESH_EXPIRES_IN
   },
 
   // CORS & Client Configuration
   cors: {
-    allowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || process.env.CLIENT_URL || 'http://localhost:5173')
+    allowedOrigins: (validatedEnv.CORS_ALLOWED_ORIGINS || validatedEnv.CLIENT_URL)
       .split(',')
       .map((origin) => origin.trim())
       .filter(Boolean),
-    clientUrl: process.env.CLIENT_URL || 'http://localhost:5173'
+    clientUrl: validatedEnv.CLIENT_URL
   },
 
   // Rate Limiting
   rateLimit: {
-    globalWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10), // 1 minute
-    globalMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10), // 100 requests per minute
-    authWindowMs: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW_MS || '60000', 10), // 1 minute
-    authMax: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '10', 10), // 10 login/refresh attempts per minute
-    passwordResetWindowMs: parseInt(process.env.PASSWORD_RESET_RATE_LIMIT_WINDOW_MS || '3600000', 10), // 1 hour
-    passwordResetMax: parseInt(process.env.PASSWORD_RESET_RATE_LIMIT_MAX || '5', 10) // 5 reset requests per hour
+    globalWindowMs: validatedEnv.RATE_LIMIT_WINDOW_MS,
+    globalMax: validatedEnv.RATE_LIMIT_MAX,
+    authWindowMs: validatedEnv.AUTH_RATE_LIMIT_WINDOW_MS,
+    authMax: validatedEnv.AUTH_RATE_LIMIT_MAX,
+    passwordResetWindowMs: validatedEnv.PASSWORD_RESET_RATE_LIMIT_WINDOW_MS,
+    passwordResetMax: validatedEnv.PASSWORD_RESET_RATE_LIMIT_MAX
   },
 
   // Email / SMTP
   smtp: {
-    service: process.env.SMTP_SERVICE || '',
-    host: process.env.SMTP_HOST || (process.env.SMTP_SERVICE === 'gmail' ? 'smtp.gmail.com' : ''),
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    user: process.env.SMTP_USER || '',
-    pass: (process.env.SMTP_PASS || '').replace(/\s/g, ''),
-    secure: process.env.SMTP_SECURE === 'true' || parseInt(process.env.SMTP_PORT || '587', 10) === 465,
-    from: process.env.SMTP_FROM || '"Enterprise ITMS" <noreply@enterprise.com>'
+    service: validatedEnv.SMTP_SERVICE,
+    host: validatedEnv.SMTP_HOST || (validatedEnv.SMTP_SERVICE === 'gmail' ? 'smtp.gmail.com' : ''),
+    port: validatedEnv.SMTP_PORT,
+    user: validatedEnv.SMTP_USER,
+    pass: (validatedEnv.SMTP_PASS || '').replace(/\s/g, ''),
+    secure: validatedEnv.SMTP_SECURE === 'true' || validatedEnv.SMTP_PORT === 465,
+    from: validatedEnv.SMTP_FROM
   },
 
   // Logging
   logging: {
-    level: process.env.LOG_LEVEL || 'info'
+    level: validatedEnv.LOG_LEVEL
   }
 };
 

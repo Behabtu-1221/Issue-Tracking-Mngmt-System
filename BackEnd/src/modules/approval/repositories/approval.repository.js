@@ -254,14 +254,15 @@ export const approvalRepository = {
     return query(sql, params);
   },
 
-  async createApproval(data) {
+  async createApproval(data, tx = null) {
     const sql = `
       INSERT INTO Approval (
         RequestID, ApprovalRuleID, Title, Description,
         TotalStages, CurrentStageNumber, ApprovalStatusCode, CreatedBy
       ) VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?)
     `;
-    const result = await query(sql, [
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const result = await runner(sql, [
       data.RequestID,
       data.ApprovalRuleID || null,
       data.Title,
@@ -273,14 +274,15 @@ export const approvalRepository = {
     return result.insertId;
   },
 
-  async createStage(data) {
+  async createStage(data, tx = null) {
     const sql = `
       INSERT INTO ApprovalStage (
         ApprovalID, StageNumber, ApproverUserID, ApproverGroupID,
         StageStatusCode, SequenceNumber, CreatedBy
       ) VALUES (?, ?, ?, ?, 'PENDING', ?, ?)
     `;
-    const result = await query(sql, [
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const result = await runner(sql, [
       data.ApprovalID,
       data.StageNumber,
       data.ApproverUserID || null,
@@ -291,7 +293,7 @@ export const approvalRepository = {
     return result.insertId;
   },
 
-  async updateApproval(id, data) {
+  async updateApproval(id, data, tx = null) {
     const sql = `
       UPDATE Approval SET
         CurrentStageNumber = COALESCE(?, CurrentStageNumber),
@@ -302,7 +304,8 @@ export const approvalRepository = {
         ModifiedDate = CURRENT_TIMESTAMP(6)
       WHERE ApprovalID = ? AND IsDeleted = 0
     `;
-    await query(sql, [
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    await runner(sql, [
       data.CurrentStageNumber ?? null,
       data.ApprovalStatusCode ?? null,
       data.FinalActionedByUserID ?? null,
@@ -313,7 +316,7 @@ export const approvalRepository = {
     return this.findById(id);
   },
 
-  async updateStageStatus(stageId, statusCode, userId) {
+  async updateStageStatus(stageId, statusCode, userId, tx = null) {
     const sql = `
       UPDATE ApprovalStage SET
         StageStatusCode = ?,
@@ -321,16 +324,18 @@ export const approvalRepository = {
         ModifiedDate = CURRENT_TIMESTAMP(6)
       WHERE ApprovalStageID = ? AND IsDeleted = 0
     `;
-    await query(sql, [statusCode, userId || 1, stageId]);
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    await runner(sql, [statusCode, userId || 1, stageId]);
   },
 
-  async recordDecision(data) {
+  async recordDecision(data, tx = null) {
     const sql = `
       INSERT INTO ApprovalDecision (
         ApprovalStageID, DecisionUserID, DecisionCode, Comments, CreatedBy
       ) VALUES (?, ?, ?, ?, ?)
     `;
-    const result = await query(sql, [
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const result = await runner(sql, [
       data.ApprovalStageID,
       data.DecisionUserID,
       data.DecisionCode,

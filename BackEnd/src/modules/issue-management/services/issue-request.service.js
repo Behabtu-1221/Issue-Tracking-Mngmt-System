@@ -7,6 +7,9 @@ import { approvalService } from '../../approval/services/approval.service.js';
 import { notificationService } from '../../notification/services/notification.service.js';
 import AppError from '../../../shared/errors/AppError.js';
 import { query } from '../../../database/connection.js';
+import unitOfWork from '../../../shared/database/unitOfWork.js';
+import outboxService from '../../../shared/outbox/outbox.service.js';
+import businessCalendar from '../../sla/utils/business-calendar.js';
 
 export const issueRequestService = {
   async getOverviewMetrics(tenantId) {
@@ -114,51 +117,80 @@ export const issueRequestService = {
       categoryCode = 'FACILITIES';
     }
 
+    // Calculate SLA target deadlines in UTC using BusinessCalendar
+    const priority = data.PriorityCode || 'MEDIUM';
+    const now = new Date();
+    let responseMins = 120;
+    let resolutionMins = 1440;
+    let is24x7 = false;
+
+    if (priority === 'CRITICAL') {
+      responseMins = 15;
+      resolutionMins = 240;
+      is24x7 = true;
+    } else if (priority === 'HIGH') {
+      responseMins = 60;
+      resolutionMins = 480;
+    } else if (priority === 'MEDIUM') {
+      responseMins = 120;
+      resolutionMins = 1440;
+    } else if (priority === 'LOW') {
+      responseMins = 240;
+      resolutionMins = 2880;
+    }
+
+    const responseDueAt = businessCalendar.calculateDeadline(now, responseMins, { is24x7 });
+    const resolutionDueAt = businessCalendar.calculateDeadline(now, resolutionMins, { is24x7 });
+
     // Mandatory workflow: Every submitted request requires Department Manager review & approval
     const initialStatus = 'PENDING_APPROVAL';
 
-    const newIssue = await issueRequestRepository.create({
-      ...data,
-      CategoryCode: categoryCode,
-      AssignedDepartmentID: assignedDeptId,
-      StatusCode: initialStatus,
-      RequesterUserID: requesterId,
-      CreatedBy: userId || requesterId
-    });
+    return await unitOfWork.execute(async (tx) => {
+      const newIssue = await issueRequestRepository.create({
+        ...data,
+        CategoryCode: categoryCode,
+        AssignedDepartmentID: assignedDeptId,
+        StatusCode: initialStatus,
+        RequesterUserID: requesterId,
+        ResponseDueAt: responseDueAt,
+        ResolutionDueAt: resolutionDueAt,
+        TargetResolutionDateTime: resolutionDueAt,
+        CreatedBy: userId || requesterId
+      }, tx);
 
-    // Record audit trail history
-    const routingInfo = resolvedDeptName ? ` Automatically routed to ${resolvedDeptName}.` : (assignedDeptId ? ` Assigned to department #${assignedDeptId}.` : '');
-    await issueHistoryRepository.create({
-      IssueRequestID: newIssue.IssueRequestID,
-      UserID: userId || requesterId,
-      ActionTypeCode: 'ISSUE_SUBMITTED',
-      Remarks: `Issue request '${newIssue.RequestNumber}' submitted.` + routingInfo + ' Initiated multi-level approval governance.'
-    });
+      // Record audit trail history
+      const routingInfo = resolvedDeptName ? ` Automatically routed to ${resolvedDeptName}.` : (assignedDeptId ? ` Assigned to department #${assignedDeptId}.` : '');
+      await issueHistoryRepository.create({
+        IssueRequestID: newIssue.IssueRequestID,
+        UserID: userId || requesterId,
+        ActionTypeCode: 'ISSUE_SUBMITTED',
+        Remarks: `Issue request '${newIssue.RequestNumber}' submitted.` + routingInfo + ' Initiated multi-level approval governance.'
+      }, tx);
 
-    // Trigger Automated Approval Workflow (evaluates 1-stage routine or 2-stage multi-level workflow)
-    try {
+      // Trigger Automated Approval Workflow inside transaction
       await approvalService.createApprovalWorkflow({
-        RequestID: newIssue.IssueRequestID
-      }, userId || requesterId);
-    } catch (apprErr) {
-      console.warn('Approval workflow auto-trigger notice:', apprErr.message);
-    }
+        RequestID: newIssue.IssueRequestID,
+        tx
+      }, userId || requesterId, tx);
 
-    // Trigger Centralized Notification Event
-    try {
-      await notificationService.notifyEvent('ISSUE_CREATED', {
-        issue: newIssue,
-        requestId: newIssue.IssueRequestID,
-        title: newIssue.Title,
-        requestNumber: newIssue.RequestNumber,
-        departmentName: resolvedDeptName,
-        priority: newIssue.PriorityCode
-      }, userId || requesterId);
-    } catch (notifErr) {
-      console.warn('Issue creation notification notice:', notifErr.message);
-    }
+      // Trigger Centralized Notification Event via Transactional Outbox
+      await outboxService.emit(tx, {
+        aggregateType: 'IssueRequest',
+        aggregateId: newIssue.IssueRequestID,
+        eventType: 'ISSUE_CREATED',
+        payload: {
+          issue: newIssue,
+          requestId: newIssue.IssueRequestID,
+          title: newIssue.Title,
+          requestNumber: newIssue.RequestNumber,
+          departmentName: resolvedDeptName,
+          priority: newIssue.PriorityCode,
+          actorUserId: userId || requesterId
+        }
+      });
 
-    return newIssue;
+      return newIssue;
+    });
   },
 
   async updateIssue(id, data, userId) {

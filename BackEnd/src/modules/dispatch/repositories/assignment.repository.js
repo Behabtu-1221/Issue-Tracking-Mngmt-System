@@ -245,11 +245,12 @@ export const assignmentRepository = {
       data.AssignmentStatusCode || 'ASSIGNED',
       data.CreatedBy || 1
     ];
-    const res = await query(sql, params);
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const res = await runner(sql, params);
     return res.insertId;
   },
 
-  async updateAssignment(id, data) {
+  async updateAssignment(id, data, tx = null) {
     const fields = [];
     const params = [];
 
@@ -265,10 +266,11 @@ export const assignmentRepository = {
 
     params.push(id);
     const sql = `UPDATE Assignment SET ${fields.join(', ')} WHERE AssignmentID = ?`;
-    await query(sql, params);
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    await runner(sql, params);
   },
 
-  async createHistory(data) {
+  async createHistory(data, tx = null) {
     const sql = `
       INSERT INTO AssignmentHistory (
         AssignmentID, ActionUserID, ActionTypeCode, Remarks, CreatedBy
@@ -281,7 +283,8 @@ export const assignmentRepository = {
       data.Remarks || null,
       data.CreatedBy || data.ActionUserID || 1
     ];
-    const res = await query(sql, params);
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const res = await runner(sql, params);
     return res.insertId;
   },
 

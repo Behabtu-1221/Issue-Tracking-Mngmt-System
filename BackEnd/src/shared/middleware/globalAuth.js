@@ -5,7 +5,7 @@ import authenticate from './authenticate.js';
  * Secure by default: Every route requires authentication UNLESS explicitly declared here.
  */
 export const PUBLIC_ROUTES = [
-  { method: 'GET', pattern: /^\/health\/?$/i },
+  { method: 'GET', pattern: /^\/health(\/(live|ready))?\/?$/i },
   { method: 'POST', pattern: /^\/api\/auth\/login\/?$/i },
   { method: 'POST', pattern: /^\/api\/auth\/refresh\/?$/i },
   { method: 'POST', pattern: /^\/api\/auth\/refresh-token\/?$/i },

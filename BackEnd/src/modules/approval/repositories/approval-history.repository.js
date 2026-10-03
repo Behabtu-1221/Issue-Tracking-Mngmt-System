@@ -12,19 +12,21 @@ export const approvalHistoryRepository = {
     return query(sql, [approvalId]);
   },
 
-  async create(data) {
+  async create(data, tx = null) {
     const sql = `
       INSERT INTO ApprovalHistory (
         ApprovalID, UserID, ActionTypeCode, Remarks, CreatedBy
       ) VALUES (?, ?, ?, ?, ?)
     `;
-    const result = await query(sql, [
+    const params = [
       data.ApprovalID,
       data.UserID,
       data.ActionTypeCode,
       data.Remarks || null,
       data.CreatedBy || data.UserID
-    ]);
+    ];
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    const result = await runner(sql, params);
     return result.insertId;
   }
 };

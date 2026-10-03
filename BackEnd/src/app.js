@@ -60,18 +60,16 @@ app.use(morgan(morganFormat, {
   stream: { write: (message) => logger.info(message.trim()) }
 }));
 
+import healthRouter from './shared/routes/health.routes.js';
+import idempotency from './shared/middleware/idempotency.js';
+
 app.use(globalLimiter);
 app.use(attachActor);
 app.use(globalAuth);
 app.use(dataScope);
+app.use(idempotency());
 
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Server is healthy',
-    timestamp: new Date()
-  });
-});
+app.use('/health', healthRouter);
 
 const modules = [
   configurationModule,
