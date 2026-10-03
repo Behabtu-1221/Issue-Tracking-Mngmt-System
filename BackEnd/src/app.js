@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import logger from './shared/utils/logger.js';
 import errorHandler from './shared/middleware/errorHandler.js';
 import attachActor from './shared/middleware/attachActor.js';
+import globalAuth from './shared/middleware/globalAuth.js';
 import AppError from './shared/errors/AppError.js';
 import configurationModule from './modules/configuration-management/index.js';
 import identityModule from './modules/identity-access/index.js';
@@ -40,6 +41,7 @@ app.use(morgan(morganFormat, {
 }));
 
 app.use(attachActor);
+app.use(globalAuth);
 
 app.get('/health', (req, res) => {
   res.status(200).json({
