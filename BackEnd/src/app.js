@@ -25,21 +25,41 @@ import reportingModule from './modules/reporting/index.js';
 
 dotenv.config();
 
+import env from './config/env.js';
+import { globalLimiter } from './shared/middleware/rateLimiter.js';
+
 const app = express();
 
+// Trust reverse proxy for real client IP evaluation
+app.set('trust proxy', 1);
+
 app.use(helmet());
+
+// Strict CORS: Allow only explicit origins from environment variable
+const allowedOrigins = env.cors.allowedOrigins;
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new AppError(`Origin "${origin}" is not permitted by CORS policy.`, 403));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  credentials: false,
+  maxAge: 86400
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const morganFormat = process.env.NODE_ENV === 'development' ? 'dev' : 'combined';
+const morganFormat = env.NODE_ENV === 'development' ? 'dev' : 'combined';
 app.use(morgan(morganFormat, {
   stream: { write: (message) => logger.info(message.trim()) }
 }));
 
+app.use(globalLimiter);
 app.use(attachActor);
 app.use(globalAuth);
 

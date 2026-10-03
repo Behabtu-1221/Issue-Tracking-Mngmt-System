@@ -3,6 +3,11 @@ import validate from '../../../shared/middleware/validate.js';
 import authenticate from '../../../shared/middleware/authenticate.js';
 import authController from '../controllers/auth.controller.js';
 import {
+  loginLimiter,
+  passwordResetLimiter,
+  tokenRefreshLimiter
+} from '../../../shared/middleware/rateLimiter.js';
+import {
   changePasswordSchema,
   forgotPasswordSchema,
   loginSchema,
@@ -12,10 +17,10 @@ import {
 
 const router = Router();
 
-router.post('/login', validate(loginSchema), authController.login);
-router.post('/refresh', validate(refreshTokenSchema), authController.refresh);
-router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);
-router.post('/reset-password', validate(resetPasswordSchema), authController.resetPassword);
+router.post('/login', loginLimiter, validate(loginSchema), authController.login);
+router.post('/refresh', tokenRefreshLimiter, validate(refreshTokenSchema), authController.refresh);
+router.post('/forgot-password', passwordResetLimiter, validate(forgotPasswordSchema), authController.forgotPassword);
+router.post('/reset-password', passwordResetLimiter, validate(resetPasswordSchema), authController.resetPassword);
 router.post('/logout', authenticate, authController.logout);
 router.get('/me', authenticate, authController.me);
 router.put('/profile', authenticate, authController.updateProfile);
