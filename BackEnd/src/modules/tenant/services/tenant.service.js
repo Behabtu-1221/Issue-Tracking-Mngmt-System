@@ -21,7 +21,7 @@ const isParkAdminActor = (actor) => {
   const adminCodes = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN', 'ADMIN'];
   if (adminCodes.includes(code) || adminCodes.includes(role)) return true;
   if (Array.isArray(actor.roles) && actor.roles.some(r => adminCodes.includes(String(r).toUpperCase()))) return true;
-  if (!actor.tenantId && (actor.userId === 1 || code.includes('ADMIN') || role.includes('ADMIN'))) return true;
+  if (!actor.tenantId && (code.includes('ADMIN') || role.includes('ADMIN'))) return true;
   return false;
 };
 

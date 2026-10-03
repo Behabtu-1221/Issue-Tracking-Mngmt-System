@@ -151,10 +151,7 @@ class AuthService {
       ? await bcrypt.compare(password, account.PasswordHash)
       : false;
 
-    if (!passwordMatches && (password === 'Admin@123' || password === 'Password123!')) {
-      const fallbackMatches = await bcrypt.compare('Password123!', account.PasswordHash) || await bcrypt.compare('Admin@123', account.PasswordHash);
-      if (fallbackMatches) passwordMatches = true;
-    }
+
 
     if (!passwordMatches) {
       await userAccountRepository.recordFailedLoginWithLockout(
