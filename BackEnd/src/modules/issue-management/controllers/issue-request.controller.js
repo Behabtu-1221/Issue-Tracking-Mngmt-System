@@ -38,7 +38,7 @@ export const issueRequestController = {
       const actorUserId = req.actor?.userId || req.user?.id;
       const actorTenantId = req.actor?.tenantId;
       const isParkAdmin = ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN'].includes((req.actor?.userTypeCode || '').toUpperCase());
-      const effectiveTenantId = (!isParkAdmin && actorTenantId) ? actorTenantId : (req.body.TenantID || actorTenantId);
+      const effectiveTenantId = isParkAdmin ? (req.body.TenantID || actorTenantId) : actorTenantId;
 
       const newIssue = await issueRequestService.createIssue({
         ...req.body,

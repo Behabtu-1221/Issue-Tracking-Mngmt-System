@@ -2,6 +2,8 @@ import { Router } from 'express';
 import reportingController from '../controllers/reporting.controller.js';
 import validate from '../../../shared/middleware/validate.js';
 import { authorizePermissions } from '../../../shared/middleware/authorize.js';
+import authenticate from '../../../shared/middleware/authenticate.js';
+import dataScope from '../../../shared/middleware/dataScope.js';
 import {
   reportFilterSchema,
   createSavedReportSchema,
@@ -11,6 +13,9 @@ import {
 } from '../validators/reporting.validator.js';
 
 const router = Router();
+
+router.use(authenticate);
+router.use(dataScope);
 
 // ── Analytics & Overview Dashboards ──
 router.get(

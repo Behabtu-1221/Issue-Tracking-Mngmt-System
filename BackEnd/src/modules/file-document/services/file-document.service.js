@@ -162,9 +162,9 @@ class FileDocumentService {
   }
 
   // ── Share Link ──
-  async createShareLink(documentId, shareData, creatorId) {
-    const doc = await fileDocumentRepository.findById(documentId);
-    if (!doc) throw new AppError('Document not found', 404);
+  // ── Share Link ──
+  async createShareLink(documentId, shareData, creatorId, actor) {
+    const doc = await this.getDocumentById(documentId, actor);
 
     const shareUUID = crypto.randomUUID();
     const share = await fileDocumentRepository.createShare({
@@ -200,9 +200,8 @@ class FileDocumentService {
   }
 
   // ── Metadata Update ──
-  async updateDocument(documentId, updateData, actorId) {
-    const doc = await fileDocumentRepository.findById(documentId);
-    if (!doc) throw new AppError('Document not found', 404);
+  async updateDocument(documentId, updateData, actorId, actor) {
+    const doc = await this.getDocumentById(documentId, actor);
 
     const updated = await fileDocumentRepository.updateDocument(documentId, updateData);
     await fileDocumentRepository.logAudit(documentId, 'UPDATE_METADATA', actorId, null, `Updated document metadata`);
@@ -210,24 +209,23 @@ class FileDocumentService {
   }
 
   // ── Archiving & Deletion ──
-  async archiveDocument(documentId, actorId) {
-    const doc = await fileDocumentRepository.findById(documentId);
-    if (!doc) throw new AppError('Document not found', 404);
+  async archiveDocument(documentId, actorId, actor) {
+    const doc = await this.getDocumentById(documentId, actor);
 
     await fileDocumentRepository.archiveDocument(documentId, actorId);
     await fileDocumentRepository.logAudit(documentId, 'ARCHIVE', actorId, null, `Archived document`);
     return { message: 'Document archived successfully' };
   }
 
-  async restoreDocument(documentId, actorId) {
+  async restoreDocument(documentId, actorId, actor) {
+    await this.getDocumentById(documentId, actor);
     await fileDocumentRepository.restoreDocument(documentId);
     await fileDocumentRepository.logAudit(documentId, 'RESTORE', actorId, null, `Restored document from archive`);
     return { message: 'Document restored successfully' };
   }
 
-  async deletePermanent(documentId, actorId) {
-    const doc = await fileDocumentRepository.findById(documentId);
-    if (!doc) throw new AppError('Document not found', 404);
+  async deletePermanent(documentId, actorId, actor) {
+    const doc = await this.getDocumentById(documentId, actor);
 
     // Remove file from disk
     if (fs.existsSync(doc.FilePath)) {

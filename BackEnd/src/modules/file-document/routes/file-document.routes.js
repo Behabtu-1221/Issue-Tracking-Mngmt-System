@@ -2,6 +2,7 @@ import { Router } from 'express';
 import fileDocumentController from '../controllers/file-document.controller.js';
 import uploadMiddleware from '../middleware/upload.middleware.js';
 import authenticate from '../../../shared/middleware/authenticate.js';
+import dataScope from '../../../shared/middleware/dataScope.js';
 import { authorizePermissions } from '../../../shared/middleware/authorize.js';
 
 const router = Router();
@@ -9,8 +10,9 @@ const router = Router();
 // Public / Token-based share link retrieval
 router.get('/share/:shareToken', fileDocumentController.getShareByToken);
 
-// All other endpoints require authentication
+// All other endpoints require authentication and data scoping
 router.use(authenticate);
+router.use(dataScope);
 
 // ── Metrics & Categories ──
 router.get('/metrics', fileDocumentController.getMetrics);

@@ -8,7 +8,7 @@ export const issueCommentController = {
       const { issueRequestId } = getParams(req);
       const queryParams = getQuery(req);
       const includeInternal = queryParams.includeInternal === 'false' ? false : true;
-      const comments = await issueCommentService.getComments(issueRequestId, includeInternal);
+      const comments = await issueCommentService.getComments(issueRequestId, includeInternal, req.actor);
       return sendSuccess(res, comments);
     } catch (err) {
       next(err);
@@ -17,7 +17,8 @@ export const issueCommentController = {
 
   async addComment(req, res, next) {
     try {
-      const newComment = await issueCommentService.addComment(req.body, req.user?.id);
+      const actorUserId = req.actor?.userId || req.user?.id;
+      const newComment = await issueCommentService.addComment(req.body, actorUserId, req.actor);
       return sendCreated(res, newComment);
     } catch (err) {
       next(err);
@@ -27,7 +28,8 @@ export const issueCommentController = {
   async deleteComment(req, res, next) {
     try {
       const { id } = getParams(req);
-      const result = await issueCommentService.deleteComment(id, req.user?.id);
+      const actorUserId = req.actor?.userId || req.user?.id;
+      const result = await issueCommentService.deleteComment(id, actorUserId, req.actor);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);

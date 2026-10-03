@@ -64,7 +64,7 @@ class UserService {
       user.TenantID !== actor.tenantId &&
       user.UserID !== actor.userId
     ) {
-      throw new AppError('Permission denied: Unauthorized tenant access', 403);
+      throw new AppError('User not found', 404);
     }
 
     return user;

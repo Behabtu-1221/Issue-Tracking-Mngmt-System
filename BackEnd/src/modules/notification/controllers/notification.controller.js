@@ -13,7 +13,8 @@ export const notificationController = {
 
   async getUserNotifications(req, res, next) {
     try {
-      const userId = req.actor?.userId || req.user?.id || req.query.userId || 1;
+      const isParkAdmin = req.actor?.isParkAdmin || ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN'].includes((req.actor?.userTypeCode || '').toUpperCase());
+      const userId = (isParkAdmin && req.query.userId) ? parseInt(req.query.userId, 10) : (req.actor?.userId || req.user?.id || 1);
       const data = await notificationService.getUserNotifications(userId, {
         unreadOnly: req.query.unreadOnly === 'true',
         limit: req.query.limit || 50,
@@ -27,7 +28,8 @@ export const notificationController = {
 
   async getUnreadCount(req, res, next) {
     try {
-      const userId = req.actor?.userId || req.user?.id || req.query.userId || 1;
+      const isParkAdmin = req.actor?.isParkAdmin || ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN'].includes((req.actor?.userTypeCode || '').toUpperCase());
+      const userId = (isParkAdmin && req.query.userId) ? parseInt(req.query.userId, 10) : (req.actor?.userId || req.user?.id || 1);
       const count = await notificationService.getUnreadCount(userId);
       return sendSuccess(res, { unreadCount: count });
     } catch (err) {

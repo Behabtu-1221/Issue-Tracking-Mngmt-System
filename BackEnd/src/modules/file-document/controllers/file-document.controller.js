@@ -136,8 +136,8 @@ export const fileDocumentController = {
   // ── Create Share Link ──
   async createShare(req, res, next) {
     try {
-      const creatorId = req.user?.id || req.user?.UserID || 1;
-      const data = await fileDocumentService.createShareLink(req.params.id, req.body, creatorId);
+      const creatorId = req.actor?.userId || req.user?.id || 1;
+      const data = await fileDocumentService.createShareLink(req.params.id, req.body, creatorId, req.actor);
       return sendSuccess(res, data, 201);
     } catch (err) {
       next(err);
@@ -157,8 +157,8 @@ export const fileDocumentController = {
   // ── Update Metadata ──
   async updateDocument(req, res, next) {
     try {
-      const actorId = req.user?.id || req.user?.UserID || 1;
-      const data = await fileDocumentService.updateDocument(req.params.id, req.body, actorId);
+      const actorId = req.actor?.userId || req.user?.id || 1;
+      const data = await fileDocumentService.updateDocument(req.params.id, req.body, actorId, req.actor);
       return sendSuccess(res, data);
     } catch (err) {
       next(err);
@@ -168,8 +168,8 @@ export const fileDocumentController = {
   // ── Archive Document ──
   async archiveDocument(req, res, next) {
     try {
-      const actorId = req.user?.id || req.user?.UserID || 1;
-      const data = await fileDocumentService.archiveDocument(req.params.id, actorId);
+      const actorId = req.actor?.userId || req.user?.id || 1;
+      const data = await fileDocumentService.archiveDocument(req.params.id, actorId, req.actor);
       return sendSuccess(res, data);
     } catch (err) {
       next(err);
@@ -179,8 +179,8 @@ export const fileDocumentController = {
   // ── Restore Document ──
   async restoreDocument(req, res, next) {
     try {
-      const actorId = req.user?.id || req.user?.UserID || 1;
-      const data = await fileDocumentService.restoreDocument(req.params.id, actorId);
+      const actorId = req.actor?.userId || req.user?.id || 1;
+      const data = await fileDocumentService.restoreDocument(req.params.id, actorId, req.actor);
       return sendSuccess(res, data);
     } catch (err) {
       next(err);
@@ -190,8 +190,8 @@ export const fileDocumentController = {
   // ── Permanent Delete ──
   async deletePermanent(req, res, next) {
     try {
-      const actorId = req.user?.id || req.user?.UserID || 1;
-      const data = await fileDocumentService.deletePermanent(req.params.id, actorId);
+      const actorId = req.actor?.userId || req.user?.id || 1;
+      const data = await fileDocumentService.deletePermanent(req.params.id, actorId, req.actor);
       return sendSuccess(res, data);
     } catch (err) {
       next(err);

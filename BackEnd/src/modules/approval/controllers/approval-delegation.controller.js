@@ -6,7 +6,7 @@ export const approvalDelegationController = {
   async getDelegations(req, res, next) {
     try {
       const params = getQuery(req);
-      const result = await approvalDelegationService.getDelegations(params);
+      const result = await approvalDelegationService.getDelegations(params, req.actor);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);
@@ -16,7 +16,7 @@ export const approvalDelegationController = {
   async getDelegationById(req, res, next) {
     try {
       const { id } = getParams(req);
-      const delegation = await approvalDelegationService.getDelegationById(id);
+      const delegation = await approvalDelegationService.getDelegationById(id, req.actor);
       return sendSuccess(res, delegation);
     } catch (err) {
       next(err);
@@ -25,7 +25,7 @@ export const approvalDelegationController = {
 
   async createDelegation(req, res, next) {
     try {
-      const delegation = await approvalDelegationService.createDelegation(req.body, req.user?.id);
+      const delegation = await approvalDelegationService.createDelegation(req.body, req.actor);
       return sendSuccess(res, delegation, 201);
     } catch (err) {
       next(err);
@@ -35,7 +35,7 @@ export const approvalDelegationController = {
   async updateDelegation(req, res, next) {
     try {
       const { id } = getParams(req);
-      const updated = await approvalDelegationService.updateDelegation(id, req.body, req.user?.id);
+      const updated = await approvalDelegationService.updateDelegation(id, req.body, req.actor);
       return sendSuccess(res, updated);
     } catch (err) {
       next(err);
@@ -45,7 +45,7 @@ export const approvalDelegationController = {
   async deleteDelegation(req, res, next) {
     try {
       const { id } = getParams(req);
-      const result = await approvalDelegationService.deleteDelegation(id, req.user?.id);
+      const result = await approvalDelegationService.deleteDelegation(id, req.actor);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);
