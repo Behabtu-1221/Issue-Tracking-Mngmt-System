@@ -1,0 +1,208 @@
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { 
+  Building2, 
+  Building, 
+  Layers, 
+  Grid, 
+  MapPin, 
+  Compass, 
+  PieChart, 
+  CheckCircle2, 
+  Maximize2 
+} from 'lucide-react';
+import { PARK_TABS } from '../constants/parkConstants';
+import ParksTab from '../components/ParksTab';
+import BuildingsTab from '../components/BuildingsTab';
+import FloorsTab from '../components/FloorsTab';
+import OfficeSpacesTab from '../components/OfficeSpacesTab';
+import FacilityZonesTab from '../components/FacilityZonesTab';
+import CampusLocationsTab from '../components/CampusLocationsTab';
+import parkApi from '../api/parkApi';
+
+const ICON_MAP = {
+  Building2: Building2,
+  Building: Building,
+  Layers: Layers,
+  Grid: Grid,
+  MapPin: MapPin,
+  Compass: Compass
+};
+
+const TAB_COMPONENTS = {
+  parks: ParksTab,
+  buildings: BuildingsTab,
+  floors: FloorsTab,
+  offices: OfficeSpacesTab,
+  zones: FacilityZonesTab,
+  locations: CampusLocationsTab
+};
+
+export default function BusinessParkPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl && TAB_COMPONENTS[tabFromUrl] ? tabFromUrl : 'parks');
+
+  useEffect(() => {
+    if (tabFromUrl && TAB_COMPONENTS[tabFromUrl]) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setSearchParams({ tab: tabId });
+  };
+  const [metrics, setMetrics] = useState({
+    parks: { totalParks: 0, totalParkArea: 0 },
+    buildings: { totalBuildings: 0, totalFloors: 0, totalBuildingArea: 0 },
+    offices: { totalOffices: 0, vacantOffices: 0, occupiedOffices: 0, totalOfficeArea: 0 }
+  });
+
+  const fetchMetrics = async () => {
+    try {
+      const res = await parkApi.getParkMetrics();
+      if (res.data && res.data.status === 'success') {
+        setMetrics(res.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to load park overview metrics:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMetrics();
+  }, []);
+
+  const ActiveComponent = TAB_COMPONENTS[activeTab];
+
+  const occupancyRate = metrics.offices.totalOffices > 0 
+    ? Math.round((metrics.offices.occupiedOffices / metrics.offices.totalOffices) * 100)
+    : 0;
+
+  return (
+    <div>
+      {/* Page Header */}
+      <div style={{ marginBottom: '28px' }}>
+        <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.2rem', marginBottom: '8px' }}>
+          Ethiopian IT Park <span className="glow-text">Campus Master</span>
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+          Ethiopian IT Park — Central Campus Management for physical topology, commercial buildings, floors, office spaces, and facility zones hosting multiple tenant organizations.
+        </p>
+      </div>
+
+      {/* Top Overview Metrics Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(138, 75, 255, 0.15)', color: 'var(--accent-primary)' }}>
+            <Building2 size={24} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Business Park Campus</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+              {metrics.parks.totalParks || 1} Campus
+            </div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              {metrics.parks.totalParkArea ? `${Number(metrics.parks.totalParkArea).toLocaleString()} m² Total Area` : 'Primary Campus Site'}
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--color-info)' }}>
+            <Building size={24} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Buildings & Floors</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+              {metrics.buildings.totalBuildings || 0}
+            </div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              {metrics.buildings.totalFloors || 0} Floor Levels
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-success)' }}>
+            <Grid size={24} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Office Spaces</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+              {metrics.offices.totalOffices || 0}
+            </div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--color-success)' }}>
+              {metrics.offices.vacantOffices || 0} Vacant Units Available
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-warning)' }}>
+            <PieChart size={24} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Occupancy Rate</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+              {occupancyRate}%
+            </div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              {metrics.offices.occupiedOffices || 0} Occupied Units
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div style={{
+        display: 'flex',
+        gap: '6px',
+        padding: '6px',
+        background: 'var(--glass-bg)',
+        border: '1px solid var(--glass-border)',
+        borderRadius: 'var(--border-radius-md)',
+        marginBottom: '28px',
+        overflowX: 'auto'
+      }}>
+        {PARK_TABS.map((tab) => {
+          const Icon = ICON_MAP[tab.icon];
+          const isActive = activeTab === tab.id;
+
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              title={tab.description}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 18px',
+                borderRadius: 'var(--border-radius-sm)',
+                border: 'none',
+                background: isActive ? 'var(--accent-gradient)' : 'transparent',
+                color: isActive ? 'white' : 'var(--text-muted)',
+                fontWeight: isActive ? '600' : '500',
+                fontSize: '0.88rem',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all var(--transition-fast)',
+                boxShadow: isActive ? 'var(--glow-accent)' : 'none'
+              }}
+            >
+              {Icon && <Icon size={16} />}
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Active Tab Component */}
+      <div>
+        {ActiveComponent && <ActiveComponent />}
+      </div>
+    </div>
+  );
+}

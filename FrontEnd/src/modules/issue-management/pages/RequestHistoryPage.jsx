@@ -1,0 +1,529 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  History, Search, Filter, RefreshCw, Calendar, CheckCircle2,
+  XCircle, Clock, ChevronRight, FileText, ArrowLeft,
+  LayoutGrid, List, MoveHorizontal, Eye
+} from 'lucide-react';
+import issueManagementApi from '../api/issueManagementApi';
+import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
+import { IssueDetailView } from '../components/IssueDetailView';
+
+export default function RequestHistoryPage() {
+  const navigate = useNavigate();
+  const { user } = usePermissionContext();
+
+  const [historyItems, setHistoryItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL_HISTORY');
+  const [priorityFilter, setPriorityFilter] = useState('ALL');
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [viewMode, setViewMode] = useState('table');
+
+  const currentUserId = user?.UserID || user?.userId;
+
+  useEffect(() => {
+    if (currentUserId) {
+      fetchHistory();
+    }
+  }, [currentUserId]);
+
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      const res = await issueManagementApi.getIssues({ requesterUserId: currentUserId, limit: 200 });
+      const data = res.data?.data?.issues || res.data?.data || [];
+      setHistoryItems(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to load request history:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusBadge = (statusStr) => {
+    const status = (statusStr || '').toUpperCase();
+    switch (status) {
+      case 'RESOLVED':
+        return { label: 'Resolved', bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
+      case 'CLOSED':
+        return { label: 'Closed', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+      case 'CANCELLED':
+        return { label: 'Cancelled', bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' };
+      default:
+        return { label: statusStr || 'Active', bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
+    }
+  };
+
+  const filteredItems = historyItems.filter(item => {
+    const status = (item.StatusCode || item.StatusName || '').toUpperCase();
+
+    if (statusFilter === 'CLOSED' && status !== 'CLOSED') return false;
+    if (statusFilter === 'RESOLVED' && status !== 'RESOLVED') return false;
+    if (statusFilter === 'CANCELLED' && status !== 'CANCELLED') return false;
+
+    if (priorityFilter !== 'ALL' && (item.PriorityCode || '').toUpperCase() !== priorityFilter) return false;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const titleMatch = (item.Title || '').toLowerCase().includes(q);
+      const codeMatch = (item.IssueRequestCode || '').toLowerCase().includes(q);
+      const serviceMatch = (item.ServiceName || '').toLowerCase().includes(q);
+      return titleMatch || codeMatch || serviceMatch;
+    }
+    return true;
+  });
+
+  if (selectedRequest) {
+    return (
+      <IssueDetailView
+        issue={selectedRequest}
+        onBack={() => {
+          setSelectedRequest(null);
+          fetchHistory();
+        }}
+        onRefresh={fetchHistory}
+      />
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <History size={26} style={{ color: 'var(--accent-primary)' }} /> Request <span className="glow-text">History & Audit Log</span>
+          </h1>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+            Search and filter your historical service requests, resolved tickets, and closed interactions.
+          </p>
+        </div>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="glass-panel" style={{ padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+        
+        {/* Status Filters */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {[
+            { id: 'ALL_HISTORY', label: 'All History' },
+            { id: 'RESOLVED', label: 'Resolved Tickets' },
+            { id: 'CLOSED', label: 'Closed Tickets' },
+            { id: 'CANCELLED', label: 'Cancelled Requests' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setStatusFilter(tab.id)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '16px',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                background: statusFilter === tab.id ? 'var(--accent-gradient)' : 'var(--bg-tertiary)',
+                color: statusFilter === tab.id ? '#ffffff' : 'var(--text-secondary)',
+                transition: 'all 0.2s'
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Priority Filter & Search */}
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <select
+            value={priorityFilter}
+            onChange={e => setPriorityFilter(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-primary)',
+              fontSize: '0.85rem'
+            }}
+          >
+            <option value="ALL">All Priorities</option>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="URGENT">Urgent</option>
+          </select>
+
+          <div style={{ position: 'relative' }}>
+            <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input
+              type="text"
+              placeholder="Search historical tickets..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                padding: '8px 14px 8px 36px',
+                borderRadius: '8px',
+                border: '1px solid var(--glass-border)',
+                background: 'var(--bg-tertiary)',
+                color: 'var(--text-primary)',
+                fontSize: '0.85rem',
+                width: '220px'
+              }}
+            />
+          </div>
+
+          {/* View Mode Toggle */}
+          <div style={{
+            display: 'flex',
+            background: 'var(--bg-tertiary)',
+            border: '1px solid var(--glass-border)',
+            borderRadius: '8px',
+            padding: '3px',
+            gap: '2px'
+          }}>
+            <button
+              onClick={() => setViewMode('table')}
+              title="Table View (with horizontal scroll)"
+              style={{
+                padding: '5px 10px',
+                borderRadius: '6px',
+                border: 'none',
+                background: viewMode === 'table' ? 'var(--accent-gradient)' : 'transparent',
+                color: viewMode === 'table' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                transition: 'all 0.2s'
+              }}
+            >
+              <List size={14} /> Table
+            </button>
+            <button
+              onClick={() => setViewMode('cards')}
+              title="Card Grid View"
+              style={{
+                padding: '5px 10px',
+                borderRadius: '6px',
+                border: 'none',
+                background: viewMode === 'cards' ? 'var(--accent-gradient)' : 'transparent',
+                color: viewMode === 'cards' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                transition: 'all 0.2s'
+              }}
+            >
+              <LayoutGrid size={14} /> Cards
+            </button>
+          </div>
+
+          <button
+            onClick={fetchHistory}
+            style={{
+              padding: '8px',
+              borderRadius: '8px',
+              border: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer'
+            }}
+            title="Refresh history"
+          >
+            <RefreshCw size={16} />
+          </button>
+        </div>
+
+      </div>
+
+      {/* History Container */}
+      {viewMode === 'table' ? (
+        <div className="glass-panel" style={{ borderRadius: 'var(--border-radius-md)', padding: 0, overflow: 'hidden' }}>
+          {/* Table Subheader Bar with Live Count & Horizontal Scroll Cue */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 20px',
+            borderBottom: '1px solid var(--glass-border)',
+            background: 'rgba(255, 255, 255, 0.02)',
+            fontSize: '0.82rem',
+            color: 'var(--text-muted)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Request History & Archive</span>
+              <span style={{
+                background: 'rgba(99, 102, 241, 0.12)',
+                color: 'var(--accent-primary)',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                fontSize: '0.75rem',
+                fontWeight: 700
+              }}>
+                {filteredItems.length} {filteredItems.length === 1 ? 'record' : 'records'}
+              </span>
+            </div>
+
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.75rem',
+              color: 'var(--text-muted)',
+              background: 'var(--bg-tertiary)',
+              padding: '4px 10px',
+              borderRadius: '6px',
+              border: '1px solid var(--glass-border)'
+            }}>
+              <MoveHorizontal size={13} color="var(--accent-primary)" />
+              <span>Horizontal Scroll Enabled</span>
+            </div>
+          </div>
+
+          {/* Table with Horizontal Scrollbar */}
+          <div className="table-scroll-container" tabIndex={0} role="region" aria-label="Request History Table">
+            <table className="custom-table" style={{ width: '100%', minWidth: '1200px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+              <thead>
+                <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)' }}>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px' }}>Request # & Title</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px' }}>Service & Category</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Status</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '110px' }}>Priority</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px' }}>Assigned Tech</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Submitted Date</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '150px' }}>Resolved / Closed</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="8" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      Loading request history...
+                    </td>
+                  </tr>
+                ) : filteredItems.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <History size={36} style={{ color: 'var(--accent-primary)', marginBottom: '10px' }} />
+                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>No historical requests found</div>
+                      <div style={{ fontSize: '0.85rem' }}>
+                        No past records match your selected filters.
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredItems.map(item => {
+                    const badge = getStatusBadge(item.StatusCode || item.StatusName);
+
+                    return (
+                      <tr
+                        key={item.IssueRequestID || item.id}
+                        onClick={() => setSelectedRequest(item)}
+                        style={{ borderBottom: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'background-color 0.15s ease' }}
+                        className="table-row-hover"
+                      >
+                        <td style={{ padding: '14px 18px' }}>
+                          <div style={{ fontWeight: '800', color: 'var(--accent-primary)', fontFamily: 'monospace' }}>
+                            {item.IssueRequestCode || `#${item.IssueRequestID}`}
+                          </div>
+                          <div style={{
+                            fontWeight: '600',
+                            color: 'var(--text-primary)',
+                            marginTop: '2px',
+                            maxWidth: '260px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }} title={item.Title}>
+                            {item.Title}
+                          </div>
+                        </td>
+
+                        <td style={{ padding: '14px 18px' }}>
+                          <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{item.ServiceName || 'General Service'}</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.CategoryName || 'Standard'}</div>
+                        </td>
+
+                        <td style={{ padding: '14px 18px' }}>
+                          <span style={{
+                            padding: '3px 10px',
+                            borderRadius: '12px',
+                            fontSize: '0.73rem',
+                            fontWeight: 700,
+                            background: badge.bg,
+                            color: badge.color,
+                            border: `1px solid ${badge.border}`
+                          }}>
+                            {badge.label}
+                          </span>
+                        </td>
+
+                        <td style={{ padding: '14px 18px' }}>
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                            {item.PriorityCode || 'MEDIUM'}
+                          </span>
+                        </td>
+
+                        <td style={{ padding: '14px 18px' }}>
+                          <span style={{ color: item.AssignedTechnicianName ? '#c084fc' : 'var(--text-muted)', fontWeight: item.AssignedTechnicianName ? 600 : 400 }}>
+                            {item.AssignedTechnicianName || 'N/A'}
+                          </span>
+                        </td>
+
+                        <td style={{ padding: '14px 18px' }}>
+                          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Calendar size={13} style={{ color: 'var(--text-muted)' }} />
+                            {new Date(item.CreatedAt || item.RequestDate || Date.now()).toLocaleDateString()}
+                          </div>
+                        </td>
+
+                        <td style={{ padding: '14px 18px' }}>
+                          <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Clock size={13} />
+                            {item.ResolvedDateTime ? new Date(item.ResolvedDateTime).toLocaleDateString() : (item.StatusCode === 'CLOSED' ? 'Closed' : 'Yes')}
+                          </div>
+                        </td>
+
+                        <td style={{ padding: '14px 18px', textAlign: 'right' }}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSelectedRequest(item); }}
+                            style={{
+                              padding: '7px 12px',
+                              borderRadius: '8px',
+                              background: 'rgba(37,99,235,0.12)',
+                              border: '1px solid rgba(37,99,235,0.3)',
+                              color: '#60a5fa',
+                              fontSize: '0.8rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                          >
+                            <Eye size={14} /> View Archive
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        /* Cards View */
+        <div className="glass-panel" style={{ padding: '24px' }}>
+          {loading ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              Loading request history...
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <History size={40} style={{ color: 'var(--accent-primary)', marginBottom: '12px' }} />
+              <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>No historical requests found</h4>
+              <p style={{ margin: 0, fontSize: '0.85rem' }}>
+                No past records match your selected filters.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {filteredItems.map(item => {
+                const badge = getStatusBadge(item.StatusCode || item.StatusName);
+
+                return (
+                  <div
+                    key={item.IssueRequestID || item.id}
+                    onClick={() => setSelectedRequest(item)}
+                    style={{
+                      padding: '18px 20px',
+                      borderRadius: '12px',
+                      background: 'var(--bg-tertiary)',
+                      border: '1px solid var(--glass-border)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '16px'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                      e.currentTarget.style.transform = 'translateX(4px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'var(--glass-border)';
+                      e.currentTarget.style.transform = 'translateX(0)';
+                    }}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--accent-primary)', fontFamily: 'monospace' }}>
+                          {item.IssueRequestCode || `#${item.IssueRequestID}`}
+                        </span>
+
+                        <span style={{
+                          padding: '3px 10px',
+                          borderRadius: '12px',
+                          fontSize: '0.73rem',
+                          fontWeight: 700,
+                          background: badge.bg,
+                          color: badge.color,
+                          border: `1px solid ${badge.border}`
+                        }}>
+                          {badge.label}
+                        </span>
+
+                        {item.ServiceName && (
+                          <span style={{ fontSize: '0.73rem', color: 'var(--text-muted)', background: 'var(--bg-secondary)', padding: '2px 8px', borderRadius: '4px' }}>
+                            {item.ServiceName}
+                          </span>
+                        )}
+                      </div>
+
+                      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {item.Title}
+                      </h4>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                        <span>Submitted: {new Date(item.CreatedAt || item.RequestDate || Date.now()).toLocaleDateString()}</span>
+                        <span>Assigned Tech: <strong style={{ color: item.AssignedTechnicianName ? '#c084fc' : 'var(--text-muted)' }}>{item.AssignedTechnicianName || 'N/A'}</strong></span>
+                        <span>Resolved / Closed: {item.ResolvedDateTime ? new Date(item.ResolvedDateTime).toLocaleDateString() : 'Yes'}</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <button style={{
+                        padding: '8px 14px',
+                        borderRadius: '8px',
+                        background: 'rgba(37,99,235,0.12)',
+                        border: '1px solid rgba(37,99,235,0.3)',
+                        color: '#60a5fa',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}>
+                        View Archive <ChevronRight size={15} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

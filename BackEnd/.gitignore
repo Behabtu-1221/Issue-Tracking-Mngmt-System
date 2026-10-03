@@ -1,0 +1,14 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Node dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Test coverage
+coverage/
