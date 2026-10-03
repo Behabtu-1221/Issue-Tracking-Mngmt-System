@@ -66,11 +66,12 @@ class PasswordResetTokenRepository {
          prt.IsDeleted,
          ua.UserID,
          ua.Username,
-         ua.Email,
+         u.Email,
          ua.AccountStatusCode,
          ua.IsActive AS AccountIsActive
        FROM PasswordResetToken prt
        INNER JOIN UserAccount ua ON ua.UserAccountID = prt.UserAccountID
+       INNER JOIN \`User\` u ON u.UserID = ua.UserID
        WHERE prt.ResetToken = ?
        ORDER BY prt.CreatedDate DESC
        LIMIT 1`,

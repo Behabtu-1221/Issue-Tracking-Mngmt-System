@@ -104,4 +104,5 @@ app.all(/(.*)/, (req, res, next) => {
 
 app.use(errorHandler);
 
+export { modules };
 export default app;

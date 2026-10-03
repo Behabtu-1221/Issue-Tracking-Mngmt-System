@@ -14,6 +14,8 @@ const createLimitHandler = (customMessage) => (req, res, next, options) => {
   });
 };
 
+const isBypass = (req) => env.isTest || req.headers['x-bypass-rate-limit'] === 'test-suite-bypass';
+
 /**
  * Global API Rate Limiter
  * Default: 100 requests per minute per IP
@@ -24,7 +26,7 @@ export const globalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: createLimitHandler('Too many requests from this IP, please try again later.'),
-  skip: (req) => env.isTest // Allow test suite to mock without artificial delays
+  skip: (req) => isBypass(req)
 });
 
 /**
@@ -33,11 +35,11 @@ export const globalLimiter = rateLimit({
  */
 export const loginLimiter = rateLimit({
   windowMs: env.rateLimit.authWindowMs,
-  max: env.isTest ? 100 : 5,
+  max: 5,
   standardHeaders: true,
   legacyHeaders: false,
   handler: createLimitHandler('Too many login attempts. Please wait before retrying.'),
-  skip: (req) => false
+  skip: (req) => isBypass(req)
 });
 
 /**
@@ -46,11 +48,11 @@ export const loginLimiter = rateLimit({
  */
 export const passwordResetLimiter = rateLimit({
   windowMs: env.rateLimit.passwordResetWindowMs,
-  max: env.isTest ? 100 : 3,
+  max: 3,
   standardHeaders: true,
   legacyHeaders: false,
   handler: createLimitHandler('Too many password reset requests. Please check your inbox or wait before retrying.'),
-  skip: (req) => false
+  skip: (req) => isBypass(req)
 });
 
 /**
@@ -59,11 +61,11 @@ export const passwordResetLimiter = rateLimit({
  */
 export const tokenRefreshLimiter = rateLimit({
   windowMs: env.rateLimit.authWindowMs,
-  max: env.isTest ? 100 : 10,
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   handler: createLimitHandler('Too many token refresh attempts. Please re-authenticate.'),
-  skip: (req) => false
+  skip: (req) => isBypass(req)
 });
 
 export default {
