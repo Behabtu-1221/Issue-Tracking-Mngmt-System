@@ -3,7 +3,7 @@
     "scripts": {
         "dev": "nodemon index.js",
         "start": "node index.js",
-        "test": "node tests/security-hardening.test.js"
+        "test": "node tests/security-hardening.test.js && node tests/authorization-isolation.test.js"
     },
     "dependencies": {
         "bcryptjs": "^3.0.3",
