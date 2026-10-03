@@ -1,10 +1,11 @@
 import app from './app.js';
+import env from './config/env.js';
 import db from './database/connection.js';
 import logger from './shared/utils/logger.js';
 import { enforceSingleBusinessPark } from './database/seeders/enforce-single-business-park.js';
 import { initServiceCategoryMappingTable } from './database/seeders/init-category-mapping-table.js';
 
-const PORT = process.env.PORT || 5000;
+const PORT = env.PORT;
 
 const startServer = async () => {
   try {
@@ -20,7 +21,7 @@ const startServer = async () => {
   }
 
   app.listen(PORT, () => {
-    logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    logger.info(`Server running in ${env.NODE_ENV} mode on port ${PORT}`);
   });
 };
 
