@@ -333,7 +333,7 @@ export default function ReportDataTable({
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(15, 23, 42, 0.65)',
+          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
           backdropFilter: 'blur(5px)',
           display: 'flex',
           alignItems: 'center',

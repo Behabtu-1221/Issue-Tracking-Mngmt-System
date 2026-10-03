@@ -327,7 +327,7 @@ export default function SLAPoliciesTab() {
       {showModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(12px)',
+          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 9999, padding: '20px'
         }}>

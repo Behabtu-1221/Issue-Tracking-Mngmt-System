@@ -284,7 +284,7 @@ export default function LookupsTab() {
                   placeholder="e.g. SEVERITY_LEVEL"
                   value={typeForm.lookupTypeCode}
                   onChange={(e) => setTypeForm({ ...typeForm, lookupTypeCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
               <div style={{ marginBottom: '20px' }}>
@@ -295,11 +295,11 @@ export default function LookupsTab() {
                   placeholder="e.g. Severity Level"
                   value={typeForm.lookupTypeName}
                   onChange={(e) => setTypeForm({ ...typeForm, lookupTypeName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsTypeModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsTypeModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Type'}</button>
               </div>
             </form>
@@ -322,7 +322,7 @@ export default function LookupsTab() {
                   placeholder="e.g. HIGH"
                   value={valueForm.lookupValueCode}
                   onChange={(e) => setValueForm({ ...valueForm, lookupValueCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
               <div style={{ marginBottom: '14px' }}>
@@ -333,7 +333,7 @@ export default function LookupsTab() {
                   placeholder="e.g. High Priority"
                   value={valueForm.lookupValueName}
                   onChange={(e) => setValueForm({ ...valueForm, lookupValueName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ marginBottom: '20px' }}>
@@ -342,11 +342,11 @@ export default function LookupsTab() {
                   type="number"
                   value={valueForm.displayOrder}
                   onChange={(e) => setValueForm({ ...valueForm, displayOrder: parseInt(e.target.value, 10) || 0 })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsValueModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsValueModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Add Value'}</button>
               </div>
             </form>

@@ -297,7 +297,7 @@ export default function CalendarsTab() {
                   placeholder="e.g. CAL_BUSINESS_PARK_DEFAULT"
                   value={calendarForm.calendarCode}
                   onChange={(e) => setCalendarForm({ ...calendarForm, calendarCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
               <div style={{ marginBottom: '14px' }}>
@@ -308,7 +308,7 @@ export default function CalendarsTab() {
                   placeholder="e.g. Standard 8-5 Business Calendar"
                   value={calendarForm.calendarName}
                   onChange={(e) => setCalendarForm({ ...calendarForm, calendarName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
@@ -318,7 +318,7 @@ export default function CalendarsTab() {
                     type="time"
                     value={calendarForm.workStartTime}
                     onChange={(e) => setCalendarForm({ ...calendarForm, workStartTime: e.target.value })}
-                    style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                    style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                   />
                 </div>
                 <div>
@@ -327,12 +327,12 @@ export default function CalendarsTab() {
                     type="time"
                     value={calendarForm.workEndTime}
                     onChange={(e) => setCalendarForm({ ...calendarForm, workEndTime: e.target.value })}
-                    style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                    style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                   />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsCalendarModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsCalendarModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Calendar'}</button>
               </div>
             </form>
@@ -355,7 +355,7 @@ export default function CalendarsTab() {
                   placeholder="e.g. New Year's Day"
                   value={holidayForm.holidayName}
                   onChange={(e) => setHolidayForm({ ...holidayForm, holidayName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ marginBottom: '14px' }}>
@@ -365,7 +365,7 @@ export default function CalendarsTab() {
                   required
                   value={holidayForm.holidayDate}
                   onChange={(e) => setHolidayForm({ ...holidayForm, holidayDate: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -378,7 +378,7 @@ export default function CalendarsTab() {
                 <label htmlFor="isRecurring" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Recurring Annual Holiday</label>
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsHolidayModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsHolidayModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Add Holiday'}</button>
               </div>
             </form>

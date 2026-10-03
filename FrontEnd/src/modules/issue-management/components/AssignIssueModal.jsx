@@ -85,7 +85,7 @@ export const AssignIssueModal = ({ isOpen, onClose, issue, onAssigned }) => {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 1000,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
       backdropFilter: 'blur(6px)'
     }}>
       <div className="glass-panel" style={{
@@ -97,11 +97,11 @@ export const AssignIssueModal = ({ isOpen, onClose, issue, onAssigned }) => {
           padding: '20px 28px',
           borderBottom: '1px solid var(--glass-border)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(138, 75, 255, 0.06))'
+          background: 'linear-gradient(135deg, rgba(47, 129, 247, 0.08), rgba(56, 163, 255, 0.04))'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.15)' }}>
-              <UserCheck size={20} style={{ color: '#c084fc' }} />
+            <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--color-primary-subtle)' }}>
+              <UserCheck size={20} style={{ color: 'var(--color-primary)' }} />
             </div>
             <div>
               <h2 style={{ fontWeight: '700', fontSize: '1.1rem' }}>Assign Department</h2>
@@ -110,7 +110,7 @@ export const AssignIssueModal = ({ isOpen, onClose, issue, onAssigned }) => {
               </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', border: '1px solid var(--glass-border)', backgroundColor: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}>
             <X size={18} />
           </button>
         </div>

@@ -494,7 +494,7 @@ export default function ContactsAddressesTab() {
 
       {/* Modal: Create Contact */}
       {isContactModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div className="glass-card" style={{ width: '100%', maxWidth: '480px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
               <Phone color="var(--accent-primary)" /> Add Contact Channel
@@ -636,7 +636,7 @@ export default function ContactsAddressesTab() {
 
       {/* Modal: Create Address */}
       {isAddressModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div className="glass-card" style={{ width: '100%', maxWidth: '540px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
               <MapPin color="var(--accent-primary)" /> Add Registered Address

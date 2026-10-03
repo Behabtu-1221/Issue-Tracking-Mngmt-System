@@ -438,7 +438,7 @@ export default function BuildingsTab() {
       {/* Register / Edit Modal */}
       {showCreateModal && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.65)',
+          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
           backdropFilter: 'blur(8px)', zIndex: 1000,
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
         }}>

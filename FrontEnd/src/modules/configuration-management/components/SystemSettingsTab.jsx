@@ -107,7 +107,7 @@ export default function SystemSettingsTab() {
             onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(10, 12, 22, 0.4)',
+              background: 'var(--color-elevated)',
               border: '1px solid var(--glass-border)',
               borderRadius: 'var(--border-radius-sm)',
               padding: '10px 14px 10px 40px',
@@ -244,7 +244,7 @@ export default function SystemSettingsTab() {
                     required
                     value={formData.categoryCode}
                     onChange={(e) => setFormData({ ...formData, categoryCode: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                   />
                 </div>
                 <div>
@@ -252,7 +252,7 @@ export default function SystemSettingsTab() {
                   <select
                     value={formData.dataType}
                     onChange={(e) => setFormData({ ...formData, dataType: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                   >
                     {DATA_TYPES.map((dt) => (
                       <option key={dt} value={dt} style={{ background: 'var(--bg-secondary)' }}>{dt}</option>
@@ -270,7 +270,7 @@ export default function SystemSettingsTab() {
                   placeholder="e.g. SYSTEM_DEFAULT_TIMEZONE"
                   value={formData.settingKey}
                   onChange={(e) => setFormData({ ...formData, settingKey: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
 
@@ -282,7 +282,7 @@ export default function SystemSettingsTab() {
                   placeholder="Enter setting value..."
                   value={formData.settingValue}
                   onChange={(e) => setFormData({ ...formData, settingValue: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
 
@@ -293,7 +293,7 @@ export default function SystemSettingsTab() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Help text for administrators..."
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
 
@@ -301,7 +301,7 @@ export default function SystemSettingsTab() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}
+                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
                   Cancel
                 </button>

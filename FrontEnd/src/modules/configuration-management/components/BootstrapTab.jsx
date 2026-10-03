@@ -41,7 +41,7 @@ export default function BootstrapTab() {
             padding: '10px 18px',
             borderRadius: 'var(--border-radius-sm)',
             background: 'var(--bg-tertiary)',
-            color: 'white',
+            color: 'var(--color-text)',
             border: '1px solid var(--glass-border)',
             fontWeight: '600',
             fontSize: '0.88rem',
@@ -98,7 +98,7 @@ export default function BootstrapTab() {
           <div className="glass-panel" style={{ padding: '20px' }}>
             <h4 style={{ fontSize: '1rem', marginBottom: '14px', color: 'var(--text-secondary)' }}>Bootstrap JSON Payload</h4>
             <pre style={{
-              background: 'rgba(10, 12, 22, 0.6)',
+              background: 'var(--color-elevated)',
               border: '1px solid var(--glass-border)',
               borderRadius: 'var(--border-radius-sm)',
               padding: '18px',

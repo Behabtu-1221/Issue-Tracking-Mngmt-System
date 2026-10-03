@@ -534,7 +534,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
       {/* Allocate Modal (Office / Floor / Building) */}
       {isAllocateModalOpen && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }} onClick={() => setIsAllocateModalOpen(false)}>
           <div style={{
@@ -867,7 +867,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
       {/* Release Modal */}
       {releaseModalAlloc && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }} onClick={() => setReleaseModalAlloc(null)}>
           <div style={{

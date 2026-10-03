@@ -28,7 +28,7 @@ export const inputSanitizer = {
     const base = filename.replace(/^.*[\\/]/, '');
     const clean = base
       .replace(REGEX_PATTERNS.PATH_TRAVERSAL, '')
-      .replace(/[^\w\s\.\-()]/gi, '_')
+      .replace(/[^\w\s.\-()]/gi, '_')
       .trim();
     return clean.substring(0, VALIDATION_LIMITS.MAX_FILENAME_LENGTH) || 'unnamed_file';
   },

@@ -249,7 +249,7 @@ export default function FeatureFlagsTab() {
                   placeholder="e.g. ENABLE_NEW_APPROVAL_WORKFLOW"
                   value={formData.flagCode}
                   onChange={(e) => setFormData({ ...formData, flagCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
 
@@ -261,7 +261,7 @@ export default function FeatureFlagsTab() {
                   placeholder="e.g. New Approval Workflow Engine"
                   value={formData.flagName}
                   onChange={(e) => setFormData({ ...formData, flagName: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
 
@@ -272,7 +272,7 @@ export default function FeatureFlagsTab() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Explains what this feature toggle controls..."
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
 
@@ -280,7 +280,7 @@ export default function FeatureFlagsTab() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}
+                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
                   Cancel
                 </button>

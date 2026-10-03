@@ -1044,9 +1044,9 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                           borderRadius: '8px', color: 'var(--text-primary)'
                         }}
                       >
-                        <option value="PERMANENT_FIX" style={{ background: '#111528' }}>Permanent Fix</option>
-                        <option value="WORKAROUND" style={{ background: '#111528' }}>Workaround</option>
-                        <option value="REPLACEMENT" style={{ background: '#111528' }}>Replacement</option>
+                        <option value="PERMANENT_FIX">Permanent Fix</option>
+                        <option value="WORKAROUND">Workaround</option>
+                        <option value="REPLACEMENT">Replacement</option>
                       </select>
                     </FormField>
                   </div>
@@ -1182,7 +1182,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
             {/* Quick Upload Modal */}
             {showAddDocModal && (
-              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+              <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                 <div className="glass-panel" style={{ width: '100%', maxWidth: '460px', padding: '24px', borderRadius: '16px' }}>
                   <h4 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>Attach File to Issue #{issueId}</h4>
                   <form onSubmit={handleUploadAttachment} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -1240,7 +1240,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
       {/* ── Satisfaction Rating & Confirmation Modal ── */}
       {showFeedbackModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: '520px', padding: '28px', borderRadius: '20px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1366,11 +1366,11 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                     onChange={(e) => setFeedbackForm(prev => ({ ...prev, TimelinessRating: Number(e.target.value) }))}
                     style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
                   >
-                    <option value={5} style={{ background: '#111528' }}>5 - Very Fast</option>
-                    <option value={4} style={{ background: '#111528' }}>4 - Fast</option>
-                    <option value={3} style={{ background: '#111528' }}>3 - On Time</option>
-                    <option value={2} style={{ background: '#111528' }}>2 - Delayed</option>
-                    <option value={1} style={{ background: '#111528' }}>1 - Unacceptable</option>
+                    <option value={5}>5 - Very Fast</option>
+                    <option value={4}>4 - Fast</option>
+                    <option value={3}>3 - On Time</option>
+                    <option value={2}>2 - Delayed</option>
+                    <option value={1}>1 - Unacceptable</option>
                   </select>
                 </div>
 
@@ -1383,11 +1383,11 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                     onChange={(e) => setFeedbackForm(prev => ({ ...prev, QualityRating: Number(e.target.value) }))}
                     style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
                   >
-                    <option value={5} style={{ background: '#111528' }}>5 - High Quality</option>
-                    <option value={4} style={{ background: '#111528' }}>4 - Good Quality</option>
-                    <option value={3} style={{ background: '#111528' }}>3 - Average</option>
-                    <option value={2} style={{ background: '#111528' }}>2 - Substandard</option>
-                    <option value={1} style={{ background: '#111528' }}>1 - Defective</option>
+                    <option value={5}>5 - High Quality</option>
+                    <option value={4}>4 - Good Quality</option>
+                    <option value={3}>3 - Average</option>
+                    <option value={2}>2 - Substandard</option>
+                    <option value={1}>1 - Defective</option>
                   </select>
                 </div>
               </div>

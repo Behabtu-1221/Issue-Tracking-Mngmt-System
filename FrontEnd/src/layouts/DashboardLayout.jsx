@@ -732,11 +732,11 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   width: '40px',
                   height: '40px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                  background: 'var(--accent-gradient)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 14px rgba(139, 92, 246, 0.35)',
+                  boxShadow: '0 4px 14px rgba(47, 129, 247, 0.35)',
                   flexShrink: 0
                 }}>
                   <img
@@ -750,7 +750,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   fontWeight: '800',
                   fontSize: '1.2rem',
                   letterSpacing: '-0.01em',
-                  color: theme === 'dark' ? '#ffffff' : '#0f172a'
+                  color: 'var(--text-primary)'
                 }}>
                   ITMS
                 </span>
@@ -783,14 +783,14 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                 width: '40px',
                 height: '40px',
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                background: 'var(--accent-gradient)',
                 border: 'none',
                 color: '#ffffff',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(139, 92, 246, 0.35)'
+                boxShadow: '0 4px 14px rgba(47, 129, 247, 0.35)'
               }}
             >
               <Menu size={20} />
@@ -854,7 +854,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   title={sidebarCollapsed ? item.label : undefined}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <Icon size={18} color={isParentActive ? '#ffffff' : (theme === 'dark' ? '#60a5fa' : 'var(--accent-primary)')} />
+                    <Icon size={18} color={isParentActive ? '#ffffff' : 'var(--color-primary)'} />
                     {!sidebarCollapsed && (
                       <span style={{ fontWeight: '800', color: isParentActive && !isChildActive ? '#ffffff' : 'var(--text-primary)', fontSize: '0.9rem' }}>
                         {item.label}
@@ -872,7 +872,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         justifyContent: 'center',
                         transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
                         transition: 'transform 0.25s ease',
-                        color: isParentActive ? '#ffffff' : '#60a5fa',
+                        color: isParentActive ? '#ffffff' : 'var(--color-primary)',
                         cursor: 'pointer'
                       }}
                     >
@@ -895,9 +895,9 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                           className={`sidebar-child-btn ${isSubActive ? 'child-active' : ''}`}
                           style={{
                             fontWeight: isSubActive ? '800' : '700',
-                            color: isSubActive ? '#ffffff' : 'var(--text-primary)',
-                            backgroundColor: isSubActive ? 'var(--accent-gradient)' : (theme === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.05)'),
-                            borderLeft: isSubActive ? '4px solid var(--accent-primary)' : '4px solid transparent',
+                            color: isSubActive ? '#ffffff' : 'var(--text-secondary)',
+                            backgroundColor: isSubActive ? 'var(--color-primary)' : 'transparent',
+                            borderLeft: isSubActive ? '4px solid var(--color-primary)' : '4px solid transparent',
                             borderRadius: '8px',
                             padding: '7px 12px',
                             display: 'flex',
@@ -907,7 +907,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                             transition: 'all 0.15s ease'
                           }}
                         >
-                          <ChildIcon size={14} color={isSubActive ? '#ffffff' : (theme === 'dark' ? '#60a5fa' : 'var(--accent-primary)')} />
+                          <ChildIcon size={14} color={isSubActive ? '#ffffff' : 'var(--color-primary)'} />
                           <span style={{ fontWeight: isSubActive ? '800' : '700', fontSize: '0.86rem' }}>{child.label}</span>
                         </button>
                       );
@@ -928,7 +928,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
         <header style={{
           height: '70px',
           borderBottom: '1px solid var(--glass-border)',
-          background: theme === 'dark' ? 'rgba(15, 18, 30, 0.75)' : 'rgba(255, 255, 255, 0.8)',
+          background: theme === 'dark' ? 'rgba(23, 27, 33, 0.88)' : 'rgba(255, 255, 255, 0.85)',
           backdropFilter: 'blur(12px)',
           display: 'flex',
           alignItems: 'center',
@@ -1004,13 +1004,13 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                 borderRadius: '50%',
                 background: 'var(--bg-tertiary)',
                 border: '1px solid var(--sidebar-border)',
-                color: theme === 'dark' ? '#f59e0b' : '#6366f1',
+                color: theme === 'dark' ? 'var(--color-warning)' : 'var(--color-primary)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: theme === 'dark' ? '0 0 12px rgba(245, 158, 11, 0.2)' : '0 0 12px rgba(99, 102, 241, 0.2)'
+                boxShadow: theme === 'dark' ? '0 0 12px rgba(242, 176, 30, 0.25)' : '0 0 12px rgba(47, 129, 247, 0.25)'
               }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1.0)'; }}
@@ -1045,7 +1045,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                     position: 'absolute',
                     top: '-2px',
                     right: '-2px',
-                    background: '#ef4444',
+                    background: 'var(--color-error)',
                     color: '#fff',
                     fontSize: '10px',
                     fontWeight: '800',
@@ -1055,7 +1055,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)'
+                    boxShadow: '0 0 8px rgba(229, 72, 77, 0.5)'
                   }}>
                     {unreadCount}
                   </span>
@@ -1069,10 +1069,10 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   top: '50px',
                   right: 0,
                   width: '380px',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--glass-border)',
+                  background: 'var(--color-elevated)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '16px',
-                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.4)',
+                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.35)',
                   backdropFilter: 'blur(20px)',
                   zIndex: 100,
                   overflow: 'hidden',
@@ -1081,18 +1081,18 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   {/* Popover Header */}
                   <div style={{
                     padding: '16px 20px',
-                    borderBottom: '1px solid var(--glass-border)',
+                    borderBottom: '1px solid var(--color-border)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Bell size={16} color="var(--accent-primary)" />
-                      <span style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '14px' }}>Notifications</span>
+                      <Bell size={16} color="var(--color-primary)" />
+                      <span style={{ color: 'var(--color-text)', fontWeight: 700, fontSize: '14px' }}>Notifications</span>
                       {unreadCount > 0 && (
                         <span style={{
-                          background: 'rgba(239, 68, 68, 0.15)',
-                          color: '#ef4444',
+                          background: 'var(--color-error-bg)',
+                          color: 'var(--color-error)',
                           padding: '2px 8px',
                           borderRadius: '6px',
                           fontSize: '11px',
@@ -1107,7 +1107,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         style={{
                           background: 'none',
                           border: 'none',
-                          color: 'var(--accent-primary)',
+                          color: 'var(--color-primary)',
                           fontSize: '12px',
                           fontWeight: 600,
                           cursor: 'pointer'
@@ -1119,8 +1119,8 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   {/* Filter Sub-header Tabs */}
                   <div style={{
                     display: 'flex',
-                    borderBottom: '1px solid var(--glass-border)',
-                    background: 'var(--bg-tertiary)',
+                    borderBottom: '1px solid var(--color-border)',
+                    background: 'var(--color-surface)',
                     padding: '4px'
                   }}>
                     <button
@@ -1128,10 +1128,10 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                       style={{
                         flex: 1,
                         padding: '6px 12px',
-                        background: notifFilter === 'all' ? 'var(--bg-secondary)' : 'transparent',
+                        background: notifFilter === 'all' ? 'var(--color-elevated)' : 'transparent',
                         border: 'none',
                         borderRadius: '8px',
-                        color: notifFilter === 'all' ? 'var(--text-primary)' : 'var(--text-muted)',
+                        color: notifFilter === 'all' ? 'var(--color-text)' : 'var(--color-text-muted)',
                         fontSize: '12px',
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -1145,10 +1145,10 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                       style={{
                         flex: 1,
                         padding: '6px 12px',
-                        background: notifFilter === 'unread' ? 'var(--bg-secondary)' : 'transparent',
+                        background: notifFilter === 'unread' ? 'var(--color-elevated)' : 'transparent',
                         border: 'none',
                         borderRadius: '8px',
-                        color: notifFilter === 'unread' ? 'var(--text-primary)' : 'var(--text-muted)',
+                        color: notifFilter === 'unread' ? 'var(--color-text)' : 'var(--color-text-muted)',
                         fontSize: '12px',
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -1308,7 +1308,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                     justifyContent: 'center',
                     fontWeight: 700,
                     fontSize: '0.85rem',
-                    boxShadow: '0 0 8px rgba(138, 75, 255, 0.4)'
+                    boxShadow: '0 0 8px rgba(47, 129, 247, 0.35)'
                   }}>
                     {user ? `${(user.firstName || user.FirstName || 'U').charAt(0)}${(user.lastName || user.LastName || '').charAt(0)}`.toUpperCase() : 'U'}
                   </div>
@@ -1331,10 +1331,10 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   top: '50px',
                   right: 0,
                   width: '260px',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--glass-border)',
+                  background: 'var(--color-elevated)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '16px',
-                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.4)',
+                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.35)',
                   backdropFilter: 'blur(20px)',
                   zIndex: 100,
                   overflow: 'hidden',
@@ -1343,7 +1343,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                 }}>
                   <div style={{
                     padding: '12px 14px',
-                    borderBottom: '1px solid var(--glass-border)',
+                    borderBottom: '1px solid var(--color-border)',
                     marginBottom: '6px'
                   }}>
                     <div style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.9rem' }}>
@@ -1375,10 +1375,10 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         cursor: 'pointer',
                         textAlign: 'left'
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
-                      <User size={16} color="var(--accent-primary)" />
+                      <User size={16} color="var(--color-primary)" />
                       <span>My Profile & Settings</span>
                     </button>
 
@@ -1402,10 +1402,10 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         cursor: 'pointer',
                         textAlign: 'left'
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
-                      <Bell size={16} color="var(--accent-secondary)" />
+                      <Bell size={16} color="var(--color-info)" />
                       <span>Notification Preferences</span>
                     </button>
 
@@ -1429,14 +1429,14 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         cursor: 'pointer',
                         textAlign: 'left'
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
-                      <Lock size={16} color="#10b981" />
+                      <Lock size={16} color="var(--color-success)" />
                       <span>Password & Security</span>
                     </button>
 
-                    <div style={{ height: '1px', background: 'var(--glass-border)', margin: '4px 0' }} />
+                    <div style={{ height: '1px', background: 'var(--color-border)', margin: '4px 0' }} />
 
                     <button
                       onClick={() => {
@@ -1450,16 +1450,16 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         width: '100%',
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        background: 'rgba(239, 68, 68, 0.1)',
+                        background: 'var(--color-error-bg)',
                         border: 'none',
-                        color: '#ef4444',
+                        color: 'var(--color-error)',
                         fontSize: '0.85rem',
                         fontWeight: 700,
                         cursor: 'pointer',
                         textAlign: 'left'
                       }}
                     >
-                      <LogOut size={16} color="#ef4444" />
+                      <LogOut size={16} color="var(--color-error)" />
                       <span>Sign Out</span>
                     </button>
                   </div>

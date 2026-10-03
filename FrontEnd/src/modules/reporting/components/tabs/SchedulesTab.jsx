@@ -124,10 +124,10 @@ export default function SchedulesTab({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
           {schedules.map((s) => {
             const isTriggering = triggeringId === s.ReportScheduleID;
-            let recipients = [];
+            let recipients;
             try {
-              recipients = typeof s.RecipientsJson === 'string' ? JSON.parse(s.RecipientsJson) : s.RecipientsJson || [];
-            } catch (e) { recipients = []; }
+              recipients = typeof s.RecipientsJson === 'string' ? JSON.parse(s.RecipientsJson) : (s.RecipientsJson || []);
+            } catch { recipients = []; }
 
             return (
               <div

@@ -444,7 +444,7 @@ export default function OfficeSpacesTab() {
         <div style={{
           position: 'fixed', inset: 0, zIndex: 9999,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(0,0,0,0.6)',
+          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
           backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
           animation: 'fadeIn 0.2s ease-out'
         }}>
@@ -724,7 +724,7 @@ export default function OfficeSpacesTab() {
         <div style={{
           position: 'fixed', inset: 0, zIndex: 9999,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(15, 23, 42, 0.75)',
+          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
           backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
           animation: 'fadeIn 0.2s ease-out', padding: '20px'
         }}>

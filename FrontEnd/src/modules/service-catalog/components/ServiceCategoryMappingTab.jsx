@@ -455,7 +455,7 @@ export default function ServiceCategoryMappingTab() {
 
       {/* Modal 1: Create/Edit Mapping Form */}
       {isModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div style={{ width: '100%', maxWidth: '520px', background: 'var(--bg-secondary)', borderRadius: '20px', border: '1px solid var(--glass-border-accent)', padding: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>

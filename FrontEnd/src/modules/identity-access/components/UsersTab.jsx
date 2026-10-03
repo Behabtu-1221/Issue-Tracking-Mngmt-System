@@ -760,7 +760,7 @@ export default function UsersTab() {
       {/* REGISTRATION CONFIRMATION MODAL */}
       {createdResult && (
         <div className="modal-overlay" style={{
-          position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(10px)',
+          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200
         }}>
           <div style={{

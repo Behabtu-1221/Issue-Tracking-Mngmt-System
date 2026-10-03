@@ -34,54 +34,54 @@ export default function ConfirmDialogModal({
       case 'danger':
         return {
           icon: CustomIcon || Trash2,
-          bannerBg: 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(185, 28, 28, 0.05) 100%)',
-          bannerBorder: 'rgba(239, 68, 68, 0.25)',
-          badgeBg: 'rgba(239, 68, 68, 0.2)',
-          badgeBorder: 'rgba(239, 68, 68, 0.4)',
-          iconColor: '#f87171',
-          btnBg: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-          btnShadow: '0 4px 18px rgba(239, 68, 68, 0.35)',
+          bannerBg: 'linear-gradient(135deg, rgba(229, 72, 77, 0.14) 0%, rgba(185, 28, 28, 0.05) 100%)',
+          bannerBorder: 'rgba(229, 72, 77, 0.3)',
+          badgeBg: 'rgba(229, 72, 77, 0.2)',
+          badgeBorder: 'rgba(229, 72, 77, 0.4)',
+          iconColor: '#E5484D',
+          btnBg: 'linear-gradient(135deg, #E5484D 0%, #c73e43 100%)',
+          btnShadow: '0 4px 18px rgba(229, 72, 77, 0.35)',
           btnBorder: '1px solid rgba(254, 202, 202, 0.3)',
-          accentColor: '#f87171'
+          accentColor: '#E5484D'
         };
       case 'warning':
         return {
           icon: CustomIcon || AlertTriangle,
-          bannerBg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(180, 83, 9, 0.05) 100%)',
-          bannerBorder: 'rgba(245, 158, 11, 0.25)',
-          badgeBg: 'rgba(245, 158, 11, 0.2)',
-          badgeBorder: 'rgba(245, 158, 11, 0.4)',
-          iconColor: '#fbbf24',
-          btnBg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-          btnShadow: '0 4px 18px rgba(245, 158, 11, 0.35)',
+          bannerBg: 'linear-gradient(135deg, rgba(242, 176, 30, 0.14) 0%, rgba(180, 83, 9, 0.05) 100%)',
+          bannerBorder: 'rgba(242, 176, 30, 0.3)',
+          badgeBg: 'rgba(242, 176, 30, 0.2)',
+          badgeBorder: 'rgba(242, 176, 30, 0.4)',
+          iconColor: '#F2B01E',
+          btnBg: 'linear-gradient(135deg, #F2B01E 0%, #d89912 100%)',
+          btnShadow: '0 4px 18px rgba(242, 176, 30, 0.35)',
           btnBorder: '1px solid rgba(253, 230, 138, 0.3)',
-          accentColor: '#fbbf24'
+          accentColor: '#F2B01E'
         };
       case 'success':
         return {
           icon: CustomIcon || CheckCircle2,
-          bannerBg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(4, 120, 87, 0.05) 100%)',
-          bannerBorder: 'rgba(16, 185, 129, 0.25)',
-          badgeBg: 'rgba(16, 185, 129, 0.2)',
-          badgeBorder: 'rgba(16, 185, 129, 0.4)',
-          iconColor: '#34d399',
-          btnBg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-          btnShadow: '0 4px 18px rgba(16, 185, 129, 0.35)',
+          bannerBg: 'linear-gradient(135deg, rgba(47, 191, 113, 0.14) 0%, rgba(4, 120, 87, 0.05) 100%)',
+          bannerBorder: 'rgba(47, 191, 113, 0.3)',
+          badgeBg: 'rgba(47, 191, 113, 0.2)',
+          badgeBorder: 'rgba(47, 191, 113, 0.4)',
+          iconColor: '#2FBF71',
+          btnBg: 'linear-gradient(135deg, #2FBF71 0%, #239b5b 100%)',
+          btnShadow: '0 4px 18px rgba(47, 191, 113, 0.35)',
           btnBorder: '1px solid rgba(167, 243, 208, 0.3)',
-          accentColor: '#34d399'
+          accentColor: '#2FBF71'
         };
       default:
         return {
           icon: CustomIcon || Info,
-          bannerBg: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(59, 130, 246, 0.05) 100%)',
-          bannerBorder: 'rgba(99, 102, 241, 0.25)',
-          badgeBg: 'rgba(99, 102, 241, 0.2)',
-          badgeBorder: 'rgba(99, 102, 241, 0.4)',
-          iconColor: '#818cf8',
-          btnBg: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-          btnShadow: '0 4px 18px rgba(99, 102, 241, 0.35)',
+          bannerBg: 'linear-gradient(135deg, rgba(56, 163, 255, 0.14) 0%, rgba(47, 129, 247, 0.05) 100%)',
+          bannerBorder: 'rgba(56, 163, 255, 0.3)',
+          badgeBg: 'rgba(56, 163, 255, 0.2)',
+          badgeBorder: 'rgba(56, 163, 255, 0.4)',
+          iconColor: '#38A3FF',
+          btnBg: 'linear-gradient(135deg, #2F81F7 0%, #1f6feb 100%)',
+          btnShadow: '0 4px 18px rgba(47, 129, 247, 0.35)',
           btnBorder: '1px solid rgba(199, 210, 254, 0.3)',
-          accentColor: '#818cf8'
+          accentColor: '#2F81F7'
         };
     }
   };
@@ -95,7 +95,7 @@ export default function ConfirmDialogModal({
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(15, 23, 42, 0.75)',
+        background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         zIndex: 10000,
@@ -111,10 +111,10 @@ export default function ConfirmDialogModal({
         style={{
           width: '100%',
           maxWidth: '480px',
-          background: 'var(--bg-secondary, #1e293b)',
+          background: 'var(--color-elevated, #20262D)',
           borderRadius: '24px',
-          border: '1px solid var(--glass-border-accent, rgba(255, 255, 255, 0.12))',
-          boxShadow: '0 32px 72px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) inset',
+          border: '1px solid var(--color-border, #303841)',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45)',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',

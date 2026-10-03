@@ -250,7 +250,7 @@ export default function BusinessRulesTab() {
                   placeholder="e.g. HIGH_PRIORITY_ESCALATION"
                   value={formData.ruleCode}
                   onChange={(e) => setFormData({ ...formData, ruleCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
 
@@ -262,7 +262,7 @@ export default function BusinessRulesTab() {
                   placeholder="e.g. High Priority SLA Escalation"
                   value={formData.ruleName}
                   onChange={(e) => setFormData({ ...formData, ruleName: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
 
@@ -274,7 +274,7 @@ export default function BusinessRulesTab() {
                   placeholder="e.g. priority == 'HIGH' && responseTime > 30"
                   value={formData.ruleExpression}
                   onChange={(e) => setFormData({ ...formData, ruleExpression: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
 
@@ -282,7 +282,7 @@ export default function BusinessRulesTab() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}
+                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
                   Cancel
                 </button>

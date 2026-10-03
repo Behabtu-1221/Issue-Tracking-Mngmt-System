@@ -731,7 +731,7 @@ export default function TechRequestDetailPage() {
 
       {/* ── MODAL: REQUEST ADDITIONAL INFO ── */}
       {showInfoModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '24px', borderRadius: '16px', background: 'var(--bg-secondary)' }}>
             <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <HelpCircle size={20} color="var(--accent-primary)" /> Request Additional Information
@@ -788,7 +788,7 @@ export default function TechRequestDetailPage() {
 
       {/* ── MODAL: ESCALATE REQUEST ── */}
       {showEscalationModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: '500px', padding: '24px', borderRadius: '16px', background: 'var(--bg-secondary)' }}>
             <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700, color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <ShieldAlert size={20} /> Escalate Request to Management
@@ -868,7 +868,7 @@ export default function TechRequestDetailPage() {
 
       {/* ── MODAL: STRUCTURED RESOLUTION FORM ── */}
       {showResolutionModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: '560px', padding: '24px', borderRadius: '16px', background: 'var(--bg-secondary)' }}>
             <h3 style={{ margin: '0 0 8px', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CheckCircle2 size={22} color="#10b981" /> Structured Request Resolution

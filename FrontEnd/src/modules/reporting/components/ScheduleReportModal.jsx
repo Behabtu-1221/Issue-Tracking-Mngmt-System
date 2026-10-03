@@ -63,7 +63,7 @@ export default function ScheduleReportModal({
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(15, 23, 42, 0.7)',
+      background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
       backdropFilter: 'blur(6px)',
       display: 'flex',
       alignItems: 'center',

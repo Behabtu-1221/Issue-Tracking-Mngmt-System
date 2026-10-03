@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, AlertTriangle, ShieldCheck, AlertOctagon, CheckCircle2, ShieldAlert, Zap } from 'lucide-react';
+import { Clock, AlertTriangle, ShieldCheck, AlertOctagon, CheckCircle2, ShieldAlert, Zap, AlertCircle } from 'lucide-react';
 import KPICard from '../KPICard';
 import ReportDataTable from '../ReportDataTable';
 import RadialGaugeChart from '../RadialGaugeChart';

@@ -246,7 +246,7 @@ export default function LocalizationTab() {
                     placeholder="e.g. en"
                     value={localeForm.languageCode}
                     onChange={(e) => setLocaleForm({ ...localeForm, languageCode: e.target.value.toLowerCase() })}
-                    style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                    style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                   />
                 </div>
                 <div>
@@ -257,7 +257,7 @@ export default function LocalizationTab() {
                     placeholder="e.g. US"
                     value={localeForm.countryCode}
                     onChange={(e) => setLocaleForm({ ...localeForm, countryCode: e.target.value.toUpperCase() })}
-                    style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                    style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                   />
                 </div>
               </div>
@@ -269,11 +269,11 @@ export default function LocalizationTab() {
                   placeholder="e.g. English (United States)"
                   value={localeForm.localeName}
                   onChange={(e) => setLocaleForm({ ...localeForm, localeName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsLocaleModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsLocaleModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Locale'}</button>
               </div>
             </form>
@@ -296,7 +296,7 @@ export default function LocalizationTab() {
                   placeholder="e.g. button.submit"
                   value={resourceForm.resourceKey}
                   onChange={(e) => setResourceForm({ ...resourceForm, resourceKey: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
               <div style={{ marginBottom: '20px' }}>
@@ -307,11 +307,11 @@ export default function LocalizationTab() {
                   placeholder="e.g. Submit Request"
                   value={resourceForm.resourceValue}
                   onChange={(e) => setResourceForm({ ...resourceForm, resourceValue: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsResourceModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}>Cancel</button>
+                <button type="button" onClick={() => setIsResourceModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
                 <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Translation'}</button>
               </div>
             </form>

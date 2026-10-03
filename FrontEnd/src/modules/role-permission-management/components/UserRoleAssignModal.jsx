@@ -5,8 +5,8 @@ import { FormField } from '../../../components/common/FormField';
 import { rolePermissionSchemas } from '../../../validation';
 
 const glassCard = {
-  background: 'var(--glass-bg)',
-  border: '1px solid rgba(148, 163, 184, 0.15)',
+  background: 'var(--color-elevated, var(--bg-tertiary))',
+  border: '1px solid var(--color-border)',
   borderRadius: '18px',
   backdropFilter: 'blur(16px)',
   padding: '24px'
@@ -81,27 +81,27 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)',
+      position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(6px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100
     }} onClick={onClose}>
       <div style={{
         ...glassCard, width: '520px', maxWidth: '92vw',
-        border: '1px solid rgba(99, 102, 241, 0.3)',
-        boxShadow: '0 25px 70px rgba(0,0,0,0.6)'
+        border: '1px solid var(--color-border)',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.35)'
       }} onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <UserCheck size={24} color="#818cf8" />
+            <UserCheck size={24} color="var(--color-primary)" />
             <div>
-              <h3 style={{ margin: 0, color: '#f1f5f9', fontSize: '17px', fontWeight: 700 }}>
+              <h3 style={{ margin: 0, color: 'var(--color-text)', fontSize: '17px', fontWeight: 700 }}>
                 Assign Employee Role
               </h3>
-              <p style={{ margin: '2px 0 0', color: '#94a3b8', fontSize: '12px' }}>
+              <p style={{ margin: '2px 0 0', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
                 Allocate security authority and granular permissions
               </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
             <X size={20} />
           </button>
         </div>
@@ -109,19 +109,19 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
         {errorMsg && (
           <div style={{
             padding: '10px 14px', borderRadius: '10px', marginBottom: '16px', fontSize: '13px',
-            background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444'
+            background: 'var(--color-error-bg)', border: '1px solid var(--color-error-border)', color: 'var(--color-error)'
           }}>
             {errorMsg}
           </div>
         )}
 
         <form onSubmit={handleAssign} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ background: 'var(--bg-tertiary)', padding: '14px 18px', borderRadius: '12px' }}>
-            <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Selected Employee:</div>
-            <div style={{ fontSize: '15px', color: '#f1f5f9', fontWeight: 700, marginTop: '2px' }}>
+          <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '14px 18px', borderRadius: '12px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Selected Employee:</div>
+            <div style={{ fontSize: '15px', color: 'var(--color-text)', fontWeight: 700, marginTop: '2px' }}>
               {userToAssign?.FirstName} {userToAssign?.LastName}
             </div>
-            <div style={{ fontSize: '12px', color: '#818cf8' }}>
+            <div style={{ fontSize: '12px', color: 'var(--color-primary)' }}>
               {userToAssign?.Email} • {userToAssign?.JobTitle || 'Employee'}
             </div>
           </div>
@@ -142,11 +142,11 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
               }}
               style={{
                 width: '100%',
-                background: 'var(--bg-tertiary)',
-                border: assignErrors.roleId ? '1px solid #ef4444' : '1px solid rgba(148, 163, 184, 0.15)',
+                background: 'var(--color-elevated)',
+                border: assignErrors.roleId ? '1px solid var(--color-error)' : '1px solid var(--color-border)',
                 borderRadius: '10px',
                 padding: '10px 14px',
-                color: '#f1f5f9',
+                color: 'var(--color-text)',
                 fontSize: '14px',
                 outline: 'none',
                 boxSizing: 'border-box'
@@ -162,11 +162,11 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
           </FormField>
 
           {selectedRoleObj && (
-            <div style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.25)', borderRadius: '12px', padding: '14px' }}>
-              <div style={{ fontSize: '12px', color: '#818cf8', fontWeight: 700 }}>
+            <div style={{ background: 'var(--color-primary-subtle)', border: '1px solid var(--color-primary-border)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--color-primary)', fontWeight: 700 }}>
                 Role Preview: {selectedRoleObj.RoleName || selectedRoleObj.roleName}
               </div>
-              <div style={{ fontSize: '11.5px', color: '#cbd5e1', marginTop: '4px' }}>
+              <div style={{ fontSize: '11.5px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
                 {selectedRoleObj.Description || selectedRoleObj.description || 'Custom organizational authority role'}
               </div>
             </div>
@@ -177,8 +177,8 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
               type="button"
               onClick={onClose}
               style={{
-                background: 'rgba(100, 116, 139, 0.2)', border: '1px solid rgba(148, 163, 184, 0.15)',
-                borderRadius: '10px', padding: '10px 18px', color: '#94a3b8', fontWeight: 600, fontSize: '13px', cursor: 'pointer'
+                background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                borderRadius: '10px', padding: '10px 18px', color: 'var(--color-text-secondary)', fontWeight: 600, fontSize: '13px', cursor: 'pointer'
               }}
             >
               Cancel
@@ -187,10 +187,10 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
               type="submit"
               disabled={submitting}
               style={{
-                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                background: 'var(--color-primary)',
                 border: 'none', borderRadius: '10px', padding: '10px 22px',
                 color: '#fff', fontWeight: 700, fontSize: '13px', cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)'
+                boxShadow: '0 4px 14px rgba(47, 129, 247, 0.35)'
               }}
             >
               {submitting ? 'Assigning...' : 'Assign Role'}

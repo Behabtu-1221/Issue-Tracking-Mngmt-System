@@ -406,7 +406,7 @@ export default function NotifRemindersTab({ onRefreshMetrics }) {
                       onClick={() => handleComplete(r.NotificationReminderID)}
                       disabled={completingId === r.NotificationReminderID}
                       style={{
-                        padding: '6px 14px', borderRadius: '8px', border: 'none',
+                        padding: '6px 14px', borderRadius: '8px',
                         background: 'rgba(16, 185, 129, 0.15)', color: '#10b981',
                         border: '1px solid rgba(16, 185, 129, 0.3)',
                         fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer',
@@ -440,7 +440,7 @@ export default function NotifRemindersTab({ onRefreshMetrics }) {
       {/* Create Reminder Modal */}
       {showModal && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)',
+          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
           backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center',
           justifyContent: 'center', zIndex: 10000, padding: '20px'
         }} onClick={() => setShowModal(false)}>

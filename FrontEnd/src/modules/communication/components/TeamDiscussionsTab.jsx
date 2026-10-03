@@ -491,7 +491,7 @@ export default function TeamDiscussionsTab() {
       {showCreateModal && canCreateChannel && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 9999,
-          background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)',
+          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
         }}>
           <div style={{

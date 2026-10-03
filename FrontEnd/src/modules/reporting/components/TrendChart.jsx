@@ -319,18 +319,18 @@ export default function TrendChart({
               right: '12px',
               padding: '10px 14px',
               borderRadius: '10px',
-              background: 'rgba(15, 23, 42, 0.95)',
-              color: '#ffffff',
+              background: 'var(--color-elevated, #20262D)',
+              color: 'var(--color-text, #F5F7FA)',
               fontSize: '0.8rem',
               boxShadow: '0 10px 24px rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              border: '1px solid var(--color-border, #303841)',
               pointerEvents: 'none',
               backdropFilter: 'blur(8px)'
             }}>
-              <div style={{ fontWeight: 800, color: '#93c5fd', marginBottom: '6px' }}>{hoveredPoint.date}</div>
+              <div style={{ fontWeight: 800, color: 'var(--color-primary, #2F81F7)', marginBottom: '6px' }}>{hoveredPoint.date}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
-                  <span style={{ color: '#93c5fd' }}>Total Submissions:</span>
+                  <span style={{ color: 'var(--color-text-secondary, #B6C2CF)' }}>Total Submissions:</span>
                   <strong>{hoveredPoint.total}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>

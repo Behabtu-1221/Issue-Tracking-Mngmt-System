@@ -278,7 +278,7 @@ export default function NumberSequencesTab() {
                   placeholder="e.g. SEQ_INCIDENT_NUMBER"
                   value={formData.sequenceCode}
                   onChange={(e) => setFormData({ ...formData, sequenceCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                 />
               </div>
 
@@ -290,7 +290,7 @@ export default function NumberSequencesTab() {
                     placeholder="e.g. INC-"
                     value={formData.prefix}
                     onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                   />
                 </div>
                 <div>
@@ -300,7 +300,7 @@ export default function NumberSequencesTab() {
                     placeholder="e.g. -2026"
                     value={formData.suffix}
                     onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', fontFamily: 'monospace' }}
+                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
                   />
                 </div>
               </div>
@@ -313,7 +313,7 @@ export default function NumberSequencesTab() {
                     required
                     value={formData.nextNumber}
                     onChange={(e) => setFormData({ ...formData, nextNumber: parseInt(e.target.value, 10) || 1 })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                   />
                 </div>
                 <div>
@@ -323,7 +323,7 @@ export default function NumberSequencesTab() {
                     required
                     value={formData.incrementValue}
                     onChange={(e) => setFormData({ ...formData, incrementValue: parseInt(e.target.value, 10) || 1 })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                   />
                 </div>
                 <div>
@@ -333,7 +333,7 @@ export default function NumberSequencesTab() {
                     required
                     value={formData.numberWidth}
                     onChange={(e) => setFormData({ ...formData, numberWidth: parseInt(e.target.value, 10) || 6 })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'rgba(10, 12, 22, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white' }}
+                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                   />
                 </div>
               </div>
@@ -342,7 +342,7 @@ export default function NumberSequencesTab() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer' }}
+                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
                   Cancel
                 </button>

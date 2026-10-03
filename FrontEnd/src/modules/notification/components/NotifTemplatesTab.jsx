@@ -370,7 +370,7 @@ export default function NotifTemplatesTab() {
       {/* Live Preview Modal */}
       {previewTemplate && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)',
+          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
           backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center',
           justifyContent: 'center', zIndex: 10000, padding: '20px'
         }} onClick={() => setPreviewTemplate(null)}>
@@ -463,7 +463,7 @@ export default function NotifTemplatesTab() {
       {/* Edit Modal */}
       {editingTemplate && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)',
+          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
           backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center',
           justifyContent: 'center', zIndex: 10000, padding: '20px'
         }} onClick={() => setEditingTemplate(null)}>
