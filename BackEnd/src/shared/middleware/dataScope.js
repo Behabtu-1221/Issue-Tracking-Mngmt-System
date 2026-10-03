@@ -31,6 +31,21 @@ export const dataScope = async (req, res, next) => {
   }
 
   try {
+    const isParkAdmin = isParkAdminActor(req.actor);
+    req.actor.isParkAdmin = isParkAdmin;
+
+    // Strict Tenant Isolation: Never trust client-supplied tenant identifiers for non-park-admins
+    if (!isParkAdmin && req.actor.tenantId) {
+      if (req.body && typeof req.body === 'object') {
+        if ('TenantID' in req.body) req.body.TenantID = req.actor.tenantId;
+        if ('tenantId' in req.body) req.body.tenantId = req.actor.tenantId;
+      }
+      if (req.query && typeof req.query === 'object') {
+        if ('TenantID' in req.query) req.query.TenantID = req.actor.tenantId;
+        if ('tenantId' in req.query) req.query.tenantId = req.actor.tenantId;
+      }
+    }
+
     const { userId, tenantId, userTypeCode } = req.actor;
     let typeCode = (userTypeCode || '').toUpperCase();
 
