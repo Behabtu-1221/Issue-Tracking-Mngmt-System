@@ -5,8 +5,24 @@ import am from './locales/am';
 const DICTIONARIES = { en, am };
 
 export const AVAILABLE_LOCALES = [
-  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸', countryCode: 'ET', dir: 'ltr' },
-  { code: 'am', name: 'Amharic', nativeName: 'አማርኛ', flag: '🇪🇹', countryCode: 'ET', dir: 'ltr' },
+  {
+    code: 'en',
+    name: 'English',
+    nativeName: 'English',
+    shortLabel: 'EN',
+    region: 'International / US',
+    countryCode: 'US',
+    dir: 'ltr'
+  },
+  {
+    code: 'am',
+    name: 'Amharic',
+    nativeName: 'አማርኛ',
+    shortLabel: 'አማ',
+    region: 'Ethiopia (ኢትዮጵያ)',
+    countryCode: 'ET',
+    dir: 'ltr'
+  },
 ];
 
 const STORAGE_KEY = 'itms_locale';
