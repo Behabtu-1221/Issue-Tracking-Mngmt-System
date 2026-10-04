@@ -82,8 +82,7 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
             style={{
               position: 'absolute',
               top: 'calc(100% + 6px)',
-              right: isRTL ? 'auto' : 0,
-              left: isRTL ? 0 : 'auto',
+              right: 0,
               minWidth: '220px',
               background: 'var(--color-elevated, #20262D)',
               border: '1px solid var(--color-border, #303841)',
@@ -118,7 +117,7 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
                     fontSize: '0.85rem',
                     fontWeight: isSelected ? 700 : 500,
                     cursor: 'pointer',
-                    textAlign: isRTL ? 'right' : 'left',
+                    textAlign: 'left',
                     transition: 'all 0.15s ease'
                   }}
                   onMouseEnter={(e) => {
@@ -134,7 +133,7 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <span style={{ fontSize: '1.1rem' }}>{loc.flag}</span>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRTL ? 'flex-end' : 'flex-start' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ lineHeight: 1.2 }}>{loc.nativeName}</span>
                       <span style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary, #B6C2CF)' }}>{loc.name}</span>
                     </div>
@@ -194,8 +193,7 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
           style={{
             position: 'absolute',
             top: 'calc(100% + 8px)',
-            right: isRTL ? 'auto' : 0,
-            left: isRTL ? 0 : 'auto',
+            right: 0,
             minWidth: '230px',
             background: 'var(--color-elevated, #20262D)',
             border: '1px solid var(--color-border, #303841)',
@@ -217,11 +215,6 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-secondary, #B6C2CF)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               {t('language.languages', 'Languages')}
             </span>
-            {isRTL && (
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: 'rgba(47, 129, 247, 0.15)', color: 'var(--color-primary, #2F81F7)' }}>
-                RTL
-              </span>
-            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
@@ -260,18 +253,13 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>{loc.flag}</span>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRTL ? 'flex-end' : 'flex-start' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ fontSize: '0.86rem', fontWeight: 600 }}>{loc.nativeName}</span>
                       <span style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary, #B6C2CF)' }}>{loc.name}</span>
                     </div>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    {loc.dir === 'rtl' && (
-                      <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.08)', color: 'var(--color-text-secondary, #B6C2CF)' }}>
-                        RTL
-                      </span>
-                    )}
                     {isSelected && <Check size={16} color="var(--color-primary, #2F81F7)" />}
                   </div>
                 </button>

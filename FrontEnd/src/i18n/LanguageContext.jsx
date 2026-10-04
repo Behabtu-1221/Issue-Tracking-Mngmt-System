@@ -1,18 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import en from './locales/en';
 import am from './locales/am';
-import ar from './locales/ar';
-import fr from './locales/fr';
-import es from './locales/es';
 
-const DICTIONARIES = { en, am, ar, fr, es };
+const DICTIONARIES = { en, am };
 
 export const AVAILABLE_LOCALES = [
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸', countryCode: 'ET', dir: 'ltr' },
   { code: 'am', name: 'Amharic', nativeName: 'አማርኛ', flag: '🇪🇹', countryCode: 'ET', dir: 'ltr' },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', countryCode: 'SA', dir: 'rtl' },
-  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷', countryCode: 'FR', dir: 'ltr' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', countryCode: 'ES', dir: 'ltr' },
 ];
 
 const STORAGE_KEY = 'itms_locale';

@@ -215,10 +215,7 @@ INSERT INTO NumberSequence (NumberSequenceID, SequenceCode, Prefix, NextNumber, 
 
 INSERT INTO Localization (LocalizationID, LanguageCode, CountryCode, LocaleName, CreatedBy) VALUES
 (1, 'en', 'ET', 'English (Ethiopia)', @SYS),
-(2, 'am', 'ET', 'አማርኛ (Amharic)', @SYS),
-(3, 'ar', 'SA', 'العربية (Arabic)', @SYS),
-(4, 'fr', 'FR', 'Français (French)', @SYS),
-(5, 'es', 'ES', 'Español (Spanish)', @SYS);
+(2, 'am', 'ET', 'አማርኛ (Amharic)', @SYS);
 
 INSERT INTO LanguageResource (LocalizationID, ResourceKey, ResourceValue, CreatedBy) VALUES
 (1, 'app.title', 'Issue Tracking System', @SYS),
