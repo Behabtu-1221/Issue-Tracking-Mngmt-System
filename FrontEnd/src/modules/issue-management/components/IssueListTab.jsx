@@ -21,6 +21,7 @@ import issueManagementApi from '../api/issueManagementApi';
 import PermissionGuard from '../../../components/common/PermissionGuard';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { useTranslation } from '../../../i18n';
 
 export const IssueListTab = ({
   onSelectIssue,
@@ -29,6 +30,7 @@ export const IssueListTab = ({
   onOpenStatusModal,
   refreshKey
 }) => {
+  const { t, isRTL } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialStatus = searchParams.get('status') || '';
   const [issues, setIssues] = useState([]);
@@ -179,15 +181,15 @@ export const IssueListTab = ({
       <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: 'var(--border-radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
         <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', flex: '1', minWidth: '280px' }}>
           <div style={{ position: 'relative', flex: '1' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+            <Search size={18} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
             <input
               type="text"
-              placeholder="Search by Request #, title, description, or requester name..."
+              placeholder={t('common.searchPlaceholder', 'Search by Request #, title, description, or requester name...')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
                 width: '100%',
-                padding: '9px 12px 9px 38px',
+                padding: isRTL ? '9px 38px 9px 12px' : '9px 12px 9px 38px',
                 backgroundColor: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid var(--glass-border)',
                 borderRadius: 'var(--border-radius-sm)',
@@ -196,7 +198,7 @@ export const IssueListTab = ({
               }}
             />
           </div>
-          <button type="submit" className="btn-secondary" style={{ padding: '9px 16px' }}>Search</button>
+          <button type="submit" className="btn-secondary" style={{ padding: '9px 16px' }}>{t('common.search', 'Search')}</button>
         </form>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -213,14 +215,14 @@ export const IssueListTab = ({
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Statuses</option>
-            <option value="NEW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>New</option>
-            <option value="ASSIGNED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Assigned</option>
-            <option value="IN_PROGRESS" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>In Progress</option>
-            <option value="PENDING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Pending</option>
-            <option value="RESOLVED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Resolved</option>
-            <option value="CLOSED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Closed</option>
-            <option value="CANCELLED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Cancelled</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.slaStatus', 'Statuses')}</option>
+            <option value="NEW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusOpen', 'New')}</option>
+            <option value="ASSIGNED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.assignee', 'Assigned')}</option>
+            <option value="IN_PROGRESS" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusInProgress', 'In Progress')}</option>
+            <option value="PENDING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusPaused', 'Pending')}</option>
+            <option value="RESOLVED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusResolved', 'Resolved')}</option>
+            <option value="CLOSED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusClosed', 'Closed')}</option>
+            <option value="CANCELLED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusCancelled', 'Cancelled')}</option>
           </select>
 
           {/* Priority Filter */}
@@ -236,11 +238,11 @@ export const IssueListTab = ({
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Priorities</option>
-            <option value="CRITICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Critical</option>
-            <option value="HIGH" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>High</option>
-            <option value="MEDIUM" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Medium</option>
-            <option value="LOW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Low</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.priorityHigh', 'Priorities')}</option>
+            <option value="CRITICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityCritical', 'Critical')}</option>
+            <option value="HIGH" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityHigh', 'High')}</option>
+            <option value="MEDIUM" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityMedium', 'Medium')}</option>
+            <option value="LOW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityLow', 'Low')}</option>
           </select>
 
           {/* Type Filter */}
@@ -256,7 +258,7 @@ export const IssueListTab = ({
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Types</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.requestType', 'Types')}</option>
             <option value="INCIDENT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Incident</option>
             <option value="MAINTENANCE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Maintenance</option>
             <option value="COMPLAINT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Complaint</option>
@@ -265,7 +267,7 @@ export const IssueListTab = ({
 
           <PermissionGuard anyPermission={['Issue.Create', 'Request.Create', 'issue:create']}>
             <button className="btn-primary" onClick={onOpenCreateModal} style={{ padding: '9px 18px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              <Plus size={16} /> Submit New Request
+              <Plus size={16} /> {t('issues.createIssue', 'Submit New Request')}
             </button>
           </PermissionGuard>
         </div>
@@ -291,7 +293,7 @@ export const IssueListTab = ({
           color: 'var(--text-muted)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Issue Requests</span>
+            <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t('nav.issues', 'Issue Requests')}</span>
             <span style={{
               background: 'rgba(99, 102, 241, 0.12)',
               color: 'var(--accent-primary)',
@@ -300,7 +302,7 @@ export const IssueListTab = ({
               fontSize: '0.75rem',
               fontWeight: 700
             }}>
-              {issues.length} {issues.length === 1 ? 'record' : 'records'}
+              {issues.length} {issues.length === 1 ? t('common.record', 'record') : t('common.records', 'records')}
             </span>
           </div>
 
@@ -322,30 +324,30 @@ export const IssueListTab = ({
 
         {/* Scrollable Table Area */}
         <div className="table-scroll-container" tabIndex={0} role="region" aria-label="Issue Requests Table">
-          <table className="custom-table" style={{ width: '100%', minWidth: '1250px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+          <table className="custom-table" style={{ width: '100%', minWidth: '1250px', borderCollapse: 'collapse', textAlign: isRTL ? 'right' : 'left', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)' }}>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px' }}>Request # & Title</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px' }}>Service & Category</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '170px' }}>Requester & Tenant</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '120px' }}>Priority</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Status</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px' }}>Assigned Dept</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Created Date</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.ticketNumber', 'Request #')} & {t('issues.requestTitle', 'Title')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.category', 'Service & Category')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '170px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.requester', 'Requester')} & {t('profile.tenant', 'Tenant')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '120px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.priorityHigh', 'Priority')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.slaStatus', 'Status')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: isRTL ? 'right' : 'left' }}>{t('profile.department', 'Assigned Dept')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px', textAlign: isRTL ? 'right' : 'left' }}>{t('common.date', 'Created Date')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px', textAlign: isRTL ? 'left' : 'right' }}>{t('common.actions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
                   <td colSpan="8" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    Loading issue requests...
+                    {t('common.loading', 'Loading issue requests...')}
                   </td>
                 </tr>
               ) : issues.length === 0 ? (
                 <tr>
                   <td colSpan="8" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    No issue requests found matching the current criteria.
+                    {t('common.noData', 'No issue requests found matching the current criteria.')}
                   </td>
                 </tr>
               ) : (

@@ -38,6 +38,7 @@ import ProtectedRoute from './modules/role-permission-management/guards/Protecte
 import DashboardRouter from './components/common/DashboardRouter';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
+import { LanguageProvider } from './i18n';
 import { AuthProvider } from './modules/authentication/contexts/AuthContext';
 import { RequireAuth, GuestOnly } from './modules/authentication/guards/AuthGuards';
 import LoginPage from './modules/authentication/pages/LoginPage';
@@ -266,24 +267,26 @@ function AuthenticatedShell() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <Routes>
-          {/* Public / Guest-only routes */}
-          <Route path="/" element={<GuestOnly><LoginPage /></GuestOnly>} />
-          <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <LanguageProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Public / Guest-only routes */}
+            <Route path="/" element={<GuestOnly><LoginPage /></GuestOnly>} />
+            <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-          {/* First-login mandatory password change */}
-          <Route path="/first-login-password-change" element={
-            <RequireAuth><FirstLoginPasswordChangePage /></RequireAuth>
-          } />
+            {/* First-login mandatory password change */}
+            <Route path="/first-login-password-change" element={
+              <RequireAuth><FirstLoginPasswordChangePage /></RequireAuth>
+            } />
 
-          {/* All authenticated module routes */}
-          <Route path="/*" element={
-            <RequireAuth><AuthenticatedShell /></RequireAuth>
-          } />
-        </Routes>
-      </AuthProvider>
+            {/* All authenticated module routes */}
+            <Route path="/*" element={
+              <RequireAuth><AuthenticatedShell /></RequireAuth>
+            } />
+          </Routes>
+        </AuthProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }

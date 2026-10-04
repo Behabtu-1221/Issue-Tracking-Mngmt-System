@@ -69,8 +69,10 @@ import { usePermissionContext } from '../modules/role-permission-management/cont
 import { useAuth } from '../modules/authentication/contexts/AuthContext';
 import { notificationApi } from '../modules/notification/api/notificationApi';
 import NotificationDetailModal from '../modules/notification/components/NotificationDetailModal';
+import { useTranslation, LanguageSelector } from '../i18n';
 
 export default function DashboardLayout({ children, activeMenu = 'parks', onNavigate }) {
+  const { t, isRTL } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -653,6 +655,123 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
           ? tenantRepresentativeMenuItems
           : adminMenuItems;
 
+  const getLocalizedLabel = (item) => {
+    if (!item) return '';
+    const keyMap = {
+      'dashboard': 'nav.dashboard',
+      'parks': 'nav.parks',
+      'parks/dashboard': 'nav.parkOverview',
+      'parks/campus': 'nav.campusProfile',
+      'parks/buildings': 'nav.buildingsBlocks',
+      'parks/floors': 'nav.floorsLevels',
+      'parks/offices': 'nav.officeUnits',
+      'parks/zones': 'nav.facilityZones',
+      'parks/landmarks': 'nav.campusLandmarks',
+      'tenants': 'nav.tenants',
+      'tenants/dashboard': 'nav.tenantOverview',
+      'tenants/directory': 'nav.tenantDirectory',
+      'tenants/leases': 'nav.leaseAgreements',
+      'tenants/allocations': 'nav.spaceAllocations',
+      'tenants/sub-tenants': 'nav.subTenants',
+      'tenants/contacts': 'nav.tenantContacts',
+      'services': 'nav.services',
+      'services/dashboard': 'nav.servicesOverview',
+      'services/directory': 'nav.serviceDirectory',
+      'services/categories': 'nav.serviceCategories',
+      'services/category-mappings': 'nav.serviceCategoryMapping',
+      'services/pricing': 'nav.pricingBilling',
+      'services/requirements': 'nav.serviceRequirements',
+      'services/governance': 'nav.serviceGovernance',
+      'issues': 'nav.issues',
+      'issues/dashboard': 'nav.issuesOverview',
+      'issues/tracker': 'nav.issuesTracker',
+      'issues/create': 'nav.createRequest',
+      'issues/my-requests': 'nav.myRequests',
+      'issues/history': 'nav.requestHistory',
+      'issues/status-flow': 'nav.statusFlow',
+      'issues/known': 'nav.knownIssues',
+      'approvals': 'nav.approvals',
+      'approvals/dashboard': 'nav.approvalOverview',
+      'approvals/queue': 'nav.approvalQueue',
+      'approvals/delegations': 'nav.delegationMatrix',
+      'approvals/rules': 'nav.governanceRules',
+      'dispatch': 'nav.dispatch',
+      'dispatch/dashboard': 'nav.dispatchOverview',
+      'dispatch/queue': 'nav.dispatchQueue',
+      'dispatch/workbench': 'nav.workbench',
+      'dispatch/roster': 'nav.roster',
+      'dispatch/teams': 'nav.technicianTeams',
+      'sla': 'nav.sla',
+      'sla/dashboard': 'nav.slaOverview',
+      'sla/clocks': 'nav.slaClocks',
+      'sla/breaches': 'nav.slaBreaches',
+      'sla/policies': 'nav.slaPolicies',
+      'communication': 'nav.communication',
+      'communication/dashboard': 'nav.commOverview',
+      'communication/discussions': 'nav.discussions',
+      'communication/announcements': 'nav.announcements',
+      'communication/channels': 'nav.channels',
+      'communication/timeline': 'nav.activityTimeline',
+      'organization': 'nav.organization',
+      'organization/dashboard': 'nav.orgOverview',
+      'organization/departments': 'nav.departments',
+      'organization/teams': 'nav.teamsPositions',
+      'organization/assignments': 'nav.employeeAssignments',
+      'organization/financials': 'nav.financials',
+      'documents': 'nav.documents',
+      'documents/dashboard': 'nav.docOverview',
+      'documents/repository': 'nav.docRepository',
+      'documents/categories': 'nav.docCategories',
+      'documents/versions': 'nav.docVersions',
+      'documents/security': 'nav.docSecurity',
+      'users': 'nav.users',
+      'users/dashboard': 'nav.userOverview',
+      'users/directory': 'nav.usersDirectory',
+      'users/sessions': 'nav.activeSessions',
+      'users/audit': 'nav.securityAudit',
+      'roles': 'nav.roles',
+      'roles/dashboard': 'nav.rbacOverview',
+      'roles/management': 'nav.roleManagement',
+      'roles/matrix': 'nav.permissionMatrix',
+      'roles/assignments': 'nav.roleAssignments',
+      'roles/audit': 'nav.auditTrail',
+      'configuration': 'nav.configuration',
+      'configuration/dashboard': 'nav.configOverview',
+      'configuration/settings': 'nav.systemSettings',
+      'configuration/lookups': 'nav.masterLookups',
+      'configuration/sequences': 'nav.numberSequences',
+      'configuration/calendars': 'nav.businessCalendars',
+      'configuration/flags': 'nav.featureFlags',
+      'configuration/rules': 'nav.businessRules',
+      'configuration/localization': 'nav.localization',
+      'configuration/bootstrap': 'nav.systemBootstrap',
+      'reports': 'nav.reports',
+      'reports/dashboard': 'nav.reportsOverview',
+      'reports/executive': 'nav.executiveDashboard',
+      'reports/requests': 'nav.requestsAnalytics',
+      'reports/workload': 'nav.workloadBalance',
+      'reports/sla': 'nav.slaEscalations',
+      'reports/tenants': 'nav.tenantBenchmarks',
+      'reports/departments': 'nav.departmentEfficiency',
+      'reports/saved': 'nav.savedReports',
+      'reports/schedules': 'nav.automatedSchedules',
+      'notifications': 'nav.notifications',
+      'notifications/dashboard': 'nav.notificationInbox',
+      'notifications/inbox': 'nav.notificationInbox',
+      'notifications/preferences': 'nav.notificationPreferences',
+      'notifications/reminders': 'nav.automatedReminders',
+      'notifications/templates': 'nav.notificationTemplates',
+      'notifications/log': 'nav.deliveryLog',
+      'profile': 'nav.profile',
+      'technician/dashboard': 'nav.assignedWork',
+      'technician/assigned': 'nav.assignedWork',
+      'technician/resolved': 'nav.workHistory'
+    };
+
+    const translationKey = keyMap[item.id];
+    return translationKey ? t(translationKey, item.label) : item.label;
+  };
+
   const filteredMenuItems = menuItems
     .filter(item => {
       if (item.scope && item.scope !== 'BOTH') {
@@ -674,9 +793,13 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const parentMatches = item.label.toLowerCase().includes(q);
+        const localizedParent = getLocalizedLabel(item).toLowerCase();
+        const parentMatches = item.label.toLowerCase().includes(q) || localizedParent.includes(q);
         if (!parentMatches && validChildren) {
-          validChildren = validChildren.filter(child => child.label.toLowerCase().includes(q));
+          validChildren = validChildren.filter(child => {
+            const locChild = getLocalizedLabel(child).toLowerCase();
+            return child.label.toLowerCase().includes(q) || locChild.includes(q);
+          });
         }
       }
 
@@ -690,7 +813,8 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       if (!searchQuery.trim()) return true;
 
       const q = searchQuery.toLowerCase().trim();
-      const parentMatches = item.label.toLowerCase().includes(q);
+      const localizedParent = getLocalizedLabel(item).toLowerCase();
+      const parentMatches = item.label.toLowerCase().includes(q) || localizedParent.includes(q);
       const childMatches = Array.isArray(item.children) && item.children.length > 0;
       return parentMatches || childMatches;
     });
@@ -851,13 +975,13 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                     justifyContent: sidebarCollapsed ? 'center' : 'space-between',
                     fontWeight: '800'
                   }}
-                  title={sidebarCollapsed ? item.label : undefined}
+                  title={sidebarCollapsed ? getLocalizedLabel(item) : undefined}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Icon size={18} color={isParentActive ? '#ffffff' : 'var(--color-primary)'} />
                     {!sidebarCollapsed && (
                       <span style={{ fontWeight: '800', color: isParentActive && !isChildActive ? '#ffffff' : 'var(--text-primary)', fontSize: '0.9rem' }}>
-                        {item.label}
+                        {getLocalizedLabel(item)}
                       </span>
                     )}
                   </div>
@@ -870,20 +994,20 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transform: isExpanded ? (isRTL ? 'rotate(-90deg)' : 'rotate(90deg)') : 'rotate(0deg)',
                         transition: 'transform 0.25s ease',
                         color: isParentActive ? '#ffffff' : 'var(--color-primary)',
                         cursor: 'pointer'
                       }}
                     >
-                      <ChevronRight size={16} />
+                      <ChevronRight size={16} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
                     </div>
                   )}
                 </button>
 
                 {/* Sub-menu Children Accordion List */}
                 {!sidebarCollapsed && hasChildren && isExpanded && (
-                  <div className="sidebar-children-inner" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '3px', paddingLeft: '14px' }}>
+                  <div className="sidebar-children-inner" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '3px', paddingLeft: isRTL ? '0' : '14px', paddingRight: isRTL ? '14px' : '0' }}>
                     {item.children.map((child) => {
                       const ChildIcon = child.icon;
                       const isSubActive = checkChildActive(child);
@@ -897,7 +1021,8 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                             fontWeight: isSubActive ? '800' : '700',
                             color: isSubActive ? '#ffffff' : 'var(--text-secondary)',
                             backgroundColor: isSubActive ? 'var(--color-primary)' : 'transparent',
-                            borderLeft: isSubActive ? '4px solid var(--color-primary)' : '4px solid transparent',
+                            borderLeft: isSubActive ? (isRTL ? 'none' : '4px solid var(--color-primary)') : '4px solid transparent',
+                            borderRight: isSubActive ? (isRTL ? '4px solid var(--color-primary)' : 'none') : '4px solid transparent',
                             borderRadius: '8px',
                             padding: '7px 12px',
                             display: 'flex',
@@ -908,7 +1033,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                           }}
                         >
                           <ChildIcon size={14} color={isSubActive ? '#ffffff' : 'var(--color-primary)'} />
-                          <span style={{ fontWeight: isSubActive ? '800' : '700', fontSize: '0.86rem' }}>{child.label}</span>
+                          <span style={{ fontWeight: isSubActive ? '800' : '700', fontSize: '0.86rem' }}>{getLocalizedLabel(child)}</span>
                         </button>
                       );
                     })}
@@ -947,7 +1072,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
               <Search size={16} style={{ position: 'absolute', left: '14px', color: 'var(--text-muted)' }} />
               <input
                 type="text"
-                placeholder="Global search across platform..."
+                placeholder={t('common.searchPlaceholder', 'Global search across platform...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
@@ -970,7 +1095,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  title="Clear search"
+                  title={t('common.clear', 'Clear search')}
                   style={{
                     position: 'absolute',
                     right: '10px',
@@ -995,10 +1120,13 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', position: 'relative' }}>
+            {/* Multi-Language Selector */}
+            <LanguageSelector />
+
             {/* Theme Toggle Button (Dark / Bright) */}
             <button
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'Switch to Bright/Light Theme' : 'Switch to Dark Theme'}
+              title={theme === 'dark' ? t('theme.switchToLight', 'Switch to Bright/Light Theme') : t('theme.switchToDark', 'Switch to Dark Theme')}
               style={{
                 padding: '10px',
                 borderRadius: '50%',
@@ -1088,7 +1216,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Bell size={16} color="var(--color-primary)" />
-                      <span style={{ color: 'var(--color-text)', fontWeight: 700, fontSize: '14px' }}>Notifications</span>
+                      <span style={{ color: 'var(--color-text)', fontWeight: 700, fontSize: '14px' }}>{t('notifications.title', 'Notifications')}</span>
                       {unreadCount > 0 && (
                         <span style={{
                           background: 'var(--color-error-bg)',
@@ -1097,7 +1225,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                           borderRadius: '6px',
                           fontSize: '11px',
                           fontWeight: 700
-                        }}>{unreadCount} New</span>
+                        }}>{unreadCount} {t('notifications.unread', 'New')}</span>
                       )}
                     </div>
 
@@ -1112,7 +1240,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                           fontWeight: 600,
                           cursor: 'pointer'
                         }}
-                      >Mark all read</button>
+                      >{t('notifications.markAllRead', 'Mark all read')}</button>
                     )}
                   </div>
 
@@ -1138,7 +1266,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         transition: 'all 0.2s'
                       }}
                     >
-                      All ({notifications.length})
+                      {t('common.all', 'All')} ({notifications.length})
                     </button>
                     <button
                       onClick={() => setNotifFilter('unread')}
@@ -1379,7 +1507,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
                       <User size={16} color="var(--color-primary)" />
-                      <span>My Profile & Settings</span>
+                      <span>{t('profile.myProfile', 'My Profile & Settings')}</span>
                     </button>
 
                     <button
@@ -1400,13 +1528,13 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         fontSize: '0.85rem',
                         fontWeight: 600,
                         cursor: 'pointer',
-                        textAlign: 'left'
+                        textAlign: isRTL ? 'right' : 'left'
                       }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
                       <Bell size={16} color="var(--color-info)" />
-                      <span>Notification Preferences</span>
+                      <span>{t('nav.notificationPreferences', 'Notification Preferences')}</span>
                     </button>
 
                     <button
@@ -1427,13 +1555,13 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         fontSize: '0.85rem',
                         fontWeight: 600,
                         cursor: 'pointer',
-                        textAlign: 'left'
+                        textAlign: isRTL ? 'right' : 'left'
                       }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
                       <Lock size={16} color="var(--color-success)" />
-                      <span>Password & Security</span>
+                      <span>{t('auth.profileSettings', 'Password & Security')}</span>
                     </button>
 
                     <div style={{ height: '1px', background: 'var(--color-border)', margin: '4px 0' }} />
@@ -1456,11 +1584,11 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         fontSize: '0.85rem',
                         fontWeight: 700,
                         cursor: 'pointer',
-                        textAlign: 'left'
+                        textAlign: isRTL ? 'right' : 'left'
                       }}
                     >
                       <LogOut size={16} color="var(--color-error)" />
-                      <span>Sign Out</span>
+                      <span>{t('auth.signOut', 'Sign Out')}</span>
                     </button>
                   </div>
                 </div>

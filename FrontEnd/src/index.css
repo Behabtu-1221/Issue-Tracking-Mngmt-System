@@ -826,3 +826,33 @@ select option {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) var(--color-bg);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INTERNATIONALIZATION & RTL SUPPORT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+  text-align: right;
+}
+
+[dir="rtl"] .sidebar-child-btn,
+[dir="rtl"] .sidebar-parent-btn {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl-mirror {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+

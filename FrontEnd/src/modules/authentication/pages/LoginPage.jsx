@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import sessionManager from '../utils/sessionManager';
+import { useTranslation, LanguageSelector } from '../../../i18n';
 
 import { authSchemas } from '../../../validation';
 
@@ -18,6 +19,7 @@ const DEMO_ROLES = [
 ];
 
 export default function LoginPage() {
+  const { t, isRTL } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated, mustChangePassword, getDefaultDashboard, loading: authLoading } = useAuth();
@@ -132,6 +134,17 @@ export default function LoginPage() {
       boxSizing: 'border-box',
       overflowY: 'auto'
     }}>
+      {/* Top Language Bar */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: isRTL ? 'auto' : '24px',
+        left: isRTL ? '24px' : 'auto',
+        zIndex: 50
+      }}>
+        <LanguageSelector variant="auth" />
+      </div>
+
       {/* Subtle Brand Cyan Glow Orbs */}
       <div style={{
         position: 'absolute', top: '10%', left: '15%', width: '400px', height: '400px',
@@ -194,14 +207,14 @@ export default function LoginPage() {
             ITMS
           </h1>
           <p style={{ margin: 0, color: '#475569', fontSize: '0.85rem', fontWeight: 500 }}>
-            Issue Tracking & Facility Operations Platform
+            {t('app.subtitle', 'Issue Tracking & Facility Operations Platform')}
           </p>
         </div>
 
         {/* Card Subhead */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '14px', borderBottom: '1px solid #e2e8f0' }}>
           <span style={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b', fontFamily: "'Outfit', sans-serif" }}>
-            Account Authentication
+            {t('auth.loginTitle', 'Account Authentication')}
           </span>
           <div style={{ padding: '4px 11px', borderRadius: '20px', background: 'rgba(2, 132, 199, 0.08)', border: '1px solid rgba(2, 132, 199, 0.25)', color: '#0284c7', fontSize: '0.72rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
             <ShieldCheck size={13} color="#0284c7" /> SECURE GATEWAY
@@ -227,20 +240,20 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} autoComplete="off">
           <div style={{ marginBottom: '18px' }}>
             <label htmlFor="login-username" style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '7px', letterSpacing: '0.4px', textTransform: 'uppercase' }}>
-              Username or Account Email
+              {t('auth.usernameOrEmail', 'Username or Account Email')}
             </label>
             <div style={{ position: 'relative' }}>
-              <User size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+              <User size={18} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
               <input
                 ref={usernameRef}
                 id="login-username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder={t('auth.usernamePlaceholder', 'Enter your username')}
                 autoComplete="username"
                 autoFocus={!username}
-                style={{ width: '100%', padding: '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                 onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}
                 onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f8fafc'; }}
               />
@@ -250,26 +263,26 @@ export default function LoginPage() {
           <div style={{ marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '7px' }}>
               <label htmlFor="login-password" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#334155', letterSpacing: '0.4px', textTransform: 'uppercase' }}>
-                Password
+                {t('auth.password', 'Password')}
               </label>
               <Link to="/forgot-password" style={{ color: '#0284c7', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 600 }}>
-                Forgot password?
+                {t('auth.forgotPassword', 'Forgot password?')}
               </Link>
             </div>
             <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+              <Lock size={18} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
               <input
                 id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t('auth.passwordPlaceholder', 'Enter your password')}
                 autoComplete="current-password"
-                style={{ width: '100%', padding: '13px 48px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: isRTL ? '13px 44px 13px 48px' : '13px 48px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                 onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}
                 onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f8fafc'; }}
               />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}>
+              <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
@@ -283,7 +296,7 @@ export default function LoginPage() {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 style={{ accentColor: '#0284c7', width: '16px', height: '16px', cursor: 'pointer' }}
               />
-              Remember login session on this browser
+              {t('auth.rememberMe', 'Remember login session on this browser')}
             </label>
           </div>
 
@@ -300,9 +313,9 @@ export default function LoginPage() {
             }}
           >
             {loading ? (
-              <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> Verifying Security Credentials...</>
+              <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.loggingIn', 'Authenticating...')}</>
             ) : (
-              <><ArrowRight size={18} /> Login</>
+              <><ArrowRight size={18} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} /> {t('auth.signIn', 'Sign In')}</>
             )}
           </button>
         </form>

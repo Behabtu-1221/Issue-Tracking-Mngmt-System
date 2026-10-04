@@ -13,8 +13,10 @@ import parkApi from '../../business-park/api/parkApi';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { requestSchemas, fileSchemas } from '../../../validation';
 import { FormField } from '../../../components/common/FormField';
+import { useTranslation } from '../../../i18n';
 
 export default function CreateRequestPage() {
+  const { t, isRTL } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialServiceId = searchParams.get('serviceId') || '';
@@ -236,10 +238,10 @@ export default function CreateRequestPage() {
               display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, marginBottom: '8px'
             }}
           >
-            <ArrowLeft size={16} /> Back to My Requests
+            <ArrowLeft size={16} style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} /> {t('common.back', 'Back')} to {t('nav.myRequests', 'My Requests')}
           </button>
           <h1 style={{ fontSize: '1.7rem', fontWeight: 800, margin: 0 }}>
-            Create New <span className="glow-text">Service Request</span>
+            {t('issues.createIssue', 'Create New Service Request')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
             Submit a new business park service request or report an issue to facility engineers.
@@ -598,7 +600,7 @@ export default function CreateRequestPage() {
               cursor: 'pointer'
             }}
           >
-            Cancel
+            {t('common.cancel', 'Cancel')}
           </button>
 
           <button
@@ -620,7 +622,7 @@ export default function CreateRequestPage() {
             }}
           >
             <Plus size={18} />
-            {submitting ? 'Submitting Request...' : 'Submit Request'}
+            {submitting ? t('common.loading', 'Submitting Request...') : t('common.submit', 'Submit Request')}
           </button>
         </div>
 
