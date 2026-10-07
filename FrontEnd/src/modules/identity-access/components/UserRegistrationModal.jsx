@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from '../../../i18n';
 import {
   X, ShieldCheck, Building2, User as UserIcon, Mail, Phone,
   Briefcase, Lock, AlertCircle, CheckCircle2, Search, ChevronDown,
@@ -222,6 +223,7 @@ export default function UserRegistrationModal({
   isParkAdmin = true,
   user
 }) {
+  const { t } = useTranslation();
   // Mode: 'IT_PARK_USER' | 'TENANT_REP'
   const [userType, setUserType] = useState('IT_PARK_USER');
 
@@ -530,7 +532,7 @@ export default function UserRegistrationModal({
                     letterSpacing: '-0.3px'
                   }}
                 >
-                  Create User
+                  {t('identity.registerModalTitle')}
                 </h3>
                 <span
                   style={{
@@ -549,7 +551,7 @@ export default function UserRegistrationModal({
                 </span>
               </div>
               <p style={{ margin: '3px 0 0', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                Add a new user to the IT Park service management platform
+                {t('identity.registerModalSubtitle')}
               </p>
             </div>
           </div>
@@ -605,7 +607,7 @@ export default function UserRegistrationModal({
 
             <div>
               <h3 style={{ margin: '0 0 8px', fontSize: '1.4rem', color: 'var(--text-primary)', fontWeight: 800 }}>
-                User Created Successfully
+                {t('identity.userCreatedSuccess')}
               </h3>
               <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '500px', lineHeight: 1.5 }}>
                 <strong style={{ color: 'var(--text-primary)' }}>{createdSuccessData.fullName}</strong> has been added as a{' '}
@@ -630,7 +632,7 @@ export default function UserRegistrationModal({
                 }}
               >
                 <Send size={16} />
-                <span>Account activation invitation queued for {createdSuccessData.email}</span>
+                <span>{t('identity.accountInvitationQueued')} {createdSuccessData.email}</span>
               </div>
             )}
 
@@ -653,7 +655,7 @@ export default function UserRegistrationModal({
                 }}
               >
                 <RefreshCw size={15} />
-                Add Another User
+                {t('identity.btnAddAnotherUser')}
               </button>
 
               <button
@@ -671,7 +673,7 @@ export default function UserRegistrationModal({
                   boxShadow: 'var(--glow-accent)'
                 }}
               >
-                Done
+                {t('identity.btnDone')}
               </button>
             </div>
           </div>
@@ -715,7 +717,7 @@ export default function UserRegistrationModal({
             <div>
               <FloatingSelect
                 id="select-user-type"
-                label="User type"
+                label={t('identity.userTypeLabel')}
                 required
                 value={userType}
                 onChange={(e) => {
@@ -724,10 +726,10 @@ export default function UserRegistrationModal({
                 }}
               >
                 <option value="IT_PARK_USER" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                  IT Park User (Internal IT Park employee or staff)
+                  {t('identity.userTypeItPark')}
                 </option>
                 <option value="TENANT_REP" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                  Tenant Representative (Represents a tenant organization)
+                  {t('identity.userTypeTenant')}
                 </option>
               </FloatingSelect>
             </div>
@@ -747,7 +749,7 @@ export default function UserRegistrationModal({
                   marginBottom: '14px'
                 }}
               >
-                PERSONAL INFORMATION
+                {t('identity.sectionPersonalInfo')}
               </label>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -755,7 +757,7 @@ export default function UserRegistrationModal({
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                   <FloatingInput
                     id="input-first-name"
-                    label="First name"
+                    label={t('identity.firstName')}
                     required
                     value={firstName}
                     onChange={(e) => {
@@ -767,7 +769,7 @@ export default function UserRegistrationModal({
                   />
                   <FloatingInput
                     id="input-last-name"
-                    label="Last name"
+                    label={t('identity.lastName')}
                     required
                     value={lastName}
                     onChange={(e) => {
@@ -783,7 +785,7 @@ export default function UserRegistrationModal({
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                   <FloatingInput
                     id="input-middle-name"
-                    label="Middle name"
+                    label={t('identity.middleName')}
                     optional
                     value={middleName}
                     onChange={(e) => setMiddleName(e.target.value)}
@@ -792,7 +794,7 @@ export default function UserRegistrationModal({
                   <FloatingInput
                     id="input-email"
                     type="email"
-                    label="Business email"
+                    label={t('identity.businessEmail')}
                     required
                     value={email}
                     onChange={(e) => {
@@ -809,7 +811,7 @@ export default function UserRegistrationModal({
                   <FloatingInput
                     id="input-phone"
                     type="tel"
-                    label="Phone number"
+                    label={t('identity.phoneNumber')}
                     optional
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
@@ -817,11 +819,11 @@ export default function UserRegistrationModal({
                   />
                   <FloatingInput
                     id="input-job-title"
-                    label="Job title"
+                    label={t('identity.jobTitle')}
                     optional
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
-                    placeholder={userType === 'TENANT_REP' ? '' : ''}
+                    placeholder=""
                   />
                 </div>
               </div>
@@ -842,13 +844,13 @@ export default function UserRegistrationModal({
                   marginBottom: '14px'
                 }}
               >
-                {userType === 'TENANT_REP' ? 'TENANT ACCESS' : 'ORGANIZATION & ACCESS'}
+                {userType === 'TENANT_REP' ? t('identity.sectionTenantAccess') : t('identity.sectionOrgAccess')}
               </label>
 
               {/* ── Business Park (Read-Only, fetched from DB) ── */}
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                  Business Park
+                  {t('identity.businessPark')}
                 </label>
                 <div
                   style={{
@@ -894,7 +896,7 @@ export default function UserRegistrationModal({
                       textTransform: 'uppercase'
                     }}
                   >
-                    AUTO-FILLED
+                    {t('identity.autoFilled')}
                   </span>
                 </div>
               </div>
@@ -905,7 +907,7 @@ export default function UserRegistrationModal({
                   {/* Department */}
                   <FloatingSelect
                     id="select-department"
-                    label="Department"
+                    label={t('identity.department')}
                     required
                     value={departmentId}
                     onChange={(e) => {
@@ -915,7 +917,7 @@ export default function UserRegistrationModal({
                     error={fieldErrors.departmentId}
                   >
                     <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      Select department...
+                      {t('identity.selectDepartment')}
                     </option>
                     {departments.map((d) => (
                       <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
@@ -927,16 +929,23 @@ export default function UserRegistrationModal({
                   {/* Role Selector Combobox Dropdown */}
                   <FloatingSelect
                     id="select-it-park-role"
-                    label="Role"
+                    label={t('identity.role')}
                     required
                     value={itParkRoleCode}
                     onChange={(e) => setItParkRoleCode(e.target.value)}
                   >
-                    {IT_PARK_ROLES.map(role => (
-                      <option key={role.code} value={role.code} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {role.label} — {role.desc}
-                      </option>
-                    ))}
+                    {IT_PARK_ROLES.map(role => {
+                      const roleText = role.code === 'EMPLOYEE'
+                        ? `${t('identity.roleEmployeeLabel')} — ${t('identity.roleEmployeeDesc')}`
+                        : role.code === 'TECHNICIAN'
+                          ? `${t('identity.roleTechnicianLabel')} — ${t('identity.roleTechnicianDesc')}`
+                          : `${t('identity.roleManagerLabel')} — ${t('identity.roleManagerDesc')}`;
+                      return (
+                        <option key={role.code} value={role.code} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                          {roleText}
+                        </option>
+                      );
+                    })}
                   </FloatingSelect>
                 </div>
               ) : (
@@ -981,7 +990,7 @@ export default function UserRegistrationModal({
                             zIndex: 2
                           }}
                         >
-                          Tenant organization *
+                          {t('identity.tenantOrganization')} *
                         </label>
                         <div style={{ padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: '48px' }}>
                           {selectedTenantObj ? (
@@ -1026,7 +1035,7 @@ export default function UserRegistrationModal({
                               type="text"
                               value={tenantSearchQuery}
                               onChange={(e) => setTenantSearchQuery(e.target.value)}
-                              placeholder="Search by company name or code"
+                              placeholder={t('identity.searchTenantPlaceholder')}
                               autoFocus
                               style={{
                                 width: '100%',
@@ -1045,7 +1054,7 @@ export default function UserRegistrationModal({
                           <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto' }}>
                             {filteredTenants.length === 0 ? (
                               <div style={{ padding: '12px', fontSize: '0.82rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-                                No tenant organization found
+                                {t('identity.noTenantFound')}
                               </div>
                             ) : (
                               filteredTenants.map(t => {
@@ -1097,7 +1106,7 @@ export default function UserRegistrationModal({
                   {/* Read-Only Role Badge */}
                   <div>
                     <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                      Role
+                      {t('identity.role')}
                     </label>
                     <div
                       style={{
@@ -1115,10 +1124,10 @@ export default function UserRegistrationModal({
                         <Building2 size={20} color="#d97706" />
                         <div>
                           <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                            Tenant Representative
+                            {t('identity.tenantRepRoleTitle')}
                           </span>
                           <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block' }}>
-                            Automatically assigned for Tenant Representative accounts
+                            {t('identity.tenantRepRoleDesc')}
                           </span>
                         </div>
                       </div>
@@ -1133,7 +1142,7 @@ export default function UserRegistrationModal({
                           textTransform: 'uppercase'
                         }}
                       >
-                        SYSTEM DETERMINED
+                        {t('identity.systemDetermined')}
                       </span>
                     </div>
                   </div>
@@ -1156,7 +1165,7 @@ export default function UserRegistrationModal({
                   marginBottom: '14px'
                 }}
               >
-                ACCOUNT SETTINGS
+                {t('identity.sectionAccountSettings')}
               </label>
 
               <div>
@@ -1184,7 +1193,7 @@ export default function UserRegistrationModal({
                       cursor: 'pointer'
                     }}
                   />
-                  <span>Send account activation invitation email</span>
+                  <span>{t('identity.sendActivationEmail')}</span>
                 </label>
               </div>
             </div>
@@ -1216,7 +1225,7 @@ export default function UserRegistrationModal({
                   cursor: submitting ? 'not-allowed' : 'pointer'
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
 
               <button
@@ -1241,10 +1250,10 @@ export default function UserRegistrationModal({
                 {submitting ? (
                   <>
                     <Loader2 size={16} className="spin" />
-                    <span>Creating User...</span>
+                    <span>{t('identity.creatingUser')}</span>
                   </>
                 ) : (
-                  <span>Create User</span>
+                  <span>{t('identity.btnCreateUser')}</span>
                 )}
               </button>
             </div>

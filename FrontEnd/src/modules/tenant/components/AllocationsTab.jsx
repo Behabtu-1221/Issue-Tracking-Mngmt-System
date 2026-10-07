@@ -22,6 +22,7 @@ import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { tenantSchemas } from '../../../validation';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
+import { useTranslation } from '../../../i18n';
 
 const glassCard = {
   background: 'var(--glass-bg)',
@@ -32,6 +33,7 @@ const glassCard = {
 };
 
 export default function AllocationsTab({ onRefreshMetrics }) {
+  const { t } = useTranslation();
   const { isParkAdmin } = usePermissionContext();
   const [allocations, setAllocations] = useState([]);
   const [history, setHistory] = useState([]);
@@ -358,10 +360,10 @@ export default function AllocationsTab({ onRefreshMetrics }) {
           <Building2 size={22} color="#f59e0b" />
           <div>
             <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '16.5px', fontWeight: 700 }}>
-              Tenant Space Allocations Engine
+              {t('tenant.allocationsEngine')}
             </h3>
             <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: '12.5px' }}>
-              Allocate Individual Office Units, Full Floor Levels, or Entire Buildings to Enterprise Tenants
+              {t('tenant.allocationsDesc')}
             </p>
           </div>
         </div>
@@ -378,7 +380,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                 fontWeight: 700, fontSize: '12.5px', cursor: 'pointer'
               }}
             >
-              Active Allocations
+              {t('tenant.activeAllocations')}
             </button>
             <button
               onClick={() => setActiveSubTab('history')}
@@ -389,7 +391,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                 fontWeight: 700, fontSize: '12.5px', cursor: 'pointer'
               }}
             >
-              Allocation History
+              {t('tenant.allocationHistory')}
             </button>
           </div>
 
@@ -404,7 +406,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                 boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
               }}
             >
-              <Plus size={16} /> Allocate Space (Office / Floor / Building)
+              <Plus size={16} /> {t('tenant.allocateSpace')}
             </button>
           )}
         </div>
@@ -414,21 +416,21 @@ export default function AllocationsTab({ onRefreshMetrics }) {
       {activeSubTab === 'allocations' ? (
         <div style={{ ...glassCard, padding: '0', overflow: 'hidden' }}>
           {loading ? (
-            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '60px' }}>Loading space allocations...</div>
+            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '60px' }}>{t('tenant.loadingAllocations')}</div>
           ) : allocations.length === 0 ? (
-            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '60px' }}>No office allocations recorded.</div>
+            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '60px' }}>{t('tenant.noAllocationsFound')}</div>
           ) : (
             <table className="custom-table">
               <thead>
                 <tr>
-                  <th>Allocation ID</th>
-                  <th>Tenant Company</th>
-                  <th>Space Details</th>
-                  <th>Building & Floor</th>
-                  <th>Area (sq.m)</th>
-                  <th>Allocated Date</th>
-                  <th>Status</th>
-                  {isParkAdmin && <th>Actions</th>}
+                  <th>{t('tenant.allocationId')}</th>
+                  <th>{t('tenant.tenantCompany')}</th>
+                  <th>{t('tenant.spaceDetails')}</th>
+                  <th>{t('tenant.buildingAndFloor')}</th>
+                  <th>{t('tenant.occupiedArea')}</th>
+                  <th>{t('tenant.allocatedDate')}</th>
+                  <th>{t('tenant.status')}</th>
+                  {isParkAdmin && <th>{t('common.actions')}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -845,7 +847,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                     fontSize: '13px', cursor: 'pointer'
                   }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -856,7 +858,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                     boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
                   }}
                 >
-                  Execute Space Allocation {previewStats.count > 0 ? `(${previewStats.count} Units)` : ''}
+                  {t('tenant.allocateSpace')} {previewStats.count > 0 ? `(${previewStats.count} Units)` : ''}
                 </button>
               </div>
             </form>
@@ -924,7 +926,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                     fontSize: '13px', cursor: 'pointer'
                   }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -935,7 +937,7 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                     boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
                   }}
                 >
-                  Confirm Release
+                  {t('common.confirm')}
                 </button>
               </div>
             </form>

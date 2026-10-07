@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Plus, ShieldCheck } from 'lucide-react';
 import RolePermissionMatrix from '../components/RolePermissionMatrix';
 import CompanyRoleModal from '../components/CompanyRoleModal';
+import { useTranslation } from '../../../i18n';
 
 export default function RbacMatrixPage() {
+  const { t } = useTranslation();
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [roleToEdit, setRoleToEdit] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -47,11 +49,11 @@ export default function RbacMatrixPage() {
               <ShieldCheck size={20} />
             </div>
             <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.85rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
-              Permission Assignment Matrix
+              {t('rbac.tabPermissionMatrix', 'Permission Assignment Matrix')}
             </h1>
           </div>
           <p style={{ margin: 0, color: '#cbd5e1', fontSize: '0.92rem', maxWidth: '750px' }}>
-            Assign, map, and toggle granular CRUD resource permissions to created security roles across system modules.
+            {t('rbac.governanceSubtitle', 'Assign, map, and toggle granular CRUD resource permissions to created security roles across system modules.')}
           </p>
         </div>
 
@@ -65,7 +67,7 @@ export default function RbacMatrixPage() {
             boxShadow: '0 8px 24px rgba(99, 102, 241, 0.35)', transition: 'all 0.25s ease'
           }}
         >
-          <Plus size={18} /> Create New Role
+          <Plus size={18} /> {t('rbac.createCustomRole', 'Create New Role')}
         </button>
       </div>
 

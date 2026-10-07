@@ -19,8 +19,10 @@ import CreateIssueModal from '../components/CreateIssueModal';
 import AssignIssueModal from '../components/AssignIssueModal';
 import StatusUpdateModal from '../components/StatusUpdateModal';
 import KnownIssuesTab from '../components/KnownIssuesTab';
+import { useTranslation } from '../../../i18n';
 
 export default function IssueManagementPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('issues');
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [metrics, setMetrics] = useState(null);
@@ -80,7 +82,7 @@ export default function IssueManagementPage() {
   // KPI Card Data
   const kpiCards = [
     {
-      label: 'Total Issues',
+      label: t('issues.totalIssues', 'Total Issues'),
       value: m.totalIssues || 0,
       icon: ListChecks,
       bg: 'rgba(138, 75, 255, 0.15)',
@@ -88,7 +90,7 @@ export default function IssueManagementPage() {
       glow: '0 0 20px rgba(138, 75, 255, 0.15)'
     },
     {
-      label: 'New Requests',
+      label: t('issues.newRequests', 'New Requests'),
       value: m.newIssues || 0,
       icon: AlertCircle,
       bg: 'rgba(59, 130, 246, 0.15)',
@@ -96,7 +98,7 @@ export default function IssueManagementPage() {
       glow: '0 0 20px rgba(59, 130, 246, 0.15)'
     },
     {
-      label: 'In Progress',
+      label: t('issues.inProgress', 'In Progress'),
       value: m.inProgressIssues || 0,
       icon: Clock,
       bg: 'rgba(234, 179, 8, 0.15)',
@@ -104,7 +106,7 @@ export default function IssueManagementPage() {
       glow: '0 0 20px rgba(234, 179, 8, 0.15)'
     },
     {
-      label: 'Resolved',
+      label: t('issues.resolved', 'Resolved'),
       value: m.resolvedIssues || 0,
       icon: CheckCircle2,
       bg: 'rgba(34, 197, 94, 0.15)',
@@ -112,7 +114,7 @@ export default function IssueManagementPage() {
       glow: '0 0 20px rgba(34, 197, 94, 0.15)'
     },
     {
-      label: 'Closed',
+      label: t('issues.closed', 'Closed'),
       value: m.closedIssues || 0,
       icon: XCircle,
       bg: 'rgba(100, 116, 139, 0.15)',
@@ -120,7 +122,7 @@ export default function IssueManagementPage() {
       glow: '0 0 20px rgba(100, 116, 139, 0.15)'
     },
     {
-      label: 'Major Incidents',
+      label: t('issues.majorIncidents', 'Major Incidents'),
       value: m.majorIncidents || 0,
       icon: AlertTriangle,
       bg: 'rgba(239, 68, 68, 0.15)',
@@ -135,10 +137,11 @@ export default function IssueManagementPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            Issue Request <span className="glow-text">Management</span>
+            {t('issues.managementTitle', 'Issue Request')}{' '}
+            <span className="glow-text">{t('issues.managementTitleHighlight', 'Management')}</span>
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginTop: '4px' }}>
-            Submit, track, investigate, assign, resolve, and close issue requests across the entire lifecycle.
+            {t('issues.managementSubtitle', 'Submit, track, investigate, assign, resolve, and close issue requests across the entire lifecycle.')}
           </p>
         </div>
         <button
@@ -157,7 +160,7 @@ export default function IssueManagementPage() {
           }}
         >
           <RefreshCw size={16} />
-          Refresh
+          {t('common.refresh', 'Refresh')}
         </button>
       </div>
 
@@ -206,8 +209,8 @@ export default function IssueManagementPage() {
       {!selectedIssue && (
         <div style={{ borderBottom: '1px solid var(--glass-border)', display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
           {[
-            { id: 'issues', label: 'Issue Requests', icon: ListChecks },
-            { id: 'knowledge', label: 'Knowledge Base', icon: BookOpen }
+            { id: 'issues', label: t('issues.tabIssueRequests', 'Issue Requests'), icon: ListChecks },
+            { id: 'knowledge', label: t('issues.tabKnowledgeBase', 'Knowledge Base'), icon: BookOpen }
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

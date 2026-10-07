@@ -13,8 +13,10 @@ import ConversationPanel from '../../communication/components/ConversationPanel'
 import InternalNotesPanel from '../../communication/components/InternalNotesPanel';
 import { FormField } from '../../../components/common/FormField';
 import { slaSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function TechRequestDetailPage() {
+  const { t, isRTL } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, hasPermission } = usePermissionContext();
@@ -337,7 +339,8 @@ export default function TechRequestDetailPage() {
   if (loading) {
     return (
       <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
-        Loading technician workspace...
+        <RefreshCw className="animate-spin" size={28} style={{ margin: '0 auto 12px', display: 'block', opacity: 0.7 }} />
+        {t('technician.loadingWorkspace', 'Loading technician workspace...')}
       </div>
     );
   }
@@ -357,7 +360,7 @@ export default function TechRequestDetailPage() {
             fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
           }}
         >
-          <ArrowLeft size={16} /> Back to Work Roster
+          <ArrowLeft size={16} style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} /> {t('technician.backToWork', 'Back to Work Roster')}
         </button>
 
         {successMsg && (

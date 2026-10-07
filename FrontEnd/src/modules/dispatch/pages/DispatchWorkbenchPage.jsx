@@ -1,15 +1,17 @@
 import React from 'react';
+import { useTranslation } from '../../../i18n';
 import { ChevronRight } from 'lucide-react';
 import TechnicianWorkbenchTab from '../components/TechnicianWorkbenchTab';
 
 export default function DispatchWorkbenchPage() {
+  const { t } = useTranslation();
+
   return (
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
         <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-          Active technician assignments, task execution timer, status updates, and fulfillment proof
+          {t('dispatch.workbenchPageSubtitle')}
         </p>
       </div>
 

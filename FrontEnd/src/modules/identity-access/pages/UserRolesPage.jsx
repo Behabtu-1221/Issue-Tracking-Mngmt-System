@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../../i18n';
 import { ShieldCheck, ArrowRight, Sliders, FileText, CheckCircle2 } from 'lucide-react';
 
 export default function UserRolesPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '20px' }}>
@@ -27,37 +29,37 @@ export default function UserRolesPage() {
         </div>
 
         <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.8rem', fontWeight: 800, color: '#ffffff', marginBottom: '12px' }}>
-          Role Definitions & RBAC Matrix Centralized
+          {t('identity.rolesCentralizedTitle')}
         </h2>
         <p style={{ color: '#94a3b8', fontSize: '0.96rem', maxWidth: '640px', margin: '0 auto 28px', lineHeight: '1.6' }}>
-          System role definitions, custom role creation, granular permission matrix grid, and RBAC governance policies have been consolidated into the dedicated <strong style={{ color: '#cbd5e1' }}>Role & RBAC Management Module</strong>.
+          {t('identity.rolesCentralizedDesc')}
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '32px', textAlign: 'left' }}>
           <div style={{ padding: '16px 20px', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#818cf8', fontWeight: 700, fontSize: '0.9rem', marginBottom: '6px' }}>
-              <Sliders size={18} /> Permission Matrix
+              <Sliders size={18} /> {t('identity.cardPermissionMatrix')}
             </div>
             <p style={{ margin: 0, color: '#64748b', fontSize: '0.82rem' }}>
-              Module-by-module permission matrix grid with group expanders and search filtering.
+              {t('identity.cardPermissionMatrixDesc')}
             </p>
           </div>
 
           <div style={{ padding: '16px 20px', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', fontWeight: 700, fontSize: '0.9rem', marginBottom: '6px' }}>
-              <CheckCircle2 size={18} /> Data Scope Enforcement
+              <CheckCircle2 size={18} /> {t('identity.cardDataScope')}
             </div>
             <p style={{ margin: 0, color: '#64748b', fontSize: '0.82rem' }}>
-              Role scope definitions: OWN, DEPARTMENT, COMPANY, and SYSTEM_ALL scopes.
+              {t('identity.cardDataScopeDesc')}
             </p>
           </div>
 
           <div style={{ padding: '16px 20px', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b', fontWeight: 700, fontSize: '0.9rem', marginBottom: '6px' }}>
-              <FileText size={18} /> RBAC Audit Logs
+              <FileText size={18} /> {t('identity.cardRbacAudit')}
             </div>
             <p style={{ margin: 0, color: '#64748b', fontSize: '0.82rem' }}>
-              Real-time security audit trails tracking permission modifications and role assignments.
+              {t('identity.cardRbacAuditDesc')}
             </p>
           </div>
         </div>
@@ -73,7 +75,7 @@ export default function UserRolesPage() {
               boxShadow: '0 8px 24px rgba(99, 102, 241, 0.35)', transition: 'all 0.25s ease'
             }}
           >
-            Launch Permission Matrix <ArrowRight size={18} />
+            {t('identity.launchMatrixBtn')} <ArrowRight size={18} />
           </button>
 
           <button
@@ -85,7 +87,7 @@ export default function UserRolesPage() {
               cursor: 'pointer', transition: 'all 0.25s ease'
             }}
           >
-            View RBAC Governance Dashboard
+            {t('identity.viewGovernanceDashboardBtn')}
           </button>
         </div>
       </div>

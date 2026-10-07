@@ -6,8 +6,10 @@ import {
   ListChecks, BookOpen, ShieldCheck, UserCheck, Play, Pause, RefreshCw, FileText
 } from 'lucide-react';
 import issueManagementApi from '../api/issueManagementApi';
+import { useTranslation } from '../../../i18n';
 
 export default function IssueDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,25 +35,25 @@ export default function IssueDashboardPage() {
 
   // Status Cards covering the full 7-stage issue status lifecycle
   const statusCards = [
-    { key: 'total', label: 'Total Requests', value: loading ? '...' : (m.totalIssues || 0), sub: 'All system requests', icon: ListChecks, color: 'var(--accent-primary)', bg: 'rgba(138, 75, 255, 0.15)', border: 'var(--accent-primary)', filter: '' },
-    { key: 'new', label: 'New Requests', value: loading ? '...' : (m.newIssues || 0), sub: 'Awaiting triage', icon: AlertCircle, color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: '#60a5fa', filter: 'NEW' },
-    { key: 'approved', label: 'Approved', value: loading ? '...' : (m.approvedIssues || m.newIssues || 0), sub: 'Verified & Approved', icon: ShieldCheck, color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.15)', border: '#38bdf8', filter: 'APPROVED' },
-    { key: 'assigned', label: 'Assigned', value: loading ? '...' : (m.assignedIssues || 0), sub: 'Dispatched to Agent', icon: UserCheck, color: '#c084fc', bg: 'rgba(192, 132, 252, 0.15)', border: '#c084fc', filter: 'ASSIGNED' },
-    { key: 'in_progress', label: 'In Progress', value: loading ? '...' : (m.inProgressIssues || 0), sub: 'Active Investigation', icon: Play, color: '#facc15', bg: 'rgba(250, 204, 21, 0.15)', border: '#facc15', filter: 'IN_PROGRESS' },
-    { key: 'pending', label: 'Pending Hold', value: loading ? '...' : (m.pendingIssues || 0), sub: 'On Hold / Info Needed', icon: Pause, color: '#fb923c', bg: 'rgba(251, 146, 60, 0.15)', border: '#fb923c', filter: 'PENDING' },
-    { key: 'resolved', label: 'Resolved', value: loading ? '...' : (m.resolvedIssues || 0), sub: 'Solution Confirmed', icon: CheckCircle2, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)', border: '#4ade80', filter: 'RESOLVED' },
-    { key: 'closed', label: 'Closed', value: loading ? '...' : (m.closedIssues || 0), sub: 'Archived & Closed', icon: XCircle, color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.15)', border: '#94a3b8', filter: 'CLOSED' }
+    { key: 'total', label: t('common.total', 'Total') + ' ' + t('issues.requestPlural', 'Requests'), value: loading ? '...' : (m.totalIssues || 0), sub: t('common.all', 'All') + ' ' + t('issues.requestPlural', 'requests'), icon: ListChecks, color: 'var(--accent-primary)', bg: 'rgba(138, 75, 255, 0.15)', border: 'var(--accent-primary)', filter: '' },
+    { key: 'new', label: t('issues.statusNew', 'New Requests'), value: loading ? '...' : (m.newIssues || 0), sub: t('issues.statusNew', 'Awaiting triage'), icon: AlertCircle, color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: '#60a5fa', filter: 'NEW' },
+    { key: 'approved', label: t('issues.statusApproved', 'Approved'), value: loading ? '...' : (m.approvedIssues || m.newIssues || 0), sub: t('issues.statusApproved', 'Verified & Approved'), icon: ShieldCheck, color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.15)', border: '#38bdf8', filter: 'APPROVED' },
+    { key: 'assigned', label: t('issues.statusAssigned', 'Assigned'), value: loading ? '...' : (m.assignedIssues || 0), sub: t('issues.statusAssigned', 'Dispatched to Agent'), icon: UserCheck, color: '#c084fc', bg: 'rgba(192, 132, 252, 0.15)', border: '#c084fc', filter: 'ASSIGNED' },
+    { key: 'in_progress', label: t('issues.statusInProgress', 'In Progress'), value: loading ? '...' : (m.inProgressIssues || 0), sub: t('issues.statusInProgress', 'Active Investigation'), icon: Play, color: '#facc15', bg: 'rgba(250, 204, 21, 0.15)', border: '#facc15', filter: 'IN_PROGRESS' },
+    { key: 'pending', label: t('issues.statusPending', 'Pending Hold'), value: loading ? '...' : (m.pendingIssues || 0), sub: t('issues.statusPending', 'On Hold / Info Needed'), icon: Pause, color: '#fb923c', bg: 'rgba(251, 146, 60, 0.15)', border: '#fb923c', filter: 'PENDING' },
+    { key: 'resolved', label: t('issues.statusResolved', 'Resolved'), value: loading ? '...' : (m.resolvedIssues || 0), sub: t('issues.statusResolved', 'Solution Confirmed'), icon: CheckCircle2, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)', border: '#4ade80', filter: 'RESOLVED' },
+    { key: 'closed', label: t('issues.statusClosed', 'Closed'), value: loading ? '...' : (m.closedIssues || 0), sub: t('issues.statusClosed', 'Archived & Closed'), icon: XCircle, color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.15)', border: '#94a3b8', filter: 'CLOSED' }
   ];
 
   // 7-Stage Status Flow Lifecycle Progression
   const lifecycleStages = [
-    { code: 'NEW', label: '1. New', desc: 'Submitted by user', color: '#60a5fa' },
-    { code: 'APPROVED', label: '2. Approved', desc: 'Validated by Manager', color: '#38bdf8' },
-    { code: 'ASSIGNED', label: '3. Assigned', desc: 'Routed to Specialist', color: '#c084fc' },
-    { code: 'IN_PROGRESS', label: '4. In Progress', desc: 'Active Troubleshooting', color: '#facc15' },
-    { code: 'PENDING', label: '5. Pending', desc: 'Waiting for Feedback', color: '#fb923c' },
-    { code: 'RESOLVED', label: '6. Resolved', desc: 'Fix verified', color: '#4ade80' },
-    { code: 'CLOSED', label: '7. Closed', desc: 'Ticket finalized', color: '#94a3b8' }
+    { code: 'NEW', label: '1. ' + t('issues.statusNew', 'New'), desc: 'Submitted by user', color: '#60a5fa' },
+    { code: 'APPROVED', label: '2. ' + t('issues.statusApproved', 'Approved'), desc: 'Validated by Manager', color: '#38bdf8' },
+    { code: 'ASSIGNED', label: '3. ' + t('issues.statusAssigned', 'Assigned'), desc: 'Routed to Specialist', color: '#c084fc' },
+    { code: 'IN_PROGRESS', label: '4. ' + t('issues.statusInProgress', 'In Progress'), desc: 'Active Troubleshooting', color: '#facc15' },
+    { code: 'PENDING', label: '5. ' + t('issues.statusPending', 'Pending'), desc: 'Waiting for Feedback', color: '#fb923c' },
+    { code: 'RESOLVED', label: '6. ' + t('issues.statusResolved', 'Resolved'), desc: 'Fix verified', color: '#4ade80' },
+    { code: 'CLOSED', label: '7. ' + t('issues.statusClosed', 'Closed'), desc: 'Ticket finalized', color: '#94a3b8' }
   ];
 
   return (
@@ -60,15 +62,15 @@ export default function IssueDashboardPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              Issue Overview & <span className="glow-text">Analytics</span>
+              {t('dashboard.serviceRequestsTracker', 'Issue Overview & Analytics')}
             </h1>
             <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Real-time issue tracking telemetry, 7-stage status lifecycle, and resolution SLAs
+              {t('dashboard.serviceRequestsTrackerDesc', 'Real-time issue tracking telemetry, 7-stage status lifecycle, and resolution SLAs')}
             </p>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa', fontSize: '0.78rem', fontWeight: 700 }}>
-              <Activity size={14} /> Live Issue Stream
+              <Activity size={14} /> Live Stream
             </span>
           </div>
         <div style={{ marginBottom: '24px' }}>
@@ -142,16 +144,16 @@ export default function IssueDashboardPage() {
 
       {/* Shortcuts Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-md)', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>Issue Request Shortcuts</div>
+        <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>{t('common.actions', 'Quick Shortcuts')}</div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           {[
-            { label: 'Issue Requests Tracker', icon: ListChecks, route: '/issues/tracker' },
-            { label: 'Status Lifecycle Flow', icon: RefreshCw, route: '/issues/status-flow' },
-            { label: 'Known Issues & KB', icon: BookOpen, route: '/issues/known' }
+            { label: t('dashboard.serviceRequestsTracker', 'Issue Requests Tracker'), icon: ListChecks, route: '/issues/tracker' },
+            { label: t('dashboard.serviceRequestsTrackerDesc', 'Status Lifecycle Flow'), icon: RefreshCw, route: '/issues/status-flow' },
+            { label: t('dashboard.knowledgeBase', 'Known Issues & KB'), icon: BookOpen, route: '/issues/known' }
           ].map((s) => {
             const ShortIcon = s.icon;
             return (
-              <button key={s.label} onClick={() => navigate(s.route)} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', padding: '7px 14px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+              <button key={s.route} onClick={() => navigate(s.route)} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', padding: '7px 14px', borderRadius: '8px', border: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-gradient)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
               >

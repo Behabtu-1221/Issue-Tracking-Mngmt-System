@@ -29,8 +29,10 @@ import TenantDetailModal from './TenantDetailModal';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { tenantSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function TenantsTab({ onRefreshMetrics }) {
+  const { t } = useTranslation();
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -247,25 +249,25 @@ export default function TenantsTab({ onRefreshMetrics }) {
       case 'ACTIVE':
         return (
           <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <CheckCircle2 size={12} /> Active
+            <CheckCircle2 size={12} /> {t('tenant.active')}
           </span>
         );
       case 'ONBOARDING':
         return (
           <span className="badge badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <Clock size={12} /> Onboarding
+            <Clock size={12} /> {t('tenant.onboarding')}
           </span>
         );
       case 'SUSPENDED':
         return (
           <span className="badge badge-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <AlertCircle size={12} /> Suspended
+            <AlertCircle size={12} /> {t('tenant.suspended')}
           </span>
         );
       case 'TERMINATED':
         return (
           <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.1)', color: '#888', fontSize: '0.75rem' }}>
-            Terminated
+            {t('tenant.terminated')}
           </span>
         );
       default:
@@ -282,7 +284,7 @@ export default function TenantsTab({ onRefreshMetrics }) {
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search by company, code, registration #..."
+              placeholder={t('tenant.searchTenants')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -308,11 +310,11 @@ export default function TenantsTab({ onRefreshMetrics }) {
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Statuses</option>
-            <option value="ONBOARDING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Onboarding</option>
-            <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Active</option>
-            <option value="SUSPENDED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Suspended</option>
-            <option value="TERMINATED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Terminated</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.allStatuses')}</option>
+            <option value="ONBOARDING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.onboarding')}</option>
+            <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.active')}</option>
+            <option value="SUSPENDED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.suspended')}</option>
+            <option value="TERMINATED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.terminated')}</option>
           </select>
           {/* Park filter — single campus system */}
           <div style={{
@@ -346,39 +348,39 @@ export default function TenantsTab({ onRefreshMetrics }) {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> Onboard New Tenant
+          <Plus size={16} /> {t('tenant.onboardTenant')}
         </button>
       </div>
 
       {/* Tenants Table */}
       <div className="glass-card" style={{ padding: '0', overflow: 'auto' }}>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading tenants...</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.loadingTenants')}</div>
         ) : tenants.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No tenants found.</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.noTenantsFound')}</div>
         ) : (
           <div style={{ overflowX: 'auto', width: '100%' }}>
           <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
             <thead>
               <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                <th style={{ padding: '16px 20px' }}>Company & Code</th>
-                <th style={{ padding: '16px 20px' }}>Business Park</th>
-                <th style={{ padding: '16px 20px' }}>Registration / Tax ID</th>
-                <th style={{ padding: '16px 20px' }}>Status</th>
-                <th style={{ padding: '16px 20px' }}>Leases / Offices</th>
-                <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.companyAndCode')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.businessPark')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.regTaxId')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.status')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.leasesOffices')}</th>
+                <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
-              {tenants.map((t) => (
-                <tr key={t.TenantID} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s ease' }}>
+              {tenants.map((tn) => (
+                <tr key={tn.TenantID} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s ease' }}>
                   <td style={{ padding: '16px 20px' }}>
-                    <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{t.CompanyName}</div>
+                    <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{tn.CompanyName}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <span style={{ background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: '4px' }}>{t.TenantCode}</span>
-                      {t.Website && (
-                        <a href={t.Website.startsWith('http') ? t.Website : `https://${t.Website}`} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                          <Globe size={12} /> {t.Website}
+                      <span style={{ background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: '4px' }}>{tn.TenantCode}</span>
+                      {tn.Website && (
+                        <a href={tn.Website.startsWith('http') ? tn.Website : `https://${tn.Website}`} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <Globe size={12} /> {tn.Website}
                         </a>
                       )}
                     </div>
@@ -386,18 +388,18 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   <td style={{ padding: '16px 20px', color: 'var(--text-secondary)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <Building2 size={14} color="var(--accent-primary)" />
-                      {t.BusinessParkName || 'N/A'}
+                      {tn.BusinessParkName || 'N/A'}
                     </div>
                   </td>
                   <td style={{ padding: '16px 20px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <div>Reg: {t.RegistrationNumber || '—'}</div>
-                    <div>TIN: {t.TaxIdentificationNo || '—'}</div>
+                    <div>Reg: {tn.RegistrationNumber || '—'}</div>
+                    <div>TIN: {tn.TaxIdentificationNo || '—'}</div>
                   </td>
                   <td style={{ padding: '16px 20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {getStatusBadge(t.Status)}
+                      {getStatusBadge(tn.Status)}
                       <button
-                        onClick={() => { setStatusModalTenant(t); setNewStatus(''); setErrorMsg(''); }}
+                        onClick={() => { setStatusModalTenant(tn); setNewStatus(''); setErrorMsg(''); }}
                         title="Change Status Lifecycle"
                         style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}
                       >
@@ -408,29 +410,29 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   <td style={{ padding: '16px 20px' }}>
                     <div style={{ display: 'flex', gap: '12px', fontSize: '0.8rem' }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)' }}>
-                        <FileText size={13} /> {t.LeaseCount} Leases
+                        <FileText size={13} /> {tn.LeaseCount} {t('tenant.leases')}
                       </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: t.ActiveAllocationCount > 0 ? '#4ade80' : 'var(--text-muted)' }}>
-                        <Building2 size={13} /> {t.ActiveAllocationCount} Allocated
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: tn.ActiveAllocationCount > 0 ? '#4ade80' : 'var(--text-muted)' }}>
+                        <Building2 size={13} /> {tn.ActiveAllocationCount} {t('businessPark.occupied')}
                       </span>
                     </div>
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                       <button
-                        onClick={() => setSelectedTenant(t)}
+                        onClick={() => setSelectedTenant(tn)}
                         style={{ padding: '6px 12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
                       >
-                        View Details
+                        {t('common.viewDetails')}
                       </button>
                       <button
-                        onClick={() => handleOpenEdit(t)}
+                        onClick={() => handleOpenEdit(tn)}
                         style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-muted)', cursor: 'pointer' }}
                       >
                         <Edit2 size={14} />
                       </button>
                       <button
-                        onClick={() => handleDelete(t.TenantID, t.CompanyName)}
+                        onClick={() => handleDelete(tn.TenantID, tn.CompanyName)}
                         style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
                       >
                         <Trash2 size={14} />
@@ -614,13 +616,13 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   onClick={() => setIsCreateModalOpen(false)}
                   style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)' }}
                 >
-                  {editingTenant ? 'Save Changes' : 'Onboard Tenant'}
+                  {editingTenant ? t('common.saveChanges') : t('tenant.onboardTenant')}
                 </button>
               </div>
             </form>
@@ -684,14 +686,14 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   onClick={() => setStatusModalTenant(null)}
                   style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={!newStatus}
                   style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)', opacity: !newStatus ? 0.5 : 1 }}
                 >
-                  Update Status
+                  {t('common.confirm')}
                 </button>
               </div>
             </form>

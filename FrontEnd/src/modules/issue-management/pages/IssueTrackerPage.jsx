@@ -6,8 +6,10 @@ import CreateIssueModal from '../components/CreateIssueModal';
 import AssignIssueModal from '../components/AssignIssueModal';
 import StatusUpdateModal from '../components/StatusUpdateModal';
 import issueManagementApi from '../api/issueManagementApi';
+import { useTranslation } from '../../../i18n';
 
 export default function IssueTrackerPage() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [selectedIssue, setSelectedIssue] = useState(null);
@@ -72,9 +74,11 @@ export default function IssueTrackerPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
+        <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+          {t('dashboard.serviceRequestsTracker', 'Service Requests Tracker')}
+        </h2>
         <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-          Submit, monitor, assign, update status, and manage issue requests across the facility
+          {t('issues.myRequestsSubtitle', 'Submit, monitor, assign, update status, and manage issue requests across the facility')}
         </p>
       </div>
 

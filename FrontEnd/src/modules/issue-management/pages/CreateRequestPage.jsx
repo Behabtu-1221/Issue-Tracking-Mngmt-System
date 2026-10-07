@@ -238,13 +238,13 @@ export default function CreateRequestPage() {
               display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, marginBottom: '8px'
             }}
           >
-            <ArrowLeft size={16} style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} /> {t('common.back', 'Back')} to {t('nav.myRequests', 'My Requests')}
+            <ArrowLeft size={16} style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} /> {t('issues.backToRequests', 'Back to My Requests')}
           </button>
           <h1 style={{ fontSize: '1.7rem', fontWeight: 800, margin: 0 }}>
             {t('issues.createIssue', 'Create New Service Request')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Submit a new business park service request or report an issue to facility engineers.
+            {t('dashboard.employeeSubtitle', 'Submit a new business park service request or report an issue to facility engineers.')}
           </p>
         </div>
       </div>
@@ -265,24 +265,24 @@ export default function CreateRequestPage() {
             <User size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Auto-Fetched Requester</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{t('issues.requesterCard', 'Auto-Fetched Requester')}</div>
             <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>{requesterFullName}</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', fontWeight: 700 }}>ID: #{userIdDisplay}</div>
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Business Park / Campus</div>
+          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{t('issues.campus', 'Business Park / Campus')}</div>
           <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Building2 size={15} color="#60a5fa" /> {businessParkName}
           </div>
           {tenantNameDisplay && (
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>Tenant: {tenantNameDisplay}</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>{t('nav.tenants', 'Tenant')}: {tenantNameDisplay}</div>
           )}
         </div>
 
         <div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Contact Email & Phone</div>
+          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{t('issues.contactDetails', 'Contact Email & Phone')}</div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
             <div>{emailDisplay}</div>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{phoneDisplay}</div>
@@ -308,7 +308,7 @@ export default function CreateRequestPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
-              Business Park Campus
+              {t('issues.campus', 'Business Park Campus')}
             </label>
             <div style={{
               width: '100%',
@@ -330,7 +330,7 @@ export default function CreateRequestPage() {
                   <span style={{ fontWeight: 800 }}>{businessParkName}</span>
                   {tenantNameDisplay && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                      Tenant: {tenantNameDisplay}
+                      {t('nav.tenants', 'Tenant')}: {tenantNameDisplay}
                     </span>
                   )}
                 </div>
@@ -340,12 +340,12 @@ export default function CreateRequestPage() {
           </div>
 
           <FormField
-            label="Service Category"
+            label={t('issues.category', 'Service Category')}
             id="ServiceCategoryID"
             required
             icon={Layers}
             error={formErrors.ServiceCategoryID}
-            helpText="Select domain of request"
+            helpText={t('issues.selectDomain', 'Select domain of request')}
           >
             <select
               id="ServiceCategoryID"
@@ -363,7 +363,7 @@ export default function CreateRequestPage() {
                 boxSizing: 'border-box'
               }}
             >
-              <option value="">-- Select Service Category --</option>
+              <option value="">{t('issues.chooseCategory', '-- Select Service Category --')}</option>
               {categoriesList.map(c => (
                 <option key={c.ServiceCategoryID} value={c.ServiceCategoryID}>
                   {c.CategoryName} ({c.CategoryCode})
@@ -376,7 +376,7 @@ export default function CreateRequestPage() {
         {/* Specific Service Selection (Optional) */}
         <div>
           <FormField
-            label="Specific Catalog Service (Optional)"
+            label={t('issues.serviceItem', 'Specific Catalog Service (Optional)')}
             id="ServiceID"
             icon={FileText}
             error={formErrors.ServiceID}
@@ -397,7 +397,7 @@ export default function CreateRequestPage() {
                 boxSizing: 'border-box'
               }}
             >
-              <option value="">-- General Category Request --</option>
+              <option value="">{t('issues.chooseService', '-- General Category Request --')}</option>
               {servicesList
                 .filter(s => !form.ServiceCategoryID || String(s.ServiceCategoryID) === String(form.ServiceCategoryID))
                 .map(s => (
@@ -417,7 +417,7 @@ export default function CreateRequestPage() {
         {/* Priority */}
         <div>
           <FormField
-            label="Urgency / Priority Level"
+            label={t('issues.urgencyPriority', 'Urgency / Priority Level')}
             id="PriorityCode"
             required
             icon={Clock}
@@ -425,10 +425,10 @@ export default function CreateRequestPage() {
           >
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
               {[
-                { code: 'LOW', label: 'Low', desc: 'Routine request', color: '#94a3b8' },
-                { code: 'MEDIUM', label: 'Medium', desc: 'Standard response', color: '#60a5fa' },
-                { code: 'HIGH', label: 'High', desc: 'Important issue', color: '#facc15' },
-                { code: 'URGENT', label: 'Urgent', desc: 'Severe impact', color: '#f87171' }
+                { code: 'LOW', label: t('issues.priorityLow', 'Low'), desc: 'Routine request', color: '#94a3b8' },
+                { code: 'MEDIUM', label: t('issues.priorityMedium', 'Medium'), desc: 'Standard response', color: '#60a5fa' },
+                { code: 'HIGH', label: t('issues.priorityHigh', 'High'), desc: 'Important issue', color: '#facc15' },
+                { code: 'URGENT', label: t('issues.priorityUrgent', 'Urgent'), desc: 'Severe impact', color: '#f87171' }
               ].map(p => {
                 const isSel = form.PriorityCode === p.code;
                 return (
@@ -455,7 +455,7 @@ export default function CreateRequestPage() {
 
         {/* Subject Title */}
         <FormField
-          label="Subject / Request Title"
+          label={t('issues.requestTitle', 'Subject / Request Title')}
           id="Title"
           required
           icon={Sparkles}
@@ -465,7 +465,7 @@ export default function CreateRequestPage() {
           <input
             id="Title"
             type="text"
-            placeholder="e.g. AC unit in office 304 making loud noise"
+            placeholder={t('issues.titlePlaceholder', 'e.g. AC unit in office 304 making loud noise')}
             value={form.Title}
             onChange={e => handleInputChange('Title', e.target.value)}
             style={{
@@ -484,7 +484,7 @@ export default function CreateRequestPage() {
 
         {/* Detailed Description */}
         <FormField
-          label="Detailed Request Description"
+          label={t('issues.descriptionDetails', 'Detailed Request Description')}
           id="Description"
           required
           icon={FileText}
@@ -494,7 +494,7 @@ export default function CreateRequestPage() {
           <textarea
             id="Description"
             rows={5}
-            placeholder="Please describe the issue or service required in detail, including specific building, floor, room number, or symptom..."
+            placeholder={t('issues.descPlaceholder', 'Please describe the issue or service required in detail, including specific building, floor, room number, or symptom...')}
             value={form.Description}
             onChange={e => handleInputChange('Description', e.target.value)}
             style={{
@@ -516,7 +516,7 @@ export default function CreateRequestPage() {
         {/* File Attachments Uploader */}
         <div>
           <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
-            Upload Supporting Documents / Photos (Optional)
+            {t('issues.attachFiles', 'Upload Supporting Documents / Photos (Optional)')}
           </label>
           <input
             type="file"
@@ -542,10 +542,10 @@ export default function CreateRequestPage() {
           >
             <Upload size={28} style={{ color: 'var(--accent-primary)', marginBottom: '8px' }} />
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Click to browse or drop files here
+              {t('issues.dragDropBrowse', 'Click to browse or drop files here')}
             </div>
             <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Upload photos, error screenshots, PDFs, or equipment logs (Max 10 MB per file)
+              {t('issues.fileSupportHint', 'Upload photos, error screenshots, PDFs, or equipment logs (Max 10 MB per file)')}
             </div>
           </div>
 
@@ -622,7 +622,7 @@ export default function CreateRequestPage() {
             }}
           >
             <Plus size={18} />
-            {submitting ? t('common.loading', 'Submitting Request...') : t('common.submit', 'Submit Request')}
+            {submitting ? t('issues.submitting', 'Submitting Request...') : t('issues.submitServiceRequest', 'Submit Service Request')}
           </button>
         </div>
 

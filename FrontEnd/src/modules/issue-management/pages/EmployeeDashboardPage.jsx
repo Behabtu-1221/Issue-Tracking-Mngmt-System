@@ -9,8 +9,10 @@ import issueManagementApi from '../api/issueManagementApi';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { CreateIssueModal } from '../components/CreateIssueModal';
 import { IssueDetailView } from '../components/IssueDetailView';
+import { useTranslation } from '../../../i18n';
 
 export default function EmployeeDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = usePermissionContext();
   
@@ -21,17 +23,44 @@ export default function EmployeeDashboardPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
 
-  // Sample announcements for employee view
+  // Localized announcements for employee view
   const announcements = [
-    { id: 1, title: 'Annual HVAC & Filter Maintenance', date: 'Today', tag: 'Facility Alert', desc: 'Air conditioning systems in Block B will undergo scheduled maintenance between 14:00 and 16:00.' },
-    { id: 2, title: 'New Smart Badge Access System', date: '2 days ago', tag: 'Security', desc: 'All tenant employees can now tap NFC mobile passes at turnstiles.' }
+    {
+      id: 1,
+      title: t('dashboard.announcement1Title', 'Annual HVAC & Filter Maintenance'),
+      date: t('dashboard.today', 'Today'),
+      tag: t('dashboard.facilityAlert', 'Facility Alert'),
+      desc: t('dashboard.announcement1Desc', 'Air conditioning systems in Block B will undergo scheduled maintenance between 14:00 and 16:00.')
+    },
+    {
+      id: 2,
+      title: t('dashboard.announcement2Title', 'New Smart Badge Access System'),
+      date: t('dashboard.twoDaysAgo', '2 days ago'),
+      tag: t('dashboard.securityTag', 'Security'),
+      desc: t('dashboard.announcement2Desc', 'All tenant employees can now tap NFC mobile passes at turnstiles.')
+    }
   ];
 
-  // Sample KB Articles
+  // Localized KB Articles
   const kbArticles = [
-    { id: 1, title: 'How to request visitor parking passes', category: 'Facilities', readTime: '2 min' },
-    { id: 2, title: 'Wi-Fi guest network credential generator', category: 'IT & Network', readTime: '1 min' },
-    { id: 3, title: 'Reporting urgent plumbing or electrical issues', category: 'Maintenance', readTime: '3 min' }
+    {
+      id: 1,
+      title: t('dashboard.kb1Title', 'How to request visitor parking passes'),
+      category: t('dashboard.catFacilities', 'Facilities'),
+      readTime: t('dashboard.kb1Time', '2 min')
+    },
+    {
+      id: 2,
+      title: t('dashboard.kb2Title', 'Wi-Fi guest network credential generator'),
+      category: t('dashboard.catItNetwork', 'IT & Network'),
+      readTime: t('dashboard.kb2Time', '1 min')
+    },
+    {
+      id: 3,
+      title: t('dashboard.kb3Title', 'Reporting urgent plumbing or electrical issues'),
+      category: t('dashboard.catMaintenance', 'Maintenance'),
+      readTime: t('dashboard.kb3Time', '3 min')
+    }
   ];
 
   const currentUserId = user?.UserID || user?.userId;
@@ -82,21 +111,21 @@ export default function EmployeeDashboardPage() {
     const status = (statusStr || '').toUpperCase();
     switch (status) {
       case 'NEW':
-        return { label: 'New Request', bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
+        return { label: t('issues.statusNew', 'New Request'), bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
       case 'APPROVED':
-        return { label: 'Approved', bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: 'rgba(56, 189, 248, 0.3)' };
+        return { label: t('issues.statusApproved', 'Approved'), bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: 'rgba(56, 189, 248, 0.3)' };
       case 'ASSIGNED':
-        return { label: 'Assigned', bg: 'rgba(192, 132, 252, 0.15)', color: '#c084fc', border: 'rgba(192, 132, 252, 0.3)' };
+        return { label: t('issues.statusAssigned', 'Assigned'), bg: 'rgba(192, 132, 252, 0.15)', color: '#c084fc', border: 'rgba(192, 132, 252, 0.3)' };
       case 'IN_PROGRESS':
-        return { label: 'In Progress', bg: 'rgba(250, 204, 21, 0.15)', color: '#facc15', border: 'rgba(250, 204, 21, 0.3)' };
+        return { label: t('issues.statusInProgress', 'In Progress'), bg: 'rgba(250, 204, 21, 0.15)', color: '#facc15', border: 'rgba(250, 204, 21, 0.3)' };
       case 'PENDING':
-        return { label: 'Action Needed', bg: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: 'rgba(251, 146, 60, 0.3)' };
+        return { label: t('issues.statusPending', 'Action Needed'), bg: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: 'rgba(251, 146, 60, 0.3)' };
       case 'RESOLVED':
-        return { label: 'Resolved', bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
+        return { label: t('issues.statusResolved', 'Resolved'), bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
       case 'CLOSED':
-        return { label: 'Closed', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: t('issues.statusClosed', 'Closed'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
       default:
-        return { label: statusStr || 'Submitted', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: statusStr || t('issues.statusSubmitted', 'Submitted'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
     }
   };
 
@@ -130,7 +159,7 @@ export default function EmployeeDashboardPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <span style={{ padding: '3px 10px', borderRadius: '12px', background: 'rgba(37,99,235,0.2)', color: '#60a5fa', fontSize: '0.75rem', fontWeight: 700 }}>
-              Employee Self-Service Desk
+              {t('dashboard.employeeDesk', 'Employee Self-Service Desk')}
             </span>
             {user?.TenantName && (
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -139,10 +168,10 @@ export default function EmployeeDashboardPage() {
             )}
           </div>
           <h1 style={{ fontSize: '1.7rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
-            Welcome back, <span className="glow-text">{user?.FirstName || user?.Username || 'Employee'}</span>
+            {t('dashboard.welcomeBack', 'Welcome back')}, <span className="glow-text">{user?.FirstName || user?.Username || 'Employee'}</span>
           </h1>
           <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Submit new service requests, track active tickets, and communicate directly with park technicians.
+            {t('dashboard.employeeSubtitle', 'Submit new service requests, track active tickets, and communicate directly with park technicians.')}
           </p>
         </div>
 
@@ -167,7 +196,7 @@ export default function EmployeeDashboardPage() {
             onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
           >
-            <Plus size={18} /> New Request
+            <Plus size={18} /> {t('dashboard.newRequest', 'New Request')}
           </button>
           
           <button
@@ -186,7 +215,7 @@ export default function EmployeeDashboardPage() {
               gap: '8px'
             }}
           >
-            <BookOpen size={16} /> Service Catalog
+            <BookOpen size={16} /> {t('dashboard.catalogButton', 'Service Catalog')}
           </button>
         </div>
       </div>
@@ -194,10 +223,10 @@ export default function EmployeeDashboardPage() {
       {/* KPI Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
         {[
-          { key: 'ALL', label: 'My Total Requests', value: loading ? '...' : totalCount, sub: 'Lifetime submitted', icon: FileText, color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
-          { key: 'OPEN', label: 'My Open Requests', value: loading ? '...' : openCount, sub: 'Active in resolution pipeline', icon: Clock, color: '#facc15', bg: 'rgba(250, 204, 21, 0.15)' },
-          { key: 'PENDING', label: 'Action Needed', value: loading ? '...' : pendingCount, sub: 'Awaiting your response', icon: AlertCircle, color: '#fb923c', bg: 'rgba(251, 146, 60, 0.15)' },
-          { key: 'RESOLVED', label: 'Recently Resolved', value: loading ? '...' : resolvedCount, sub: 'Completed & closed', icon: CheckCircle2, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)' },
+          { key: 'ALL', label: t('dashboard.myTotalRequests', 'My Total Requests'), value: loading ? '...' : totalCount, sub: t('dashboard.lifetimeSubmitted', 'Lifetime submitted'), icon: FileText, color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
+          { key: 'OPEN', label: t('dashboard.myOpenRequests', 'My Open Requests'), value: loading ? '...' : openCount, sub: t('dashboard.activePipeline', 'Active in resolution pipeline'), icon: Clock, color: '#facc15', bg: 'rgba(250, 204, 21, 0.15)' },
+          { key: 'PENDING', label: t('dashboard.actionNeeded', 'Action Needed'), value: loading ? '...' : pendingCount, sub: t('dashboard.awaitingResponse', 'Awaiting your response'), icon: AlertCircle, color: '#fb923c', bg: 'rgba(251, 146, 60, 0.15)' },
+          { key: 'RESOLVED', label: t('dashboard.recentlyResolved', 'Recently Resolved'), value: loading ? '...' : resolvedCount, sub: t('dashboard.completedClosed', 'Completed & closed'), icon: CheckCircle2, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)' },
         ].map(card => {
           const Icon = card.icon;
           const isSelected = filterStatus === card.key;
@@ -246,10 +275,10 @@ export default function EmployeeDashboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <LifeBuoy size={18} style={{ color: 'var(--accent-primary)' }} /> My Service Requests
+                <LifeBuoy size={18} style={{ color: 'var(--accent-primary)' }} /> {t('dashboard.recentRequests', 'My Service Requests')}
               </h3>
               <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Track live status updates and technician communications
+                {t('dashboard.recentRequestsDesc', 'Track live status updates and technician communications')}
               </p>
             </div>
 
@@ -258,7 +287,7 @@ export default function EmployeeDashboardPage() {
                 <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                 <input
                   type="text"
-                  placeholder="Search my requests..."
+                  placeholder={t('dashboard.searchRequests', 'Search my requests...')}
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   style={{
@@ -283,7 +312,7 @@ export default function EmployeeDashboardPage() {
                   color: 'var(--text-secondary)',
                   cursor: 'pointer'
                 }}
-                title="Refresh requests"
+                title={t('common.refresh', 'Refresh requests')}
               >
                 <RefreshCw size={15} />
               </button>
@@ -293,10 +322,10 @@ export default function EmployeeDashboardPage() {
           {/* Filter Chips */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {[
-              { id: 'ALL', label: 'All Requests' },
-              { id: 'OPEN', label: 'Active Open' },
-              { id: 'PENDING', label: 'Action Needed' },
-              { id: 'RESOLVED', label: 'Resolved / Closed' },
+              { id: 'ALL', label: t('dashboard.allRequests', 'All Requests') },
+              { id: 'OPEN', label: t('dashboard.openFilter', 'Active Open') },
+              { id: 'PENDING', label: t('dashboard.pendingFilter', 'Action Needed') },
+              { id: 'RESOLVED', label: t('dashboard.resolvedFilter', 'Resolved / Closed') },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -321,7 +350,7 @@ export default function EmployeeDashboardPage() {
           {/* Requests List */}
           {loading ? (
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              Loading your requests...
+              {t('common.loadingRequests', 'Loading your requests...')}
             </div>
           ) : filteredIssues.length === 0 ? (
             <div style={{
@@ -332,9 +361,9 @@ export default function EmployeeDashboardPage() {
               border: '1px stroke var(--glass-border)'
             }}>
               <CheckCircle2 size={40} style={{ color: '#4ade80', marginBottom: '12px' }} />
-              <h4 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 700 }}>No requests found</h4>
+              <h4 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 700 }}>{t('dashboard.noRequestsFound', 'No requests found')}</h4>
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                {filterStatus !== 'ALL' ? 'No issues match the selected filter.' : 'You have not submitted any service requests yet.'}
+                {filterStatus !== 'ALL' ? t('dashboard.noFilterMatches', 'No issues match the selected filter.') : t('dashboard.noRequestsYet', 'You have not submitted any service requests yet.')}
               </p>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
@@ -353,7 +382,7 @@ export default function EmployeeDashboardPage() {
                   gap: '6px'
                 }}
               >
-                <Plus size={15} /> Submit First Request
+                <Plus size={15} /> {t('dashboard.submitFirst', 'Submit First Request')}
               </button>
             </div>
           ) : (
@@ -413,10 +442,10 @@ export default function EmployeeDashboardPage() {
                       </h4>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                        <span>Submitted: {new Date(issue.CreatedAt || issue.RequestDate || Date.now()).toLocaleDateString()}</span>
+                        <span>{t('issues.submittedOn', 'Submitted')}: {new Date(issue.CreatedAt || issue.RequestDate || Date.now()).toLocaleDateString()}</span>
                         {issue.AssignedTechnicianName && (
                           <span style={{ color: '#c084fc', fontWeight: 600 }}>
-                            Technician: {issue.AssignedTechnicianName}
+                            {t('issues.technician', 'Technician')}: {issue.AssignedTechnicianName}
                           </span>
                         )}
                       </div>
@@ -436,7 +465,7 @@ export default function EmployeeDashboardPage() {
                         alignItems: 'center',
                         gap: '4px'
                       }}>
-                        View Details <ChevronRight size={14} />
+                        {t('common.viewDetails', 'View Details')} <ChevronRight size={14} />
                       </button>
                     </div>
                   </div>
@@ -453,7 +482,7 @@ export default function EmployeeDashboardPage() {
           <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
               <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Bell size={16} style={{ color: '#fb923c' }} /> Park Announcements
+                <Bell size={16} style={{ color: '#fb923c' }} /> {t('dashboard.parkAnnouncements', 'Park Announcements')}
               </h3>
             </div>
 
@@ -484,13 +513,13 @@ export default function EmployeeDashboardPage() {
           <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
               <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <HelpCircle size={16} style={{ color: '#38bdf8' }} /> Popular Self-Help
+                <HelpCircle size={16} style={{ color: '#38bdf8' }} /> {t('dashboard.knowledgeBase', 'Popular Self-Help')}
               </h3>
               <button
                 onClick={() => navigate('/issues/known')}
                 style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
               >
-                View KB
+                {t('dashboard.viewAll', 'View KB')}
               </button>
             </div>
 
@@ -515,7 +544,7 @@ export default function EmployeeDashboardPage() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                     <span>{article.category}</span>
-                    <span>{article.readTime} read</span>
+                    <span>{article.readTime} {t('dashboard.readSuffix', 'read')}</span>
                   </div>
                 </div>
               ))}

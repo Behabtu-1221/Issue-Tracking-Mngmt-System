@@ -5,8 +5,10 @@ import { LOCATION_TYPES } from '../constants/parkConstants';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { parkSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function CampusLocationsTab() {
+  const { t } = useTranslation();
   const [locations, setLocations] = useState([]);
   const [parks, setParks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,12 +87,12 @@ export default function CampusLocationsTab() {
     setFormError('');
     setFieldErrors({});
 
-    const validation = parkSchemas.campusLocationForm({
+    const validation = parkSchemas.locationForm({
       LocationName: formData.LocationName,
       LocationCode: formData.LocationCode,
       ParkID: formData.BusinessParkID,
-      LocationType: formData.LocationType,
       ParentLocationID: formData.ParentLocationID,
+      LocationType: formData.LocationType,
       Description: formData.Description
     });
 
@@ -104,14 +106,13 @@ export default function CampusLocationsTab() {
 
     try {
       const payload = {
-        BusinessParkID: validation.sanitized.ParkID,
+        ...formData,
         LocationName: validation.sanitized.LocationName,
         LocationCode: validation.sanitized.LocationCode,
-        LocationType: formData.LocationType || 'BLOCK',
-        ParentLocationID: (formData.ParentLocationID !== undefined && formData.ParentLocationID !== null && String(formData.ParentLocationID).trim() !== '')
-          ? Number(formData.ParentLocationID)
-          : null,
-        Description: validation.sanitized.Description || ''
+        BusinessParkID: validation.sanitized.ParkID,
+        ParentLocationID: validation.sanitized.ParentLocationID,
+        LocationType: validation.sanitized.LocationType,
+        Description: validation.sanitized.Description
       };
 
       if (selectedLoc) {
@@ -124,7 +125,7 @@ export default function CampusLocationsTab() {
       resetForm();
       fetchLocationsAndParks();
     } catch (err) {
-      const errMsg = err.response?.data?.message || 'Failed to save campus location.';
+      const errMsg = err.response?.data?.message || 'Failed to save location.';
       setFormError(errMsg);
       if (err.response?.data?.details && Array.isArray(err.response.data.details)) {
         const backendFieldErrors = {};
@@ -142,10 +143,10 @@ export default function CampusLocationsTab() {
     setSelectedLoc(loc);
     setConfirmConfig({
       isOpen: true,
-      title: 'Remove Landmark Location',
+      title: t('common.delete'),
       message: `Are you sure you want to delete campus location "${loc.LocationName}"?`,
       type: 'danger',
-      confirmText: 'Delete Location',
+      confirmText: t('common.delete'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -154,7 +155,7 @@ export default function CampusLocationsTab() {
           fetchLocationsAndParks();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete location.';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('common.error'), msg, 'error');
         }
       }
     });
@@ -196,7 +197,7 @@ export default function CampusLocationsTab() {
           <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search campus locations by name or code..."
+            placeholder={t('businessPark.searchLandmarks')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -227,7 +228,7 @@ export default function CampusLocationsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
           </button>
 
           <button
@@ -251,7 +252,7 @@ export default function CampusLocationsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <Plus size={16} /> Add Location
+            <Plus size={16} /> {t('businessPark.addLandmark')}
           </button>
         </div>
       </div>
@@ -261,23 +262,23 @@ export default function CampusLocationsTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-            <p>Loading physical location hierarchy...</p>
+            <p>{t('businessPark.loadingLandmarks')}</p>
           </div>
         ) : locations.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <Compass size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-            <p>No campus locations registered.</p>
+            <p>{t('businessPark.noLandmarksFound')}</p>
           </div>
         ) : (
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Location Name</th>
-                <th>Location Code</th>
-                <th>Location Type</th>
-                <th>Parent Location</th>
-                <th>Business Park</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('businessPark.locationName')}</th>
+                <th>{t('businessPark.locationCode')}</th>
+                <th>{t('businessPark.locationType')}</th>
+                <th>{t('businessPark.parentLocation')}</th>
+                <th>{t('businessPark.businessPark')}</th>
+                <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -291,13 +292,13 @@ export default function CampusLocationsTab() {
                   <td>
                     <span className="badge badge-info">{loc.LocationType}</span>
                   </td>
-                  <td>{loc.ParentLocationName || 'Top Level'}</td>
+                  <td>{loc.ParentLocationName || t('businessPark.noneRootLocation')}</td>
                   <td>{loc.BusinessParkName}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                       <button
                         onClick={() => openEditModal(loc)}
-                        title="Edit Landmark Location"
+                        title={t('businessPark.editLocation')}
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: '4px',
                           padding: '6px 12px', borderRadius: '8px',
@@ -308,11 +309,11 @@ export default function CampusLocationsTab() {
                           cursor: 'pointer', transition: 'all 0.2s'
                         }}
                       >
-                        <Edit size={14} /> Edit
+                        <Edit size={14} /> {t('common.edit')}
                       </button>
                       <button
                         onClick={() => promptDeleteLocation(loc)}
-                        title="Delete Landmark Location"
+                        title={t('common.delete')}
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: '4px',
                           padding: '6px 12px', borderRadius: '8px',
@@ -323,7 +324,7 @@ export default function CampusLocationsTab() {
                           cursor: 'pointer', transition: 'all 0.2s'
                         }}
                       >
-                        <Trash2 size={14} /> Delete
+                        <Trash2 size={14} /> {t('common.delete')}
                       </button>
                     </div>
                   </td>
@@ -364,10 +365,10 @@ export default function CampusLocationsTab() {
                   </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {selectedLoc ? 'Edit Campus Landmark' : 'Register Campus Landmark'}
+                      {selectedLoc ? t('businessPark.editLocation') : t('businessPark.registerLocation')}
                     </h3>
                     <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {selectedLoc ? `Modifying landmark ID: ${selectedLoc.LocationCode}` : 'Define physical landmark or waypoint on campus'}
+                      {selectedLoc ? `${t('businessPark.modifyingStructure')}: ${selectedLoc.LocationCode}` : t('businessPark.landmarksSubtitle')}
                     </p>
                   </div>
                 </div>
@@ -387,7 +388,7 @@ export default function CampusLocationsTab() {
 
               <form onSubmit={handleSaveLocation} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} noValidate>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Business Park</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.businessPark')}</label>
                   <div style={{
                     width: '100%', padding: '10px 14px', borderRadius: '8px',
                     background: 'rgba(99, 102, 241, 0.08)',
@@ -398,16 +399,16 @@ export default function CampusLocationsTab() {
                     🏢 {parks.length > 0 ? `${parks[0].BusinessParkName} (${parks[0].BusinessParkCode})` : 'Ethiopian IT Park'}
                   </div>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px', display: 'block' }}>
-                    Single campus system — auto-assigned
+                    {t('businessPark.singleCampusAssigned')}
                   </span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Location / Landmark Name *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.locationName')} *</label>
                     <input
                       type="text"
-                      placeholder="e.g. Central Plaza Fountain"
+                      placeholder={t('businessPark.enterLocationName')}
                       value={formData.LocationName}
                       onChange={(e) => handleFieldChange('LocationName', e.target.value)}
                       style={{
@@ -424,10 +425,10 @@ export default function CampusLocationsTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Location Code</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.locationCode')}</label>
                     <input
                       type="text"
-                      placeholder="e.g. LMK-PLZ"
+                      placeholder={t('businessPark.enterLocationCode')}
                       value={formData.LocationCode}
                       onChange={(e) => handleFieldChange('LocationCode', e.target.value.toUpperCase())}
                       style={{
@@ -447,7 +448,7 @@ export default function CampusLocationsTab() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Location Type *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.locationType')} *</label>
                     <select
                       value={formData.LocationType}
                       onChange={(e) => handleFieldChange('LocationType', e.target.value)}
@@ -469,7 +470,7 @@ export default function CampusLocationsTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Parent Location (Optional)</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.parentLocation')}</label>
                     <select
                       value={formData.ParentLocationID}
                       onChange={(e) => handleFieldChange('ParentLocationID', e.target.value)}
@@ -480,7 +481,7 @@ export default function CampusLocationsTab() {
                         color: 'var(--text-primary)', fontSize: '0.88rem'
                       }}
                     >
-                      <option value="">None (Top-Level Landmark)</option>
+                      <option value="">{t('businessPark.noneRootLocation')}</option>
                       {locations
                         .filter(l => !selectedLoc || l.LocationID !== selectedLoc.LocationID)
                         .map(l => (
@@ -496,7 +497,7 @@ export default function CampusLocationsTab() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Description</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('common.description')}</label>
                   <textarea
                     rows={3}
                     placeholder="Directions, landmark features or navigational cues..."
@@ -519,10 +520,10 @@ export default function CampusLocationsTab() {
                 {/* Footer Actions */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid var(--glass-border)' }}>
                   <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '10px 22px', borderRadius: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.88rem' }}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" disabled={formSubmitting} style={{ padding: '10px 24px', borderRadius: '10px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', opacity: formSubmitting ? 0.7 : 1 }}>
-                    {formSubmitting ? '⏳ Saving...' : selectedLoc ? '✓ Update Location' : '✓ Add Location'}
+                    {formSubmitting ? `⏳ ${t('common.loading')}` : selectedLoc ? `✓ ${t('businessPark.updateLocation')}` : `✓ ${t('businessPark.addLandmark')}`}
                   </button>
                 </div>
               </form>

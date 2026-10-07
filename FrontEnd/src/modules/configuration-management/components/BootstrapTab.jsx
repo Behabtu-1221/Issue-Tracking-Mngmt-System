@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Zap, RefreshCw, Layers, Database, ShieldCheck } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 
 export default function BootstrapTab() {
+  const { t } = useTranslation();
   const [bootstrapData, setBootstrapData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,8 +30,8 @@ export default function BootstrapTab() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>System Bootstrap Configuration</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Initial system runtime configuration loaded by clients during startup.</p>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>{t('config.bootstrapSectionTitle')}</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('config.bootstrapSectionDesc')}</p>
         </div>
 
         <button
@@ -48,14 +50,14 @@ export default function BootstrapTab() {
             cursor: 'pointer'
           }}
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Reload Bootstrap Payload
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('config.reloadBootstrapBtn')}
         </button>
       </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
           <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-          <p>Querying backend bootstrap service...</p>
+          <p>{t('config.queryingBootstrap')}</p>
         </div>
       ) : (
         <div>
@@ -65,7 +67,7 @@ export default function BootstrapTab() {
                 <Layers size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Settings Loaded</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('config.settingsLoadedCard')}</div>
                 <div style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   {bootstrapData?.settings ? Object.keys(bootstrapData.settings).length : 0}
                 </div>
@@ -77,7 +79,7 @@ export default function BootstrapTab() {
                 <Database size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Feature Flags</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('config.featureFlagsCard')}</div>
                 <div style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   {bootstrapData?.flags ? Object.keys(bootstrapData.flags).length : 0}
                 </div>
@@ -89,14 +91,14 @@ export default function BootstrapTab() {
                 <ShieldCheck size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Bootstrap State</div>
-                <div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--color-success)' }}>READY</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('config.bootstrapStateCard')}</div>
+                <div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--color-success)' }}>{t('config.stateReady')}</div>
               </div>
             </div>
           </div>
 
           <div className="glass-panel" style={{ padding: '20px' }}>
-            <h4 style={{ fontSize: '1rem', marginBottom: '14px', color: 'var(--text-secondary)' }}>Bootstrap JSON Payload</h4>
+            <h4 style={{ fontSize: '1rem', marginBottom: '14px', color: 'var(--text-secondary)' }}>{t('config.bootstrapPayloadTitle')}</h4>
             <pre style={{
               background: 'var(--color-elevated)',
               border: '1px solid var(--glass-border)',

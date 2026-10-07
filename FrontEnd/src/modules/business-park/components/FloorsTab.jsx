@@ -4,8 +4,10 @@ import parkApi from '../api/parkApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { parkSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function FloorsTab() {
+  const { t } = useTranslation();
   const [floors, setFloors] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -138,10 +140,10 @@ export default function FloorsTab() {
     setSelectedFloor(f);
     setConfirmConfig({
       isOpen: true,
-      title: 'Remove Floor Level',
+      title: t('common.delete'),
       message: `Are you sure you want to delete floor level "${f.FloorName}"? Associated office suites will be affected.`,
       type: 'danger',
-      confirmText: 'Delete Floor',
+      confirmText: t('common.delete'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -150,7 +152,7 @@ export default function FloorsTab() {
           fetchFloorsAndBuildings();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete floor.';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('common.error'), msg, 'error');
         }
       }
     });
@@ -193,7 +195,7 @@ export default function FloorsTab() {
             <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search floors by name or code..."
+              placeholder={t('businessPark.searchFloors')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -220,7 +222,7 @@ export default function FloorsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Buildings</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('businessPark.allBuildings')}</option>
             {buildings.map(b => (
               <option key={b.BuildingID} value={b.BuildingID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{b.BuildingName}</option>
             ))}
@@ -243,7 +245,7 @@ export default function FloorsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
           </button>
 
           <button
@@ -267,7 +269,7 @@ export default function FloorsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <Plus size={16} /> Add Floor
+            <Plus size={16} /> {t('businessPark.addFloor')}
           </button>
         </div>
       </div>
@@ -277,12 +279,12 @@ export default function FloorsTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-            <p>Loading floor levels</p>
+            <p>{t('businessPark.loadingFloors')}</p>
           </div>
         ) : floors.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <Layers size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-            <p>No floor levels found matching criteria.</p>
+            <p>{t('businessPark.noFloorsFound')}</p>
           </div>
         ) : (
           <>
@@ -290,13 +292,13 @@ export default function FloorsTab() {
               <table className="custom-table" style={{ minWidth: '1000px' }}>
                 <thead>
                   <tr>
-                    <th>Floor Name</th>
-                    <th>Floor Code</th>
-                    <th>Floor #</th>
-                    <th>Parent Building</th>
-                    <th>Office Spaces</th>
-                    <th>Floor Plan</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th>{t('businessPark.floorName')}</th>
+                    <th>{t('businessPark.floorCode')}</th>
+                    <th>{t('businessPark.floorNumber')}</th>
+                    <th>{t('businessPark.building')}</th>
+                    <th>{t('businessPark.officesConfigured')}</th>
+                    <th>{t('businessPark.floorBlueprint')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -307,27 +309,27 @@ export default function FloorsTab() {
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{f.Description || '—'}</div>
                       </td>
                       <td style={{ fontFamily: 'monospace', color: 'var(--accent-primary)' }}>{f.FloorCode}</td>
-                      <td style={{ fontWeight: '700' }}>Floor {f.FloorNumber}</td>
+                      <td style={{ fontWeight: '700' }}>{t('businessPark.floorNumber')} {f.FloorNumber}</td>
                       <td>{f.BuildingName}</td>
                       <td>
                         <span className="badge badge-info" style={{ fontWeight: 600 }}>
-                          {f.OfficeSpaceCount || 0} / {f.TotalOfficeSpaces > 0 ? f.TotalOfficeSpaces : '∞'} Offices
+                          {f.OfficeSpaceCount || 0} / {f.TotalOfficeSpaces > 0 ? f.TotalOfficeSpaces : '∞'} {t('businessPark.offices')}
                         </span>
                       </td>
                       <td>
                         {f.HasFloorPlan ? (
                           <span className="badge badge-success" style={{ fontSize: '0.72rem' }}>
-                            <CheckCircle2 size={12} style={{ marginRight: '4px' }} /> Blueprint Attached
+                            <CheckCircle2 size={12} style={{ marginRight: '4px' }} /> {t('businessPark.mapped')}
                           </span>
                         ) : (
-                          <span className="badge badge-secondary" style={{ fontSize: '0.72rem' }}>No Blueprint</span>
+                          <span className="badge badge-secondary" style={{ fontSize: '0.72rem' }}>—</span>
                         )}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                           <button
                             onClick={() => openEditModal(f)}
-                            title="Edit Floor Level"
+                            title={t('businessPark.editFloorLevel')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -338,11 +340,11 @@ export default function FloorsTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Edit size={14} /> Edit
+                            <Edit size={14} /> {t('common.edit')}
                           </button>
                           <button
                             onClick={() => promptDeleteFloor(f)}
-                            title="Delete Floor Level"
+                            title={t('common.delete')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -353,7 +355,7 @@ export default function FloorsTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Trash2 size={14} /> Delete
+                            <Trash2 size={14} /> {t('common.delete')}
                           </button>
                         </div>
                       </td>
@@ -374,10 +376,10 @@ export default function FloorsTab() {
               fontSize: '0.78rem',
               color: 'var(--text-muted)'
             }}>
-              <span>Showing <strong>{floors.length}</strong> floor level records</span>
+              <span>{t('common.showing')} <strong>{floors.length}</strong> {t('businessPark.showingFloorRecords')}</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <ArrowLeftRight size={13} style={{ color: 'var(--accent-primary)' }} />
-                Use horizontal scroll bar to view full level layout & office capacity
+                {t('businessPark.useHorizontalScroll')}
               </span>
             </div>
           </>
@@ -414,10 +416,10 @@ export default function FloorsTab() {
                   </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {selectedFloor ? 'Edit Floor Level' : 'Add Floor Level'}
+                      {selectedFloor ? t('businessPark.editFloorLevel') : t('businessPark.addFloor')}
                     </h3>
                     <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {selectedFloor ? `Modifying level ID: ${selectedFloor.FloorCode || selectedFloor.FloorName}` : 'Configure vertical floor level within building'}
+                      {selectedFloor ? `${t('businessPark.modifyingStructure')}: ${selectedFloor.FloorCode || selectedFloor.FloorName}` : t('businessPark.floorsSubtitle')}
                     </p>
                   </div>
                 </div>
@@ -438,10 +440,10 @@ export default function FloorsTab() {
               <form onSubmit={handleSaveFloor} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} noValidate>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Building Block *</label>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('businessPark.building')} *</label>
                     {formData.BuildingID && (
                       <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-primary)', background: 'rgba(99, 102, 241, 0.12)', padding: '2px 8px', borderRadius: '6px', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
-                        🏢 Max Capacity: {buildings.find(b => String(b.BuildingID) === String(formData.BuildingID))?.TotalFloors || 1} Floors
+                        🏢 {t('businessPark.targetBuildingFloors')}: {buildings.find(b => String(b.BuildingID) === String(formData.BuildingID))?.TotalFloors || 1} {t('businessPark.floorsLevels')}
                       </span>
                     )}
                   </div>
@@ -455,7 +457,7 @@ export default function FloorsTab() {
                       color: 'var(--text-primary)', fontSize: '0.88rem'
                     }}
                   >
-                    <option value="">Select Building</option>
+                    <option value="">{t('businessPark.selectBuilding')}</option>
                     {buildings.map(b => (
                       <option key={b.BuildingID} value={b.BuildingID}>{b.BuildingName} ({b.BuildingCode}) — Max {b.TotalFloors} Floors</option>
                     ))}
@@ -469,10 +471,10 @@ export default function FloorsTab() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Floor / Level Name *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.floorName')} *</label>
                     <input
                       type="text"
-                      placeholder="e.g. Ground Floor, 2nd Floor"
+                      placeholder={t('businessPark.enterFloorName')}
                       value={formData.FloorName}
                       onChange={(e) => handleFieldChange('FloorName', e.target.value)}
                       style={{
@@ -489,7 +491,7 @@ export default function FloorsTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Floor Level Number *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.floorNumber')} *</label>
                     <input
                       type="number"
                       min="1"
@@ -515,10 +517,10 @@ export default function FloorsTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Floor Code *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.floorCode')} *</label>
                     <input
                       type="text"
-                      placeholder="e.g. FLR-1, FLR-G"
+                      placeholder={t('businessPark.enterFloorCode')}
                       value={formData.FloorCode}
                       onChange={(e) => handleFieldChange('FloorCode', e.target.value.toUpperCase())}
                       style={{
@@ -538,7 +540,7 @@ export default function FloorsTab() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Configured Office Capacity</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.totalOfficeSpaces')}</label>
                     <input
                       type="number" min="0"
                       placeholder="e.g. 10 (0 for unlimited)"
@@ -558,10 +560,10 @@ export default function FloorsTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Description</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('common.description')}</label>
                     <input
                       type="text"
-                      placeholder="Floor specifications, executive suites, or wing details..."
+                      placeholder={t('businessPark.floorDescription')}
                       value={formData.Description}
                       onChange={(e) => handleFieldChange('Description', e.target.value)}
                       style={{
@@ -582,10 +584,10 @@ export default function FloorsTab() {
                 {/* Footer Actions */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid var(--glass-border)' }}>
                   <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '10px 22px', borderRadius: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.88rem' }}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" disabled={formSubmitting} style={{ padding: '10px 24px', borderRadius: '10px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', opacity: formSubmitting ? 0.7 : 1 }}>
-                    {formSubmitting ? '⏳ Saving...' : selectedFloor ? '✓ Update Floor' : '✓ Add Floor'}
+                    {formSubmitting ? `⏳ ${t('common.loading')}` : selectedFloor ? `✓ ${t('businessPark.updateFloor')}` : `✓ ${t('businessPark.addFloor')}`}
                   </button>
                 </div>
               </form>

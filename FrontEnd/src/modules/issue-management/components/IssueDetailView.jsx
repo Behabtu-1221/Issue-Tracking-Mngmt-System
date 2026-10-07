@@ -39,8 +39,10 @@ import ApprovalDetailModal from '../../approval/components/ApprovalDetailModal';
 import ManualAssignModal from '../../dispatch/components/ManualAssignModal';
 import ConversationPanel from '../../communication/components/ConversationPanel';
 import InternalNotesPanel from '../../communication/components/InternalNotesPanel';
+import { useTranslation } from '../../../i18n';
 
 export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
+  const { t, isRTL } = useTranslation();
   const { user, isParkAdmin, isCompanyAdmin } = usePermissionContext();
 
   const isTenantRep = !isParkAdmin && (
@@ -369,7 +371,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
   });
 
   if (loading && !d) {
-    return <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading issue details...</div>;
+    return <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>{t('issues.loadingDetails', 'Loading issue details...')}</div>;
   }
 
   return (
@@ -387,7 +389,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
           alignSelf: 'flex-start'
         }}
       >
-        <ArrowLeft size={16} /> Back to Issue List
+        <ArrowLeft size={16} style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} /> {t('issues.backToRequests', 'Back to Requests')}
       </button>
 
       {/* Issue Header Card */}
@@ -405,7 +407,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
               </span>
               {(d.IsMajorIncident === 1 || d.IsMajorIncident === true) && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '800', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
-                  <AlertTriangle size={12} /> MAJOR INCIDENT
+                  <AlertTriangle size={12} /> {t('issues.majorIncident', 'MAJOR INCIDENT')}
                 </span>
               )}
             </div>
@@ -423,28 +425,28 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <User size={16} style={{ color: 'var(--accent-primary)' }} />
             <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Requester</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.requester', 'Requester')}</div>
               <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.RequesterName || 'N/A'}</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Tag size={16} style={{ color: '#10b981' }} />
             <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Service</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.service', 'Service')}</div>
               <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.ServiceName || 'N/A'}</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Building size={16} style={{ color: '#f59e0b' }} />
             <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Assigned Dept</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.assignedStaff', 'Assigned Dept')}</div>
               <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.AssignedDepartmentName || 'Unassigned'}</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Calendar size={16} style={{ color: '#60a5fa' }} />
             <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submitted</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.submitted', 'Submitted')}</div>
               <div style={{ fontWeight: '600', color: 'var(--text-primary)', fontSize: '0.85rem' }}>{formatDate(d.CreatedDate)}</div>
             </div>
           </div>
@@ -452,7 +454,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <MapPin size={16} style={{ color: '#ec4899' }} />
               <div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Location</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.locationDetails', 'Location')}</div>
                 <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.BuildingName}{d.OfficeSpaceNumber ? ` / ${d.OfficeSpaceNumber}` : ''}</div>
               </div>
             </div>
@@ -461,7 +463,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Tag size={16} style={{ color: '#a78bfa' }} />
               <div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Category</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.category', 'Category')}</div>
                 <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.CategoryCode}</div>
               </div>
             </div>
@@ -481,20 +483,20 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.8px', color: '#94a3b8', fontWeight: 700 }}>
-                Enterprise Governance Workflow
+                {t('issues.enterpriseGovernance', 'Enterprise Governance Workflow')}
               </span>
               {approvalWorkflow?.TotalStages > 1 ? (
                 <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.25)', border: '1px solid rgba(168, 85, 247, 0.5)', color: '#c084fc', fontWeight: 800 }}>
-                  Multi-Level Approval Required
+                  {t('issues.multiLevelApproval', 'Multi-Level Approval Required')}
                 </span>
               ) : (
                 <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.2)', border: '1px solid rgba(59, 130, 246, 0.4)', color: '#60a5fa', fontWeight: 800 }}>
-                  Standard Department Review
+                  {t('issues.standardDeptReview', 'Standard Department Review')}
                 </span>
               )}
             </div>
             <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#f8fafc' }}>
-              Approval & Assignment Lifecycle
+              {t('issues.approvalLifecycle', 'Approval & Assignment Lifecycle')}
             </h3>
           </div>
 
@@ -526,7 +528,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)'
                 }}
               >
-                <Wrench size={16} /> Dispatch Technician / Team
+                <Wrench size={16} /> {t('issues.dispatchTechTeam', 'Dispatch Technician / Team')}
               </button>
             )}
           </div>
@@ -543,7 +545,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
               <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800 }}>
                 ✓
               </div>
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>1. Submitted</span>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>{t('issues.stepSubmitted', '1. Submitted')}</span>
             </div>
             <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
               Routed to <strong>{d.AssignedDepartmentName || 'Department'}</strong>
@@ -574,7 +576,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   }}>
                     {isApproved ? '✓' : isRejected ? '✕' : '2'}
                   </div>
-                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>2. Dept Manager</span>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>{t('issues.stepDeptManager', '2. Dept Manager')}</span>
                 </div>
                 <div style={{ fontSize: '0.78rem', color: isApproved ? '#34d399' : isRejected ? '#f87171' : isPending ? '#fbbf24' : '#94a3b8', fontWeight: isPending ? 700 : 500 }}>
                   {isApproved ? `Approved (${st1?.DecisionUserName || 'Manager'})` : isRejected ? 'Rejected' : isPending ? '● Awaiting Dept Review' : 'Pending'}
@@ -601,7 +603,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                     <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#334155', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800 }}>
                       -
                     </div>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#94a3b8' }}>3. Park Admin</span>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#94a3b8' }}>{t('issues.stepParkAdmin', '3. Park Admin')}</span>
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
                     Not Required (Routine Request)
@@ -630,7 +632,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   }}>
                     {isApproved ? '✓' : isRejected ? '✕' : '3'}
                   </div>
-                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>3. Park Admin</span>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>{t('issues.stepParkAdmin', '3. Park Admin')}</span>
                 </div>
                 <div style={{ fontSize: '0.78rem', color: isApproved ? '#c084fc' : isRejected ? '#f87171' : isPending ? '#c084fc' : '#94a3b8', fontWeight: isPending ? 700 : 500 }}>
                   {isApproved ? `Authorized (${st2?.DecisionUserName || 'Admin'})` : isRejected ? 'Rejected by Admin' : isPending ? '● Awaiting Admin Sign-off' : isWaitingStage1 ? 'Queued (Awaiting Dept)' : 'Pending'}
@@ -663,7 +665,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   }}>
                     {isAssigned ? '✓' : '4'}
                   </div>
-                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>4. Dispatch</span>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>{t('issues.stepDispatch', '4. Dispatch')}</span>
                 </div>
                 <div style={{ fontSize: '0.78rem', color: isAssigned ? '#c084fc' : isAwaitingDispatch ? '#34d399' : '#94a3b8', fontWeight: isAwaitingDispatch ? 700 : 500 }}>
                   {isAssigned ? (d.AssignedUserName ? `Assigned: ${d.AssignedUserName}` : (d.TeamName ? `Team: ${d.TeamName}` : 'Assigned')) : isAwaitingDispatch ? '● Ready for Assignment' : 'Locked (Pending Approval)'}
@@ -691,7 +693,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   }}>
                     {isResolved ? '✓' : '5'}
                   </div>
-                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>5. Resolution</span>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>{t('issues.stepResolution', '5. Resolution')}</span>
                 </div>
                 <div style={{ fontSize: '0.78rem', color: isResolved ? '#34d399' : isInProgress ? '#38bdf8' : '#94a3b8', fontWeight: isInProgress ? 700 : 500 }}>
                   {isResolved ? 'Resolved' : isInProgress ? '● Field Work Active' : 'Queued'}
@@ -721,14 +723,14 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 10px', borderRadius: '20px', background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', fontSize: '0.75rem', fontWeight: 800 }}>
-                      <CheckCircle2 size={13} /> {feedback.ResolutionConfirmed ? 'Resolution Confirmed by Requester' : 'Resolution Contested'}
+                      <CheckCircle2 size={13} /> {feedback.ResolutionConfirmed ? t('issues.confirmedByRequester', 'Resolution Confirmed by Requester') : t('issues.contestedByRequester', 'Resolution Contested')}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      Submitted {formatDate(feedback.CreatedDate)}
+                      {t('issues.submittedOn', 'Submitted')} {formatDate(feedback.CreatedDate)}
                     </span>
                   </div>
                   <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    Tenant Satisfaction Feedback & Review
+                    {t('issues.satisfactionTitle', 'Tenant Satisfaction Feedback & Review')}
                   </h4>
                 </div>
 
@@ -758,13 +760,13 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
               <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 {feedback.TimelinessRating && (
-                  <div>Timeliness Score: <strong style={{ color: 'var(--text-primary)' }}>{feedback.TimelinessRating}/5</strong></div>
+                  <div>{t('issues.timelinessScore', 'Timeliness Score')}: <strong style={{ color: 'var(--text-primary)' }}>{feedback.TimelinessRating}/5</strong></div>
                 )}
                 {feedback.QualityRating && (
-                  <div>Work Quality Score: <strong style={{ color: 'var(--text-primary)' }}>{feedback.QualityRating}/5</strong></div>
+                  <div>{t('issues.qualityScore', 'Work Quality Score')}: <strong style={{ color: 'var(--text-primary)' }}>{feedback.QualityRating}/5</strong></div>
                 )}
                 {feedback.SubmittedByName && (
-                  <div>Reviewed by: <strong style={{ color: 'var(--text-primary)' }}>{feedback.SubmittedByName}</strong></div>
+                  <div>{t('issues.reviewedBy', 'Reviewed by')}: <strong style={{ color: 'var(--text-primary)' }}>{feedback.SubmittedByName}</strong></div>
                 )}
               </div>
             </div>
@@ -773,13 +775,13 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f59e0b', fontSize: '0.8rem', fontWeight: 700, marginBottom: '2px' }}>
-                    <CheckCircle2 size={16} /> Work Completed by Field Staff
+                    <CheckCircle2 size={16} /> {t('issues.workCompletedByStaff', 'Work Completed by Field Staff')}
                   </div>
                   <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    Confirm Resolution & Rate Service Quality
+                    {t('issues.confirmResolutionPrompt', 'Confirm Resolution & Rate Service Quality')}
                   </h4>
                   <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    Please confirm that this request was resolved to your satisfaction and rate the maintenance service to close this ticket.
+                    {t('issues.confirmResolutionDesc', 'Please confirm that this request was resolved to your satisfaction and rate the maintenance service to close this ticket.')}
                   </p>
                 </div>
 
@@ -788,7 +790,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   onClick={() => setShowFeedbackModal(true)}
                   style={{ padding: '9px 20px', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem' }}
                 >
-                  <Star size={16} fill="#fff" /> Submit Satisfaction Feedback
+                  <Star size={16} fill="#fff" /> {t('issues.submitSatisfactionFeedback', 'Submit Satisfaction Feedback')}
                 </button>
               </div>
             </div>
@@ -799,19 +801,19 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
       {/* Section Tabs */}
       <div style={{ borderBottom: '1px solid var(--glass-border)', display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '0' }}>
         <button style={sectionBtnStyle(activeSection === 'timeline')} onClick={() => setActiveSection('timeline')}>
-          <Clock size={16} /> Timeline & Audit Trail
+          <Clock size={16} /> {t('issues.timelineTab', 'Timeline & Audit Trail')}
         </button>
         <button style={sectionBtnStyle(activeSection === 'investigation')} onClick={() => setActiveSection('investigation')}>
-          <SearchIcon size={16} /> Investigation ({investigations.length})
+          <SearchIcon size={16} /> {t('issues.investigationTab', 'Investigation')} ({investigations.length})
         </button>
         <button style={sectionBtnStyle(activeSection === 'resolution')} onClick={() => setActiveSection('resolution')}>
-          <Wrench size={16} /> Resolution ({resolutions.length})
+          <Wrench size={16} /> {t('issues.resolutionTab', 'Resolution')} ({resolutions.length})
         </button>
         <button style={sectionBtnStyle(activeSection === 'comments')} onClick={() => setActiveSection('comments')}>
-          <MessageSquare size={16} /> Discussion ({comments.length})
+          <MessageSquare size={16} /> {t('issues.commentsTab', 'Discussion')} ({comments.length})
         </button>
         <button style={sectionBtnStyle(activeSection === 'attachments')} onClick={() => setActiveSection('attachments')}>
-          <Paperclip size={16} /> Attachments & Documents ({documents.length})
+          <Paperclip size={16} /> {t('issues.attachmentsTab', 'Attachments & Documents')} ({documents.length})
         </button>
       </div>
 
@@ -821,10 +823,10 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
         {activeSection === 'timeline' && (
           <div className="glass-panel" style={{ padding: '28px', borderRadius: 'var(--border-radius-md)' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Clock size={18} style={{ color: 'var(--accent-primary)' }} /> Activity Timeline
+              <Clock size={18} style={{ color: 'var(--accent-primary)' }} /> {t('issues.activityTimeline', 'Activity Timeline')}
             </h3>
             {(detailData?.timelineHistory || []).length === 0 ? (
-              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '30px' }}>No timeline events recorded yet.</p>
+              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '30px' }}>{t('issues.noTimelineEvents', 'No timeline events recorded yet.')}</p>
             ) : (
               <div style={{ position: 'relative', paddingLeft: '30px' }}>
                 {/* Vertical Line */}
@@ -863,7 +865,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
           <div className="glass-panel" style={{ padding: '28px', borderRadius: 'var(--border-radius-md)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <SearchIcon size={18} style={{ color: '#f59e0b' }} /> Root Cause Investigation
+                <SearchIcon size={18} style={{ color: '#f59e0b' }} /> {t('issues.rootCauseInvestigation', 'Root Cause Investigation')}
               </h3>
               {d.StatusCode !== 'CLOSED' && d.StatusCode !== 'CANCELLED' && !isTenantRep && (
                 <button
@@ -871,7 +873,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   onClick={() => setShowInvestigationForm(!showInvestigationForm)}
                   style={{ padding: '8px 16px', fontSize: '0.85rem' }}
                 >
-                  {showInvestigationForm ? 'Cancel' : '+ New Investigation'}
+                  {showInvestigationForm ? t('common.cancel', 'Cancel') : t('issues.newInvestigation', '+ New Investigation')}
                 </button>
               )}
             </div>
@@ -881,7 +883,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                   <div style={{ gridColumn: '1 / -1' }}>
                     <FormField
-                      label="Root Cause Summary"
+                      label={t('issues.rootCauseSummary', 'Root Cause Summary')}
                       id="RootCauseSummary"
                       required
                       error={investigationErrors.RootCauseSummary}
@@ -905,7 +907,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
                   <div style={{ gridColumn: '1 / -1' }}>
                     <FormField
-                      label="Detailed Investigation Findings"
+                      label={t('issues.rootCauseDetails', 'Detailed Investigation Findings')}
                       id="RootCauseDetails"
                       error={investigationErrors.RootCauseDetails}
                     >
@@ -927,7 +929,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
                   <div>
                     <FormField
-                      label="Corrective Actions Taken"
+                      label={t('issues.correctiveActions', 'Corrective Actions Taken')}
                       id="CorrectiveActionsTaken"
                       error={investigationErrors.CorrectiveActionsTaken}
                     >
@@ -949,7 +951,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
                   <div>
                     <FormField
-                      label="Preventive Actions Proposed"
+                      label={t('issues.preventiveActions', 'Preventive Actions Proposed')}
                       id="PreventiveActionsProposed"
                       error={investigationErrors.PreventiveActionsProposed}
                     >
@@ -970,13 +972,13 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   </div>
                 </div>
                 <button type="submit" className="btn-primary" disabled={submittingInvestigation} style={{ padding: '10px 24px' }}>
-                  {submittingInvestigation ? 'Saving...' : 'Save Investigation'}
+                  {submittingInvestigation ? t('issues.savingInvestigation', 'Saving...') : t('issues.saveInvestigation', 'Save Investigation')}
                 </button>
               </form>
             )}
 
             {investigations.length === 0 && !showInvestigationForm ? (
-              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '30px' }}>No investigation records. Click "New Investigation" to document root cause analysis.</p>
+              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '30px' }}>{t('issues.noInvestigations', 'No investigation records. Click "New Investigation" to document root cause analysis.')}</p>
             ) : (
               investigations.map((inv, idx) => (
                 <div key={inv.RootCauseID || idx} style={{ padding: '18px', marginBottom: '14px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
@@ -985,19 +987,19 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     {inv.CorrectiveActionsTaken && (
                       <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(34, 197, 94, 0.06)', border: '1px solid rgba(34, 197, 94, 0.15)' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#4ade80', marginBottom: '4px', textTransform: 'uppercase' }}>Corrective Actions</div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#4ade80', marginBottom: '4px', textTransform: 'uppercase' }}>{t('issues.correctiveActions', 'Corrective Actions')}</div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{inv.CorrectiveActionsTaken}</div>
                       </div>
                     )}
                     {inv.PreventiveActionsProposed && (
                       <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(59, 130, 246, 0.06)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#60a5fa', marginBottom: '4px', textTransform: 'uppercase' }}>Preventive Actions</div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#60a5fa', marginBottom: '4px', textTransform: 'uppercase' }}>{t('issues.preventiveActions', 'Preventive Actions')}</div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{inv.PreventiveActionsProposed}</div>
                       </div>
                     )}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <User size={12} /> Investigator: {inv.InvestigatorName || 'N/A'} · {formatDate(inv.CreatedDate)}
+                    <User size={12} /> {t('issues.investigator', 'Investigator')}: {inv.InvestigatorName || 'N/A'} · {formatDate(inv.CreatedDate)}
                   </div>
                 </div>
               ))
@@ -1010,7 +1012,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
           <div className="glass-panel" style={{ padding: '28px', borderRadius: 'var(--border-radius-md)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Wrench size={18} style={{ color: '#10b981' }} /> Resolution Records
+                <Wrench size={18} style={{ color: '#10b981' }} /> {t('issues.resolutionRecords', 'Resolution Records')}
               </h3>
               {d.StatusCode !== 'CLOSED' && d.StatusCode !== 'CANCELLED' && !isTenantRep && (
                 <button
@@ -1018,7 +1020,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   onClick={() => setShowResolutionForm(!showResolutionForm)}
                   style={{ padding: '8px 16px', fontSize: '0.85rem' }}
                 >
-                  {showResolutionForm ? 'Cancel' : '+ Add Resolution'}
+                  {showResolutionForm ? t('common.cancel', 'Cancel') : t('issues.addResolution', '+ Add Resolution')}
                 </button>
               )}
             </div>
@@ -1028,7 +1030,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                   <div>
                     <FormField
-                      label="Resolution Type"
+                      label={t('issues.resolutionType', 'Resolution Type')}
                       id="ResolutionTypeCode"
                       required
                       error={resolutionErrors.ResolutionTypeCode}
@@ -1053,7 +1055,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
                   <div>
                     <FormField
-                      label="Resolution Summary"
+                      label={t('issues.resolutionSummary', 'Resolution Summary')}
                       id="ResolutionSummary"
                       required
                       error={resolutionErrors.ResolutionSummary}
@@ -1077,7 +1079,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
                   <div>
                     <FormField
-                      label="Action Steps Taken"
+                      label={t('issues.actionStepsTaken', 'Action Steps Taken')}
                       id="ActionStepsTaken"
                       error={resolutionErrors.ActionStepsTaken}
                     >
@@ -1099,7 +1101,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
                   <div>
                     <FormField
-                      label="Verification Notes"
+                      label={t('issues.verificationNotes', 'Verification Notes')}
                       id="VerificationNotes"
                       error={resolutionErrors.VerificationNotes}
                     >
@@ -1120,13 +1122,13 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   </div>
                 </div>
                 <button type="submit" className="btn-primary" disabled={submittingResolution} style={{ padding: '10px 24px' }}>
-                  {submittingResolution ? 'Saving...' : 'Save Resolution'}
+                  {submittingResolution ? t('issues.savingInvestigation', 'Saving...') : t('issues.saveResolution', 'Save Resolution')}
                 </button>
               </form>
             )}
 
             {resolutions.length === 0 && !showResolutionForm ? (
-              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '30px' }}>No resolution records. Click "Add Resolution" to document the solution.</p>
+              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '30px' }}>{t('issues.noResolutions', 'No resolution records. Click "Add Resolution" to document the solution.')}</p>
             ) : (
               resolutions.map((res, idx) => (
                 <div key={res.ResolutionID || idx} style={{ padding: '18px', marginBottom: '14px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)' }}>
@@ -1140,12 +1142,12 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   {res.ActionStepsTaken && <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '8px', whiteSpace: 'pre-wrap' }}>{res.ActionStepsTaken}</p>}
                   {res.VerificationNotes && (
                     <div style={{ padding: '10px', borderRadius: '6px', backgroundColor: 'rgba(59, 130, 246, 0.06)', border: '1px solid rgba(59, 130, 246, 0.15)', marginBottom: '8px' }}>
-                      <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#60a5fa', marginBottom: '4px', textTransform: 'uppercase' }}>Verification Notes</div>
+                      <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#60a5fa', marginBottom: '4px', textTransform: 'uppercase' }}>{t('issues.verificationNotes', 'Verification Notes')}</div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{res.VerificationNotes}</div>
                     </div>
                   )}
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <User size={12} /> Resolved by: {res.ResolverName || 'N/A'} · {formatDate(res.CreatedDate || res.ResolvedDateTime)}
+                    <User size={12} /> {t('issues.resolvedBy', 'Resolved by')}: {res.ResolverName || 'N/A'} · {formatDate(res.CreatedDate || res.ResolvedDateTime)}
                   </div>
                 </div>
               ))
@@ -1184,10 +1186,10 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
             {showAddDocModal && (
               <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                 <div className="glass-panel" style={{ width: '100%', maxWidth: '460px', padding: '24px', borderRadius: '16px' }}>
-                  <h4 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>Attach File to Issue #{issueId}</h4>
+                  <h4 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 700 }}>{t('issues.attachFileToIssue', 'Attach File to Issue')} #{issueId}</h4>
                   <form onSubmit={handleUploadAttachment} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>Select File</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>{t('issues.selectFile', 'Select File')}</label>
                       <input
                         type="file"
                         required
@@ -1196,7 +1198,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>Document Title (optional)</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>{t('issues.docTitleOptional', 'Document Title (optional)')}</label>
                       <input
                         type="text"
                         placeholder="e.g. Photo of HVAC leak"
@@ -1206,9 +1208,9 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                       />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
-                      <button type="button" onClick={() => setShowAddDocModal(false)} style={{ padding: '8px 16px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Cancel</button>
+                      <button type="button" onClick={() => setShowAddDocModal(false)} style={{ padding: '8px 16px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}>{t('common.cancel', 'Cancel')}</button>
                       <button type="submit" disabled={uploadingDoc} style={{ padding: '8px 20px', borderRadius: '8px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>
-                        {uploadingDoc ? 'Uploading...' : 'Upload & Attach'}
+                        {uploadingDoc ? t('issues.uploading', 'Uploading...') : t('issues.uploadAndAttach', 'Upload & Attach')}
                       </button>
                     </div>
                   </form>
@@ -1248,7 +1250,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   <Star size={20} fill="#f59e0b" />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Tenant Feedback & Confirmation</h3>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>{t('issues.tenantFeedbackAndConfirmation', 'Tenant Feedback & Confirmation')}</h3>
                   <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>Issue #{d.RequestNumber}</p>
                 </div>
               </div>
@@ -1261,7 +1263,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
               {/* Overall Star Rating */}
               <div style={{ textAlign: 'center', padding: '14px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-secondary)' }}>
-                  Overall Satisfaction Rating *
+                  {t('issues.overallSatisfaction', 'Overall Satisfaction Rating *')}
                 </label>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                   {[1, 2, 3, 4, 5].map(star => {
@@ -1307,7 +1309,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
               {/* Resolution Confirmed Toggle */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                  Was your issue resolved satisfactorily?
+                  {t('issues.wasIssueResolved', 'Was your issue resolved satisfactorily?')}
                 </label>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button
@@ -1329,7 +1331,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                       gap: '6px'
                     }}
                   >
-                    <CheckCircle2 size={16} /> Yes, Issue Resolved
+                    <CheckCircle2 size={16} /> {t('issues.yesResolved', 'Yes, Issue Resolved')}
                   </button>
                   <button
                     type="button"
@@ -1350,7 +1352,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                       gap: '6px'
                     }}
                   >
-                    <XCircle size={16} /> No, Still Having Issues
+                    <XCircle size={16} /> {t('issues.noStillIssues', 'No, Still Having Issues')}
                   </button>
                 </div>
               </div>
@@ -1359,7 +1361,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>
-                    Response Timeliness
+                    {t('issues.responseTimeliness', 'Response Timeliness')}
                   </label>
                   <select
                     value={feedbackForm.TimelinessRating}
@@ -1376,7 +1378,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>
-                    Technical Quality
+                    {t('issues.technicalQuality', 'Technical Quality')}
                   </label>
                   <select
                     value={feedbackForm.QualityRating}
@@ -1394,7 +1396,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
               {/* Feedback comments */}
               <FormField
-                label="Comments & Feedback (optional)"
+                label={t('issues.feedbackCommentsOptional', 'Comments & Feedback (optional)')}
                 id="feedbackComments"
                 error={feedbackErrors.Comments}
               >
@@ -1424,14 +1426,14 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
                   onClick={() => setShowFeedbackModal(false)}
                   style={{ padding: '9px 18px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submittingFeedback}
                   style={{ padding: '9px 24px', borderRadius: '8px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
-                  <CheckCircle2 size={16} /> {submittingFeedback ? 'Submitting...' : 'Submit Feedback & Close Ticket'}
+                  <CheckCircle2 size={16} /> {submittingFeedback ? t('issues.submittingFeedback', 'Submitting...') : t('issues.submitAndClose', 'Submit Feedback & Close Ticket')}
                 </button>
               </div>
             </form>

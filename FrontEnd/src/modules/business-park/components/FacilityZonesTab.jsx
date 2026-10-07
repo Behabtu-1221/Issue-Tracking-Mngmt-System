@@ -5,8 +5,10 @@ import { ZONE_TYPES } from '../constants/parkConstants';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { parkSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function FacilityZonesTab() {
+  const { t } = useTranslation();
   const [zones, setZones] = useState([]);
   const [parks, setParks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,10 +87,10 @@ export default function FacilityZonesTab() {
     setFormError('');
     setFieldErrors({});
 
-    const validation = parkSchemas.facilityZoneForm({
+    const validation = parkSchemas.zoneForm({
       FacilityZoneName: formData.FacilityZoneName,
       FacilityZoneCode: formData.FacilityZoneCode,
-      BusinessParkID: formData.BusinessParkID,
+      ParkID: formData.BusinessParkID,
       ZoneType: formData.ZoneType,
       CapacityLimit: formData.CapacityLimit,
       Description: formData.Description
@@ -104,12 +106,13 @@ export default function FacilityZonesTab() {
 
     try {
       const payload = {
+        ...formData,
+        FacilityZoneName: validation.sanitized.FacilityZoneName,
+        FacilityZoneCode: validation.sanitized.FacilityZoneCode,
         BusinessParkID: validation.sanitized.ParkID,
-        FacilityZoneName: validation.sanitized.ZoneName,
-        FacilityZoneCode: validation.sanitized.ZoneCode,
-        ZoneType: formData.ZoneType || 'OPERATIONAL',
-        Description: validation.sanitized.Description || '',
-        CapacityLimit: validation.sanitized.CapacityLimit
+        ZoneType: validation.sanitized.ZoneType,
+        CapacityLimit: validation.sanitized.CapacityLimit,
+        Description: validation.sanitized.Description
       };
 
       if (selectedZone) {
@@ -140,10 +143,10 @@ export default function FacilityZonesTab() {
     setSelectedZone(z);
     setConfirmConfig({
       isOpen: true,
-      title: 'Remove Facility Zone',
+      title: t('common.delete'),
       message: `Are you sure you want to delete zone "${z.FacilityZoneName}"?`,
       type: 'danger',
-      confirmText: 'Delete Facility Zone',
+      confirmText: t('common.delete'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -152,7 +155,7 @@ export default function FacilityZonesTab() {
           fetchZonesAndParks();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete facility zone.';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('common.error'), msg, 'error');
         }
       }
     });
@@ -194,7 +197,7 @@ export default function FacilityZonesTab() {
           <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search facility zones by name or code"
+            placeholder={t('businessPark.searchZones')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -225,7 +228,7 @@ export default function FacilityZonesTab() {
               fontSize: '0.88rem'
             }}
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
           </button>
 
           <button
@@ -249,7 +252,7 @@ export default function FacilityZonesTab() {
               fontSize: '0.88rem'
             }}
           >
-            <Plus size={16} /> Add Facility Zone
+            <Plus size={16} /> {t('businessPark.addZone')}
           </button>
         </div>
       </div>
@@ -259,12 +262,12 @@ export default function FacilityZonesTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-            <p>Loading facility zones...</p>
+            <p>{t('businessPark.loadingZones')}</p>
           </div>
         ) : zones.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <MapPin size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-            <p>No facility zones registered.</p>
+            <p>{t('businessPark.noZonesFound')}</p>
           </div>
         ) : (
           <>
@@ -272,13 +275,13 @@ export default function FacilityZonesTab() {
               <table className="custom-table" style={{ minWidth: '1000px' }}>
                 <thead>
                   <tr>
-                    <th>Zone Name</th>
-                    <th>Zone Code</th>
-                    <th>Zone Type</th>
-                    <th>Business Park</th>
-                    <th>Buildings</th>
-                    <th>Capacity Limit</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th>{t('businessPark.zoneName')}</th>
+                    <th>{t('businessPark.zoneCode')}</th>
+                    <th>{t('businessPark.zoneType')}</th>
+                    <th>{t('businessPark.businessPark')}</th>
+                    <th>{t('businessPark.buildingsBlocks')}</th>
+                    <th>{t('businessPark.capacityLimit')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -294,14 +297,14 @@ export default function FacilityZonesTab() {
                       </td>
                       <td>{z.BusinessParkName}</td>
                       <td>
-                        <span className="badge badge-info">{z.BuildingCount || 0} Buildings</span>
+                        <span className="badge badge-info">{z.BuildingCount || 0} {t('businessPark.buildingsBlocks')}</span>
                       </td>
-                      <td style={{ fontWeight: '600' }}>{z.CapacityLimit ? `${z.CapacityLimit} Vehicles/Persons` : 'Unlimited'}</td>
+                      <td style={{ fontWeight: '600' }}>{z.CapacityLimit ? `${z.CapacityLimit} Persons` : t('common.none')}</td>
                       <td style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                           <button
                             onClick={() => openEditModal(z)}
-                            title="Edit Facility Zone"
+                            title={t('businessPark.editZone')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -312,11 +315,11 @@ export default function FacilityZonesTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Edit size={14} /> Edit
+                            <Edit size={14} /> {t('common.edit')}
                           </button>
                           <button
                             onClick={() => promptDeleteZone(z)}
-                            title="Delete Facility Zone"
+                            title={t('common.delete')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -327,7 +330,7 @@ export default function FacilityZonesTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Trash2 size={14} /> Delete
+                            <Trash2 size={14} /> {t('common.delete')}
                           </button>
                         </div>
                       </td>
@@ -348,10 +351,10 @@ export default function FacilityZonesTab() {
               fontSize: '0.78rem',
               color: 'var(--text-muted)'
             }}>
-              <span>Showing <strong>{zones.length}</strong> facility zone records</span>
+              <span>{t('common.showing')} <strong>{zones.length}</strong> {t('businessPark.showingZoneRecords')}</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <ArrowLeftRight size={13} style={{ color: 'var(--accent-primary)' }} />
-                Use horizontal scroll bar to inspect all zone boundaries & allocations
+                {t('businessPark.useHorizontalScroll')}
               </span>
             </div>
           </>
@@ -388,10 +391,10 @@ export default function FacilityZonesTab() {
                   </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {selectedZone ? 'Edit Facility Zone' : 'Register Facility Zone'}
+                      {selectedZone ? t('businessPark.editZone') : t('businessPark.registerZone')}
                     </h3>
                     <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {selectedZone ? `Modifying zone ID: ${selectedZone.FacilityZoneCode}` : 'Define operational, parking, or security zone'}
+                      {selectedZone ? `${t('businessPark.modifyingStructure')}: ${selectedZone.FacilityZoneCode}` : t('businessPark.zonesSubtitle')}
                     </p>
                   </div>
                 </div>
@@ -411,7 +414,7 @@ export default function FacilityZonesTab() {
 
               <form onSubmit={handleSaveZone} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} noValidate>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Business Park</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.businessPark')}</label>
                   <div style={{
                     width: '100%', padding: '10px 14px', borderRadius: '8px',
                     background: 'rgba(99, 102, 241, 0.08)',
@@ -422,16 +425,16 @@ export default function FacilityZonesTab() {
                     🏢 {parks.length > 0 ? `${parks[0].BusinessParkName} (${parks[0].BusinessParkCode})` : 'Ethiopian IT Park'}
                   </div>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px', display: 'block' }}>
-                    Single campus system — auto-assigned
+                    {t('businessPark.singleCampusAssigned')}
                   </span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Zone Name *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.zoneName')} *</label>
                     <input
                       type="text"
-                      placeholder="e.g. North Perimeter Security"
+                      placeholder={t('businessPark.enterZoneName')}
                       value={formData.FacilityZoneName}
                       onChange={(e) => handleFieldChange('FacilityZoneName', e.target.value)}
                       style={{
@@ -448,10 +451,10 @@ export default function FacilityZonesTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Zone Code *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.zoneCode')} *</label>
                     <input
                       type="text"
-                      placeholder="e.g. ZN-N01"
+                      placeholder={t('businessPark.enterZoneCode')}
                       value={formData.FacilityZoneCode}
                       onChange={(e) => handleFieldChange('FacilityZoneCode', e.target.value.toUpperCase())}
                       style={{
@@ -471,7 +474,7 @@ export default function FacilityZonesTab() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Zone Type *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.zoneType')} *</label>
                     <select
                       value={formData.ZoneType}
                       onChange={(e) => handleFieldChange('ZoneType', e.target.value)}
@@ -493,11 +496,11 @@ export default function FacilityZonesTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Capacity Limit (Optional)</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.capacityLimit')} ({t('businessPark.optional')})</label>
                     <input
                       type="number"
                       min="0"
-                      placeholder="e.g. 50 (Persons / Vehicles)"
+                      placeholder="e.g. 50"
                       value={formData.CapacityLimit}
                       onChange={(e) => handleFieldChange('CapacityLimit', e.target.value)}
                       style={{
@@ -516,7 +519,7 @@ export default function FacilityZonesTab() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Description</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('common.description')}</label>
                   <textarea
                     rows={3}
                     placeholder="Zone boundaries, access policies, or operational instructions..."
@@ -539,10 +542,10 @@ export default function FacilityZonesTab() {
                 {/* Footer Actions */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid var(--glass-border)' }}>
                   <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '10px 22px', borderRadius: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.88rem' }}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" disabled={formSubmitting} style={{ padding: '10px 24px', borderRadius: '10px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', opacity: formSubmitting ? 0.7 : 1 }}>
-                    {formSubmitting ? '⏳ Saving...' : selectedZone ? '✓ Update Zone' : '✓ Add Zone'}
+                    {formSubmitting ? `⏳ ${t('common.loading')}` : selectedZone ? `✓ ${t('businessPark.updateZone')}` : `✓ ${t('businessPark.addZone')}`}
                   </button>
                 </div>
               </form>

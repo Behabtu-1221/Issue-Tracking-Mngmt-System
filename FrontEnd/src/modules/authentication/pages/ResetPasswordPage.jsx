@@ -3,8 +3,10 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Eye, EyeOff, Loader2, CheckCircle2, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import authApi from '../api/authApi';
 import { validatePasswordComplexity } from '../utils/passwordValidation';
+import { useTranslation, LanguageSelector } from '../../../i18n';
 
 export default function ResetPasswordPage() {
+  const { t, isRTL } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -72,6 +74,17 @@ export default function ResetPasswordPage() {
       boxSizing: 'border-box',
       overflowY: 'auto'
     }}>
+      {/* Top Language Bar */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: isRTL ? 'auto' : '24px',
+        left: isRTL ? '24px' : 'auto',
+        zIndex: 50
+      }}>
+        <LanguageSelector variant="auth" />
+      </div>
+
       {/* Subtle Brand Glow Orb */}
       <div style={{
         position: 'absolute', top: '10%', left: '15%', width: '400px', height: '400px',
@@ -134,7 +147,7 @@ export default function ResetPasswordPage() {
             ITMS
           </h1>
           <p style={{ margin: 0, color: '#475569', fontSize: '0.85rem', fontWeight: 500 }}>
-            Reset Account Credentials
+            {t('auth.resetAccountCredentials', 'Reset Account Credentials')}
           </p>
         </div>
 
@@ -144,13 +157,13 @@ export default function ResetPasswordPage() {
               <XCircle size={34} />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', fontFamily: "'Outfit', sans-serif" }}>
-              Invalid or Expired Token
+              {t('auth.invalidOrExpiredToken', 'Invalid or Expired Token')}
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '24px', lineHeight: '1.5' }}>
-              The password reset token is invalid, used, or expired. Please request a new link.
+              {t('auth.invalidTokenDesc', 'The password reset token is invalid, used, or expired. Please request a new link.')}
             </p>
             <Link to="/forgot-password" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 22px', borderRadius: '12px', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%)', color: '#ffffff', fontWeight: 700, fontSize: '0.88rem', textDecoration: 'none', boxShadow: '0 10px 25px rgba(2, 132, 199, 0.3)' }}>
-              Request New Password Reset Link
+              {t('auth.requestNewResetLink', 'Request New Password Reset Link')}
             </Link>
           </div>
         ) : success ? (
@@ -159,10 +172,10 @@ export default function ResetPasswordPage() {
               <CheckCircle2 size={34} />
             </div>
             <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', fontFamily: "'Outfit', sans-serif" }}>
-              Password Reset Successfully
+              {t('auth.passwordUpdatedSuccess', 'Password Reset Successfully')}
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '24px' }}>
-              Your security password has been updated. Redirecting to sign in page...
+              {t('auth.passwordUpdatedSuccessDesc', 'Your security password has been updated. Redirecting to sign in page...')}
             </p>
             <Loader2 size={24} style={{ animation: 'spin 1s linear infinite', color: '#0284c7' }} />
           </div>
@@ -170,10 +183,10 @@ export default function ResetPasswordPage() {
           <>
             <div style={{ marginBottom: '20px', paddingBottom: '14px', borderBottom: '1px solid #e2e8f0' }}>
               <span style={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b', fontFamily: "'Outfit', sans-serif" }}>
-                Set New Account Password
+                {t('auth.setNewAccountPassword', 'Set New Account Password')}
               </span>
               <span style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '2px', display: 'block' }}>
-                Choose a complex password complying with security rules
+                {t('auth.chooseComplexPassword', 'Choose a complex password complying with security rules')}
               </span>
             </div>
 
@@ -186,19 +199,19 @@ export default function ResetPasswordPage() {
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '7px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                  New Password
+                  {t('auth.newPasswordLabel', 'New Password')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showNew ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
-                    style={{ width: '100%', padding: '13px 44px 13px 14px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
+                    placeholder={t('auth.enterNewPassword', 'Enter new password')}
+                    style={{ width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                     onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}
                     onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f8fafc'; }}
                   />
-                  <button type="button" onClick={() => setShowNew(!showNew)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => setShowNew(!showNew)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
                     {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
@@ -207,8 +220,10 @@ export default function ResetPasswordPage() {
               {newPassword && (
                 <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#64748b', fontWeight: 700, marginBottom: '6px' }}>
-                    <span>PASSWORD STRENGTH</span>
-                    <span style={{ color: getStrengthColor(complexity.score) }}>{complexity.score >= 100 ? 'STRONG' : complexity.score >= 60 ? 'MEDIUM' : 'WEAK'}</span>
+                    <span>{t('auth.passwordStrength', 'PASSWORD STRENGTH')}</span>
+                    <span style={{ color: getStrengthColor(complexity.score) }}>
+                      {complexity.score >= 100 ? t('auth.strengthStrong', 'STRONG') : complexity.score >= 60 ? t('auth.strengthMedium', 'MEDIUM') : t('auth.strengthWeak', 'WEAK')}
+                    </span>
                   </div>
                   <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{ width: `${complexity.score}%`, height: '100%', background: getStrengthColor(complexity.score), transition: 'all 0.3s ease' }} />
@@ -218,26 +233,26 @@ export default function ResetPasswordPage() {
 
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '7px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                  Confirm New Password
+                  {t('auth.confirmNewPasswordLabel', 'Confirm New Password')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showConfirm ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
-                    style={{ width: '100%', padding: '13px 44px 13px 14px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
+                    placeholder={t('auth.confirmNewPasswordPlaceholder', 'Confirm new password')}
+                    style={{ width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                     onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}
                     onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f8fafc'; }}
                   />
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
                     {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 {confirmPassword && (
                   <span style={{ fontSize: '0.78rem', color: passwordsMatch ? '#059669' : '#dc2626', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '6px' }}>
                     {passwordsMatch ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
-                    {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                    {passwordsMatch ? t('auth.passwordsMatch', 'Passwords match') : t('auth.passwordsDoNotMatch', 'Passwords do not match')}
                   </span>
                 )}
               </div>
@@ -254,12 +269,12 @@ export default function ResetPasswordPage() {
                   marginBottom: '18px'
                 }}
               >
-                {loading ? <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> Updating Security Password...</> : 'Reset Password & Sign In'}
+                {loading ? <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.updatingPassword', 'Updating Security Password...')}</> : t('auth.resetPasswordAndSignIn', 'Reset Password & Sign In')}
               </button>
 
               <div style={{ textAlign: 'center' }}>
                 <Link to="/" style={{ color: '#0284c7', fontSize: '0.84rem', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                  <ArrowLeft size={15} /> Return to Sign In
+                  <ArrowLeft size={15} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} /> {t('auth.returnToSignIn', 'Return to Sign In')}
                 </Link>
               </div>
             </form>
@@ -269,7 +284,7 @@ export default function ResetPasswordPage() {
 
       {/* Footer */}
       <div style={{ marginTop: '20px', textAlign: 'center', color: '#ffffff', fontSize: '0.8rem', fontWeight: '600', textShadow: '0 2px 6px rgba(0,0,0,0.6)', zIndex: 10 }}>
-        Enterprise Issue Tracking System • Copyright © {new Date().getFullYear()} All Rights Reserved
+        {t('app.copyright', 'Enterprise Issue Tracking System • Copyright © {year} All Rights Reserved', { year: new Date().getFullYear() })}
       </div>
 
       <style>{`

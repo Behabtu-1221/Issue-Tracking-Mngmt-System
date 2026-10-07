@@ -8,8 +8,10 @@ import {
 import issueManagementApi from '../api/issueManagementApi';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { IssueDetailView } from '../components/IssueDetailView';
+import { useTranslation } from '../../../i18n';
 
 export default function MyRequestsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = usePermissionContext();
@@ -77,31 +79,31 @@ export default function MyRequestsPage() {
     const status = (statusStr || '').toUpperCase();
     switch (status) {
       case 'NEW':
-        return { label: 'New Request', bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
+        return { label: t('issues.statusNew', 'New Request'), bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
       case 'APPROVED':
-        return { label: 'Approved', bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: 'rgba(56, 189, 248, 0.3)' };
+        return { label: t('issues.statusApproved', 'Approved'), bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: 'rgba(56, 189, 248, 0.3)' };
       case 'ASSIGNED':
-        return { label: 'Assigned', bg: 'rgba(192, 132, 252, 0.15)', color: '#c084fc', border: 'rgba(192, 132, 252, 0.3)' };
+        return { label: t('issues.statusAssigned', 'Assigned'), bg: 'rgba(192, 132, 252, 0.15)', color: '#c084fc', border: 'rgba(192, 132, 252, 0.3)' };
       case 'IN_PROGRESS':
-        return { label: 'In Progress', bg: 'rgba(250, 204, 21, 0.15)', color: '#facc15', border: 'rgba(250, 204, 21, 0.3)' };
+        return { label: t('issues.statusInProgress', 'In Progress'), bg: 'rgba(250, 204, 21, 0.15)', color: '#facc15', border: 'rgba(250, 204, 21, 0.3)' };
       case 'PENDING':
-        return { label: 'Action Needed', bg: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: 'rgba(251, 146, 60, 0.3)' };
+        return { label: t('issues.statusPending', 'Action Needed'), bg: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: 'rgba(251, 146, 60, 0.3)' };
       case 'RESOLVED':
-        return { label: 'Resolved', bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
+        return { label: t('issues.statusResolved', 'Resolved'), bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
       case 'CLOSED':
-        return { label: 'Closed', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: t('issues.statusClosed', 'Closed'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
       default:
-        return { label: statusStr || 'Submitted', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: statusStr || t('issues.statusSubmitted', 'Submitted'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
     }
   };
 
   const getPriorityBadge = (priorityStr) => {
     const p = (priorityStr || '').toUpperCase();
     switch (p) {
-      case 'URGENT': return { label: 'Urgent', color: '#f87171' };
-      case 'HIGH': return { label: 'High', color: '#facc15' };
-      case 'LOW': return { label: 'Low', color: '#94a3b8' };
-      default: return { label: 'Medium', color: '#60a5fa' };
+      case 'URGENT': return { label: t('issues.priorityUrgent', 'Urgent'), color: '#f87171' };
+      case 'HIGH': return { label: t('issues.priorityHigh', 'High'), color: '#facc15' };
+      case 'LOW': return { label: t('issues.priorityLow', 'Low'), color: '#94a3b8' };
+      default: return { label: t('issues.priorityMedium', 'Medium'), color: '#60a5fa' };
     }
   };
 
@@ -142,10 +144,10 @@ export default function MyRequestsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <LifeBuoy size={26} style={{ color: 'var(--accent-primary)' }} /> My Service <span className="glow-text">Requests</span>
+            <LifeBuoy size={26} style={{ color: 'var(--accent-primary)' }} /> {t('issues.myRequests', 'My Service Requests')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            View and track all service requests submitted by you across the Business Park.
+            {t('issues.myRequestsSubtitle', 'View and track all service requests submitted by you across the Business Park.')}
           </p>
         </div>
 
@@ -166,7 +168,7 @@ export default function MyRequestsPage() {
             boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)'
           }}
         >
-          <Plus size={18} /> Create Request
+          <Plus size={18} /> {t('issues.createIssue', 'Create Request')}
         </button>
       </div>
 
@@ -176,10 +178,10 @@ export default function MyRequestsPage() {
         {/* Status Chips */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {[
-            { id: 'ALL', label: 'All My Requests' },
-            { id: 'OPEN', label: 'Active Open' },
-            { id: 'PENDING', label: 'Action Needed' },
-            { id: 'RESOLVED', label: 'Resolved & Closed' }
+            { id: 'ALL', label: t('dashboard.allRequests', 'All My Requests') },
+            { id: 'OPEN', label: t('issues.activeOpen', 'Active Open') },
+            { id: 'PENDING', label: t('dashboard.actionNeeded', 'Action Needed') },
+            { id: 'RESOLVED', label: t('issues.resolvedClosed', 'Resolved & Closed') }
           ].map(tab => (
             <button
               key={tab.id}
@@ -207,7 +209,7 @@ export default function MyRequestsPage() {
             <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search by request code or title..."
+              placeholder={t('issues.searchMyRequests', 'Search by request code or title...')}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               style={{
@@ -233,7 +235,7 @@ export default function MyRequestsPage() {
           }}>
             <button
               onClick={() => setViewMode('table')}
-              title="Table View (with horizontal scroll)"
+              title={t('issues.tableView', 'Table View')}
               style={{
                 padding: '5px 10px',
                 borderRadius: '6px',
@@ -249,11 +251,11 @@ export default function MyRequestsPage() {
                 transition: 'all 0.2s'
               }}
             >
-              <List size={14} /> Table
+              <List size={14} /> {t('issues.tableView', 'Table')}
             </button>
             <button
               onClick={() => setViewMode('cards')}
-              title="Card Grid View"
+              title={t('issues.cardView', 'Card Grid View')}
               style={{
                 padding: '5px 10px',
                 borderRadius: '6px',
@@ -269,7 +271,7 @@ export default function MyRequestsPage() {
                 transition: 'all 0.2s'
               }}
             >
-              <LayoutGrid size={14} /> Cards
+              <LayoutGrid size={14} /> {t('issues.cardView', 'Cards')}
             </button>
           </div>
 
@@ -283,7 +285,7 @@ export default function MyRequestsPage() {
               color: 'var(--text-secondary)',
               cursor: 'pointer'
             }}
-            title="Refresh list"
+            title={t('common.refresh', 'Refresh list')}
           >
             <RefreshCw size={16} />
           </button>
@@ -306,7 +308,7 @@ export default function MyRequestsPage() {
             color: 'var(--text-muted)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>My Requests</span>
+              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t('issues.myRequests', 'My Requests')}</span>
               <span style={{
                 background: 'rgba(99, 102, 241, 0.12)',
                 color: 'var(--accent-primary)',
@@ -315,7 +317,7 @@ export default function MyRequestsPage() {
                 fontSize: '0.75rem',
                 fontWeight: 700
               }}>
-                {filteredRequests.length} {filteredRequests.length === 1 ? 'request' : 'requests'}
+                {filteredRequests.length} {filteredRequests.length === 1 ? t('issues.requestSingle', 'request') : t('issues.requestPlural', 'requests')}
               </span>
             </div>
 
@@ -331,7 +333,7 @@ export default function MyRequestsPage() {
               border: '1px solid var(--glass-border)'
             }}>
               <MoveHorizontal size={13} color="var(--accent-primary)" />
-              <span>Horizontal Scroll Enabled</span>
+              <span>{t('issues.scrollEnabled', 'Horizontal Scroll Enabled')}</span>
             </div>
           </div>
 
@@ -340,30 +342,30 @@ export default function MyRequestsPage() {
             <table className="custom-table" style={{ width: '100%', minWidth: '1200px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)' }}>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px' }}>Request # & Title</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px' }}>Service & Category</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '120px' }}>Priority</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Status</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px' }}>Assigned Tech</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Submitted Date</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Last Updated</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px' }}>{t('issues.requestNumberAndTitle', 'Request # & Title')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px' }}>{t('issues.serviceAndCategory', 'Service & Category')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '120px' }}>{t('issues.priority', 'Priority')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>{t('issues.status', 'Status')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px' }}>{t('issues.assignedTechnician', 'Assigned Tech')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>{t('issues.submittedDate', 'Submitted Date')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>{t('issues.lastUpdated', 'Last Updated')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: 'right' }}>{t('common.actions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
                     <td colSpan="8" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      Loading your service requests...
+                      {t('common.loadingRequests', 'Loading your service requests...')}
                     </td>
                   </tr>
                 ) : filteredRequests.length === 0 ? (
                   <tr>
                     <td colSpan="8" style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
                       <CheckCircle2 size={36} style={{ color: '#4ade80', marginBottom: '10px' }} />
-                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>No requests found</div>
+                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>{t('issues.noRequestsFound', 'No requests found')}</div>
                       <div style={{ fontSize: '0.85rem' }}>
-                        {statusFilter !== 'ALL' ? 'No issues match the selected filter.' : 'You have not submitted any service requests yet.'}
+                        {statusFilter !== 'ALL' ? t('issues.noMatchingFilter', 'No issues match the selected filter.') : t('issues.noSubmittedRequests', 'You have not submitted any service requests yet.')}
                       </div>
                     </td>
                   </tr>
@@ -423,7 +425,7 @@ export default function MyRequestsPage() {
 
                         <td style={{ padding: '14px 18px' }}>
                           <span style={{ color: req.AssignedTechnicianName ? '#c084fc' : 'var(--text-muted)', fontWeight: req.AssignedTechnicianName ? 600 : 400 }}>
-                            {req.AssignedTechnicianName || 'Unassigned'}
+                            {req.AssignedTechnicianName || t('issues.unassigned', 'Unassigned')}
                           </span>
                         </td>
 
@@ -458,7 +460,7 @@ export default function MyRequestsPage() {
                               gap: '6px'
                             }}
                           >
-                            <Eye size={14} /> Details & Chat
+                            <Eye size={14} /> {t('issues.detailsAndChat', 'Details & Chat')}
                           </button>
                         </td>
                       </tr>
@@ -474,14 +476,14 @@ export default function MyRequestsPage() {
         <div className="glass-panel" style={{ padding: '24px' }}>
           {loading ? (
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              Loading your service requests...
+              {t('common.loadingRequests', 'Loading your service requests...')}
             </div>
           ) : filteredRequests.length === 0 ? (
             <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
               <CheckCircle2 size={40} style={{ color: '#4ade80', marginBottom: '12px' }} />
-              <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>No requests found</h4>
+              <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('issues.noRequestsFound', 'No requests found')}</h4>
               <p style={{ margin: 0, fontSize: '0.85rem' }}>
-                {statusFilter !== 'ALL' ? 'No issues match the selected filter.' : 'You have not submitted any service requests yet.'}
+                {statusFilter !== 'ALL' ? t('issues.noMatchingFilter', 'No issues match the selected filter.') : t('issues.noSubmittedRequests', 'You have not submitted any service requests yet.')}
               </p>
               <button
                 onClick={() => navigate('/issues/create')}
@@ -500,7 +502,7 @@ export default function MyRequestsPage() {
                   gap: '6px'
                 }}
               >
-                <Plus size={16} /> Submit Service Request
+                <Plus size={16} /> {t('issues.submitServiceRequest', 'Submit Service Request')}
               </button>
             </div>
           ) : (
@@ -553,12 +555,12 @@ export default function MyRequestsPage() {
                         </span>
 
                         <span style={{ fontSize: '0.73rem', fontWeight: 700, color: priorityBadge.color }}>
-                          Priority: {priorityBadge.label}
+                          {t('issues.priority', 'Priority')}: {priorityBadge.label}
                         </span>
 
                         {req.ServiceName && (
                           <span style={{ fontSize: '0.73rem', color: 'var(--text-muted)', background: 'var(--bg-secondary)', padding: '2px 8px', borderRadius: '4px' }}>
-                            Service: {req.ServiceName}
+                            {t('issues.service', 'Service')}: {req.ServiceName}
                           </span>
                         )}
                       </div>
@@ -568,9 +570,9 @@ export default function MyRequestsPage() {
                       </h4>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                        <span>Submitted: {new Date(req.CreatedAt || req.RequestDate || Date.now()).toLocaleDateString()}</span>
-                        <span>Assigned Tech: <strong style={{ color: req.AssignedTechnicianName ? '#c084fc' : 'var(--text-muted)' }}>{req.AssignedTechnicianName || 'Unassigned'}</strong></span>
-                        <span>Last Updated: {new Date(req.UpdatedAt || req.CreatedAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span>{t('issues.submitted', 'Submitted')}: {new Date(req.CreatedAt || req.RequestDate || Date.now()).toLocaleDateString()}</span>
+                        <span>{t('issues.assignedTech', 'Assigned Tech')}: <strong style={{ color: req.AssignedTechnicianName ? '#c084fc' : 'var(--text-muted)' }}>{req.AssignedTechnicianName || t('issues.unassigned', 'Unassigned')}</strong></span>
+                        <span>{t('issues.lastUpdated', 'Last Updated')}: {new Date(req.UpdatedAt || req.CreatedAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </div>
 
@@ -588,7 +590,7 @@ export default function MyRequestsPage() {
                         alignItems: 'center',
                         gap: '6px'
                       }}>
-                        View Details & Chat <ChevronRight size={15} />
+                        {t('issues.viewDetailsAndChat', 'View Details & Chat')} <ChevronRight size={15} />
                       </button>
                     </div>
                   </div>

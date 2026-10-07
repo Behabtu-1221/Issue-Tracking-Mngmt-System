@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../i18n';
 import {
   ShieldCheck, Plus, RefreshCw, Check, X, Trash2, Edit, Key, Lock, Users,
   Layers, CheckSquare, Square, MinusSquare, Search, ChevronRight, ChevronDown, AlertCircle,
@@ -19,6 +20,7 @@ const SCOPE_COLORS = {
 };
 
 export default function RolesTab() {
+  const { t } = useTranslation();
   const [roles, setRoles] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -239,10 +241,10 @@ export default function RolesTab() {
     if (!roleTarget) return;
     setConfirmConfig({
       isOpen: true,
-      title: 'Decommission Custom Role',
-      message: `Are you sure you want to delete custom role "${roleTarget.RoleName}"? Users with this assigned role will revert to default permissions.`,
+      title: t('identity.decommissionRoleTitle'),
+      message: `${t('identity.decommissionRolePrompt')} "${roleTarget.RoleName}"? ${t('identity.decommissionRoleNotice')}`,
       type: 'danger',
-      confirmText: 'Delete Role',
+      confirmText: t('identity.deleteRoleBtn'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -315,9 +317,9 @@ export default function RolesTab() {
       {/* Header Bar */}
       <div className="glass-panel" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '4px' }}>Security Role Definitions & RBAC</h3>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '4px' }}>{t('identity.rolesHeader')}</h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Enterprise Permission Groups, Module Hierarchy & Granular Authorization
+            {t('identity.rolesHeaderDesc')}
           </p>
         </div>
 
@@ -330,7 +332,7 @@ export default function RolesTab() {
               color: 'var(--text-primary)', border: '1px solid var(--glass-border)', cursor: 'pointer'
             }}
           >
-            <RefreshCw className={loading ? 'animate-spin' : ''} size={16} /> Refresh
+            <RefreshCw className={loading ? 'animate-spin' : ''} size={16} /> {t('common.refresh')}
           </button>
 
           <button
@@ -347,7 +349,7 @@ export default function RolesTab() {
               boxShadow: 'var(--glow-accent)', fontSize: '0.88rem'
             }}
           >
-            <Plus size={16} /> Create Security Role
+            <Plus size={16} /> {t('identity.createSecurityRole')}
           </button>
         </div>
       </div>
@@ -356,7 +358,7 @@ export default function RolesTab() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
           <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-          <p>Loading enterprise roles...</p>
+          <p>{t('identity.loadingRoles')}</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
@@ -373,10 +375,10 @@ export default function RolesTab() {
 
                   {role.IsSystemRole ? (
                     <span className="badge badge-info" style={{ fontSize: '0.72rem' }}>
-                      <Lock size={10} style={{ marginRight: '4px' }} /> System Role
+                      <Lock size={10} style={{ marginRight: '4px' }} /> {t('identity.systemRole')}
                     </span>
                   ) : (
-                    <span className="badge badge-success" style={{ fontSize: '0.72rem' }}>Custom</span>
+                    <span className="badge badge-success" style={{ fontSize: '0.72rem' }}>{t('identity.customRole')}</span>
                   )}
                 </div>
 
@@ -392,14 +394,14 @@ export default function RolesTab() {
                   marginBottom: '16px', display: 'flex', justifyContent: 'space-around', textAlign: 'center'
                 }}>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Permissions</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('identity.permissionsCount')}</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                       {role.PermissionCount || (role.Permissions ? role.Permissions.length : 0)}
                     </div>
                   </div>
                   <div style={{ borderLeft: '1px solid var(--glass-border)' }} />
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Assigned Users</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('identity.assignedUsers')}</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--accent-primary)' }}>
                       {role.UserCount || 0}
                     </div>
@@ -416,7 +418,7 @@ export default function RolesTab() {
                       fontWeight: '600', fontSize: '0.82rem', cursor: 'pointer'
                     }}
                   >
-                    <Key size={14} /> Permission Matrix
+                    <Key size={14} /> {t('identity.permissionMatrixBtn')}
                   </button>
 
                   {!role.IsSystemRole && (
@@ -461,7 +463,7 @@ export default function RolesTab() {
         <div className="modal-overlay">
           <div className="modal-content" style={{ width: '480px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '1.2rem' }}>{selectedRole ? 'Edit Role Metadata' : 'Create New Security Role'}</h3>
+              <h3 style={{ fontSize: '1.2rem' }}>{selectedRole ? t('identity.editRoleModalTitle') : t('identity.createRoleModalTitle')}</h3>
               <button onClick={() => setShowCreateModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
@@ -475,7 +477,7 @@ export default function RolesTab() {
 
             <form onSubmit={handleSaveRole} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <FormField
-                label="Role Display Name"
+                label={t('identity.roleDisplayName')}
                 required
                 icon={Shield}
                 error={roleErrors.roleName}
@@ -484,7 +486,7 @@ export default function RolesTab() {
                 <input
                   id="tab-role-name"
                   type="text"
-                  placeholder="e.g. Compliance Officer"
+                  placeholder={t('identity.roleDisplayNamePlaceholder')}
                   value={formData.roleName}
                   onChange={(e) => {
                     setFormData({ ...formData, roleName: e.target.value });
@@ -502,7 +504,7 @@ export default function RolesTab() {
               </FormField>
 
               <FormField
-                label="Role Unique Code"
+                label={t('identity.roleUniqueCode')}
                 required
                 icon={Tag}
                 error={roleErrors.roleCode}
@@ -511,7 +513,7 @@ export default function RolesTab() {
                 <input
                   id="tab-role-code"
                   type="text"
-                  placeholder="e.g. COMPLIANCE_OFFICER"
+                  placeholder={t('identity.roleUniqueCodePlaceholder')}
                   value={formData.roleCode}
                   onChange={(e) => {
                     setFormData({ ...formData, roleCode: e.target.value.toUpperCase().replace(/\s+/g, '_') });
@@ -530,7 +532,7 @@ export default function RolesTab() {
               </FormField>
 
               <FormField
-                label="Description (Optional)"
+                label={t('identity.roleDescLabel')}
                 icon={FileText}
                 error={roleErrors.description}
                 id="tab-role-desc"
@@ -538,7 +540,7 @@ export default function RolesTab() {
                 <textarea
                   id="tab-role-desc"
                   rows={3}
-                  placeholder="Describe the scope and responsibilities of this role..."
+                  placeholder={t('identity.roleDescPlaceholder')}
                   value={formData.description}
                   onChange={(e) => {
                     setFormData({ ...formData, description: e.target.value });
@@ -561,13 +563,13 @@ export default function RolesTab() {
                   type="button" onClick={() => setShowCreateModal(false)}
                   style={{ padding: '10px 18px', borderRadius: 'var(--border-radius-sm)', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit" disabled={formSubmitting}
                   style={{ padding: '10px 20px', borderRadius: 'var(--border-radius-sm)', background: 'var(--accent-gradient)', border: 'none', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
                 >
-                  {formSubmitting ? 'Saving...' : 'Save Role'}
+                  {formSubmitting ? t('identity.savingRoleBtn') : t('identity.saveRoleBtn')}
                 </button>
               </div>
             </form>
@@ -584,10 +586,10 @@ export default function RolesTab() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexShrink: 0 }}>
               <div>
                 <h3 style={{ fontSize: '1.2rem', margin: 0 }}>
-                  Permission Matrix: <span className="glow-text">{selectedRole.RoleName}</span>
+                  {t('identity.permissionMatrixFor')} <span className="glow-text">{selectedRole.RoleName}</span>
                 </h3>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                  Module → Permission Group → Granular Permissions for <code>{selectedRole.RoleCode}</code>
+                  {t('identity.matrixHierarchyDesc')} <code>{selectedRole.RoleCode}</code>
                 </p>
               </div>
               <button onClick={() => setShowMatrixModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
@@ -604,7 +606,7 @@ export default function RolesTab() {
                 <div style={{ position: 'relative', flex: 1, maxWidth: '260px' }}>
                   <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                   <input
-                    type="text" placeholder="Search permissions..."
+                    type="text" placeholder={t('identity.searchPermPlaceholder')}
                     value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                     style={{
                       width: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
@@ -619,7 +621,7 @@ export default function RolesTab() {
                     borderRadius: '6px', padding: '7px 10px', color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none'
                   }}
                 >
-                  <option value="ALL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All System Modules</option>
+                  <option value="ALL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('rbac.allSystemModules')}</option>
                   {PERMISSION_MODULE_TREE.map(mod => (
                     <option key={mod.moduleCode} value={mod.moduleCode} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{mod.moduleName}</option>
                   ))}
@@ -628,16 +630,16 @@ export default function RolesTab() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ color: 'var(--accent-primary)', fontWeight: 700, fontSize: '0.82rem' }}>
-                  {rolePermissions.length} granted
+                  {rolePermissions.length} {t('identity.grantedBadge')}
                 </span>
                 <button type="button" onClick={expandAll} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline' }}>
-                  Expand All
+                  {t('identity.expandAll')}
                 </button>
                 <button type="button" onClick={collapseAll} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline' }}>
-                  Collapse All
+                  {t('identity.collapseAll')}
                 </button>
                 <button type="button" onClick={() => setRolePermissions([])} style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline' }}>
-                  Clear All
+                  {t('identity.clearAll')}
                 </button>
               </div>
             </div>
@@ -689,7 +691,7 @@ export default function RolesTab() {
                             color: 'var(--accent-primary)', cursor: 'pointer'
                           }}
                         >
-                          {modCheckState === 'all' ? 'Deselect Module' : 'Select All Module'}
+                          {modCheckState === 'all' ? t('identity.deselectModule') : t('identity.selectModule')}
                         </button>
                         <div onClick={(e) => { e.stopPropagation(); toggleModuleAll(mod); }} style={{ cursor: 'pointer' }}>
                           <CheckIcon state={modCheckState} />
@@ -744,7 +746,7 @@ export default function RolesTab() {
                                       color: 'var(--accent-primary)', cursor: 'pointer', textDecoration: 'underline'
                                     }}
                                   >
-                                    {grpCheckState === 'all' ? 'Deselect' : 'Select All'}
+                                    {grpCheckState === 'all' ? t('identity.deselectGroup') : t('identity.selectGroup')}
                                   </button>
                                   <div onClick={(e) => { e.stopPropagation(); toggleGroupAll(grp.permissions); }} style={{ cursor: 'pointer' }}>
                                     <CheckIcon state={grpCheckState} size={14} />
@@ -812,20 +814,20 @@ export default function RolesTab() {
             {/* Modal Footer Actions */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', marginTop: '10px', borderTop: '1px solid var(--glass-border)', flexShrink: 0 }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                {rolePermissions.length} granted permissions will be saved for <strong>{selectedRole.RoleName}</strong>
+                {rolePermissions.length} {t('identity.matrixFooterNotice')} <strong>{selectedRole.RoleName}</strong>
               </span>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button
                   type="button" onClick={() => setShowMatrixModal(false)}
                   style={{ padding: '9px 18px', borderRadius: 'var(--border-radius-sm)', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="button" onClick={handleSaveMatrix} disabled={matrixSaving}
                   style={{ padding: '9px 22px', borderRadius: 'var(--border-radius-sm)', background: 'var(--accent-gradient)', border: 'none', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
                 >
-                  {matrixSaving ? 'Syncing Matrix...' : 'Save Matrix'}
+                  {matrixSaving ? t('identity.syncingMatrixBtn') : t('identity.syncMatrixBtn')}
                 </button>
               </div>
             </div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Cpu, Plus, Edit3, Trash2, ToggleLeft, ToggleRight, RefreshCw, AlertCircle } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 
 export default function BusinessRulesTab() {
+  const { t } = useTranslation();
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,7 +92,7 @@ export default function BusinessRulesTab() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Delete this business rule?')) {
+    if (window.confirm(t('config.confirmDeleteRule'))) {
       try {
         await configApi.deleteBusinessRule(id);
         fetchRules();
@@ -104,8 +106,8 @@ export default function BusinessRulesTab() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Configurable Business Rules</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Define dynamic evaluation rules and logic expressions for routing and validation.</p>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>{t('config.rulesSectionTitle')}</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('config.rulesSectionDesc')}</p>
         </div>
 
         <button
@@ -125,7 +127,7 @@ export default function BusinessRulesTab() {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> New Business Rule
+          <Plus size={16} /> {t('config.newRuleBtn')}
         </button>
       </div>
 
@@ -133,22 +135,22 @@ export default function BusinessRulesTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-            <p>Loading business rules...</p>
+            <p>{t('config.loadingRules')}</p>
           </div>
         ) : rules.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <Cpu size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-            <p>No business rules configured.</p>
+            <p>{t('config.noRulesFound')}</p>
           </div>
         ) : (
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Rule Code</th>
-                <th>Rule Name</th>
-                <th>Rule Expression</th>
-                <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('config.thRuleCode')}</th>
+                <th>{t('config.thRuleName')}</th>
+                <th>{t('config.thExpression')}</th>
+                <th>{t('common.status')}</th>
+                <th style={{ textAlign: 'right' }}>{t('config.thActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -179,7 +181,7 @@ export default function BusinessRulesTab() {
                       }}
                     >
                       {item.IsActive ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-                      {item.IsActive ? 'ACTIVE' : 'INACTIVE'}
+                      {item.IsActive ? t('common.active') : t('common.inactive')}
                     </button>
                   </td>
                   <td style={{ textAlign: 'right' }}>
@@ -231,7 +233,7 @@ export default function BusinessRulesTab() {
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)' }}>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? 'Edit Business Rule' : 'Create Business Rule'}
+              {editingItem ? t('config.editRuleTitle') : t('config.createRuleTitle')}
             </h3>
 
             {error && (
@@ -242,7 +244,7 @@ export default function BusinessRulesTab() {
 
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Rule Code</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.ruleCodeLabel')}</label>
                 <input
                   type="text"
                   required
@@ -255,7 +257,7 @@ export default function BusinessRulesTab() {
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Rule Name</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.ruleNameLabel')}</label>
                 <input
                   type="text"
                   required
@@ -267,7 +269,7 @@ export default function BusinessRulesTab() {
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Rule Expression</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.ruleExpressionLabel')}</label>
                 <textarea
                   rows={4}
                   required
@@ -284,14 +286,14 @@ export default function BusinessRulesTab() {
                   onClick={() => setIsModalOpen(false)}
                   style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
                   style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
                 >
-                  {submitting ? 'Saving...' : editingItem ? 'Update Rule' : 'Create Rule'}
+                  {submitting ? t('common.save') : editingItem ? t('config.updateRuleBtn') : t('config.createRuleBtn')}
                 </button>
               </div>
             </form>

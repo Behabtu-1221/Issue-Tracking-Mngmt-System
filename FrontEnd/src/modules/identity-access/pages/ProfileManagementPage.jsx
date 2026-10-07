@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from '../../../i18n';
 import {
   User,
   Bell,
@@ -25,6 +26,7 @@ import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 
 export default function ProfileManagementPage() {
+  const { t } = useTranslation();
   const { user, refreshProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('personal');
   const avatarInputRef = useRef(null);
@@ -170,15 +172,17 @@ export default function ProfileManagementPage() {
   const handleRevokeSession = async (sessionId) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Revoke Active Session',
-      message: 'Are you sure you want to terminate this login session?',
+      title: t('identity.revokeSessionTitle'),
+      message: t('identity.revokeSessionConfirm'),
+      confirmText: t('identity.revokeSessionBtn'),
+      type: 'warning',
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
           await authApi.revokeSession(sessionId);
           setSessions(prev => prev.filter(s => s.UserSessionID !== sessionId));
         } catch (err) {
-          showAlert('Revocation Failed', 'Could not revoke session: ' + err.message, 'error');
+          showAlert(t('identity.revokeSessionFailed'), t('identity.revokeSessionFailedMsg'), 'error');
         }
       }
     });
@@ -192,7 +196,7 @@ export default function ProfileManagementPage() {
     try {
       await authApi.updateProfile(formData);
       if (refreshProfile) await refreshProfile();
-      setProfileMsg({ type: 'success', text: 'Personal profile updated successfully!' });
+      setProfileMsg({ type: 'success', text: t('profile.personalSaved') });
     } catch (err) {
       setProfileMsg({ type: 'error', text: err.response?.data?.message || err.message || 'Failed to update profile' });
     } finally {
@@ -211,7 +215,7 @@ export default function ProfileManagementPage() {
 
     try {
       await authApi.updateNotificationPreferences(notifPrefs);
-      setNotifMsg({ type: 'success', text: 'Notification preferences saved successfully!' });
+      setNotifMsg({ type: 'success', text: t('profile.prefsSaved') });
     } catch (err) {
       setNotifMsg({ type: 'error', text: err.response?.data?.message || err.message || 'Failed to save preferences' });
     } finally {
@@ -233,12 +237,12 @@ export default function ProfileManagementPage() {
     setPasswordMsg({ type: '', text: '' });
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordMsg({ type: 'error', text: 'New password and confirmation password do not match' });
+      setPasswordMsg({ type: 'error', text: t('profile.passwordMatchError') });
       return;
     }
 
     if (passwordValidation && !passwordValidation.isValid) {
-      setPasswordMsg({ type: 'error', text: 'Please ensure your password meets all complexity requirements' });
+      setPasswordMsg({ type: 'error', text: t('profile.passwordComplexityError') });
       return;
     }
 
@@ -250,7 +254,7 @@ export default function ProfileManagementPage() {
       });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setPasswordValidation(null);
-      setPasswordMsg({ type: 'success', text: 'Password updated successfully!' });
+      setPasswordMsg({ type: 'success', text: t('profile.passwordChangedSuccess') });
     } catch (err) {
       setPasswordMsg({ type: 'error', text: err.response?.data?.message || err.message || 'Failed to change password' });
     } finally {
@@ -291,7 +295,7 @@ export default function ProfileManagementPage() {
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
               flexShrink: 0
             }}
-            title="Click to change profile photo"
+            title={t('profile.photoClickChange')}
           >
             {avatarPreview ? (
               <img
@@ -366,7 +370,7 @@ export default function ProfileManagementPage() {
           backdropFilter: 'blur(5px)'
         }}>
           <Shield size={14} color="#10b981" />
-          <span>Role Scope: {user?.userTypeCode || 'STAFF'}</span>
+          <span>{t('profile.roleScope')} {user?.userTypeCode || 'STAFF'}</span>
         </div>
       </div>
 
@@ -380,9 +384,9 @@ export default function ProfileManagementPage() {
         paddingBottom: '4px'
       }}>
         {[
-          { id: 'personal', label: 'Personal Details', icon: User },
-          { id: 'notifications', label: 'Notification Settings', icon: Bell },
-          { id: 'security', label: 'Security & Password', icon: Lock }
+          { id: 'personal', label: t('profile.personalDetailsTab'), icon: User },
+          { id: 'notifications', label: t('profile.notifSettingsTab'), icon: Bell },
+          { id: 'security', label: t('profile.securityPasswordTab'), icon: Lock }
         ].map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -424,7 +428,7 @@ export default function ProfileManagementPage() {
         }}>
           <h2 style={{ fontSize: '1.2rem', marginBottom: '20px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <User size={20} color="var(--accent-primary)" />
-            <span>Manage Personal Information</span>
+            <span>{t('profile.managePersonal')}</span>
           </h2>
 
           {profileMsg.text && (
@@ -447,7 +451,7 @@ export default function ProfileManagementPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginBottom: '24px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>First Name</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.firstName')}</label>
               <input
                 type="text"
                 value={formData.firstName}
@@ -467,7 +471,7 @@ export default function ProfileManagementPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Last Name</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.lastName')}</label>
               <input
                 type="text"
                 value={formData.lastName}
@@ -487,7 +491,7 @@ export default function ProfileManagementPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Work Email Address (Read-only)</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.workEmail')}</label>
               <input
                 type="email"
                 value={formData.email}
@@ -506,12 +510,12 @@ export default function ProfileManagementPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Job Title / Position</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.jobTitle')}</label>
               <input
                 type="text"
                 value={formData.jobTitle}
                 onChange={e => setFormData({ ...formData, jobTitle: e.target.value })}
-                placeholder="e.g. Senior Technician"
+                placeholder={t('profile.jobTitlePlaceholder')}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -526,7 +530,7 @@ export default function ProfileManagementPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Office Phone Number</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.officePhone')}</label>
               <input
                 type="text"
                 value={formData.phoneNumber}
@@ -546,7 +550,7 @@ export default function ProfileManagementPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Mobile Number (For SMS Alerts)</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.mobilePhone')}</label>
               <input
                 type="text"
                 value={formData.mobileNumber}
@@ -586,7 +590,7 @@ export default function ProfileManagementPage() {
               }}
             >
               <Save size={16} />
-              <span>{isSavingProfile ? 'Saving Changes...' : 'Save Profile Changes'}</span>
+              <span>{isSavingProfile ? t('profile.savingProfile') : t('profile.saveProfile')}</span>
             </button>
           </div>
         </form>
@@ -603,10 +607,10 @@ export default function ProfileManagementPage() {
         }}>
           <h2 style={{ fontSize: '1.2rem', marginBottom: '8px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Bell size={20} color="var(--accent-primary)" />
-            <span>Notification & Alert Delivery Channels</span>
+            <span>{t('profile.notifChannelsTitle')}</span>
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '24px' }}>
-            Customize your real-time delivery preferences for ticket updates, SLA escalations, and system announcements.
+            {t('profile.notifChannelsDesc')}
           </p>
 
           {notifMsg.text && (
@@ -631,15 +635,15 @@ export default function ProfileManagementPage() {
           <div style={{ marginBottom: '28px' }}>
             <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Mail size={16} color="var(--accent-secondary)" />
-              <span>Email Notifications</span>
+              <span>{t('profile.emailNotifs')}</span>
             </h3>
 
             <div style={{ display: 'grid', gap: '12px' }}>
               {[
-                { key: 'emailTicketUpdates', label: 'Ticket Updates & Status Changes', desc: 'Receive emails when your tickets are assigned, updated, or resolved.' },
-                { key: 'emailSlaWarnings', label: 'SLA Escalation & Breach Warnings', desc: 'Receive immediate alerts when tickets approach their SLA deadline.' },
-                { key: 'emailWeeklyDigest', label: 'Weekly Performance & Ticket Summary Digest', desc: 'Receive a consolidated summary email every Monday morning.' },
-                { key: 'emailMaintenance', label: 'Campus & Infrastructure Maintenance Alerts', desc: 'Broadcasts regarding power, HVAC, or facility upgrades.' }
+                { key: 'emailTicketUpdates', label: t('profile.emailTicketUpdates'), desc: t('profile.emailTicketUpdatesDesc') },
+                { key: 'emailSlaWarnings', label: t('profile.emailSlaWarnings'), desc: t('profile.emailSlaWarningsDesc') },
+                { key: 'emailWeeklyDigest', label: t('profile.emailWeeklyDigest'), desc: t('profile.emailWeeklyDigestDesc') },
+                { key: 'emailMaintenance', label: t('profile.emailMaintenance'), desc: t('profile.emailMaintenanceDesc') }
               ].map(item => (
                 <div key={item.key} style={{
                   display: 'flex',
@@ -689,13 +693,13 @@ export default function ProfileManagementPage() {
           <div style={{ marginBottom: '28px' }}>
             <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Smartphone size={16} color="#10b981" />
-              <span>SMS & Mobile Alerts</span>
+              <span>{t('profile.smsNotifs')}</span>
             </h3>
 
             <div style={{ display: 'grid', gap: '12px' }}>
               {[
-                { key: 'smsCriticalSla', label: 'Critical SLA Breaches (P1 Emergency)', desc: 'Immediate SMS text message sent to your mobile phone.' },
-                { key: 'smsDispatchAlerts', label: 'Urgent Dispatch & Work Orders', desc: 'SMS alerts when emergency work orders are assigned to you.' }
+                { key: 'smsCriticalSla', label: t('profile.smsCriticalSla'), desc: t('profile.smsCriticalSlaDesc') },
+                { key: 'smsDispatchAlerts', label: t('profile.smsDispatchAlerts'), desc: t('profile.smsDispatchAlertsDesc') }
               ].map(item => (
                 <div key={item.key} style={{
                   display: 'flex',
@@ -742,13 +746,13 @@ export default function ProfileManagementPage() {
           <div style={{ marginBottom: '28px' }}>
             <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Volume2 size={16} color="#f59e0b" />
-              <span>In-App & Desktop Sound Alerts</span>
+              <span>{t('profile.soundAlerts')}</span>
             </h3>
 
             <div style={{ display: 'grid', gap: '12px' }}>
               {[
-                { key: 'inAppSoundAlerts', label: 'Audible Sound Alert on New Request', desc: 'Play notification tone when a ticket requires immediate attention.' },
-                { key: 'inAppPopups', label: 'Real-time Toast Banners', desc: 'Display pop-up banners in the top-right corner of the application.' }
+                { key: 'inAppSoundAlerts', label: t('profile.soundOnNew'), desc: t('profile.soundOnNewDesc') },
+                { key: 'inAppPopups', label: t('profile.toastBanners'), desc: t('profile.toastBannersDesc') }
               ].map(item => (
                 <div key={item.key} style={{
                   display: 'flex',
@@ -811,7 +815,7 @@ export default function ProfileManagementPage() {
               }}
             >
               <Save size={16} />
-              <span>{isSavingPrefs ? 'Saving Preferences...' : 'Save Notification Settings'}</span>
+              <span>{isSavingPrefs ? t('profile.savingPrefs') : t('profile.savePrefs')}</span>
             </button>
           </div>
         </form>
@@ -830,10 +834,10 @@ export default function ProfileManagementPage() {
           }}>
             <h2 style={{ fontSize: '1.2rem', marginBottom: '8px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <KeyRound size={20} color="var(--accent-primary)" />
-              <span>Change Account Password</span>
+              <span>{t('profile.changePasswordTitle')}</span>
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '24px' }}>
-              Update your account password. Passwords must be at least 8 characters and include uppercase, lowercase, numbers, and special characters.
+              {t('profile.changePasswordDesc')}
             </p>
 
             {passwordMsg.text && (
@@ -856,7 +860,7 @@ export default function ProfileManagementPage() {
 
             <div style={{ display: 'grid', gap: '18px', maxWidth: '500px', marginBottom: '24px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Current Password</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.currentPassword')}</label>
                 <input
                   type="password"
                   value={passwordForm.currentPassword}
@@ -876,7 +880,7 @@ export default function ProfileManagementPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>New Password</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.newPassword')}</label>
                 <input
                   type="password"
                   value={passwordForm.newPassword}
@@ -899,7 +903,7 @@ export default function ProfileManagementPage() {
               {passwordValidation && (
                 <div style={{ padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Password Strength:</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{t('profile.passwordStrength')}</span>
                     <span style={{ fontWeight: 700, color: passwordValidation.score > 70 ? '#10b981' : passwordValidation.score > 40 ? '#f59e0b' : '#ef4444' }}>
                       {passwordValidation.strengthLabel}
                     </span>
@@ -916,7 +920,7 @@ export default function ProfileManagementPage() {
               )}
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Confirm New Password</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.confirmNewPassword')}</label>
                 <input
                   type="password"
                   value={passwordForm.confirmPassword}
@@ -954,7 +958,7 @@ export default function ProfileManagementPage() {
               }}
             >
               <KeyRound size={16} />
-              <span>{isChangingPassword ? 'Updating Password...' : 'Update Password'}</span>
+              <span>{isChangingPassword ? t('profile.updatingPasswordBtn') : t('profile.updatePasswordBtn')}</span>
             </button>
           </form>
 
@@ -970,10 +974,10 @@ export default function ProfileManagementPage() {
               <div>
                 <h2 style={{ fontSize: '1.2rem', margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <Laptop size={20} color="var(--accent-secondary)" />
-                  <span>Active Login Sessions</span>
+                  <span>{t('profile.activeSessionsTitle')}</span>
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', margin: '4px 0 0' }}>
-                  Manage active browser sessions connected to your account.
+                  {t('profile.activeSessionsDesc')}
                 </p>
               </div>
               <button
@@ -993,13 +997,13 @@ export default function ProfileManagementPage() {
                 }}
               >
                 <RefreshCw size={14} className={loadingSessions ? 'spin' : ''} />
-                <span>Refresh Sessions</span>
+                <span>{t('identity.refreshSessions')}</span>
               </button>
             </div>
 
             {sessions.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                No other active sessions detected.
+                {t('profile.noOtherSessions')}
               </div>
             ) : (
               <div style={{ display: 'grid', gap: '12px' }}>
@@ -1020,7 +1024,7 @@ export default function ProfileManagementPage() {
                           {s.UserAgent || 'Web Browser Session'}
                         </div>
                         <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-                          IP Address: {s.IpAddress || 'Current Client'} • Last Active: {s.LastSeenDateTime ? new Date(s.LastSeenDateTime).toLocaleString() : 'Active Now'}
+                          {t('identity.thIpAddress')}: {s.IpAddress || 'Current Client'} • {t('identity.thLoginTimestamp')}: {s.LastSeenDateTime ? new Date(s.LastSeenDateTime).toLocaleString() : t('common.active')}
                         </div>
                       </div>
                     </div>
@@ -1042,7 +1046,7 @@ export default function ProfileManagementPage() {
                       }}
                     >
                       <Trash2 size={13} />
-                      <span>Revoke</span>
+                      <span>{t('profile.revokeSessionBtn')}</span>
                     </button>
                   </div>
                 ))}

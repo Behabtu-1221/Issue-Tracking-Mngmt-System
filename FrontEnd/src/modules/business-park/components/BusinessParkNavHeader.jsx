@@ -12,17 +12,10 @@ import {
   Home
 } from 'lucide-react';
 import parkApi from '../api/parkApi';
-
-const NAV_ITEMS = [
-  { path: '/parks/campus', tabId: 'parks', label: 'Park Profile', icon: Building2, description: 'Central Business Park profile & parameters' },
-  { path: '/parks/buildings', tabId: 'buildings', label: 'Buildings & Blocks', icon: Building, description: 'Commercial buildings, towers, and structural blocks' },
-  { path: '/parks/floors', tabId: 'floors', label: 'Floor Levels', icon: Layers, description: 'Building floors, Office capacity, and layouts' },
-  { path: '/parks/offices', tabId: 'offices', label: 'Office Units', icon: Grid, description: 'Office inventory, floor area, and availability' },
-  { path: '/parks/zones', tabId: 'zones', label: 'Facility Zones', icon: MapPin, description: 'Parks, parking bays, utility rooms & security posts' },
-  { path: '/parks/landmarks', tabId: 'landmarks', label: 'Campus Landmarks', icon: Compass, description: 'Campus navigation landmarks and location hierarchy' }
-];
+import { useTranslation } from '../../../i18n';
 
 export default function BusinessParkNavHeader({ activeTabId }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [metrics, setMetrics] = useState({
@@ -30,6 +23,15 @@ export default function BusinessParkNavHeader({ activeTabId }) {
     buildings: { totalBuildings: 0, totalFloors: 0 },
     offices: { totalOffices: 0, vacantOffices: 0, occupiedOffices: 0 }
   });
+
+  const navItems = [
+    { path: '/parks/campus', tabId: 'parks', label: t('businessPark.parkProfile'), icon: Building2, description: t('businessPark.parkProfileDesc') },
+    { path: '/parks/buildings', tabId: 'buildings', label: t('businessPark.buildingsBlocks'), icon: Building, description: t('businessPark.buildingsDesc') },
+    { path: '/parks/floors', tabId: 'floors', label: t('businessPark.floorsLevels'), icon: Layers, description: t('businessPark.floorsDesc') },
+    { path: '/parks/offices', tabId: 'offices', label: t('businessPark.officeUnits'), icon: Grid, description: t('businessPark.officesDesc') },
+    { path: '/parks/zones', tabId: 'zones', label: t('businessPark.facilityZones'), icon: MapPin, description: t('businessPark.zonesDesc') },
+    { path: '/parks/landmarks', tabId: 'landmarks', label: t('businessPark.campusLandmarks'), icon: Compass, description: t('businessPark.landmarksDesc') }
+  ];
 
   useEffect(() => {
     fetchMetrics();
@@ -46,7 +48,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
     }
   };
 
-  const activeItem = NAV_ITEMS.find(item => item.tabId === activeTabId || location.pathname.includes(item.tabId)) || NAV_ITEMS[0];
+  const activeItem = navItems.find(item => item.tabId === activeTabId || location.pathname.includes(item.tabId)) || navItems[0];
   const occupancyRate = metrics.offices.totalOffices > 0 
     ? Math.round((metrics.offices.occupiedOffices / metrics.offices.totalOffices) * 100) 
     : 0;
@@ -87,7 +89,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building2 size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Business Park</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.businessPark')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   {metrics.parks.totalParks || 1} Campus
                 </div>
@@ -99,7 +101,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Site Area</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.totalSiteArea')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   50,000 m²
                 </div>
@@ -111,9 +113,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Grid size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Operational Status</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.operationalStatus')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--color-success)' }}>
-                  100% Active
+                  100% {t('common.active')}
                 </div>
               </div>
             </div>
@@ -123,9 +125,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <PieChart size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Administration</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.administration')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  Central Managed
+                  {t('businessPark.centralManaged')}
                 </div>
               </div>
             </div>
@@ -139,9 +141,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Buildings</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.buildingsBlocks')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  {metrics.buildings.totalBuildings || 0} Buildings
+                  {metrics.buildings.totalBuildings || 0}
                 </div>
               </div>
             </div>
@@ -151,9 +153,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Layers size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Floor Capacity</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.configuredFloors')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  {metrics.buildings.totalFloors || 0} Floor Levels
+                  {metrics.buildings.totalFloors || 0} {t('businessPark.totalLevelsCount')}
                 </div>
               </div>
             </div>
@@ -163,7 +165,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building2 size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Blocks</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.activeBlocks')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   Block A & B
                 </div>
@@ -175,7 +177,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <PieChart size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Built-Up Area</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.builtUpArea')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   32,000 m²
                 </div>
@@ -191,7 +193,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Layers size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Floor Levels</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.totalFloorLevels')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   {metrics.buildings.totalFloors || 0} Levels
                 </div>
@@ -203,9 +205,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Grid size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Avg Units / Floor</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.avgUnitsFloor')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  4 Office Units
+                  4 {t('businessPark.officeUnits')}
                 </div>
               </div>
             </div>
@@ -215,9 +217,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Floor Blueprint</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.floorBlueprint')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--color-info)' }}>
-                  100% Mapped
+                  100% {t('businessPark.mapped')}
                 </div>
               </div>
             </div>
@@ -227,7 +229,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <PieChart size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Floor Area</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.totalFloorArea')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   18,500 m²
                 </div>
@@ -243,9 +245,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Grid size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Office Units</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.totalOfficeUnits')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  {metrics.offices.totalOffices || 0} Units
+                  {metrics.offices.totalOffices || 0}
                 </div>
               </div>
             </div>
@@ -255,9 +257,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Grid size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Vacant Units</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.vacantUnits')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--color-info)' }}>
-                  {metrics.offices.vacantOffices || 0} Available
+                  {metrics.offices.vacantOffices || 0} {t('businessPark.vacant')}
                 </div>
               </div>
             </div>
@@ -267,9 +269,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building2 size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Occupied Units</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.occupiedUnits')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  {metrics.offices.occupiedOffices || 0} Leased
+                  {metrics.offices.occupiedOffices || 0} {t('businessPark.occupied')}
                 </div>
               </div>
             </div>
@@ -279,7 +281,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <PieChart size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Occupancy Rate</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.occupancyRate')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   {occupancyRate}%
                 </div>
@@ -295,9 +297,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <MapPin size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Facility Zones</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.facilityZones')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  4 Active Zones
+                  4 {t('common.active')} Zones
                 </div>
               </div>
             </div>
@@ -307,7 +309,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <MapPin size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Parking Capacity</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.parkingCapacity')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   250 Parking Lots
                 </div>
@@ -319,7 +321,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Utility Rooms</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.utilityRooms')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   8 Tech Rooms
                 </div>
@@ -331,7 +333,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <PieChart size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Security Posts</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.securityPosts')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   3 Main Gates
                 </div>
@@ -347,9 +349,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Compass size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Waypoints & Markers</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.waypointsMarkers')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  6 Landmarks
+                  6 {t('businessPark.campusLandmarks')}
                 </div>
               </div>
             </div>
@@ -359,9 +361,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building2 size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Key Landmark</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.keyLandmark')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                  Main Campus Plaza
+                  {t('businessPark.campusPlaza')}
                 </div>
               </div>
             </div>
@@ -371,9 +373,9 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <MapPin size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>GPS Sync</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.gpsSync')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--color-success)' }}>
-                  100% Active
+                  100% {t('common.active')}
                 </div>
               </div>
             </div>
@@ -383,7 +385,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
                 <Building size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mapped Blocks</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.mappedBlocks')}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                   Block A, B & C
                 </div>

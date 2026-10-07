@@ -24,8 +24,10 @@ import {
 } from 'lucide-react';
 import tenantApi from '../api/tenantApi';
 import identityApi from '../../identity-access/api/identityApi';
+import { useTranslation } from '../../../i18n';
 
 export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeStatus }) {
+  const { t } = useTranslation();
   const [tenant, setTenant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview'); // overview | leases | allocations | representatives
@@ -84,25 +86,25 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
       case 'ACTIVE':
         return (
           <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '5px 12px', fontSize: '0.8rem' }}>
-            <CheckCircle2 size={13} /> Active Tenant
+            <CheckCircle2 size={13} /> {t('tenant.active')}
           </span>
         );
       case 'ONBOARDING':
         return (
           <span className="badge badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '5px 12px', fontSize: '0.8rem' }}>
-            <Clock size={13} /> Onboarding Stage
+            <Clock size={13} /> {t('tenant.onboarding')}
           </span>
         );
       case 'SUSPENDED':
         return (
           <span className="badge badge-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '5px 12px', fontSize: '0.8rem' }}>
-            <AlertCircle size={13} /> Suspended
+            <AlertCircle size={13} /> {t('tenant.suspended')}
           </span>
         );
       case 'TERMINATED':
         return (
           <span style={{ padding: '5px 12px', borderRadius: '9999px', background: 'rgba(148, 163, 184, 0.2)', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}>
-            Offboarded / Terminated
+            {t('tenant.terminated')}
           </span>
         );
       default:
@@ -157,7 +159,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                 <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {loading ? 'Loading Corporate Profile...' : tenant?.CompanyName}
+                  {loading ? t('tenant.loadingTenantDetails') : tenant?.CompanyName}
                 </h2>
                 {tenant && getStatusBadge(tenant.Status)}
               </div>
@@ -194,7 +196,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
                   color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600
                 }}
               >
-                <Edit2 size={14} /> Edit Profile
+                <Edit2 size={14} /> {t('tenant.editProfile')}
               </button>
             )}
             {tenant && onChangeStatus && (
@@ -208,7 +210,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
                   color: 'var(--color-warning)', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600
                 }}
               >
-                <ShieldAlert size={14} /> Status Action
+                <ShieldAlert size={14} /> {t('tenant.changeLifecycle')}
               </button>
             )}
             <button
@@ -235,10 +237,10 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
           overflowX: 'auto'
         }}>
           {[
-            { id: 'overview', label: 'Corporate Overview', icon: Building2 },
-            { id: 'leases', label: `Lease Contracts (${leases.length})`, icon: FileText },
-            { id: 'allocations', label: `Office Spaces (${allocations.length})`, icon: Layers },
-            { id: 'representatives', label: `Representatives & Users (${representatives.length})`, icon: Users }
+            { id: 'overview', label: t('tenant.overview'), icon: Building2 },
+            { id: 'leases', label: `${t('tenant.leases')} (${leases.length})`, icon: FileText },
+            { id: 'allocations', label: `${t('businessPark.officeUnits')} (${allocations.length})`, icon: Layers },
+            { id: 'representatives', label: `${t('tenant.representatives')} (${representatives.length})`, icon: Users }
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -274,7 +276,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
           {loading ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
               <Clock className="spin" size={32} style={{ marginBottom: '16px' }} />
-              <p>Retrieving enterprise tenant records...</p>
+              <p>{t('tenant.loadingTenantDetails')}</p>
             </div>
           ) : !tenant ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>

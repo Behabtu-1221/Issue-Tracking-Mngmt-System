@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, Search, RefreshCw, FileText, Download } from 'lucide-react';
 import rbacApi from '../api/rbacApi';
+import { useTranslation } from '../../../i18n';
 
 const glassCard = {
   background: 'var(--glass-bg)',
@@ -11,6 +12,7 @@ const glassCard = {
 };
 
 export default function RbacAuditLogsTab() {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +54,7 @@ export default function RbacAuditLogsTab() {
           <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
           <input
             type="text"
-            placeholder="Search RBAC audit logs..."
+            placeholder={t('rbac.searchAuditPlaceholder', 'Search RBAC audit logs...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -72,7 +74,7 @@ export default function RbacAuditLogsTab() {
               fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
             }}
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh Trail
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> {t('rbac.refreshTrail', 'Refresh Trail')}
           </button>
         </div>
       </div>
@@ -80,21 +82,21 @@ export default function RbacAuditLogsTab() {
       {/* Audit Log Table */}
       <div style={{ ...glassCard, padding: 0, overflowX: 'auto' }}>
         {loading ? (
-          <div style={{ textAlign: 'center', color: '#64748b', padding: '60px' }}>Loading RBAC Audit Log Trail...</div>
+          <div style={{ textAlign: 'center', color: '#64748b', padding: '60px' }}>{t('rbac.loadingAudit', 'Loading RBAC Audit Log Trail...')}</div>
         ) : filteredLogs.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#64748b', padding: '60px' }}>
             <FileText size={36} style={{ opacity: 0.3, marginBottom: '12px' }} />
-            <p>No authorization mutation events recorded yet.</p>
+            <p>{t('rbac.noAuditRecorded', 'No authorization mutation events recorded yet.')}</p>
           </div>
         ) : (
           <table className="custom-table" style={{ width: '100%', minWidth: '800px' }}>
             <thead>
               <tr>
-                <th>Timestamp</th>
-                <th>Event Action</th>
-                <th>Actor (Admin)</th>
-                <th>Target Entity</th>
-                <th>Audit Details</th>
+                <th>{t('rbac.timestamp', 'Timestamp')}</th>
+                <th>{t('rbac.eventAction', 'Event Action')}</th>
+                <th>{t('rbac.actorAdmin', 'Actor (Admin)')}</th>
+                <th>{t('rbac.targetEntity', 'Target Entity')}</th>
+                <th>{t('rbac.auditDetails', 'Audit Details')}</th>
               </tr>
             </thead>
             <tbody>

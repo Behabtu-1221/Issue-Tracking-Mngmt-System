@@ -96,9 +96,9 @@ export default function LoginPage() {
       if (msg.toLowerCase().includes('locked')) {
         setError(msg);
       } else if (msg.includes('suspended') || msg.includes('inactive')) {
-        setError('Account suspended. Please contact your system administrator.');
+        setError(t('auth.accountSuspended', 'Account suspended. Please contact your system administrator.'));
       } else if (msg.includes('Invalid')) {
-        setError('Invalid username or password credentials. Please verify and try again.');
+        setError(t('auth.invalidCredentials', 'Invalid username or password credentials. Please verify and try again.'));
       } else {
         setError(msg);
       }
@@ -111,7 +111,7 @@ export default function LoginPage() {
     return (
       <div style={{ minHeight: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: '#0f172a' }}>
         <Loader2 size={42} style={{ animation: 'spin 1s linear infinite', color: '#0284c7' }} />
-        <span style={{ marginTop: '16px', color: '#cbd5e1', fontSize: '0.9rem', fontWeight: 600 }}>Loading Security Shell...</span>
+        <span style={{ marginTop: '16px', color: '#cbd5e1', fontSize: '0.9rem', fontWeight: 600 }}>{t('auth.loadingSecurityShell', 'Loading Security Shell...')}</span>
       </div>
     );
   }
@@ -217,14 +217,14 @@ export default function LoginPage() {
             {t('auth.loginTitle', 'Account Authentication')}
           </span>
           <div style={{ padding: '4px 11px', borderRadius: '20px', background: 'rgba(2, 132, 199, 0.08)', border: '1px solid rgba(2, 132, 199, 0.25)', color: '#0284c7', fontSize: '0.72rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <ShieldCheck size={13} color="#0284c7" /> SECURE GATEWAY
+            <ShieldCheck size={13} color="#0284c7" /> {t('auth.secureGateway', 'SECURE GATEWAY')}
           </div>
         </div>
 
         {/* Session Expired Alert */}
         {sessionExpired && (
           <div style={{ background: 'rgba(217, 119, 6, 0.08)', border: '1px solid rgba(217, 119, 6, 0.25)', borderRadius: '12px', padding: '12px 14px', marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.84rem', color: '#b45309', fontWeight: 600 }}>
-            <AlertCircle size={17} style={{ flexShrink: 0 }} /> Your session has expired. Please sign in again to continue.
+            <AlertCircle size={17} style={{ flexShrink: 0 }} /> {t('auth.sessionExpiredMsg', 'Your session has expired. Please sign in again to continue.')}
           </div>
         )}
 
@@ -323,7 +323,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <div style={{ marginTop: '20px', textAlign: 'center', color: '#ffffff', fontSize: '0.8rem', fontWeight: '600', textShadow: '0 2px 6px rgba(0,0,0,0.6)', zIndex: 10 }}>
-        Enterprise Issue Tracking System • Copyright © {new Date().getFullYear()} All Rights Reserved
+        {t('app.copyright', 'Enterprise Issue Tracking System • Copyright © {year} All Rights Reserved', { year: new Date().getFullYear() })}
       </div>
 
       <style>{`

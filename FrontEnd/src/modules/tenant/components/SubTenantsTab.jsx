@@ -13,8 +13,10 @@ import tenantApi from '../api/tenantApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { tenantSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function SubTenantsTab() {
+  const { t } = useTranslation();
   const [subTenants, setSubTenants] = useState([]);
   const [parentTenants, setParentTenants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -202,7 +204,7 @@ export default function SubTenantsTab() {
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search sub-tenants..."
+              placeholder={t('tenant.searchSubTenants')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -228,7 +230,7 @@ export default function SubTenantsTab() {
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Parent Tenants</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.allParentTenants')}</option>
             {parentTenants.map((pt) => (
               <option key={pt.TenantID} value={pt.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                 {pt.CompanyName}
@@ -253,26 +255,26 @@ export default function SubTenantsTab() {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> Add Sub-Tenant
+          <Plus size={16} /> {t('tenant.addSubTenant')}
         </button>
       </div>
 
       {/* Sub-Tenants Table */}
       <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading sub-tenant directory...</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.loadingSubTenants')}</div>
         ) : subTenants.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No sub-tenants found matching criteria.</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.noSubTenantsFound')}</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
             <thead>
               <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                <th style={{ padding: '16px 20px' }}>Sub-Tenant Company</th>
-                <th style={{ padding: '16px 20px' }}>Parent Tenant</th>
-                <th style={{ padding: '16px 20px' }}>Relationship Type</th>
-                <th style={{ padding: '16px 20px' }}>Registration #</th>
-                <th style={{ padding: '16px 20px' }}>Status</th>
-                <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.subTenantCompany')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.parentTenant')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.relationshipType')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.registrationNo')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.status')}</th>
+                <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -301,11 +303,11 @@ export default function SubTenantsTab() {
                   <td style={{ padding: '16px 20px' }}>
                     {st.Status === 'ACTIVE' ? (
                       <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <CheckCircle2 size={12} /> Active
+                        <CheckCircle2 size={12} /> {t('tenant.active')}
                       </span>
                     ) : (
                       <span className="badge badge-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <XCircle size={12} /> Inactive
+                        <XCircle size={12} /> {t('common.inactive')}
                       </span>
                     )}
                   </td>

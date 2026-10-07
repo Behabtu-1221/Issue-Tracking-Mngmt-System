@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePermissionContext } from '../contexts/PermissionContext';
 import AccessDeniedPage from '../components/AccessDeniedPage';
+import { useTranslation } from '../../../i18n';
 
 /**
  * Route / Tab Authorization Guard Component
@@ -8,11 +9,12 @@ import AccessDeniedPage from '../components/AccessDeniedPage';
  */
 export function ProtectedRoute({ permission, any, all, requireParkAdmin, scope, onBack, children }) {
   const { hasPermission, hasAnyPermission, hasAllPermissions, isParkAdmin, loading } = usePermissionContext();
+  const { t } = useTranslation();
 
   if (loading) {
     return (
       <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
-        Evaluating security permissions...
+        {t('common.evaluatingPermissions', 'Evaluating security permissions...')}
       </div>
     );
   }

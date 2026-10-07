@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Globe, Plus, Trash2, RefreshCw, AlertCircle, Languages } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 
 export default function LocalizationTab() {
+  const { t } = useTranslation();
   const [localizations, setLocalizations] = useState([]);
   const [selectedLocale, setSelectedLocale] = useState(null);
   const [resources, setResources] = useState([]);
@@ -98,7 +100,7 @@ export default function LocalizationTab() {
       {/* Left Column: Localizations */}
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>Locales</h4>
+          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>{t('config.localesTitle')}</h4>
           <button
             onClick={() => {
               setLocaleForm({ languageCode: 'en', countryCode: 'US', localeName: 'English (United States)' });
@@ -119,7 +121,7 @@ export default function LocalizationTab() {
               gap: '4px'
             }}
           >
-            <Plus size={14} /> Add Locale
+            <Plus size={14} /> {t('config.newLocaleBtn')}
           </button>
         </div>
 
@@ -161,7 +163,7 @@ export default function LocalizationTab() {
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>
                   {selectedLocale.LocaleName} <span style={{ fontSize: '0.85rem', fontFamily: 'monospace', color: 'var(--accent-secondary)' }}>({selectedLocale.LanguageCode}-{selectedLocale.CountryCode})</span>
                 </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Language resource translations.</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('config.languageResourcesDesc')}</p>
               </div>
 
               <button
@@ -185,7 +187,7 @@ export default function LocalizationTab() {
                   boxShadow: 'var(--glow-accent)'
                 }}
               >
-                <Plus size={16} /> Add Translation Key
+                <Plus size={16} /> {t('config.addKeyBtn')}
               </button>
             </div>
 
@@ -193,19 +195,19 @@ export default function LocalizationTab() {
               {loadingResources ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-                  <p>Loading translations...</p>
+                  <p>{t('config.loadingTranslations')}</p>
                 </div>
               ) : resources.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   <Globe size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-                  <p>No translation resources configured for this locale.</p>
+                  <p>{t('config.noTranslations')}</p>
                 </div>
               ) : (
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Resource Key</th>
-                      <th>Resource Value</th>
+                      <th>{t('config.thResourceKey')}</th>
+                      <th>{t('config.thResourceValue')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -225,7 +227,7 @@ export default function LocalizationTab() {
         ) : (
           <div className="glass-panel" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
             <Languages size={40} style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <p>Select a locale on the left panel to manage language translations.</p>
+            <p>{t('config.selectLocalePrompt')}</p>
           </div>
         )}
       </div>
@@ -234,12 +236,12 @@ export default function LocalizationTab() {
       {isLocaleModalOpen && (
         <div className="modal-overlay" onClick={() => setIsLocaleModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '450px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Add New Locale</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.newLocaleBtn')}</h3>
             {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
             <form onSubmit={handleCreateLocale}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Language Code</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thLangCode')}</label>
                   <input
                     type="text"
                     required
@@ -250,7 +252,7 @@ export default function LocalizationTab() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Country Code</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.countryCodeLabel')}</label>
                   <input
                     type="text"
                     required
@@ -262,7 +264,7 @@ export default function LocalizationTab() {
                 </div>
               </div>
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Locale Display Name</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thLocaleName')}</label>
                 <input
                   type="text"
                   required
@@ -273,8 +275,8 @@ export default function LocalizationTab() {
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsLocaleModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Locale'}</button>
+                <button type="button" onClick={() => setIsLocaleModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
+                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('common.save')}</button>
               </div>
             </form>
           </div>
@@ -285,11 +287,11 @@ export default function LocalizationTab() {
       {isResourceModalOpen && (
         <div className="modal-overlay" onClick={() => setIsResourceModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '480px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Add Translation ({selectedLocale?.LanguageCode}-{selectedLocale?.CountryCode})</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.addKeyBtn')} ({selectedLocale?.LanguageCode}-{selectedLocale?.CountryCode})</h3>
             {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
             <form onSubmit={handleSaveResource}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Resource Key</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thResourceKey')}</label>
                 <input
                   type="text"
                   required
@@ -300,7 +302,7 @@ export default function LocalizationTab() {
                 />
               </div>
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Resource Value</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thResourceValue')}</label>
                 <textarea
                   rows={3}
                   required
@@ -311,8 +313,8 @@ export default function LocalizationTab() {
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsResourceModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Translation'}</button>
+                <button type="button" onClick={() => setIsResourceModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
+                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('common.save')}</button>
               </div>
             </form>
           </div>

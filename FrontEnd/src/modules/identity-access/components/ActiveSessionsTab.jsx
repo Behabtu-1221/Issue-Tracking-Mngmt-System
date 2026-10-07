@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../i18n';
 import { Monitor, RefreshCw, LogOut, ShieldAlert, CheckCircle2, Cpu } from 'lucide-react';
 import identityApi from '../api/identityApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 
 export default function ActiveSessionsTab() {
+  const { t } = useTranslation();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,17 +40,17 @@ export default function ActiveSessionsTab() {
   const handleRevokeSession = (sessionId) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Revoke Active Session',
-      message: 'Are you sure you want to terminate this active login session across your devices?',
+      title: t('identity.revokeSessionTitle'),
+      message: t('identity.revokeSessionConfirm'),
       type: 'warning',
-      confirmText: 'Revoke Session',
+      confirmText: t('identity.revokeSessionBtn'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
           await identityApi.revokeMySession(sessionId);
           fetchSessions();
         } catch (err) {
-          showAlert('Session Revocation Failed', 'Failed to revoke active session.', 'error');
+          showAlert(t('identity.revokeSessionFailed'), t('identity.revokeSessionFailedMsg'), 'error');
         }
       }
     });
@@ -57,12 +59,11 @@ export default function ActiveSessionsTab() {
   return (
     <div>
       {/* Header */}
-    <div style={{ marginBottom: '24px' }}>
-{/* Header */}
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Active Authentication Sessions</h3>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>{t('identity.activeSessionsHeader')}</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            Monitor active login sessions across devices and terminate unauthorized connections.
+            {t('identity.activeSessionsSubtitle')}
           </p>
         </div>
 
@@ -81,7 +82,7 @@ export default function ActiveSessionsTab() {
             fontSize: '0.88rem'
           }}
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh Sessions
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('identity.refreshSessions')}
         </button>
       </div>
 
@@ -90,23 +91,23 @@ export default function ActiveSessionsTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={28} style={{ marginBottom: '12px' }} />
-            <p>Scanning active session state...</p>
+            <p>{t('identity.scanningSessions')}</p>
           </div>
         ) : sessions.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <Monitor size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
-            <p>No active sessions detected.</p>
+            <p>{t('identity.noActiveSessions')}</p>
           </div>
         ) : (
           <div style={{ overflowX: 'auto', width: '100%' }}>
             <table className="custom-table" style={{ width: '100%', minWidth: '850px' }}>
             <thead>
               <tr>
-                <th>Device / Browser</th>
-                <th>IP Address</th>
-                <th>Login Timestamp</th>
-                <th>Session Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('identity.thDeviceBrowser')}</th>
+                <th>{t('identity.thIpAddress')}</th>
+                <th>{t('identity.thLoginTimestamp')}</th>
+                <th>{t('identity.thSessionStatus')}</th>
+                <th style={{ textAlign: 'right' }}>{t('identity.thActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -131,7 +132,7 @@ export default function ActiveSessionsTab() {
                   </td>
                   <td>
                     <span className="badge badge-success" style={{ fontSize: '0.75rem' }}>
-                      <CheckCircle2 size={12} style={{ marginRight: '4px' }} /> ACTIVE
+                      <CheckCircle2 size={12} style={{ marginRight: '4px' }} /> {t('identity.statusActive')}
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
@@ -151,7 +152,7 @@ export default function ActiveSessionsTab() {
                         fontWeight: '600'
                       }}
                     >
-                      <LogOut size={14} /> Revoke
+                      <LogOut size={14} /> {t('identity.btnRevoke')}
                     </button>
                   </td>
                 </tr>

@@ -89,10 +89,10 @@ export const IssueListTab = ({
   const handleCancelIssue = async (issue) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Cancel Issue Request',
-      message: `Are you sure you want to cancel issue request '${issue.RequestNumber}'?`,
+      title: t('issues.cancelRequest', 'Cancel Issue Request'),
+      message: t('issues.confirmCancelMsg', { num: issue.RequestNumber }) || `Are you sure you want to cancel issue request '${issue.RequestNumber}'?`,
       type: 'warning',
-      confirmText: 'Confirm Cancellation',
+      confirmText: t('issues.confirmCancel', 'Confirm Cancellation'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -100,7 +100,7 @@ export const IssueListTab = ({
           fetchIssues();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to cancel issue request';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('issues.actionRestricted', 'Action Restricted'), msg, 'error');
         }
       }
     });
@@ -109,10 +109,10 @@ export const IssueListTab = ({
   const handleReopenIssue = async (issue) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Reopen Issue Request',
-      message: `Are you sure you want to reopen issue request '${issue.RequestNumber}'?`,
+      title: t('issues.reopenRequest', 'Reopen Issue Request'),
+      message: t('issues.confirmReopenMsg', { num: issue.RequestNumber }) || `Are you sure you want to reopen issue request '${issue.RequestNumber}'?`,
       type: 'info',
-      confirmText: 'Reopen Request',
+      confirmText: t('issues.confirmReopen', 'Reopen Request'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -120,7 +120,7 @@ export const IssueListTab = ({
           fetchIssues();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to reopen issue request';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('issues.actionRestricted', 'Action Restricted'), msg, 'error');
         }
       }
     });
@@ -128,15 +128,15 @@ export const IssueListTab = ({
 
   const getStatusBadge = (status) => {
     const styles = {
-      NEW: { bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' },
-      ASSIGNED: { bg: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: 'rgba(168, 85, 247, 0.3)' },
-      IN_PROGRESS: { bg: 'rgba(234, 179, 8, 0.15)', color: '#facc15', border: 'rgba(234, 179, 8, 0.3)' },
-      PENDING: { bg: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: 'rgba(249, 115, 22, 0.3)' },
-      RESOLVED: { bg: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: 'rgba(34, 197, 94, 0.3)' },
-      CLOSED: { bg: 'rgba(100, 116, 139, 0.15)', color: '#94a3b8', border: 'rgba(100, 116, 139, 0.3)' },
-      CANCELLED: { bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' }
+      NEW: { bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)', label: t('issues.statusNew', 'New') },
+      ASSIGNED: { bg: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: 'rgba(168, 85, 247, 0.3)', label: t('issues.statusAssigned', 'Assigned') },
+      IN_PROGRESS: { bg: 'rgba(234, 179, 8, 0.15)', color: '#facc15', border: 'rgba(234, 179, 8, 0.3)', label: t('issues.statusInProgress', 'In Progress') },
+      PENDING: { bg: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: 'rgba(249, 115, 22, 0.3)', label: t('issues.statusPending', 'Pending') },
+      RESOLVED: { bg: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: 'rgba(34, 197, 94, 0.3)', label: t('issues.statusResolved', 'Resolved') },
+      CLOSED: { bg: 'rgba(100, 116, 139, 0.15)', color: '#94a3b8', border: 'rgba(100, 116, 139, 0.3)', label: t('issues.statusClosed', 'Closed') },
+      CANCELLED: { bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)', label: t('issues.statusCancelled', 'Cancelled') }
     };
-    const style = styles[status] || styles.NEW;
+    const style = styles[status] || { bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)', label: status?.replace('_', ' ') };
     return (
       <span style={{
         padding: '4px 10px',
@@ -148,19 +148,19 @@ export const IssueListTab = ({
         color: style.color,
         border: `1px solid ${style.border}`
       }}>
-        {status?.replace('_', ' ')}
+        {style.label}
       </span>
     );
   };
 
   const getPriorityBadge = (priority) => {
     const styles = {
-      CRITICAL: { bg: '#ef4444', color: '#fff' },
-      HIGH: { bg: '#f97316', color: '#fff' },
-      MEDIUM: { bg: '#3b82f6', color: '#fff' },
-      LOW: { bg: '#64748b', color: '#fff' }
+      CRITICAL: { bg: '#ef4444', color: '#fff', label: t('issues.priorityCritical', 'Critical') },
+      HIGH: { bg: '#f97316', color: '#fff', label: t('issues.priorityHigh', 'High') },
+      MEDIUM: { bg: '#3b82f6', color: '#fff', label: t('issues.priorityMedium', 'Medium') },
+      LOW: { bg: '#64748b', color: '#fff', label: t('issues.priorityLow', 'Low') }
     };
-    const style = styles[priority] || styles.MEDIUM;
+    const style = styles[priority] || { bg: '#3b82f6', color: '#fff', label: priority };
     return (
       <span style={{
         padding: '2px 8px',
@@ -170,7 +170,7 @@ export const IssueListTab = ({
         backgroundColor: style.bg,
         color: style.color
       }}>
-        {priority}
+        {style.label}
       </span>
     );
   };
@@ -215,11 +215,11 @@ export const IssueListTab = ({
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.slaStatus', 'Statuses')}</option>
-            <option value="NEW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusOpen', 'New')}</option>
-            <option value="ASSIGNED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.assignee', 'Assigned')}</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.status', 'Statuses')}</option>
+            <option value="NEW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusNew', 'New')}</option>
+            <option value="ASSIGNED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusAssigned', 'Assigned')}</option>
             <option value="IN_PROGRESS" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusInProgress', 'In Progress')}</option>
-            <option value="PENDING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusPaused', 'Pending')}</option>
+            <option value="PENDING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusPending', 'Pending')}</option>
             <option value="RESOLVED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusResolved', 'Resolved')}</option>
             <option value="CLOSED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusClosed', 'Closed')}</option>
             <option value="CANCELLED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.statusCancelled', 'Cancelled')}</option>
@@ -238,7 +238,7 @@ export const IssueListTab = ({
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.priorityHigh', 'Priorities')}</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.priority', 'Priorities')}</option>
             <option value="CRITICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityCritical', 'Critical')}</option>
             <option value="HIGH" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityHigh', 'High')}</option>
             <option value="MEDIUM" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityMedium', 'Medium')}</option>
@@ -259,10 +259,10 @@ export const IssueListTab = ({
             }}
           >
             <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All')} {t('issues.requestType', 'Types')}</option>
-            <option value="INCIDENT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Incident</option>
-            <option value="MAINTENANCE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Maintenance</option>
-            <option value="COMPLAINT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Complaint</option>
-            <option value="DISRUPTION" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Disruption</option>
+            <option value="INCIDENT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.incident', 'Incident')}</option>
+            <option value="MAINTENANCE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.maintenance', 'Maintenance')}</option>
+            <option value="COMPLAINT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.complaint', 'Complaint')}</option>
+            <option value="DISRUPTION" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.disruption', 'Disruption')}</option>
           </select>
 
           <PermissionGuard anyPermission={['Issue.Create', 'Request.Create', 'issue:create']}>
@@ -318,7 +318,7 @@ export const IssueListTab = ({
             border: '1px solid var(--glass-border)'
           }}>
             <MoveHorizontal size={13} color="var(--accent-primary)" />
-            <span>Horizontal Scroll Enabled</span>
+            <span>{t('issues.scrollEnabled', 'Horizontal Scroll Enabled')}</span>
           </div>
         </div>
 
@@ -327,12 +327,12 @@ export const IssueListTab = ({
           <table className="custom-table" style={{ width: '100%', minWidth: '1250px', borderCollapse: 'collapse', textAlign: isRTL ? 'right' : 'left', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)' }}>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.ticketNumber', 'Request #')} & {t('issues.requestTitle', 'Title')}</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.category', 'Service & Category')}</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '170px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.requester', 'Requester')} & {t('profile.tenant', 'Tenant')}</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '120px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.priorityHigh', 'Priority')}</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.slaStatus', 'Status')}</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: isRTL ? 'right' : 'left' }}>{t('profile.department', 'Assigned Dept')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.requestNumberAndTitle', 'Request # & Title')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.serviceAndCategory', 'Service & Category')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '170px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.requesterAndTenant', 'Requester & Tenant')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '120px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.priority', 'Priority')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.status', 'Status')}</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: isRTL ? 'right' : 'left' }}>{t('issues.assignedDept', 'Assigned Dept')}</th>
                 <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px', textAlign: isRTL ? 'right' : 'left' }}>{t('common.date', 'Created Date')}</th>
                 <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px', textAlign: isRTL ? 'left' : 'right' }}>{t('common.actions', 'Actions')}</th>
               </tr>
@@ -392,7 +392,7 @@ export const IssueListTab = ({
 
                     <td style={{ padding: '14px 18px' }} onClick={() => onSelectIssue?.(issue)}>
                       <span style={{ color: issue.AssignedDepartmentName ? 'var(--text-primary)' : 'var(--text-secondary)', fontStyle: issue.AssignedDepartmentName ? 'normal' : 'italic' }}>
-                        {issue.AssignedDepartmentName || 'Unassigned'}
+                        {issue.AssignedDepartmentName || t('issues.unassigned', 'Unassigned')}
                       </span>
                     </td>
 
@@ -403,10 +403,10 @@ export const IssueListTab = ({
                       </div>
                     </td>
 
-                    <td style={{ padding: '14px 18px', textAlign: 'right' }}>
+                    <td style={{ padding: '14px 18px', textAlign: isRTL ? 'left' : 'right' }}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         <button
-                          title="View Details & Timeline"
+                          title={t('issues.viewDetailsAndChat', 'View Details & Timeline')}
                           onClick={(e) => { e.stopPropagation(); onSelectIssue?.(issue); }}
                           style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', cursor: 'pointer' }}
                         >
@@ -417,7 +417,7 @@ export const IssueListTab = ({
                           <>
                             <PermissionGuard anyPermission={['Issue.Assign', 'Request.Assign', 'issue:update']}>
                               <button
-                                title="Assign Department"
+                                title={t('issues.assignIssue', 'Assign Department')}
                                 onClick={(e) => { e.stopPropagation(); onOpenAssignModal?.(issue); }}
                                 style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(168, 85, 247, 0.1)', color: '#c084fc', cursor: 'pointer' }}
                               >
@@ -427,7 +427,7 @@ export const IssueListTab = ({
 
                             <PermissionGuard anyPermission={['Issue.Resolve', 'Issue.Update', 'Request.Resolve', 'issue:update']}>
                               <button
-                                title="Update Status"
+                                title={t('issues.updateStatus', 'Update Status')}
                                 onClick={(e) => { e.stopPropagation(); onOpenStatusModal?.(issue); }}
                                 style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#60a5fa', cursor: 'pointer' }}
                               >
@@ -437,7 +437,7 @@ export const IssueListTab = ({
 
                             <PermissionGuard anyPermission={['Issue.Cancel', 'Issue.Delete', 'Request.Close', 'issue:delete']}>
                               <button
-                                title="Cancel Request"
+                                title={t('issues.cancelTicket', 'Cancel Request')}
                                 onClick={(e) => { e.stopPropagation(); handleCancelIssue(issue); }}
                                 style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#f87171', cursor: 'pointer' }}
                               >

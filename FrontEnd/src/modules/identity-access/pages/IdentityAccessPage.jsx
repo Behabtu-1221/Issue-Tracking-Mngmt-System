@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../../i18n';
 import { Users, ShieldCheck, Monitor, FileText, UserCheck, ArrowRight } from 'lucide-react';
 import { IDENTITY_TABS } from '../constants/identityConstants';
 import UsersTab from '../components/UsersTab';
@@ -21,6 +22,7 @@ const TAB_COMPONENTS = {
 
 export default function IdentityAccessPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('users');
   const [metrics, setMetrics] = useState({
     totalUsers: 0,
@@ -74,16 +76,34 @@ export default function IdentityAccessPage() {
 
   const ActiveComponent = TAB_COMPONENTS[activeTab];
 
+  const getTabLabel = (id) => {
+    switch (id) {
+      case 'users': return t('identity.tabUserDirectory');
+      case 'sessions': return t('identity.tabActiveSessions');
+      case 'audit': return t('identity.tabAuditTrail');
+      default: return id;
+    }
+  };
+
+  const getTabDescription = (id) => {
+    switch (id) {
+      case 'users': return t('identity.tabUserDirectoryDesc');
+      case 'sessions': return t('identity.tabActiveSessionsDesc');
+      case 'audit': return t('identity.tabAuditTrailDesc');
+      default: return '';
+    }
+  };
+
   return (
     <div>
       {/* Page Title Header */}
       <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.2rem', marginBottom: '8px' }}>
-            User & Identity <span className="glow-text">Management</span>
+            {t('identity.managementTitle')} <span className="glow-text">{t('identity.managementHighlight')}</span>
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-            Enterprise user accounts directory, active session monitoring, and identity security audit log.
+            {t('identity.managementSubtitle')}
           </p>
         </div>
 
@@ -101,7 +121,7 @@ export default function IdentityAccessPage() {
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(138, 75, 255, 0.25)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(138, 75, 255, 0.15)'; }}
         >
-          <ShieldCheck size={18} /> Role & RBAC Governance Matrix <ArrowRight size={16} />
+          <ShieldCheck size={18} /> {t('identity.roleGovernanceShortcut')} <ArrowRight size={16} />
         </button>
       </div>
 
@@ -112,7 +132,7 @@ export default function IdentityAccessPage() {
             <Users size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Registered</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('identity.totalRegistered')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>{metrics.totalUsers}</div>
           </div>
         </div>
@@ -122,7 +142,7 @@ export default function IdentityAccessPage() {
             <UserCheck size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Accounts</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('identity.activeAccounts')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>{metrics.activeUsers}</div>
           </div>
         </div>
@@ -132,7 +152,7 @@ export default function IdentityAccessPage() {
             <ShieldCheck size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Configured Roles</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('identity.configuredRoles')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>{metrics.rolesCount}</div>
           </div>
         </div>
@@ -142,7 +162,7 @@ export default function IdentityAccessPage() {
             <Monitor size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Sessions</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('identity.liveSessions')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>{metrics.activeSessions}</div>
           </div>
         </div>
@@ -167,7 +187,7 @@ export default function IdentityAccessPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              title={tab.description}
+              title={getTabDescription(tab.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -186,7 +206,7 @@ export default function IdentityAccessPage() {
               }}
             >
               {Icon && <Icon size={16} />}
-              {tab.label}
+              {getTabLabel(tab.id)}
             </button>
           );
         })}

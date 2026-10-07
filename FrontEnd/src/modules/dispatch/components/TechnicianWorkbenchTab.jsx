@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../i18n';
 import dispatchApi from '../api/dispatchApi';
 import {
   Play,
@@ -21,6 +22,7 @@ import { FormField } from '../../../components/common/FormField';
 import { dispatchSchemas } from '../../../validation';
 
 export default function TechnicianWorkbenchTab() {
+  const { t } = useTranslation();
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -103,14 +105,14 @@ export default function TechnicianWorkbenchTab() {
     try {
       if (actionType === 'accept') {
         await dispatchApi.acceptAssignment(id);
-        showAlert('Job Accepted', 'You have accepted this service assignment. Proceed when ready.', 'success');
+        showAlert(t('dispatch.jobAccepted'), t('dispatch.jobAcceptedMsg'), 'success');
       } else if (actionType === 'start') {
         await dispatchApi.startWork(id);
-        showAlert('Work Started', 'Field work execution is now in progress. Clock is ticking against SLA.', 'success');
+        showAlert(t('dispatch.workStarted'), t('dispatch.workStartedMsg'), 'success');
       }
       fetchMyWorkbench();
     } catch (err) {
-      showAlert('Workbench Action Failed', err.response?.data?.message || `Failed to ${actionType} assignment`, 'error');
+      showAlert(t('dispatch.workbenchActionFailed'), err.response?.data?.message || `Failed to ${actionType} assignment`, 'error');
     }
   };
 
@@ -148,19 +150,19 @@ export default function TechnicianWorkbenchTab() {
 
       if (actionType === 'reject') {
         await dispatchApi.rejectAssignment(assignment.AssignmentID, validation.sanitized);
-        showAlert('Assignment Declined', `Service assignment #${assignment.RequestNumber} has been declined.`, 'info');
+        showAlert(t('dispatch.assignmentDeclined'), `${t('dispatch.assignmentDeclinedMsg')} #${assignment.RequestNumber}`, 'info');
       } else if (actionType === 'pause') {
         await dispatchApi.pauseWork(assignment.AssignmentID, validation.sanitized);
-        showAlert('Work Paused', `Field work on #${assignment.RequestNumber} is now paused.`, 'warning');
+        showAlert(t('dispatch.workPaused'), `${t('dispatch.workPausedMsg')} #${assignment.RequestNumber}`, 'warning');
       } else if (actionType === 'complete') {
         await dispatchApi.completeWork(assignment.AssignmentID, validation.sanitized);
-        showAlert('Job Completed', `Assignment #${assignment.RequestNumber} has been successfully completed and resolved!`, 'success');
+        showAlert(t('dispatch.jobCompleted'), `${t('dispatch.jobCompletedMsg')} #${assignment.RequestNumber}`, 'success');
       }
 
       closeActionModal();
       fetchMyWorkbench();
     } catch (err) {
-      showAlert('Operation Failed', err.response?.data?.message || `Failed to submit ${actionType} action.`, 'error');
+      showAlert(t('dispatch.operationFailed'), err.response?.data?.message || `Failed to submit ${actionType} action.`, 'error');
     } finally {
       setSubmittingAction(false);
     }
@@ -169,17 +171,17 @@ export default function TechnicianWorkbenchTab() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'IN_PROGRESS':
-        return <span className="badge badge-primary"><Zap size={13} /> In Progress</span>;
+        return <span className="badge badge-primary"><Zap size={13} /> {t('dispatch.statusInProgress')}</span>;
       case 'PAUSED':
-        return <span className="badge badge-warning"><Pause size={13} /> Paused</span>;
+        return <span className="badge badge-warning"><Pause size={13} /> {t('dispatch.statusPaused')}</span>;
       case 'ACCEPTED':
-        return <span className="badge badge-info"><CheckCircle2 size={13} /> Accepted</span>;
+        return <span className="badge badge-info"><CheckCircle2 size={13} /> {t('dispatch.statusAccepted')}</span>;
       case 'COMPLETED':
-        return <span className="badge badge-success"><CheckCircle2 size={13} /> Completed</span>;
+        return <span className="badge badge-success"><CheckCircle2 size={13} /> {t('dispatch.statusCompleted')}</span>;
       case 'REJECTED':
-        return <span className="badge badge-danger"><XCircle size={13} /> Declined</span>;
+        return <span className="badge badge-danger"><XCircle size={13} /> {t('dispatch.statusDeclined')}</span>;
       default:
-        return <span className="badge badge-info"><Clock size={13} /> Assigned to You</span>;
+        return <span className="badge badge-info"><Clock size={13} /> {t('dispatch.statusAssignedToYou')}</span>;
     }
   };
 
@@ -194,20 +196,20 @@ export default function TechnicianWorkbenchTab() {
     }}>
       <div style={{ marginBottom: '24px' }}>
         <h3 style={{ fontSize: '1.2rem', fontWeight: '900', margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Wrench color="var(--accent-primary)" size={22} /> Field Technician Workbench
+          <Wrench color="var(--accent-primary)" size={22} /> {t('dispatch.workbenchTitle')}
         </h3>
         <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-          Manage your assigned field service jobs, record work status transitions, and log verified resolution notes
+          {t('dispatch.workbenchDesc')}
         </div>
       </div>
 
       {loading ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading field assignments...</div>
+        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('dispatch.loadingFieldAssignments')}</div>
       ) : assignments.length === 0 ? (
         <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
           <Wrench size={42} style={{ opacity: 0.4, marginBottom: '12px', color: 'var(--accent-primary)' }} />
-          <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>No Field Assignments</div>
-          <div style={{ fontSize: '0.82rem' }}>You currently have no pending or active service requests assigned.</div>
+          <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>{t('dispatch.noFieldAssignments')}</div>
+          <div style={{ fontSize: '0.82rem' }}>{t('dispatch.noFieldAssignmentsDesc')}</div>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
@@ -244,7 +246,7 @@ export default function TechnicianWorkbenchTab() {
                 </div>
 
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                  Service: <strong>{a.ServiceName}</strong> • Priority: <strong style={{ color: a.PriorityCode === 'CRITICAL' ? '#ef4444' : '#f59e0b' }}>{a.PriorityCode}</strong>
+                  {t('dispatch.serviceLabel')}: <strong>{a.ServiceName}</strong> • {t('common.priority')}: <strong style={{ color: a.PriorityCode === 'CRITICAL' ? '#ef4444' : '#f59e0b' }}>{a.PriorityCode}</strong>
                 </div>
 
                 {/* State Transition Actions */}
@@ -257,14 +259,14 @@ export default function TechnicianWorkbenchTab() {
                           className="btn btn-primary"
                           style={{ padding: '10px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                         >
-                          <CheckCircle2 size={16} /> Accept Job
+                          <CheckCircle2 size={16} /> {t('dispatch.acceptJob')}
                         </button>
                         <button
                           onClick={() => openActionModal(a, 'reject')}
                           className="btn btn-danger"
                           style={{ padding: '10px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                         >
-                          <XCircle size={16} /> Decline
+                          <XCircle size={16} /> {t('dispatch.declineJob')}
                         </button>
                       </div>
                     )}
@@ -275,7 +277,7 @@ export default function TechnicianWorkbenchTab() {
                         className="btn btn-primary"
                         style={{ width: '100%', padding: '12px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                       >
-                        <Play size={18} /> Start Work Execution
+                        <Play size={18} /> {t('dispatch.startWorkExecution')}
                       </button>
                     )}
 
@@ -290,7 +292,7 @@ export default function TechnicianWorkbenchTab() {
                             transition: 'all 0.2s'
                           }}
                         >
-                          <Pause size={16} /> Pause Work
+                          <Pause size={16} /> {t('dispatch.pauseWork')}
                         </button>
                         <button
                           onClick={() => openActionModal(a, 'complete')}
@@ -301,7 +303,7 @@ export default function TechnicianWorkbenchTab() {
                             border: 'none', color: '#ffffff', borderRadius: '10px', cursor: 'pointer'
                           }}
                         >
-                          <CheckCircle2 size={16} /> Complete Job
+                          <CheckCircle2 size={16} /> {t('dispatch.completeJob')}
                         </button>
                       </div>
                     )}
@@ -310,7 +312,7 @@ export default function TechnicianWorkbenchTab() {
 
                 {isCompleted && (
                   <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '12px 16px', borderRadius: '12px', fontSize: '0.82rem', color: '#10b981', fontWeight: '700' }}>
-                    Job Completed & Issue Resolved
+                    {t('dispatch.jobCompletedResolved')}
                   </div>
                 )}
               </div>
@@ -342,13 +344,13 @@ export default function TechnicianWorkbenchTab() {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                   <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    WORKBENCH EXECUTION • {activeModal.assignment.RequestNumber}
+                    {t('dispatch.workbenchExecution')} • {activeModal.assignment.RequestNumber}
                   </span>
                 </div>
                 <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
-                  {activeModal.actionType === 'reject' && 'Decline Service Assignment'}
-                  {activeModal.actionType === 'pause' && 'Pause Field Work Execution'}
-                  {activeModal.actionType === 'complete' && 'Complete Work & Log Resolution'}
+                  {activeModal.actionType === 'reject' && t('dispatch.declineServiceAssignment')}
+                  {activeModal.actionType === 'pause' && t('dispatch.pauseFieldWork')}
+                  {activeModal.actionType === 'complete' && t('dispatch.completeWorkLogResolution')}
                 </h3>
               </div>
               <button
@@ -367,18 +369,18 @@ export default function TechnicianWorkbenchTab() {
             <form onSubmit={handleModalSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', overflowY: 'auto' }}>
               {/* Context Summary */}
               <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Target Request: </span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('dispatch.targetRequest')} </span>
                 <strong style={{ color: 'var(--text-primary)' }}>{activeModal.assignment.RequestTitle}</strong>
               </div>
 
               {/* Decline Form */}
               {activeModal.actionType === 'reject' && (
                 <FormField
-                  label="Reason for Declining"
+                  label={t('dispatch.reasonForDeclining')}
                   required
                   error={fieldErrors.rejectionReason}
                   icon={XCircle}
-                  helpText="Provide a clear justification for why this dispatch cannot be executed."
+                  helpText={t('dispatch.reasonForDecliningHelp')}
                 >
                   <textarea
                     rows={4}
@@ -387,7 +389,7 @@ export default function TechnicianWorkbenchTab() {
                       setModalData(prev => ({ ...prev, rejectionReason: e.target.value }));
                       clearFieldError('rejectionReason');
                     }}
-                    placeholder="e.g. Current workload exceeds emergency response SLA, or lacking specialized high-voltage equipment..."
+                    placeholder={t('dispatch.reasonForDecliningPlaceholder')}
                     style={{
                       width: '100%', padding: '12px 14px', borderRadius: '12px',
                       background: 'var(--bg-tertiary)',
@@ -402,11 +404,11 @@ export default function TechnicianWorkbenchTab() {
               {/* Pause Form */}
               {activeModal.actionType === 'pause' && (
                 <FormField
-                  label="Reason for Pausing Work"
+                  label={t('dispatch.reasonForPausing')}
                   required
                   error={fieldErrors.pauseReason}
                   icon={Pause}
-                  helpText="Explain the on-site blocker or reason for placing this job on hold."
+                  helpText={t('dispatch.reasonForPausingHelp')}
                 >
                   <textarea
                     rows={4}
@@ -415,7 +417,7 @@ export default function TechnicianWorkbenchTab() {
                       setModalData(prev => ({ ...prev, pauseReason: e.target.value }));
                       clearFieldError('pauseReason');
                     }}
-                    placeholder="e.g. Awaiting specialized replacement parts from inventory; access to electrical closet restricted until 09:00 AM..."
+                    placeholder={t('dispatch.reasonForPausingPlaceholder')}
                     style={{
                       width: '100%', padding: '12px 14px', borderRadius: '12px',
                       background: 'var(--bg-tertiary)',
@@ -431,7 +433,7 @@ export default function TechnicianWorkbenchTab() {
               {activeModal.actionType === 'complete' && (
                 <>
                   <FormField
-                    label="Resolution Type"
+                    label={t('dispatch.resolutionType')}
                     required
                     error={fieldErrors.ResolutionTypeCode}
                     icon={CheckCircle2}
@@ -449,18 +451,18 @@ export default function TechnicianWorkbenchTab() {
                         color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
                       }}
                     >
-                      <option value="PERMANENT_FIX">Permanent Fix & Full Remediation</option>
-                      <option value="WORKAROUND">Temporary Workaround Implemented</option>
-                      <option value="REPLACEMENT">Hardware / Component Replaced</option>
+                      <option value="PERMANENT_FIX">{t('dispatch.permanentFix')}</option>
+                      <option value="WORKAROUND">{t('dispatch.workaround')}</option>
+                      <option value="REPLACEMENT">{t('dispatch.replacement')}</option>
                     </select>
                   </FormField>
 
                   <FormField
-                    label="Work Notes & Resolution Summary"
+                    label={t('dispatch.workNotesLabel')}
                     required
                     error={fieldErrors.workNotes}
                     icon={FileText}
-                    helpText="Minimum 5 characters describing the outcome and verification."
+                    helpText={t('dispatch.workNotesHelp')}
                   >
                     <textarea
                       rows={4}
@@ -469,7 +471,7 @@ export default function TechnicianWorkbenchTab() {
                         setModalData(prev => ({ ...prev, workNotes: e.target.value }));
                         clearFieldError('workNotes');
                       }}
-                      placeholder="Detail the work carried out, root cause identified, components tested, and final validation results..."
+                      placeholder={t('dispatch.workNotesPlaceholder')}
                       style={{
                         width: '100%', padding: '12px 14px', borderRadius: '12px',
                         background: 'var(--bg-tertiary)',
@@ -481,7 +483,7 @@ export default function TechnicianWorkbenchTab() {
                   </FormField>
 
                   <FormField
-                    label="Action Steps Taken (Optional)"
+                    label={t('dispatch.actionStepsTakenLabel')}
                     error={fieldErrors.ActionStepsTaken}
                     icon={Wrench}
                   >
@@ -492,7 +494,7 @@ export default function TechnicianWorkbenchTab() {
                         setModalData(prev => ({ ...prev, ActionStepsTaken: e.target.value }));
                         clearFieldError('ActionStepsTaken');
                       }}
-                      placeholder="e.g. 1. Shut off isolation valve. 2. Replaced worn PTFE gasket. 3. Hydrostatic pressure test to 60 PSI."
+                      placeholder={t('dispatch.actionStepsTakenPlaceholder')}
                       style={{
                         width: '100%', padding: '12px 14px', borderRadius: '12px',
                         background: 'var(--bg-tertiary)',
@@ -513,7 +515,7 @@ export default function TechnicianWorkbenchTab() {
                   className="btn btn-secondary"
                   style={{ padding: '11px 20px', borderRadius: '12px' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -532,10 +534,10 @@ export default function TechnicianWorkbenchTab() {
                   }}
                 >
                   {submittingAction ? <RefreshCw size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                  {submittingAction ? 'Processing...' : (
-                    activeModal.actionType === 'reject' ? 'Confirm Decline' :
-                    activeModal.actionType === 'pause' ? 'Confirm Pause' :
-                    'Complete & Resolve Job'
+                  {submittingAction ? t('dispatch.processing') : (
+                    activeModal.actionType === 'reject' ? t('dispatch.confirmDecline') :
+                    activeModal.actionType === 'pause' ? t('dispatch.confirmPause') :
+                    t('dispatch.completeAndResolve')
                   )}
                 </button>
               </div>

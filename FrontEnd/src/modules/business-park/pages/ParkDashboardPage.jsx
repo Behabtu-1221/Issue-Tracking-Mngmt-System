@@ -23,6 +23,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import parkApi from '../api/parkApi';
+import { useTranslation } from '../../../i18n';
 
 /* Reusable interactive card style helper */
 const interactiveCard = (extra = {}) => ({
@@ -35,6 +36,7 @@ const interactiveCard = (extra = {}) => ({
 });
 
 export default function ParkDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState({
     parks: { totalParks: 0, totalParkArea: 0 },
@@ -73,9 +75,9 @@ export default function ParkDashboardPage() {
   const kpiCards = [
     {
       key: 'campus',
-      label: 'Business Park Campus',
+      label: t('businessPark.campusKpi'),
       value: `${metrics.parks.totalParks || 1} Campus`,
-      sub: '50,000 m² Primary Site Area',
+      sub: t('businessPark.campusSiteArea'),
       subColor: 'var(--text-muted)',
       icon: Building2,
       iconBg: 'rgba(99, 102, 241, 0.15)',
@@ -85,9 +87,9 @@ export default function ParkDashboardPage() {
     },
     {
       key: 'buildings',
-      label: 'Buildings & Towers',
-      value: `${metrics.buildings.totalBuildings || 0} Buildings`,
-      sub: `${metrics.buildings.totalFloors || 0} Total Floor Levels`,
+      label: t('businessPark.buildingsBlocks'),
+      value: `${metrics.buildings.totalBuildings || 0} ${t('businessPark.buildingsBlocks')}`,
+      sub: `${metrics.buildings.totalFloors || 0} ${t('businessPark.totalLevelsCount')}`,
       subColor: 'var(--color-info)',
       icon: Building,
       iconBg: 'rgba(14, 165, 233, 0.15)',
@@ -97,9 +99,9 @@ export default function ParkDashboardPage() {
     },
     {
       key: 'offices',
-      label: 'Office Spaces',
-      value: `${metrics.offices.totalOffices || 0} Units`,
-      sub: `${vacantOffices} Vacant Units Available`,
+      label: t('businessPark.officesKpi'),
+      value: `${metrics.offices.totalOffices || 0} ${t('businessPark.officeUnits')}`,
+      sub: `${vacantOffices} ${t('businessPark.officesAvailableCount')}`,
       subColor: 'var(--color-success)',
       icon: Grid,
       iconBg: 'rgba(16, 185, 129, 0.15)',
@@ -109,9 +111,9 @@ export default function ParkDashboardPage() {
     },
     {
       key: 'occupancy',
-      label: 'Campus Occupancy',
+      label: t('businessPark.occupancyRateKpi'),
       value: `${occupancyRate}%`,
-      sub: `${occupiedOffices} Leased Office Units`,
+      sub: `${occupiedOffices} ${t('businessPark.leasedUnitsCount')}`,
       subColor: 'var(--color-warning)',
       icon: PieChart,
       iconBg: 'rgba(245, 158, 11, 0.15)',
@@ -123,24 +125,23 @@ export default function ParkDashboardPage() {
 
   /* Facility zone cards */
   const facilityCards = [
-    { key: 'green', label: 'Green Parks & Gardens', value: '2 Zones (Active)', icon: MapPin, iconBg: 'rgba(16, 185, 129, 0.15)', iconColor: 'var(--color-success)' },
-    { key: 'parking', label: 'Parking Lot Bays', value: '250 Parking Lots', icon: MapPin, iconBg: 'rgba(14, 165, 233, 0.15)', iconColor: 'var(--color-info)' },
-    { key: 'utility', label: 'Utility Tech Rooms', value: '8 Tech Rooms', icon: Building, iconBg: 'rgba(99, 102, 241, 0.15)', iconColor: 'var(--accent-primary)' },
-    { key: 'security', label: 'Security Checkpoints', value: '3 Gate Posts', icon: ShieldCheck, iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: 'var(--color-warning)' }
+    { key: 'green', label: t('businessPark.facilityZones'), value: `2 ${t('common.active')}`, icon: MapPin, iconBg: 'rgba(16, 185, 129, 0.15)', iconColor: 'var(--color-success)' },
+    { key: 'parking', label: t('businessPark.parkingCapacity'), value: '250 Parking Lots', icon: MapPin, iconBg: 'rgba(14, 165, 233, 0.15)', iconColor: 'var(--color-info)' },
+    { key: 'utility', label: t('businessPark.utilityRooms'), value: '8 Tech Rooms', icon: Building, iconBg: 'rgba(99, 102, 241, 0.15)', iconColor: 'var(--accent-primary)' },
+    { key: 'security', label: t('businessPark.securityPosts'), value: '3 Main Gates', icon: ShieldCheck, iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: 'var(--color-warning)' }
   ];
 
   return (
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              Park Overview & <span className="glow-text">Analytics</span>
+              <span className="glow-text">{t('businessPark.parkDashboardTitle')}</span>
             </h1>
             <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Real-time campus telemetry, space utilization, and infrastructure analytics
+              {t('businessPark.parkDashboardSubtitle')}
             </p>
           </div>
 
@@ -157,7 +158,7 @@ export default function ParkDashboardPage() {
               fontSize: '0.78rem',
               fontWeight: 700
             }}>
-              <Activity size={14} /> Campus Telemetry Active
+              <Activity size={14} /> 100% {t('common.active')}
             </span>
           </div>
         </div>
@@ -220,7 +221,7 @@ export default function ParkDashboardPage() {
                 opacity: isHovered ? 1 : 0.5,
                 transition: 'opacity 0.3s'
               }}>
-                <ExternalLink size={11} /> Click to view details
+                <ExternalLink size={11} /> {t('businessPark.exploreModule')}
               </div>
             </div>
           );
@@ -234,10 +235,10 @@ export default function ParkDashboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Office Space Utilization
+                {t('businessPark.officesSubtitle')}
               </h3>
               <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Live breakdown of tenant occupancy vs available inventory
+                {t('businessPark.officesDesc')}
               </p>
             </div>
             <button
@@ -257,19 +258,19 @@ export default function ParkDashboardPage() {
                 transition: 'all 0.2s'
               }}
             >
-              View Offices <ArrowUpRight size={13} />
+              {t('businessPark.officeUnits')} <ArrowUpRight size={13} />
             </button>
           </div>
 
           {/* Progress Bar Visual */}
           <div style={{ marginBottom: '24px' }}>
-<div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 600 }}>
-              <span>Total Capacity ({totalOffices} Units)</span>
-              <span style={{ color: 'var(--accent-primary)' }}>{occupancyRate}% Occupied</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 600 }}>
+              <span>{t('businessPark.capacity')} ({totalOffices} {t('businessPark.officeUnits')})</span>
+              <span style={{ color: 'var(--accent-primary)' }}>{occupancyRate}% {t('businessPark.occupied')}</span>
             </div>
             <div style={{ height: '14px', borderRadius: '7px', background: 'var(--bg-tertiary)', overflow: 'hidden', display: 'flex' }}>
-              <div style={{ width: `${occupancyRate}%`, background: 'var(--accent-gradient)', transition: 'width 0.8s ease-out', borderRadius: '7px 0 0 7px' }} title={`Occupied: ${occupiedOffices}`} />
-              <div style={{ width: `${vacancyRate}%`, background: 'var(--color-info)', transition: 'width 0.8s ease-out' }} title={`Vacant: ${vacantOffices}`} />
+              <div style={{ width: `${occupancyRate}%`, background: 'var(--accent-gradient)', transition: 'width 0.8s ease-out', borderRadius: '7px 0 0 7px' }} title={`${t('businessPark.occupied')}: ${occupiedOffices}`} />
+              <div style={{ width: `${vacancyRate}%`, background: 'var(--color-info)', transition: 'width 0.8s ease-out' }} title={`${t('businessPark.vacant')}: ${vacantOffices}`} />
             </div>
           </div>
 
@@ -283,7 +284,7 @@ export default function ParkDashboardPage() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: '12px', height: '12px', borderRadius: '4px', background: 'var(--color-info)' }} />
-                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Vacant Units</span>
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{t('businessPark.vacantUnits')}</span>
               </div>
               <span style={{ fontWeight: 700, fontSize: '1rem' }}>{vacantOffices}</span>
             </div>
@@ -296,7 +297,7 @@ export default function ParkDashboardPage() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: '12px', height: '12px', borderRadius: '4px', background: 'var(--accent-primary)' }} />
-                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Occupied / Leased</span>
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{t('businessPark.occupiedUnits')}</span>
               </div>
               <span style={{ fontWeight: 700, fontSize: '1rem' }}>{occupiedOffices}</span>
             </div>
@@ -308,10 +309,10 @@ export default function ParkDashboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Building Towers Telemetry
+                {t('businessPark.buildingsSubtitle')}
               </h3>
               <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Status & floor counts for active commercial towers
+                {t('businessPark.buildingsDesc')}
               </p>
             </div>
             <button
@@ -331,7 +332,7 @@ export default function ParkDashboardPage() {
                 transition: 'all 0.2s'
               }}
             >
-              View Buildings <ArrowUpRight size={13} />
+              {t('businessPark.buildingsBlocks')} <ArrowUpRight size={13} />
             </button>
           </div>
 
@@ -347,8 +348,8 @@ export default function ParkDashboardPage() {
                   <Building size={20} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Block A — Main Commercial Tower</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>4 Floor Levels • 12,000 m² Area</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Block A — Innovation Hub</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>4 {t('businessPark.totalLevelsCount')} • 12,000 m² {t('businessPark.totalArea')}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -359,7 +360,7 @@ export default function ParkDashboardPage() {
                   color: 'var(--color-success)',
                   fontSize: '0.72rem',
                   fontWeight: 700
-                }}>Operational</span>
+                }}>{t('businessPark.operational')}</span>
                 <ArrowUpRight size={14} style={{ color: 'var(--text-muted)' }} />
               </div>
             </div>
@@ -376,7 +377,7 @@ export default function ParkDashboardPage() {
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Block B — Tech Innovation Center</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>4 Floor Levels • 20,000 m² Area</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>4 {t('businessPark.totalLevelsCount')} • 20,000 m² {t('businessPark.totalArea')}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -387,7 +388,7 @@ export default function ParkDashboardPage() {
                   color: 'var(--color-success)',
                   fontSize: '0.72rem',
                   fontWeight: 700
-                }}>Operational</span>
+                }}>{t('businessPark.operational')}</span>
                 <ArrowUpRight size={14} style={{ color: 'var(--text-muted)' }} />
               </div>
             </div>
@@ -400,10 +401,10 @@ export default function ParkDashboardPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div>
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Facility & Campus Zone Telemetry
+              {t('businessPark.facilityZones')}
             </h3>
             <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Green parks, parking lot bays, utility tech rooms & security checkpoints
+              {t('businessPark.zonesSubtitle')}
             </p>
           </div>
           <button
@@ -423,7 +424,7 @@ export default function ParkDashboardPage() {
               transition: 'all 0.2s'
             }}
           >
-            Manage Zones <ArrowUpRight size={13} />
+            {t('common.details')} <ArrowUpRight size={13} />
           </button>
         </div>
 
@@ -474,21 +475,21 @@ export default function ParkDashboardPage() {
         gap: '12px'
       }}>
         <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-          Business Park Management Shortcuts
+          {t('businessPark.quickTopologyActions')}
         </div>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           {[
-            { label: 'Buildings & Blocks', icon: Building, route: '/parks/buildings' },
-            { label: 'Floor Levels', icon: Layers, route: '/parks/floors' },
-            { label: 'Office Units', icon: Grid, route: '/parks/offices' },
-            { label: 'Facility Zones', icon: MapPin, route: '/parks/zones' },
-            { label: 'Campus Landmarks', icon: Compass, route: '/parks/landmarks' }
+            { label: t('businessPark.buildingsBlocks'), icon: Building, route: '/parks/buildings' },
+            { label: t('businessPark.floorsLevels'), icon: Layers, route: '/parks/floors' },
+            { label: t('businessPark.officeUnits'), icon: Grid, route: '/parks/offices' },
+            { label: t('businessPark.facilityZones'), icon: MapPin, route: '/parks/zones' },
+            { label: t('businessPark.campusLandmarks'), icon: Compass, route: '/parks/landmarks' }
           ].map((shortcut) => {
             const ShortIcon = shortcut.icon;
             return (
               <button
-                key={shortcut.label}
+                key={shortcut.route}
                 onClick={() => navigate(shortcut.route)}
                 style={{
                   display: 'flex',

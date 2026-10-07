@@ -22,8 +22,10 @@ import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import BusinessParkFormModal from './BusinessParkFormModal';
 import { parkSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function ParksTab() {
+  const { t } = useTranslation();
   const [parks, setParks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +41,6 @@ export default function ParksTab() {
 
   // Modals state
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPark, setSelectedPark] = useState(null);
 
   const fetchParks = async () => {
@@ -78,10 +79,10 @@ export default function ParksTab() {
     setSelectedPark(park);
     setConfirmConfig({
       isOpen: true,
-      title: 'Decommission Business Park',
+      title: t('common.delete'),
       message: `Are you sure you want to delete campus "${park.BusinessParkName}"? Associated buildings and tenant locations will be affected.`,
       type: 'danger',
-      confirmText: 'Delete Business Park',
+      confirmText: t('common.delete'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -90,7 +91,7 @@ export default function ParksTab() {
           fetchParks();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete business park.';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('common.error'), msg, 'error');
         }
       }
     });
@@ -126,13 +127,13 @@ export default function ParksTab() {
           </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              Single Campus System: Ethiopian IT Park
+              {t('businessPark.campusMasterTitle')}
               <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontWeight: 600 }}>
-                Authoritative Central Hub
+                {t('businessPark.centralManaged')}
               </span>
             </div>
             <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              This system is exclusively established for the Ethiopian IT Park campus. All physical infrastructure, commercial blocks, tenant companies, and issue tracking operations operate within this campus.
+              {t('businessPark.campusMasterDesc')}
             </div>
           </div>
         </div>
@@ -146,7 +147,7 @@ export default function ParksTab() {
               color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer'
             }}
           >
-            <Edit size={14} /> Edit Campus Profile
+            <Edit size={14} /> {t('businessPark.editParkParameters')}
           </button>
         )}
       </div>
@@ -157,7 +158,7 @@ export default function ParksTab() {
           <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search business parks by name, code or city"
+            placeholder={t('businessPark.searchBuildings')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -217,9 +218,8 @@ export default function ParksTab() {
               fontSize: '0.88rem'
             }}
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
           </button>
-          {/* Register Business Park button hidden — single campus system (Ethiopian IT Park only) */}
         </div>
       </div>
 
@@ -227,12 +227,12 @@ export default function ParksTab() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
           <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-          <p>Loading master business parks...</p>
+          <p>{t('common.loading')}</p>
         </div>
       ) : parks.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
           <Building2 size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-          <p>No business park campuses found matching search parameters.</p>
+          <p>{t('businessPark.noParkRegistered')}</p>
         </div>
       ) : viewMode === 'grid' ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
@@ -248,9 +248,9 @@ export default function ParksTab() {
                   </div>
 
                   {park.IsOperational ? (
-                    <span className="badge badge-success" style={{ fontSize: '0.72rem' }}>Operational</span>
+                    <span className="badge badge-success" style={{ fontSize: '0.72rem' }}>{t('businessPark.operational')}</span>
                   ) : (
-                    <span className="badge badge-secondary" style={{ fontSize: '0.72rem' }}>Offline</span>
+                    <span className="badge badge-secondary" style={{ fontSize: '0.72rem' }}>{t('businessPark.maintenanceOffline')}</span>
                   )}
                 </div>
 
@@ -290,14 +290,14 @@ export default function ParksTab() {
                   textAlign: 'center'
                 }}>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Buildings</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('businessPark.buildingsBlocks')}</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                       {park.BuildingCount || 0}
                     </div>
                   </div>
                   <div style={{ borderLeft: '1px solid var(--glass-border)' }} />
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Gross Area</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('businessPark.grossArea')}</div>
                     <div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--accent-primary)' }}>
                       {park.TotalAreaSquareMeter ? `${Number(park.TotalAreaSquareMeter).toLocaleString()} m²` : '—'}
                     </div>
@@ -324,7 +324,7 @@ export default function ParksTab() {
                       transition: 'all 0.2s'
                     }}
                   >
-                    <Edit size={14} /> Edit Park
+                    <Edit size={14} /> {t('businessPark.editParkParameters')}
                   </button>
 
                   <button
@@ -353,13 +353,13 @@ export default function ParksTab() {
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Business Park</th>
-                <th>Code</th>
-                <th>Location</th>
-                <th>Buildings</th>
-                <th>Total Area</th>
-                <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('businessPark.businessPark')}</th>
+                <th>{t('common.code')}</th>
+                <th>{t('common.details')}</th>
+                <th>{t('businessPark.buildingsBlocks')}</th>
+                <th>{t('businessPark.totalArea')}</th>
+                <th>{t('common.status')}</th>
+                <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -372,21 +372,21 @@ export default function ParksTab() {
                   <td style={{ fontFamily: 'monospace', color: 'var(--accent-primary)' }}>{park.BusinessParkCode}</td>
                   <td>{park.City}, {park.Country}</td>
                   <td>
-                    <span className="badge badge-info">{park.BuildingCount || 0} Buildings</span>
+                    <span className="badge badge-info">{park.BuildingCount || 0} {t('businessPark.buildingsBlocks')}</span>
                   </td>
                   <td>{park.TotalAreaSquareMeter ? `${Number(park.TotalAreaSquareMeter).toLocaleString()} m²` : '—'}</td>
                   <td>
                     {park.IsOperational ? (
-                      <span className="badge badge-success">Operational</span>
+                      <span className="badge badge-success">{t('businessPark.operational')}</span>
                     ) : (
-                      <span className="badge badge-danger">Offline</span>
+                      <span className="badge badge-danger">{t('businessPark.maintenanceOffline')}</span>
                     )}
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                       <button
                         onClick={() => openEditModal(park)}
-                        title="Edit Park Details"
+                        title={t('businessPark.editParkParameters')}
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: '4px',
                           padding: '6px 12px', borderRadius: '8px',
@@ -397,11 +397,11 @@ export default function ParksTab() {
                           cursor: 'pointer', transition: 'all 0.2s'
                         }}
                       >
-                        <Edit size={14} /> Edit
+                        <Edit size={14} /> {t('common.edit')}
                       </button>
                       <button
                         onClick={() => promptDeletePark(park)}
-                        title="Delete Park"
+                        title={t('common.delete')}
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: '4px',
                           padding: '6px 12px', borderRadius: '8px',
@@ -412,7 +412,7 @@ export default function ParksTab() {
                           cursor: 'pointer', transition: 'all 0.2s'
                         }}
                       >
-                        <Trash2 size={14} /> Delete
+                        <Trash2 size={14} /> {t('common.delete')}
                       </button>
                     </div>
                   </td>

@@ -8,8 +8,10 @@ import {
 import issueManagementApi from '../api/issueManagementApi';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { IssueDetailView } from '../components/IssueDetailView';
+import { useTranslation } from '../../../i18n';
 
 export default function RequestHistoryPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = usePermissionContext();
 
@@ -46,13 +48,13 @@ export default function RequestHistoryPage() {
     const status = (statusStr || '').toUpperCase();
     switch (status) {
       case 'RESOLVED':
-        return { label: 'Resolved', bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
+        return { label: t('issues.statusResolved', 'Resolved'), bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
       case 'CLOSED':
-        return { label: 'Closed', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: t('issues.statusClosed', 'Closed'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
       case 'CANCELLED':
-        return { label: 'Cancelled', bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' };
+        return { label: t('issues.statusCancelled', 'Cancelled'), bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' };
       default:
-        return { label: statusStr || 'Active', bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
+        return { label: statusStr || t('issues.statusOpen', 'Active'), bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
     }
   };
 
@@ -94,10 +96,10 @@ export default function RequestHistoryPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <History size={26} style={{ color: 'var(--accent-primary)' }} /> Request <span className="glow-text">History & Audit Log</span>
+            <History size={26} style={{ color: 'var(--accent-primary)' }} /> {t('nav.requestHistory', 'Request History')} & <span className="glow-text">{t('issues.auditHistory', 'Audit Log')}</span>
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Search and filter your historical service requests, resolved tickets, and closed interactions.
+            {t('issues.historySubtitle', 'Search and filter your historical service requests, resolved tickets, and closed interactions.')}
           </p>
         </div>
       </div>
@@ -108,10 +110,10 @@ export default function RequestHistoryPage() {
         {/* Status Filters */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {[
-            { id: 'ALL_HISTORY', label: 'All History' },
-            { id: 'RESOLVED', label: 'Resolved Tickets' },
-            { id: 'CLOSED', label: 'Closed Tickets' },
-            { id: 'CANCELLED', label: 'Cancelled Requests' }
+            { id: 'ALL_HISTORY', label: t('dashboard.allHistory', 'All History') },
+            { id: 'RESOLVED', label: t('dashboard.resolvedTickets', 'Resolved Tickets') },
+            { id: 'CLOSED', label: t('dashboard.closedTickets', 'Closed Tickets') },
+            { id: 'CANCELLED', label: t('dashboard.cancelledRequests', 'Cancelled Requests') }
           ].map(tab => (
             <button
               key={tab.id}
@@ -147,18 +149,18 @@ export default function RequestHistoryPage() {
               fontSize: '0.85rem'
             }}
           >
-            <option value="ALL">All Priorities</option>
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-            <option value="URGENT">Urgent</option>
+            <option value="ALL">{t('common.all', 'All')} {t('common.priority', 'Priorities')}</option>
+            <option value="LOW">{t('issues.priorityLow', 'Low')}</option>
+            <option value="MEDIUM">{t('issues.priorityMedium', 'Medium')}</option>
+            <option value="HIGH">{t('issues.priorityHigh', 'High')}</option>
+            <option value="URGENT">{t('issues.priorityUrgent', 'Urgent')}</option>
           </select>
 
           <div style={{ position: 'relative' }}>
             <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search historical tickets..."
+              placeholder={t('dashboard.searchRequests', 'Search historical tickets...')}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               style={{
@@ -184,7 +186,7 @@ export default function RequestHistoryPage() {
           }}>
             <button
               onClick={() => setViewMode('table')}
-              title="Table View (with horizontal scroll)"
+              title={t('issues.tableView', 'Table')}
               style={{
                 padding: '5px 10px',
                 borderRadius: '6px',
@@ -200,11 +202,11 @@ export default function RequestHistoryPage() {
                 transition: 'all 0.2s'
               }}
             >
-              <List size={14} /> Table
+              <List size={14} /> {t('issues.tableView', 'Table')}
             </button>
             <button
               onClick={() => setViewMode('cards')}
-              title="Card Grid View"
+              title={t('issues.cardView', 'Cards')}
               style={{
                 padding: '5px 10px',
                 borderRadius: '6px',
@@ -220,7 +222,7 @@ export default function RequestHistoryPage() {
                 transition: 'all 0.2s'
               }}
             >
-              <LayoutGrid size={14} /> Cards
+              <LayoutGrid size={14} /> {t('issues.cardView', 'Cards')}
             </button>
           </div>
 
@@ -234,7 +236,7 @@ export default function RequestHistoryPage() {
               color: 'var(--text-secondary)',
               cursor: 'pointer'
             }}
-            title="Refresh history"
+            title={t('common.refresh', 'Refresh history')}
           >
             <RefreshCw size={16} />
           </button>
@@ -257,7 +259,7 @@ export default function RequestHistoryPage() {
             color: 'var(--text-muted)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Request History & Archive</span>
+              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t('nav.requestHistory', 'Request History & Archive')}</span>
               <span style={{
                 background: 'rgba(99, 102, 241, 0.12)',
                 color: 'var(--accent-primary)',
@@ -266,7 +268,7 @@ export default function RequestHistoryPage() {
                 fontSize: '0.75rem',
                 fontWeight: 700
               }}>
-                {filteredItems.length} {filteredItems.length === 1 ? 'record' : 'records'}
+                {filteredItems.length} {filteredItems.length === 1 ? t('issues.requestSingle', 'record') : t('issues.requestPlural', 'records')}
               </span>
             </div>
 
@@ -282,7 +284,7 @@ export default function RequestHistoryPage() {
               border: '1px solid var(--glass-border)'
             }}>
               <MoveHorizontal size={13} color="var(--accent-primary)" />
-              <span>Horizontal Scroll Enabled</span>
+              <span>{t('issues.scrollEnabled', 'Horizontal Scroll Enabled')}</span>
             </div>
           </div>
 
@@ -291,30 +293,30 @@ export default function RequestHistoryPage() {
             <table className="custom-table" style={{ width: '100%', minWidth: '1200px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)' }}>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px' }}>Request # & Title</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px' }}>Service & Category</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Status</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '110px' }}>Priority</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px' }}>Assigned Tech</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>Submitted Date</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '150px' }}>Resolved / Closed</th>
-                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px' }}>{t('issues.requestNumberAndTitle', 'Request # & Title')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px' }}>{t('issues.serviceAndCategory', 'Service & Category')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>{t('common.status', 'Status')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '110px' }}>{t('common.priority', 'Priority')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px' }}>{t('issues.assignedTech', 'Assigned Tech')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '130px' }}>{t('issues.submittedDate', 'Submitted Date')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '150px' }}>{t('issues.statusResolved', 'Resolved')} / {t('issues.statusClosed', 'Closed')}</th>
+                  <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '160px', textAlign: 'right' }}>{t('common.actions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
                     <td colSpan="8" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      Loading request history...
+                      {t('common.loadingRequestHistory', 'Loading request history...')}
                     </td>
                   </tr>
                 ) : filteredItems.length === 0 ? (
                   <tr>
                     <td colSpan="8" style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
                       <History size={36} style={{ color: 'var(--accent-primary)', marginBottom: '10px' }} />
-                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>No historical requests found</div>
+                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>{t('issues.noRequestsTitle', 'No historical requests found')}</div>
                       <div style={{ fontSize: '0.85rem' }}>
-                        No past records match your selected filters.
+                        {t('issues.noRequestsSubtitle', 'No past records match your selected filters.')}
                       </div>
                     </td>
                   </tr>
@@ -387,7 +389,7 @@ export default function RequestHistoryPage() {
                         <td style={{ padding: '14px 18px' }}>
                           <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
                             <Clock size={13} />
-                            {item.ResolvedDateTime ? new Date(item.ResolvedDateTime).toLocaleDateString() : (item.StatusCode === 'CLOSED' ? 'Closed' : 'Yes')}
+                            {item.ResolvedDateTime ? new Date(item.ResolvedDateTime).toLocaleDateString() : (item.StatusCode === 'CLOSED' ? t('issues.statusClosed', 'Closed') : t('common.yes', 'Yes'))}
                           </div>
                         </td>
 
@@ -408,7 +410,7 @@ export default function RequestHistoryPage() {
                               gap: '6px'
                             }}
                           >
-                            <Eye size={14} /> View Archive
+                            <Eye size={14} /> {t('common.viewArchive', 'View Archive')}
                           </button>
                         </td>
                       </tr>
@@ -424,14 +426,14 @@ export default function RequestHistoryPage() {
         <div className="glass-panel" style={{ padding: '24px' }}>
           {loading ? (
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              Loading request history...
+              {t('common.loadingRequestHistory', 'Loading request history...')}
             </div>
           ) : filteredItems.length === 0 ? (
             <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
               <History size={40} style={{ color: 'var(--accent-primary)', marginBottom: '12px' }} />
-              <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>No historical requests found</h4>
+              <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('issues.noRequestsTitle', 'No historical requests found')}</h4>
               <p style={{ margin: 0, fontSize: '0.85rem' }}>
-                No past records match your selected filters.
+                {t('issues.noRequestsSubtitle', 'No past records match your selected filters.')}
               </p>
             </div>
           ) : (
@@ -494,9 +496,9 @@ export default function RequestHistoryPage() {
                       </h4>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                        <span>Submitted: {new Date(item.CreatedAt || item.RequestDate || Date.now()).toLocaleDateString()}</span>
-                        <span>Assigned Tech: <strong style={{ color: item.AssignedTechnicianName ? '#c084fc' : 'var(--text-muted)' }}>{item.AssignedTechnicianName || 'N/A'}</strong></span>
-                        <span>Resolved / Closed: {item.ResolvedDateTime ? new Date(item.ResolvedDateTime).toLocaleDateString() : 'Yes'}</span>
+                        <span>{t('issues.submittedOn', 'Submitted')}: {new Date(item.CreatedAt || item.RequestDate || Date.now()).toLocaleDateString()}</span>
+                        <span>{t('issues.assignedTech', 'Assigned Tech')}: <strong style={{ color: item.AssignedTechnicianName ? '#c084fc' : 'var(--text-muted)' }}>{item.AssignedTechnicianName || 'N/A'}</strong></span>
+                        <span>{t('issues.statusResolved', 'Resolved')} / {t('issues.statusClosed', 'Closed')}: {item.ResolvedDateTime ? new Date(item.ResolvedDateTime).toLocaleDateString() : t('common.yes', 'Yes')}</span>
                       </div>
                     </div>
 
@@ -514,7 +516,7 @@ export default function RequestHistoryPage() {
                         alignItems: 'center',
                         gap: '6px'
                       }}>
-                        View Archive <ChevronRight size={15} />
+                        {t('common.viewArchive', 'View Archive')} <ChevronRight size={15} />
                       </button>
                     </div>
                   </div>

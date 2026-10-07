@@ -657,6 +657,9 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
 
   const getLocalizedLabel = (item) => {
     if (!item) return '';
+    const rawId = item.id || '';
+    const cleanId = rawId.split('?')[0];
+
     const keyMap = {
       'dashboard': 'nav.dashboard',
       'parks': 'nav.parks',
@@ -763,13 +766,103 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       'notifications/templates': 'nav.notificationTemplates',
       'notifications/log': 'nav.deliveryLog',
       'profile': 'nav.profile',
+      'technician/work': 'nav.myWork',
       'technician/dashboard': 'nav.assignedWork',
       'technician/assigned': 'nav.assignedWork',
-      'technician/resolved': 'nav.workHistory'
+      'technician/in-progress': 'issues.statusInProgress',
+      'technician/pending': 'issues.statusPending',
+      'technician/resolved': 'nav.workHistory',
+      'issues/tracker?status=ASSIGNED': 'issues.statusAssigned',
+      'issues/tracker?status=IN_PROGRESS': 'issues.statusInProgress',
+      'issues/tracker?status=RESOLVED': 'issues.statusResolved'
     };
 
-    const translationKey = keyMap[item.id];
-    return translationKey ? t(translationKey, item.label) : item.label;
+    const labelMap = {
+      'Dashboard': 'nav.dashboard',
+      'Dashboard Overview': 'nav.dashboardOverview',
+      'Operational Dashboard': 'nav.dashboard',
+      'My Work': 'nav.myWork',
+      'Assigned Requests': 'nav.assignedWork',
+      'In Progress': 'issues.statusInProgress',
+      'Pending': 'issues.statusPending',
+      'Resolved': 'issues.statusResolved',
+      'Resolved (Work History)': 'nav.workHistory',
+      'Knowledge Base': 'nav.knownIssues',
+      'Knowledge Base & FAQs': 'nav.knownIssuesFaq',
+      'Known Issues & KB': 'nav.knownIssues',
+      'My Requests': 'nav.myRequests',
+      'Create Request': 'nav.createRequest',
+      'Request History': 'nav.requestHistory',
+      'Department Requests': 'nav.departmentRequests',
+      'Pending Approval': 'nav.pendingApproval',
+      'Department Queue': 'nav.departmentQueue',
+      'Awaiting Assignment': 'nav.awaitingAssignment',
+      'Assigned': 'issues.statusAssigned',
+      'SLA At Risk': 'nav.slaAtRisk',
+      'Escalated': 'nav.escalated',
+      'Dispatch & Teams': 'nav.dispatchTeams',
+      'Assignments Queue': 'nav.assignmentsQueue',
+      'Technician Workload': 'nav.technicianWorkload',
+      'Technician Teams': 'nav.technicianTeams',
+      'Department': 'nav.department',
+      'Department Users': 'nav.departmentUsers',
+      'Operational Reports': 'nav.operationalReports',
+      'Issue Requests': 'nav.issueRequests',
+      'Company Requests Tracker': 'nav.companyRequestsTracker',
+      'My Company': 'nav.myCompany',
+      'Company Overview': 'nav.companyOverview',
+      'Lease Agreements': 'nav.leaseAgreements',
+      'Lease Contracts': 'nav.leaseAgreements',
+      'Space Allocations': 'nav.spaceAllocations',
+      'Company Contacts': 'nav.companyContacts',
+      'Reports & SLA': 'nav.reportsSla',
+      'Control Center': 'nav.controlCenter',
+      'Requests Analytics': 'nav.requestsAnalytics',
+      'SLA Performance': 'nav.slaPerformance',
+      'Park Overview ': 'nav.parkOverview',
+      'Issue Overview ': 'nav.issuesOverview',
+      'Comm Overview ': 'nav.commOverview',
+      'Broadcast Announcements': 'nav.broadcastAnnouncements',
+      'Announcements': 'nav.announcements',
+      'Team Channels': 'nav.channels',
+      'Activity & Audit Log': 'nav.activityTimeline',
+      'Audit Timeline': 'nav.activityTimeline',
+      'Delivery Audit Log': 'nav.deliveryLog',
+      'Notification Layouts': 'nav.notificationTemplates',
+      'Central Document Repository': 'nav.docRepository',
+      'Version Control & History': 'nav.docVersions',
+      'File Security & Sharing': 'nav.docSecurity',
+      'Active Sessions': 'nav.activeSessions',
+      'Security Audit Logs': 'nav.securityAudit',
+      'Governance Rules & Groups': 'nav.governanceRules',
+      'Dispatcher Queue & Routing': 'nav.dispatchQueue',
+      'Technician Workbench': 'nav.workbench',
+      'Team Roster & Availability': 'nav.roster',
+      'SLA Dashboard & Live Clocks': 'nav.slaClocks',
+      'Breach Log & Violations': 'nav.slaBreaches',
+      'SLA Policies & Targets': 'nav.slaPolicies',
+      'Cost Centers & Budgets': 'nav.financials',
+      'Saved Custom Reports': 'nav.savedReports',
+      'Automated Schedules': 'nav.automatedSchedules',
+      'Tenant Benchmarks': 'nav.tenantBenchmarks',
+      'Department Efficiency': 'nav.departmentEfficiency',
+      'User Inbox & Feeds': 'nav.notificationInbox',
+      'Inbox & Alerts': 'nav.notificationInbox',
+      'Alerts Overview': 'nav.notificationInbox',
+      'Delivery Preferences': 'nav.notificationPreferences',
+      'Automated Reminders': 'nav.automatedReminders',
+      'Service Catalog': 'nav.services',
+      'Catalog Overview': 'nav.servicesOverview',
+      'Service Directory': 'nav.serviceDirectory',
+      'Service Categories': 'nav.serviceCategories',
+      'Category Mappings': 'nav.serviceCategoryMapping',
+      'Pricing & Billing': 'nav.pricingBilling',
+      'Form & Requirements': 'nav.serviceRequirements',
+      'Governance & SLA': 'nav.serviceGovernance'
+    };
+
+    const directKey = keyMap[rawId] || keyMap[cleanId] || labelMap[item.label?.trim()];
+    return directKey ? t(directKey, item.label) : item.label;
   };
 
   const filteredMenuItems = menuItems
@@ -882,7 +975,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
 
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                title="Toggle Sidebar Menu"
+                title={t('nav.toggleSidebar', 'Toggle Sidebar Menu')}
                 style={{
                   background: 'var(--bg-tertiary)',
                   border: '1px solid var(--sidebar-border)',
@@ -902,7 +995,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
           ) : (
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              title="Expand Sidebar Menu"
+              title={t('nav.expandSidebar', 'Expand Sidebar Menu')}
               style={{
                 width: '40px',
                 height: '40px',
@@ -1150,7 +1243,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
             <div ref={notifRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                title="Notifications"
+                title={t('notifications.title', 'Notifications')}
                 style={{
                   padding: '10px',
                   borderRadius: '50%',
@@ -1283,7 +1376,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         transition: 'all 0.2s'
                       }}
                     >
-                      Unread ({unreadCount})
+                      {t('notifications.unread', 'Unread')} ({unreadCount})
                     </button>
                   </div>
 
@@ -1292,7 +1385,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                     {notifications.filter(n => notifFilter === 'all' || !n.IsRead).length === 0 ? (
                       <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '36px 10px', fontSize: '13px' }}>
                         <Inbox size={32} style={{ opacity: 0.4, margin: '0 auto 8px', display: 'block' }} />
-                        <div>{notifFilter === 'unread' ? 'No unread notifications' : 'No notifications yet'}</div>
+                        <div>{notifFilter === 'unread' ? t('notifications.noUnread', 'No unread notifications') : t('notifications.noNotifications', 'No notifications yet')}</div>
                       </div>
                     ) : notifications
                         .filter(n => notifFilter === 'all' || !n.IsRead)
@@ -1336,7 +1429,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                                   </p>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                     <span style={{ fontSize: '11px', color: 'var(--accent-primary)', fontWeight: 600 }}>
-                                      View Details →
+                                      {t('notifications.viewDetails', 'View Details →')}
                                     </span>
                                   </div>
                                 </div>
@@ -1348,7 +1441,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                                     e.stopPropagation();
                                     handleMarkSingleRead(n.UserNotificationID);
                                   }}
-                                  title="Mark as read"
+                                  title={t('notifications.markAllRead', 'Mark as read')}
                                   style={{
                                     background: 'none',
                                     border: 'none',
@@ -1388,7 +1481,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         cursor: 'pointer'
                       }}
                     >
-                      View All in Notification Center →
+                      {t('notifications.viewAllInCenter', 'View All in Notification Center →')}
                     </button>
                   </div>
                 </div>
@@ -1399,7 +1492,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
             <div ref={profileRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                title="Account & Profile Settings"
+                title={t('auth.profileSettings', 'Account & Profile Settings')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',

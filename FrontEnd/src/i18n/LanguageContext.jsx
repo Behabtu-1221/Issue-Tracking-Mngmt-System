@@ -10,7 +10,7 @@ export const AVAILABLE_LOCALES = [
     name: 'English',
     nativeName: 'English',
     shortLabel: 'EN',
-    region: 'International / US',
+    region: 'Ethiopia',
     countryCode: 'US',
     dir: 'ltr'
   },
@@ -66,16 +66,24 @@ export function LanguageProvider({ children }) {
 
   // Optional background sync with backend localization resources
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchBackendResources = async () => {
       try {
         const token = localStorage.getItem('itms_access_token') || sessionStorage.getItem('itms_access_token');
-        if (!token) return;
+        if (!token) {
+          if (!isCancelled) setBackendOverrides({});
+          return;
+        }
 
         // Fetch localizations from API
         const res = await fetch('/api/configuration/localizations?activeOnly=true', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (!isCancelled) setBackendOverrides({});
+          return;
+        }
 
         const data = await res.json();
         const list = data.data || [];
@@ -93,15 +101,18 @@ export function LanguageProvider({ children }) {
                 overrideMap[r.ResourceKey] = r.ResourceValue;
               }
             });
-            setBackendOverrides(overrideMap);
+            if (!isCancelled) setBackendOverrides(overrideMap);
+            return;
           }
         }
+        if (!isCancelled) setBackendOverrides({});
       } catch {
-        // Silently use offline dictionary on failure
+        if (!isCancelled) setBackendOverrides({});
       }
     };
 
     fetchBackendResources();
+    return () => { isCancelled = true; };
   }, [locale]);
 
   // Change language handler
@@ -110,6 +121,7 @@ export function LanguageProvider({ children }) {
       console.warn(`Unsupported locale: ${newLocale}`);
       return;
     }
+    setBackendOverrides({});
     setLocale(newLocale);
     try {
       localStorage.setItem(STORAGE_KEY, newLocale);

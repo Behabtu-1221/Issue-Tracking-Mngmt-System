@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sliders, Flag, List, Cpu, Hash, Globe, Calendar, Zap } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import { CONFIG_TABS } from '../constants/configConstants';
 import SystemSettingsTab from '../components/SystemSettingsTab';
 import FeatureFlagsTab from '../components/FeatureFlagsTab';
@@ -34,18 +35,33 @@ const TAB_COMPONENTS = {
 
 export default function ConfigurationPage() {
   const [activeTab, setActiveTab] = useState('settings');
+  const { t } = useTranslation();
 
   const ActiveComponent = TAB_COMPONENTS[activeTab];
+
+  const localizedTabs = CONFIG_TABS.map(tab => {
+    switch (tab.id) {
+      case 'settings': return { ...tab, label: t('config.tabSettings'), description: t('config.tabSettingsDesc') };
+      case 'flags': return { ...tab, label: t('config.tabFlags'), description: t('config.tabFlagsDesc') };
+      case 'lookups': return { ...tab, label: t('config.tabLookups'), description: t('config.tabLookupsDesc') };
+      case 'rules': return { ...tab, label: t('config.tabRules'), description: t('config.tabRulesDesc') };
+      case 'sequences': return { ...tab, label: t('config.tabSequences'), description: t('config.tabSequencesDesc') };
+      case 'localization': return { ...tab, label: t('config.tabLocalization'), description: t('config.tabLocalizationDesc') };
+      case 'calendars': return { ...tab, label: t('config.tabCalendars'), description: t('config.tabCalendarsDesc') };
+      case 'bootstrap': return { ...tab, label: t('config.tabBootstrap'), description: t('config.tabBootstrapDesc') };
+      default: return tab;
+    }
+  });
 
   return (
     <div>
       {/* Page Header */}
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.2rem', marginBottom: '8px' }}>
-          Configuration <span className="glow-text">Management</span>
+          {t('config.managementTitle')}
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Manage platform settings, feature toggles, lookup dictionaries, business rules, and runtime configurations.
+          {t('config.managementSubtitle')}
         </p>
       </div>
 
@@ -60,7 +76,7 @@ export default function ConfigurationPage() {
         marginBottom: '28px',
         overflowX: 'auto'
       }}>
-        {CONFIG_TABS.map((tab) => {
+        {localizedTabs.map((tab) => {
           const Icon = ICON_MAP[tab.icon];
           const isActive = activeTab === tab.id;
 

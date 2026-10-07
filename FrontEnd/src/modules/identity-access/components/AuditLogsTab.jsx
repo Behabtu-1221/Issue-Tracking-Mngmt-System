@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { FileText, Search, Shield, Filter, Calendar } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
+import { Search } from 'lucide-react';
 
 export default function AuditLogsTab() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   
   // Sample initial security events log viewer
@@ -21,12 +23,11 @@ export default function AuditLogsTab() {
   return (
     <div>
       {/* Header */}
-    <div style={{ marginBottom: '24px' }}>
-{/* Header */}
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Security & Audit Trail</h3>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>{t('identity.auditHeader')}</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            Immutable security log of user authentications, role updates, and account status transitions.
+            {t('identity.auditSubtitle')}
           </p>
         </div>
 
@@ -34,7 +35,7 @@ export default function AuditLogsTab() {
           <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search audit trail..."
+            placeholder={t('identity.searchAuditPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -55,12 +56,12 @@ export default function AuditLogsTab() {
         <table className="custom-table" style={{ width: '100%', minWidth: '950px' }}>
           <thead>
             <tr>
-              <th>Event Type</th>
-              <th>Triggered By</th>
-              <th>IP Address</th>
-              <th>Details / Payload</th>
-              <th>Timestamp</th>
-              <th>Outcome</th>
+              <th>{t('identity.thEventType')}</th>
+              <th>{t('identity.thTriggeredBy')}</th>
+              <th>{t('identity.thIpAddress')}</th>
+              <th>{t('identity.thDetailsPayload')}</th>
+              <th>{t('identity.thTimestamp')}</th>
+              <th>{t('identity.thOutcome')}</th>
             </tr>
           </thead>
           <tbody>

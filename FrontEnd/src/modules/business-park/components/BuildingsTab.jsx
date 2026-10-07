@@ -4,8 +4,10 @@ import parkApi from '../api/parkApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { parkSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function BuildingsTab() {
+  const { t } = useTranslation();
   const [buildings, setBuildings] = useState([]);
   const [parks, setParks] = useState([]);
   const [zones, setZones] = useState([]);
@@ -158,19 +160,18 @@ export default function BuildingsTab() {
     setSelectedBuilding(b);
     setConfirmConfig({
       isOpen: true,
-      title: 'Decommission Building Block',
+      title: t('businessPark.deleteBuilding'),
       message: `Are you sure you want to delete building "${b.BuildingName}"? Buildings with active floors or office spaces cannot be deleted.`,
       type: 'danger',
-      confirmText: 'Delete Building',
+      confirmText: t('common.delete'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
           await parkApi.deleteBuilding(b.BuildingID);
-          setSelectedBuilding(null);
           fetchBuildingsAndMeta();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete building.';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('common.error'), msg, 'error');
         }
       }
     });
@@ -187,7 +188,7 @@ export default function BuildingsTab() {
       BuildingName: b.BuildingName,
       ShortName: b.ShortName || '',
       Description: b.Description || '',
-      TotalFloors: b.TotalFloors || 1,
+      TotalFloors: b.TotalFloors,
       TotalAreaSquareMeter: b.TotalAreaSquareMeter || ''
     });
     setShowCreateModal(true);
@@ -219,7 +220,7 @@ export default function BuildingsTab() {
             <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search buildings by name or code..."
+              placeholder={t('businessPark.searchBuildings')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -262,7 +263,7 @@ export default function BuildingsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Facility Zones</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('businessPark.allFacilityZones')}</option>
             {(parkFilter ? zones.filter(z => String(z.BusinessParkID) === String(parkFilter)) : zones).map(z => (
               <option key={z.FacilityZoneID} value={z.FacilityZoneID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{z.FacilityZoneName}</option>
             ))}
@@ -285,7 +286,7 @@ export default function BuildingsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
           </button>
 
           <button
@@ -309,7 +310,7 @@ export default function BuildingsTab() {
               fontSize: '0.88rem'
             }}
           >
-            <Plus size={16} /> Add Building
+            <Plus size={16} /> {t('businessPark.addBuilding')}
           </button>
         </div>
       </div>
@@ -319,12 +320,12 @@ export default function BuildingsTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-            <p>Loading physical buildings...</p>
+            <p>{t('businessPark.loadingBuildings')}</p>
           </div>
         ) : buildings.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <Building size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-            <p>No building structures found matching filter.</p>
+            <p>{t('businessPark.noBuildingsFound')}</p>
           </div>
         ) : (
           <>
@@ -332,14 +333,14 @@ export default function BuildingsTab() {
               <table className="custom-table" style={{ minWidth: '1050px' }}>
                 <thead>
                   <tr>
-                    <th>Building Name</th>
-                    <th>Building Code</th>
-                    <th>Facility Zone</th>
-                    <th>Business Park</th>
-                    <th>Configured Floors</th>
-                    <th>Total Area (SqM)</th>
-                    <th>Offices</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th>{t('businessPark.buildingName')}</th>
+                    <th>{t('businessPark.buildingCode')}</th>
+                    <th>{t('businessPark.facilityZone')}</th>
+                    <th>{t('businessPark.businessPark')}</th>
+                    <th>{t('businessPark.configuredFloors')}</th>
+                    <th>{t('businessPark.totalArea')}</th>
+                    <th>{t('businessPark.offices')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -363,22 +364,22 @@ export default function BuildingsTab() {
                           fontSize: '0.75rem',
                           fontWeight: 600
                         }}>
-                          <MapPin size={12} /> {b.FacilityZoneName || 'Unassigned'}
+                          <MapPin size={12} /> {b.FacilityZoneName || t('common.none')}
                         </span>
                       </td>
                       <td>{b.BusinessParkName}</td>
                       <td style={{ fontWeight: '600' }}>
-                        {b.FloorCount || 0} / {b.TotalFloors} Floors
+                        {b.FloorCount || 0} / {b.TotalFloors} {t('businessPark.floorsLevels')}
                       </td>
                       <td>{b.TotalAreaSquareMeter ? `${Number(b.TotalAreaSquareMeter).toLocaleString()} m²` : '—'}</td>
                       <td>
-                        <span className="badge badge-info">{b.OfficeCount || 0} Offices</span>
+                        <span className="badge badge-info">{b.OfficeCount || 0} {t('businessPark.offices')}</span>
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                           <button
                             onClick={() => openEditModal(b)}
-                            title="Edit Building Details"
+                            title={t('businessPark.editBuilding')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -389,11 +390,11 @@ export default function BuildingsTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Edit size={14} /> Edit
+                            <Edit size={14} /> {t('common.edit')}
                           </button>
                           <button
                             onClick={() => promptDeleteBuilding(b)}
-                            title="Delete Building"
+                            title={t('businessPark.deleteBuilding')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -404,7 +405,7 @@ export default function BuildingsTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Trash2 size={14} /> Delete
+                            <Trash2 size={14} /> {t('common.delete')}
                           </button>
                         </div>
                       </td>
@@ -425,10 +426,10 @@ export default function BuildingsTab() {
               fontSize: '0.78rem',
               color: 'var(--text-muted)'
             }}>
-              <span>Showing <strong>{buildings.length}</strong> building records</span>
+              <span>{t('common.showing')} <strong>{buildings.length}</strong> {t('businessPark.showingBuildingRecords')}</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <ArrowLeftRight size={13} style={{ color: 'var(--accent-primary)' }} />
-                Use horizontal scroll bar to view full infrastructure specifications
+                {t('businessPark.useHorizontalScroll')}
               </span>
             </div>
           </>
@@ -452,10 +453,10 @@ export default function BuildingsTab() {
                   </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {selectedBuilding ? 'Edit Building Block' : 'Register Building Block'}
+                      {selectedBuilding ? t('businessPark.editBuildingBlock') : t('businessPark.registerBuilding')}
                     </h3>
                     <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {selectedBuilding ? `Modifying structure ID: ${selectedBuilding.BuildingCode}` : 'Define physical building details within campus and facility zone'}
+                      {selectedBuilding ? `${t('businessPark.modifyingStructure')}: ${selectedBuilding.BuildingCode}` : t('businessPark.defineBuildingDetails')}
                     </p>
                   </div>
                 </div>
@@ -478,7 +479,7 @@ export default function BuildingsTab() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                      1. Business Park
+                      1. {t('businessPark.businessPark')}
                     </label>
                     <div style={{
                       width: '100%', padding: '10px 14px', borderRadius: '8px',
@@ -491,13 +492,13 @@ export default function BuildingsTab() {
                       {parks.length > 0 ? `${parks[0].BusinessParkName} (${parks[0].BusinessParkCode})` : 'Ethiopian IT Park'}
                     </div>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px', display: 'block' }}>
-                      Single campus system — auto-assigned
+                      {t('businessPark.singleCampusAssigned')}
                     </span>
                   </div>
 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                      2. Facility Zone *
+                      2. {t('businessPark.facilityZone')} *
                     </label>
                     <select
                       value={formData.FacilityZoneID}
@@ -509,7 +510,7 @@ export default function BuildingsTab() {
                         color: 'var(--text-primary)', fontSize: '0.88rem'
                       }}
                     >
-                      <option value="">Select Facility Zone</option>
+                      <option value="">{t('businessPark.selectFacilityZone')}</option>
                       {availableZonesForForm.map(z => (
                         <option key={z.FacilityZoneID} value={z.FacilityZoneID}>
                           {z.FacilityZoneName} ({z.FacilityZoneCode})
@@ -522,7 +523,7 @@ export default function BuildingsTab() {
                       </span>
                     ) : availableZonesForForm.length === 0 && formData.BusinessParkID ? (
                       <span style={{ fontSize: '0.72rem', color: '#f87171', display: 'block', marginTop: '4px' }}>
-                        No facility zones found in selected park. Create a zone first.
+                        {t('businessPark.noFacilityZonesInPark')}
                       </span>
                     ) : null}
                   </div>
@@ -530,10 +531,10 @@ export default function BuildingsTab() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Building Name *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.buildingName')} *</label>
                     <input
                       type="text"
-                      placeholder="e.g. Block A - Innovation Hub"
+                      placeholder={t('businessPark.enterBuildingName')}
                       value={formData.BuildingName}
                       onChange={(e) => handleFieldChange('BuildingName', e.target.value)}
                       style={{
@@ -550,10 +551,10 @@ export default function BuildingsTab() {
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Building Code *</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.buildingCode')} *</label>
                     <input
                       type="text"
-                      placeholder="e.g. BLK-A"
+                      placeholder={t('businessPark.enterBuildingCode')}
                       value={formData.BuildingCode}
                       onChange={(e) => handleFieldChange('BuildingCode', e.target.value)}
                       style={{
@@ -574,7 +575,7 @@ export default function BuildingsTab() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                      Configured Number of Floors *
+                      {t('businessPark.enterTotalFloors')} *
                     </label>
                     <input
                       type="number"
@@ -589,18 +590,14 @@ export default function BuildingsTab() {
                         color: 'var(--text-primary)', fontSize: '0.88rem'
                       }}
                     />
-                    {(fieldErrors.TotalFloors || fieldErrors.FloorsCount) ? (
+                    {(fieldErrors.TotalFloors || fieldErrors.FloorsCount) && (
                       <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
                         ⚠️ {fieldErrors.TotalFloors || fieldErrors.FloorsCount}
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                        Determines maximum floor levels allowed (Floor 1 to {formData.TotalFloors || 1})
                       </span>
                     )}
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Total Area (m²)</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.totalArea')}</label>
                     <input
                       type="number"
                       placeholder="e.g. 4500"
@@ -622,10 +619,10 @@ export default function BuildingsTab() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>Description</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('common.description')}</label>
                   <textarea
                     rows={3}
-                    placeholder="Provide details about facilities, wings or architectural specifications..."
+                    placeholder={t('businessPark.buildingDescription')}
                     value={formData.Description}
                     onChange={(e) => handleFieldChange('Description', e.target.value)}
                     style={{
@@ -645,10 +642,10 @@ export default function BuildingsTab() {
                 {/* Footer Actions */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)' }}>
                   <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '10px 22px', borderRadius: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.88rem' }}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" disabled={formSubmitting} style={{ padding: '10px 24px', borderRadius: '10px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', opacity: formSubmitting ? 0.7 : 1 }}>
-                    {formSubmitting ? '⏳ Saving...' : selectedBuilding ? '✓ Update Building' : '✓ Add Building'}
+                    {formSubmitting ? `⏳ ${t('common.loading')}` : selectedBuilding ? `✓ ${t('businessPark.updateBuilding')}` : `✓ ${t('businessPark.addBuilding')}`}
                   </button>
                 </div>
               </form>

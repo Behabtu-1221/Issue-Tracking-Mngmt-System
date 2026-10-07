@@ -6,8 +6,10 @@ import {
 } from 'lucide-react';
 import parkApi from '../api/parkApi';
 import BusinessParkFormModal from './BusinessParkFormModal';
+import { useTranslation } from '../../../i18n';
 
 export default function CampusProfileTab() {
+  const { t } = useTranslation();
   const [park, setPark] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -42,7 +44,7 @@ export default function CampusProfileTab() {
         borderRadius: '20px', border: '1px solid var(--glass-border)', color: 'var(--text-muted)'
       }}>
         <RefreshCw size={28} className="animate-spin" style={{ color: 'var(--accent-primary)', marginBottom: '12px' }} />
-        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Loading Central Business Park Profile...</div>
+        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{t('common.loading')}</div>
       </div>
     );
   }
@@ -67,10 +69,10 @@ export default function CampusProfileTab() {
           </div>
 
           <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 10px', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
-            No Primary Business Park Registered
+            {t('businessPark.noParkRegistered')}
           </h2>
           <p style={{ maxWidth: '600px', margin: '0 auto 28px', color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6' }}>
-            Register your central Business Park profile parameters (Identity, Legal TIN, Geo Address, TimeZone & Currency defaults) to initialize tenant leasing, building topology, and service operations platform-wide.
+            {t('businessPark.noParkDesc')}
           </p>
 
           <button
@@ -82,20 +84,16 @@ export default function CampusProfileTab() {
               boxShadow: 'var(--glow-accent)', transition: 'all 0.2s'
             }}
           >
-            <Sparkles size={18} /> Register Primary Park Profile Now
+            <Plus size={18} /> {t('businessPark.registerPark')}
           </button>
         </div>
       ) : (
-        /* REGISTERED EXECUTIVE PARK OVERVIEW DASHBOARD */
+        /* ACTIVE MASTER CAMPUS PROFILE CARD */
         <>
-          {/* Top Hero Banner */}
-          <div style={{
-            background: 'var(--bg-secondary)',
-            borderRadius: '24px', border: '1px solid var(--glass-border-accent)',
-            padding: '28px 32px', boxShadow: 'var(--shadow-lg)',
-            position: 'relative', overflow: 'hidden', backdropFilter: 'blur(16px)'
+          <div className="glass-panel" style={{
+            padding: '32px', position: 'relative', overflow: 'hidden',
+            border: '1px solid var(--glass-border-accent)', borderRadius: '24px'
           }}>
-            {/* Top Multi-Tone Brand Line Accent */}
             <div style={{
               position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
               background: 'linear-gradient(90deg, #2563eb 0%, #7c3aed 40%, #0284c7 75%, #10b981 100%)'
@@ -133,7 +131,7 @@ export default function CampusProfileTab() {
                       display: 'inline-flex', alignItems: 'center', gap: '6px'
                     }}>
                       <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: park.IsOperational ? 'var(--color-success)' : 'var(--color-danger)' }} />
-                      {park.IsOperational ? 'Operational Park' : 'Maintenance / Offline'}
+                      {park.IsOperational ? t('businessPark.operational') : t('businessPark.maintenanceOffline')}
                     </span>
                   </div>
 
@@ -158,7 +156,7 @@ export default function CampusProfileTab() {
                   boxShadow: 'var(--glow-accent)', transition: 'all 0.2s'
                 }}
               >
-                <Edit size={16} /> Edit Park Parameters
+                <Edit size={16} /> {t('businessPark.editParkParameters')}
               </button>
             </div>
           </div>
@@ -172,41 +170,41 @@ export default function CampusProfileTab() {
               border: '1px solid var(--glass-border)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--accent-primary)', fontWeight: 800, fontSize: '0.9rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '12px' }}>
-                <Building2 size={18} /> Identity & Legal Registration
+                <Building2 size={18} /> {t('businessPark.identityLegal')}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Unique Code</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.uniqueCode')}</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{park.BusinessParkCode || '—'}</div>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Short Name</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.shortName')}</div>
                   <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{park.ShortName || '—'}</div>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Reg. Number</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.regNumber')}</div>
                   <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>{park.RegistrationNumber || '—'}</div>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Tax ID (TIN)</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.tinNumber')}</div>
                   <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>{park.TaxIdentificationNo || '—'}</div>
                 </div>
               </div>
 
               {park.TotalAreaSquareMeter && (
                 <div style={{ background: 'var(--bg-tertiary)', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Gross Footprint Area:</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('businessPark.grossArea')}:</span>
                   <strong style={{ fontSize: '0.88rem', color: 'var(--accent-primary)' }}>{Number(park.TotalAreaSquareMeter).toLocaleString()} m²</strong>
                 </div>
               )}
 
               {park.Description && (
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>Overview</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>{t('businessPark.overview')}</div>
                   <div style={{ fontSize: '0.83rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>{park.Description}</div>
                 </div>
               )}
@@ -218,7 +216,7 @@ export default function CampusProfileTab() {
               border: '1px solid var(--glass-border)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--color-info)', fontWeight: 800, fontSize: '0.9rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '12px' }}>
-                <Mail size={18} /> Contact & Digital Channels
+                <Mail size={18} /> {t('businessPark.contactChannels')}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -227,7 +225,7 @@ export default function CampusProfileTab() {
                     <Mail size={16} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Contact Email</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.contactEmail')}</div>
                     <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>{park.Email || '—'}</div>
                   </div>
                 </div>
@@ -237,7 +235,7 @@ export default function CampusProfileTab() {
                     <Phone size={16} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Landline Phone</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.landlinePhone')}</div>
                     <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>{park.PhoneNumber || '—'}</div>
                   </div>
                 </div>
@@ -247,7 +245,7 @@ export default function CampusProfileTab() {
                     <Phone size={16} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Mobile Hotline</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.mobileHotline')}</div>
                     <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>{park.MobileNumber || '—'}</div>
                   </div>
                 </div>
@@ -258,7 +256,7 @@ export default function CampusProfileTab() {
                       <Globe size={16} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Website Portal</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.officialWebsite')}</div>
                       <a href={park.Website.startsWith('http') ? park.Website : `https://${park.Website}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-info)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
                         {park.Website} <ExternalLink size={12} />
                       </a>
@@ -274,7 +272,7 @@ export default function CampusProfileTab() {
               border: '1px solid var(--glass-border)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--color-success)', fontWeight: 800, fontSize: '0.9rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '12px' }}>
-                <MapPin size={18} /> Location & Boundary Address
+                <MapPin size={18} /> {t('businessPark.geoCoordinates')}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -300,7 +298,7 @@ export default function CampusProfileTab() {
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Street Address</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.physicalAddress')}</div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   {park.AddressLine1 || 'Main Campus Gate'} {park.AddressLine2 ? `• ${park.AddressLine2}` : ''}
                 </div>
@@ -323,22 +321,22 @@ export default function CampusProfileTab() {
               border: '1px solid var(--glass-border)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--accent-secondary)', fontWeight: 800, fontSize: '0.9rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '12px' }}>
-                <Globe size={18} /> System & Regional Defaults
+                <Globe size={18} /> {t('businessPark.operatingDefaults')}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>TimeZone</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.defaultTimezone')}</div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>{park.TimeZone || 'Africa/Addis_Ababa'}</div>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Currency</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.baseCurrency')}</div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>{park.CurrencyCode || 'ETB'}</div>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Language</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{t('businessPark.systemLanguage')}</div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>{park.LanguageCode || 'en'}</div>
                 </div>
               </div>
@@ -350,7 +348,7 @@ export default function CampusProfileTab() {
                   border: park.IsOperational ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
                   color: park.IsOperational ? 'var(--color-success)' : 'var(--color-danger)', fontWeight: 800, fontSize: '0.82rem', textAlign: 'center'
                 }}>
-                  {park.IsOperational ? 'Operational' : 'Offline'}
+                  {park.IsOperational ? t('businessPark.operational') : t('businessPark.maintenanceOffline')}
                 </div>
 
                 <div style={{
@@ -359,7 +357,7 @@ export default function CampusProfileTab() {
                   border: park.IsActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid rgba(148, 163, 184, 0.3)',
                   color: park.IsActive ? 'var(--accent-primary)' : 'var(--text-muted)', fontWeight: 800, fontSize: '0.82rem', textAlign: 'center'
                 }}>
-                  {park.IsActive ? 'Active Record' : 'Deactivated'}
+                  {park.IsActive ? t('common.active') : t('common.inactive')}
                 </div>
               </div>
             </div>

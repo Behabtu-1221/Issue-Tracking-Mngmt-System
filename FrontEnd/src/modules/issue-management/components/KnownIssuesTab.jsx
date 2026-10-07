@@ -21,8 +21,10 @@ import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { requestSchemas } from '../../../validation';
 import { FormField } from '../../../components/common/FormField';
+import { useTranslation } from '../../../i18n';
 
 export const KnownIssuesTab = () => {
+  const { t } = useTranslation();
   const [knownIssues, setKnownIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -144,10 +146,10 @@ export const KnownIssuesTab = () => {
   const handleDelete = (ki) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Remove Knowledge Article',
-      message: `Are you sure you want to delete knowledge base article "${ki.Title}"? This action cannot be undone.`,
+      title: t('knownIssues.deleteTitle', 'Remove Knowledge Article'),
+      message: t('knownIssues.deleteConfirm', { title: ki.Title }, `Are you sure you want to delete knowledge base article "${ki.Title}"? This action cannot be undone.`),
       type: 'danger',
-      confirmText: 'Delete Article',
+      confirmText: t('knownIssues.deleteButton', 'Delete Article'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -155,7 +157,7 @@ export const KnownIssuesTab = () => {
           fetchKnownIssues(search);
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete known issue';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('knownIssues.actionRestricted', 'Action Restricted'), msg, 'error');
         }
       }
     });
@@ -182,16 +184,16 @@ export const KnownIssuesTab = () => {
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
             <input
               type="text"
-              placeholder="Search knowledge base by title, symptoms, keywords..."
+              placeholder={t('knownIssues.searchPlaceholder', 'Search knowledge base by title, symptoms, keywords...')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{ ...baseInputStyle(false), paddingLeft: '38px' }}
             />
           </div>
-          <button type="submit" className="btn-secondary" style={{ padding: '9px 16px' }}>Search</button>
+          <button type="submit" className="btn-secondary" style={{ padding: '9px 16px' }}>{t('common.search', 'Search')}</button>
         </form>
         <button className="btn-primary" onClick={openCreateForm} style={{ padding: '9px 18px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-          <Plus size={16} /> Add Knowledge Article
+          <Plus size={16} /> {t('knownIssues.addArticle', 'Add Knowledge Article')}
         </button>
       </div>
 
@@ -201,7 +203,7 @@ export const KnownIssuesTab = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
             <h3 style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
               <Lightbulb size={18} style={{ color: '#f59e0b' }} />
-              {editingId ? 'Edit Knowledge Article' : 'New Knowledge Article'}
+              {editingId ? t('knownIssues.editArticle', 'Edit Knowledge Article') : t('knownIssues.newArticle', 'New Knowledge Article')}
             </h3>
             <button onClick={() => setShowForm(false)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
               <X size={16} />
@@ -219,19 +221,19 @@ export const KnownIssuesTab = () => {
               {/* Title */}
               <div style={{ gridColumn: '1 / -1' }}>
                 <FormField
-                  label="Article Title"
+                  label={t('knownIssues.articleTitle', 'Article Title')}
                   id="Title"
                   required
                   icon={BookOpen}
                   error={fieldErrors.Title}
-                  helpText="Clear, descriptive title for quick recognition (3-250 characters)."
+                  helpText={t('knownIssues.articleTitleHelp', 'Clear, descriptive title for quick recognition (3-250 characters).')}
                 >
                   <input
                     id="Title"
                     type="text"
                     value={form.Title}
                     onChange={(e) => handleFieldChange('Title', e.target.value)}
-                    placeholder="e.g. VPN Disconnection on Windows 11 after Sleep"
+                    placeholder={t('knownIssues.articleTitlePlaceholder', 'e.g. VPN Disconnection on Windows 11 after Sleep')}
                     style={baseInputStyle(Boolean(fieldErrors.Title))}
                   />
                 </FormField>
@@ -240,19 +242,19 @@ export const KnownIssuesTab = () => {
               {/* Symptoms */}
               <div>
                 <FormField
-                  label="Observable Symptoms"
+                  label={t('knownIssues.symptoms', 'Observable Symptoms')}
                   id="Symptoms"
                   required
                   icon={AlertCircle}
                   error={fieldErrors.Symptoms}
-                  helpText="Describe the errors, logs, or behavioral symptoms (min 5 characters)."
+                  helpText={t('knownIssues.symptomsHelp', 'Describe the errors, logs, or behavioral symptoms (min 5 characters).')}
                 >
                   <textarea
                     id="Symptoms"
                     rows={3}
                     value={form.Symptoms}
                     onChange={(e) => handleFieldChange('Symptoms', e.target.value)}
-                    placeholder="Observable symptoms of this known issue..."
+                    placeholder={t('knownIssues.symptomsPlaceholder', 'Observable symptoms of this known issue...')}
                     style={{ ...baseInputStyle(Boolean(fieldErrors.Symptoms)), resize: 'vertical' }}
                   />
                 </FormField>
@@ -261,18 +263,18 @@ export const KnownIssuesTab = () => {
               {/* Workaround */}
               <div>
                 <FormField
-                  label="Temporary Workaround"
+                  label={t('knownIssues.workaround', 'Temporary Workaround')}
                   id="Workaround"
                   icon={CheckCircle2}
                   error={fieldErrors.Workaround}
-                  helpText="Immediate mitigation steps for users before permanent fix."
+                  helpText={t('knownIssues.workaroundHelp', 'Immediate mitigation steps for users before permanent fix.')}
                 >
                   <textarea
                     id="Workaround"
                     rows={3}
                     value={form.Workaround}
                     onChange={(e) => handleFieldChange('Workaround', e.target.value)}
-                    placeholder="Temporary workaround instructions..."
+                    placeholder={t('knownIssues.workaroundPlaceholder', 'Temporary workaround instructions...')}
                     style={{ ...baseInputStyle(Boolean(fieldErrors.Workaround)), resize: 'vertical' }}
                   />
                 </FormField>
@@ -281,18 +283,18 @@ export const KnownIssuesTab = () => {
               {/* Permanent Solution */}
               <div style={{ gridColumn: '1 / -1' }}>
                 <FormField
-                  label="Permanent Solution / Fix Procedure"
+                  label={t('knownIssues.permanentSolution', 'Permanent Solution / Fix Procedure')}
                   id="PermanentSolution"
                   icon={ShieldCheck}
                   error={fieldErrors.PermanentSolution}
-                  helpText="Final engineering resolution or root cause patch steps."
+                  helpText={t('knownIssues.permanentSolutionHelp', 'Final engineering resolution or root cause patch steps.')}
                 >
                   <textarea
                     id="PermanentSolution"
                     rows={3}
                     value={form.PermanentSolution}
                     onChange={(e) => handleFieldChange('PermanentSolution', e.target.value)}
-                    placeholder="Permanent fix procedure..."
+                    placeholder={t('knownIssues.permanentSolutionPlaceholder', 'Permanent fix procedure...')}
                     style={{ ...baseInputStyle(Boolean(fieldErrors.PermanentSolution)), resize: 'vertical' }}
                   />
                 </FormField>
@@ -301,11 +303,11 @@ export const KnownIssuesTab = () => {
               {/* Category Code */}
               <div>
                 <FormField
-                  label="Category Code"
+                  label={t('knownIssues.categoryCode', 'Category Code')}
                   id="CategoryCode"
                   icon={Tag}
                   error={fieldErrors.CategoryCode}
-                  helpText="Functional domain (e.g. IT, FACILITIES, NETWORK)."
+                  helpText={t('knownIssues.categoryCodeHelp', 'Functional domain (e.g. IT, FACILITIES, NETWORK).')}
                 >
                   <input
                     id="CategoryCode"
@@ -321,18 +323,18 @@ export const KnownIssuesTab = () => {
               {/* Search Keywords */}
               <div>
                 <FormField
-                  label="Search Keywords"
+                  label={t('knownIssues.searchKeywords', 'Search Keywords')}
                   id="SearchKeywords"
                   icon={Search}
                   error={fieldErrors.SearchKeywords}
-                  helpText="Comma-separated keywords for user searches."
+                  helpText={t('knownIssues.searchKeywordsHelp', 'Comma-separated keywords for user searches.')}
                 >
                   <input
                     id="SearchKeywords"
                     type="text"
                     value={form.SearchKeywords}
                     onChange={(e) => handleFieldChange('SearchKeywords', e.target.value)}
-                    placeholder="e.g. vpn, sleep, wifi, driver, adapter"
+                    placeholder={t('knownIssues.searchKeywordsPlaceholder', 'e.g. vpn, sleep, wifi, driver, adapter')}
                     style={baseInputStyle(Boolean(fieldErrors.SearchKeywords))}
                   />
                 </FormField>
@@ -353,7 +355,7 @@ export const KnownIssuesTab = () => {
                   fontWeight: '600'
                 }}
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
@@ -361,7 +363,7 @@ export const KnownIssuesTab = () => {
                 disabled={submitting}
                 style={{ padding: '10px 24px' }}
               >
-                {submitting ? 'Saving...' : editingId ? 'Update Article' : 'Create Article'}
+                {submitting ? t('knownIssues.saving', 'Saving...') : editingId ? t('knownIssues.updateArticle', 'Update Article') : t('knownIssues.createArticle', 'Create Article')}
               </button>
             </div>
           </form>
@@ -382,7 +384,7 @@ export const KnownIssuesTab = () => {
           color: 'var(--text-muted)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Knowledge Base Articles</span>
+            <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t('knownIssues.title', 'Knowledge Base Articles')}</span>
             <span style={{
               background: 'rgba(99, 102, 241, 0.12)',
               color: 'var(--accent-primary)',
@@ -391,7 +393,7 @@ export const KnownIssuesTab = () => {
               fontSize: '0.75rem',
               fontWeight: 700
             }}>
-              {knownIssues.length} {knownIssues.length === 1 ? 'article' : 'articles'}
+              {knownIssues.length} {knownIssues.length === 1 ? t('knownIssues.article', 'article') : t('knownIssues.articles', 'articles')}
             </span>
           </div>
 
@@ -407,7 +409,7 @@ export const KnownIssuesTab = () => {
             border: '1px solid var(--glass-border)'
           }}>
             <MoveHorizontal size={13} color="var(--accent-primary)" />
-            <span>Horizontal Scroll Enabled</span>
+            <span>{t('knownIssues.scrollEnabled', 'Horizontal Scroll Enabled')}</span>
           </div>
         </div>
 
@@ -415,9 +417,9 @@ export const KnownIssuesTab = () => {
         <div className="table-scroll-container" tabIndex={0} role="region" aria-label="Knowledge Base Articles List">
           <div style={{ minWidth: '760px' }}>
             {loading ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading knowledge base articles...</div>
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>{t('knownIssues.loading', 'Loading knowledge base articles...')}</div>
             ) : knownIssues.length === 0 ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>No knowledge base articles found.</div>
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>{t('knownIssues.empty', 'No knowledge base articles found.')}</div>
             ) : (
               knownIssues.map((ki) => {
                 const isExpanded = expandedId === ki.KnownIssueID;
@@ -463,13 +465,13 @@ export const KnownIssuesTab = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                           {ki.Workaround && (
                             <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.06)', border: '1px solid rgba(245, 158, 11, 0.15)' }}>
-                              <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#f59e0b', marginBottom: '6px', textTransform: 'uppercase' }}>Workaround</div>
+                              <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#f59e0b', marginBottom: '6px', textTransform: 'uppercase' }}>{t('knownIssues.workaround', 'Workaround')}</div>
                               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>{ki.Workaround}</p>
                             </div>
                           )}
                           {ki.PermanentSolution && (
                             <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'rgba(34, 197, 94, 0.06)', border: '1px solid rgba(34, 197, 94, 0.15)' }}>
-                              <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#4ade80', marginBottom: '6px', textTransform: 'uppercase' }}>Permanent Solution</div>
+                              <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#4ade80', marginBottom: '6px', textTransform: 'uppercase' }}>{t('knownIssues.permanentSolution', 'Permanent Solution')}</div>
                               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>{ki.PermanentSolution}</p>
                             </div>
                           )}

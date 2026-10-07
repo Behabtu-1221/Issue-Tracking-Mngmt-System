@@ -9,6 +9,7 @@ import { PERMISSION_MODULE_TREE, ADMIN_SCOPES } from '../constants/permissionCon
 import rbacApi from '../api/rbacApi';
 import { usePermission } from '../hooks/usePermission';
 import Can from '../guards/Can';
+import { useTranslation } from '../../../i18n';
 
 const SCOPE_COLORS = {
   OWN: { bg: 'rgba(234, 179, 8, 0.15)', text: '#eab308', border: 'rgba(234, 179, 8, 0.3)' },
@@ -24,6 +25,7 @@ const MODULE_ICONS = {
 };
 
 export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole }) {
+  const { t } = useTranslation();
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -283,7 +285,9 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
             <Shield size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Security Roles</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {t('rbac.activeSecurityRoles', 'Active Security Roles')}
+            </div>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>{matrixStats.totalRoles}</div>
           </div>
         </div>
@@ -293,7 +297,9 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
             <Sliders size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total System Permissions</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {t('rbac.totalSystemPermissions', 'Total System Permissions')}
+            </div>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>{matrixStats.totalPerms}</div>
           </div>
         </div>
@@ -303,7 +309,9 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
             <Sparkles size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Matrix Grants</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {t('rbac.activeMatrixGrants', 'Active Matrix Grants')}
+            </div>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>{matrixStats.totalGrants}</div>
           </div>
         </div>
@@ -317,7 +325,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
             <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search permission code, name, or group (e.g., Office.Manage)..."
+              placeholder={t('rbac.searchMatrixPlaceholder', 'Search permission code, name, or group (e.g., Office.Manage)...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -339,7 +347,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                 borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none'
               }}
             >
-              <option value="ALL">All System Modules ({PERMISSION_MODULE_TREE.length})</option>
+              <option value="ALL">{t('rbac.allSystemModules', 'All System Modules ({count})', { count: PERMISSION_MODULE_TREE.length })}</option>
               {PERMISSION_MODULE_TREE.map(mod => (
                 <option key={mod.moduleCode} value={mod.moduleCode}>{mod.moduleName}</option>
               ))}
@@ -357,7 +365,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                 borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none'
               }}
             >
-              <option value="ALL">All Roles ({roles.length})</option>
+              <option value="ALL">{t('rbac.allRolesCount', 'All Roles ({count})', { count: roles.length })}</option>
               {roles.map(r => (
                 <option key={r.RoleID || r.roleId} value={r.RoleID || r.roleId}>
                   {r.RoleName || r.roleName} ({r.RoleCode || r.roleCode})
@@ -371,11 +379,11 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', paddingTop: '14px', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button type="button" onClick={expandAll} style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.84rem', fontWeight: 700, cursor: 'pointer' }}>
-              + Expand All Sections
+              {t('rbac.expandAllSections', '+ Expand All Sections')}
             </button>
             <span style={{ color: 'var(--glass-border)' }}>|</span>
             <button type="button" onClick={collapseAll} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer' }}>
-              - Collapse All
+              {t('rbac.collapseAllSections', '- Collapse All')}
             </button>
           </div>
 
@@ -389,7 +397,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                 fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
               }}
             >
-              <Download size={15} /> Export Matrix (CSV)
+              <Download size={15} /> {t('rbac.exportMatrixCsv', 'Export Matrix (CSV)')}
             </button>
 
             <button
@@ -401,7 +409,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                 fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
               }}
             >
-              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh Matrix
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> {t('rbac.refreshMatrix', 'Refresh Matrix')}
             </button>
 
             <Can permission="Role.Create">
@@ -415,7 +423,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                   boxShadow: 'var(--shadow-md)'
                 }}
               >
-                <Plus size={16} /> Create Custom Role
+                <Plus size={16} /> {t('rbac.createCustomRole', 'Create Custom Role')}
               </button>
             </Can>
           </div>
@@ -430,11 +438,11 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
         {loading ? (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '80px 20px' }}>
             <RefreshCw className="animate-spin" size={36} style={{ marginBottom: '14px', color: 'var(--accent-primary)' }} />
-            <div style={{ fontSize: '1.05rem', fontWeight: 700 }}>Loading Enterprise Permission Matrix...</div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 700 }}>{t('rbac.loadingMatrix', 'Loading Enterprise Permission Matrix...')}</div>
           </div>
         ) : filteredRoles.length === 0 ? (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '60px 20px' }}>
-            No security roles found. Create a role or adjust filters.
+            {t('rbac.noRolesFoundMatrix', 'No security roles found. Create a role or adjust filters.')}
           </div>
         ) : (
           <table className="custom-table" style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
@@ -449,7 +457,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Sliders size={16} color="var(--accent-primary)" />
                     <span style={{ fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      System Module / Resource Scope
+                      {t('rbac.systemModuleResourceScope', 'System Module / Resource Scope')}
                     </span>
                   </div>
                 </th>
@@ -482,7 +490,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                                 fontSize: '0.72rem', padding: '2px 8px', fontWeight: 700
                               }}
                             >
-                              Edit Role
+                              {t('rbac.editRole', 'Edit Role')}
                             </button>
                           )}
                         </Can>
@@ -524,7 +532,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                             background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)',
                             color: 'var(--accent-primary)', fontSize: '0.72rem', fontWeight: 800, padding: '2px 8px', borderRadius: '12px'
                           }}>
-                            {mod.groups.flatMap(g => g.permissions).length} Permissions
+                            {t('rbac.permissionsCount', '{count} Permissions', { count: mod.groups.flatMap(g => g.permissions).length })}
                           </span>
                         </div>
                       </td>
@@ -557,7 +565,7 @@ export default function RolePermissionMatrix({ onOpenCreateRole, onOpenEditRole 
                                   ▸ {grp.groupName}
                                 </span>
                                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                                  ({grp.permissions.length} items)
+                                  {t('rbac.itemsCount', '({count} items)', { count: grp.permissions.length })}
                                 </span>
                               </div>
                             </td>

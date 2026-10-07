@@ -3,6 +3,7 @@ import { X, UserCheck, Shield, Check, AlertCircle } from 'lucide-react';
 import rbacApi from '../api/rbacApi';
 import { FormField } from '../../../components/common/FormField';
 import { rolePermissionSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 const glassCard = {
   background: 'var(--color-elevated, var(--bg-tertiary))',
@@ -13,6 +14,7 @@ const glassCard = {
 };
 
 export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }) {
+  const { t } = useTranslation();
   const [roles, setRoles] = useState([]);
   const [selectedRoleId, setSelectedRoleId] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -94,10 +96,10 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
             <UserCheck size={24} color="var(--color-primary)" />
             <div>
               <h3 style={{ margin: 0, color: 'var(--color-text)', fontSize: '17px', fontWeight: 700 }}>
-                Assign Employee Role
+                {t('rbac.assignEmployeeRoleTitle', 'Assign Employee Role')}
               </h3>
               <p style={{ margin: '2px 0 0', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
-                Allocate security authority and granular permissions
+                {t('rbac.assignEmployeeRoleSubtitle', 'Allocate security authority and granular permissions')}
               </p>
             </div>
           </div>
@@ -117,7 +119,9 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
 
         <form onSubmit={handleAssign} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: '14px 18px', borderRadius: '12px' }}>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Selected Employee:</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+              {t('rbac.selectedEmployee', 'Selected Employee:')}
+            </div>
             <div style={{ fontSize: '15px', color: 'var(--color-text)', fontWeight: 700, marginTop: '2px' }}>
               {userToAssign?.FirstName} {userToAssign?.LastName}
             </div>
@@ -127,7 +131,7 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
           </div>
 
           <FormField
-            label="Select System or Company Role"
+            label={t('rbac.selectRoleLabel', 'Select System or Company Role')}
             required
             icon={Shield}
             error={assignErrors.roleId}
@@ -152,7 +156,7 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
                 boxSizing: 'border-box'
               }}
             >
-              <option value="">-- Choose Role --</option>
+              <option value="">{t('rbac.chooseRoleOption', '-- Choose Role --')}</option>
               {roles.map(r => (
                 <option key={r.RoleID || r.id} value={r.RoleID || r.id}>
                   {r.RoleName || r.roleName} ({r.RoleCode || r.roleCode})
@@ -164,7 +168,7 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
           {selectedRoleObj && (
             <div style={{ background: 'var(--color-primary-subtle)', border: '1px solid var(--color-primary-border)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '12px', color: 'var(--color-primary)', fontWeight: 700 }}>
-                Role Preview: {selectedRoleObj.RoleName || selectedRoleObj.roleName}
+                {t('rbac.rolePreview', 'Role Preview:')} {selectedRoleObj.RoleName || selectedRoleObj.roleName}
               </div>
               <div style={{ fontSize: '11.5px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
                 {selectedRoleObj.Description || selectedRoleObj.description || 'Custom organizational authority role'}
@@ -181,7 +185,7 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
                 borderRadius: '10px', padding: '10px 18px', color: 'var(--color-text-secondary)', fontWeight: 600, fontSize: '13px', cursor: 'pointer'
               }}
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -193,7 +197,7 @@ export default function UserRoleAssignModal({ userToAssign, onClose, onSuccess }
                 boxShadow: '0 4px 14px rgba(47, 129, 247, 0.35)'
               }}
             >
-              {submitting ? 'Assigning...' : 'Assign Role'}
+              {submitting ? t('rbac.assigningRole', 'Assigning...') : t('rbac.assignRoleBtn', 'Assign Role')}
             </button>
           </div>
         </form>

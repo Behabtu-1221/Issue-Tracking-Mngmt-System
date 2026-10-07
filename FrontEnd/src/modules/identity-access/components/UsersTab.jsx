@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../i18n';
 import { 
   Users, 
   Search, 
@@ -37,6 +38,7 @@ import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { userSchemas } from '../../../validation';
 
 export default function UsersTab() {
+  const { t } = useTranslation();
   const { user, isParkAdmin, isCompanyAdmin } = usePermissionContext();
   const canCreateUser = isParkAdmin || isCompanyAdmin;
   const canManageRoles = isParkAdmin || isCompanyAdmin;
@@ -306,10 +308,10 @@ export default function UsersTab() {
     if (!selectedUser) return;
     setConfirmConfig({
       isOpen: true,
-      title: 'Decommission User Account',
-      message: `Are you sure you want to soft delete account "${selectedUser.Username}" (${selectedUser.Email})? The user will immediately lose platform access.`,
+      title: t('identity.deleteUserTitle'),
+      message: `${t('identity.deleteUserPrompt')} "${selectedUser.Username}" (${selectedUser.Email})? ${t('identity.deleteUserLostAccess')}`,
       type: 'danger',
-      confirmText: 'Delete User',
+      confirmText: t('identity.confirmDeleteBtn'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -328,17 +330,17 @@ export default function UsersTab() {
     if (!selectedUser) return;
     setConfirmConfig({
       isOpen: true,
-      title: 'Revoke Active Session',
-      message: 'Are you sure you want to terminate this user session immediately?',
+      title: t('identity.revokeSessionTitle'),
+      message: t('identity.revokeSessionConfirm'),
       type: 'warning',
-      confirmText: 'Revoke Session',
+      confirmText: t('identity.revokeSessionBtn'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
           await identityApi.revokeUserSession(selectedUser.UserID, sessionId);
           setUserSessions(userSessions.filter(s => s.SessionID !== sessionId));
         } catch (err) {
-          showAlert('Session Revocation Failed', 'Failed to revoke active session.', 'error');
+          showAlert(t('identity.revokeSessionFailed'), t('identity.revokeSessionFailedMsg'), 'error');
         }
       }
     });
@@ -347,9 +349,19 @@ export default function UsersTab() {
   const getStatusBadge = (status) => {
     const sCode = (status || '').toUpperCase();
     const matched = ACCOUNT_STATUSES.find(s => s.value === sCode || (sCode === 'PENDING_ACTIVATION' && s.value === 'MUST_CHANGE_PASSWORD'));
+    const getStatusText = (val) => {
+      switch (val) {
+        case 'ACTIVE': return t('identity.statusActive');
+        case 'MUST_CHANGE_PASSWORD':
+        case 'PENDING_ACTIVATION': return t('identity.statusPending');
+        case 'SUSPENDED': return t('identity.statusSuspended');
+        case 'DEACTIVATED': return t('identity.statusDeactivated');
+        default: return val || t('identity.statusActive');
+      }
+    };
     return (
       <span className={`badge ${matched ? matched.badgeClass : 'badge-secondary'}`}>
-        {matched ? matched.label : (sCode || 'ACTIVE')}
+        {matched ? getStatusText(matched.value) : (sCode || t('identity.statusActive'))}
       </span>
     );
   };
@@ -363,7 +375,7 @@ export default function UsersTab() {
             <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search users by name, username or email..."
+              placeholder={t('identity.searchUsersPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -390,10 +402,19 @@ export default function UsersTab() {
               fontSize: '0.88rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Statuses</option>
-            {ACCOUNT_STATUSES.map(st => (
-              <option key={st.value} value={st.value} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{st.label}</option>
-            ))}
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('identity.allStatuses')}</option>
+            {ACCOUNT_STATUSES.map(st => {
+              const stLabel = st.value === 'ACTIVE'
+                ? t('identity.statusActive')
+                : st.value === 'MUST_CHANGE_PASSWORD'
+                  ? t('identity.statusPending')
+                  : st.value === 'SUSPENDED'
+                    ? t('identity.statusSuspended')
+                    : t('identity.statusDeactivated');
+              return (
+                <option key={st.value} value={st.value} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{stLabel}</option>
+              );
+            })}
           </select>
         </div>
 
@@ -413,7 +434,7 @@ export default function UsersTab() {
               fontSize: '0.88rem'
             }}
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
           </button>
 
           {canCreateUser && (
@@ -434,7 +455,7 @@ export default function UsersTab() {
                 fontSize: '0.88rem'
               }}
             >
-              <Plus size={16} /> Register New User
+              <Plus size={16} /> {t('identity.registerNewUser')}
             </button>
           )}
         </div>
@@ -445,24 +466,24 @@ export default function UsersTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-            <p>Loading user directory...</p>
+            <p>{t('identity.loadingUsers')}</p>
           </div>
         ) : users.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <Users size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-            <p>No user accounts found matching your search criteria.</p>
+            <p>{t('identity.noUsersFound')}</p>
           </div>
         ) : (
           <table className="custom-table" style={{ width: '100%', minWidth: '1150px' }}>
             <thead>
               <tr>
-                <th style={{ minWidth: '200px' }}>User Identity</th>
-                <th style={{ minWidth: '200px' }}>Company & Department</th>
-                <th style={{ minWidth: '200px' }}>Username & Email</th>
-                <th style={{ minWidth: '130px', whiteSpace: 'nowrap' }}>Phone</th>
-                <th style={{ minWidth: '140px', whiteSpace: 'nowrap' }}>Account Status</th>
-                <th style={{ minWidth: '160px' }}>Assigned Roles</th>
-                <th style={{ textAlign: 'right', minWidth: '160px', whiteSpace: 'nowrap' }}>Actions</th>
+                <th style={{ minWidth: '200px' }}>{t('identity.thUserIdentity')}</th>
+                <th style={{ minWidth: '200px' }}>{t('identity.thCompanyDept')}</th>
+                <th style={{ minWidth: '200px' }}>{t('identity.thUsernameEmail')}</th>
+                <th style={{ minWidth: '130px', whiteSpace: 'nowrap' }}>{t('identity.thPhone')}</th>
+                <th style={{ minWidth: '140px', whiteSpace: 'nowrap' }}>{t('identity.thAccountStatus')}</th>
+                <th style={{ minWidth: '160px' }}>{t('identity.thAssignedRoles')}</th>
+                <th style={{ textAlign: 'right', minWidth: '160px', whiteSpace: 'nowrap' }}>{t('identity.thActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -516,7 +537,7 @@ export default function UsersTab() {
                           🏢 {u.TenantName || u.BusinessParkName || 'Ethiopian IT Park'}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#818cf8', fontWeight: 600 }}>
-                          📂 {u.DepartmentName || (u.TenantName ? 'Tenant Organization' : 'No Department')}
+                          📂 {u.DepartmentName || (u.TenantName ? t('identity.tenantOrganization') : t('common.none'))}
                         </div>
                       </div>
                     </td>
@@ -533,7 +554,7 @@ export default function UsersTab() {
                             <span
                               key={i}
                               onClick={canManageRoles ? () => { setSelectedUser(u); setShowRoleAssignModal(true); } : undefined}
-                              title={canManageRoles ? "Click to Change / Upgrade User Role" : undefined}
+                              title={canManageRoles ? t('identity.assignRoleTooltip') : undefined}
                               className="badge badge-info"
                               style={{ fontSize: '0.72rem', cursor: canManageRoles ? 'pointer' : 'default', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                             >
@@ -546,17 +567,17 @@ export default function UsersTab() {
                           onClick={() => { setSelectedUser(u); setShowRoleAssignModal(true); }}
                           style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline', fontWeight: 600 }}
                         >
-                          + Assign Role
+                          {t('identity.assignRoleAction')}
                         </button>
                       ) : (
-                        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Staff</span>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('identity.roleEmployeeLabel')}</span>
                       )}
                     </td>
                     <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                         <button
                           onClick={() => openDetailView(u)}
-                          title="View Profile & Audit Trail"
+                          title={t('identity.viewProfileTooltip')}
                           style={{
                             padding: '6px 10px',
                             borderRadius: 'var(--border-radius-sm)',
@@ -571,7 +592,7 @@ export default function UsersTab() {
 
                         <button
                           onClick={() => { setSelectedUser(u); setShowRoleAssignModal(true); }}
-                          title="Assign Security Role"
+                          title={t('identity.assignRoleTooltip')}
                           style={{
                             padding: '6px 10px',
                             borderRadius: 'var(--border-radius-sm)',
@@ -586,7 +607,7 @@ export default function UsersTab() {
 
                         <button
                           onClick={() => { setSelectedUser(u); setShowStatusModal(true); }}
-                          title="Change Account Status"
+                          title={t('identity.changeStatusTooltip')}
                           style={{
                             padding: '6px 10px',
                             borderRadius: 'var(--border-radius-sm)',
@@ -601,7 +622,7 @@ export default function UsersTab() {
 
                         <button
                           onClick={() => { setSelectedUser(u); setShowDeleteModal(true); }}
-                          title="Delete User"
+                          title={t('identity.deleteUserTooltip')}
                           style={{
                             padding: '6px 10px',
                             borderRadius: 'var(--border-radius-sm)',
@@ -651,8 +672,8 @@ export default function UsersTab() {
           }}>
             {/* Left: Record Summary */}
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Showing <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{startRecord}–{endRecord}</span> of{' '}
-              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{totalUsers}</span> users
+              {t('identity.paginationShowing')} <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{startRecord}–{endRecord}</span> {t('identity.paginationOf')}{' '}
+              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{totalUsers}</span> {t('identity.paginationUsers')}
             </div>
 
             {/* Center: Page Navigation Buttons */}
@@ -723,7 +744,7 @@ export default function UsersTab() {
 
             {/* Right: Page Size Selector */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Rows per page:</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('identity.rowsPerPage')}</span>
               <select
                 value={pageSize}
                 onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
@@ -780,10 +801,10 @@ export default function UsersTab() {
                 <Check size={30} strokeWidth={2.5} />
               </div>
               <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.3px' }}>
-                Employee Account Created!
+                {t('identity.accountCreatedTitle')}
               </h2>
               <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                System generated credentials have been dispatched via email.
+                {t('identity.accountCreatedSubtitle')}
               </p>
             </div>
 
@@ -793,14 +814,14 @@ export default function UsersTab() {
               borderRadius: '14px', padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Employee Name:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('identity.employeeNameLabel')}</span>
                 <strong style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 800 }}>
                   {createdResult.FirstName || createdResult.firstName} {createdResult.LastName || createdResult.lastName}
                 </strong>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Assigned Company:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('identity.assignedCompanyLabel')}</span>
                 <span style={{ color: 'var(--text-primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                   🏢 {createdResult.TenantName || createdResult.CompanyName || 'Acme Technologies PLC'}
                 </span>
@@ -808,7 +829,7 @@ export default function UsersTab() {
 
               {(createdResult.DepartmentName || createdResult.departmentName) && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Assigned Department:</span>
+                  <span style={{ color: 'var(--text-muted)' }}>{t('identity.assignedDeptLabel')}</span>
                   <span style={{ color: '#818cf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     📂 {createdResult.DepartmentName || createdResult.departmentName}
                   </span>
@@ -816,12 +837,12 @@ export default function UsersTab() {
               )}
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Email Address:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('identity.emailAddressLabel')}</span>
                 <span style={{ color: '#818cf8', fontWeight: 600 }}>{createdResult.Email || createdResult.email}</span>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Permanent Username:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('identity.permanentUsernameLabel')}</span>
                 <span style={{
                   background: 'rgba(99, 102, 241, 0.18)', border: '1px solid rgba(99, 102, 241, 0.3)',
                   color: '#a5b4fc', padding: '4px 12px', borderRadius: '6px', fontSize: '0.88rem', fontWeight: 700, fontFamily: 'monospace'
@@ -831,7 +852,7 @@ export default function UsersTab() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Generated Temp Password:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('identity.tempPasswordLabel')}</span>
                 <span style={{
                   background: 'rgba(239, 68, 68, 0.18)', border: '1px solid rgba(239, 68, 68, 0.3)',
                   color: '#f87171', padding: '4px 12px', borderRadius: '6px', fontSize: '0.88rem', fontWeight: 700, fontFamily: 'monospace'
@@ -850,7 +871,7 @@ export default function UsersTab() {
               }}>
                 <Check size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>
-                  An automated email containing login instructions and temporary credentials was dispatched to <strong>{createdResult.Email || createdResult.email}</strong>.
+                  {t('identity.emailDispatchedMsg')} <strong>{createdResult.Email || createdResult.email}</strong>.
                 </span>
               </div>
             ) : (
@@ -858,12 +879,12 @@ export default function UsersTab() {
                 background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)',
                 padding: '12px 16px', borderRadius: '10px', fontSize: '0.82rem', color: '#f87171'
               }}>
-                <div style={{ fontWeight: 700, marginBottom: '4px' }}>⚠️ Direct Email Delivery Notice</div>
+                <div style={{ fontWeight: 700, marginBottom: '4px' }}>⚠️ {t('identity.emailDeliveryNotice')}</div>
                 <div>
-                  Email could not be delivered to <strong>{createdResult.Email || createdResult.email}</strong> ({createdResult.emailError || 'Non-routable domain or SMTP filter'}).
+                  {t('identity.emailCouldNotDeliver')} <strong>{createdResult.Email || createdResult.email}</strong> ({createdResult.emailError || 'Non-routable domain or SMTP filter'}).
                 </div>
                 <div style={{ fontSize: '0.76rem', marginTop: '6px', color: 'var(--text-muted)' }}>
-                  Please share the temporary password generated above directly with the employee.
+                  {t('identity.sharePasswordNotice')}
                 </div>
               </div>
             )}
@@ -881,7 +902,7 @@ export default function UsersTab() {
                     borderRadius: '8px', fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none'
                   }}
                 >
-                  ✉️ View Sent Credential Email in Sandbox
+                  ✉️ {t('identity.viewEmailSandbox')}
                 </a>
               </div>
             )}
@@ -906,7 +927,7 @@ export default function UsersTab() {
                   e.currentTarget.style.boxShadow = '0 4px 14px rgba(99, 102, 241, 0.4)';
                 }}
               >
-                Done
+                {t('identity.btnDone')}
               </button>
             </div>
           </div>
@@ -956,7 +977,7 @@ export default function UsersTab() {
                   cursor: 'pointer'
                 }}
               >
-                Profile & Metadata
+                {t('identity.tabProfileMetadata')}
               </button>
               <button
                 onClick={() => setDetailTab('sessions')}
@@ -970,7 +991,7 @@ export default function UsersTab() {
                   cursor: 'pointer'
                 }}
               >
-                Active Sessions ({userSessions.length})
+                {t('identity.tabActiveSessionsCount')} ({userSessions.length})
               </button>
               <button
                 onClick={() => setDetailTab('audit')}
@@ -984,31 +1005,31 @@ export default function UsersTab() {
                   cursor: 'pointer'
                 }}
               >
-                Audit Log History ({userAuditLogs.length})
+                {t('identity.tabAuditHistoryCount')} ({userAuditLogs.length})
               </button>
             </div>
 
             {loadingDetails ? (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                 <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-                <p>Fetching user details...</p>
+                <p>{t('identity.fetchingDetails')}</p>
               </div>
             ) : detailTab === 'profile' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Email Address</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('common.email')}</div>
                   <div style={{ fontWeight: '600', marginTop: '4px' }}>{selectedUser.Email}</div>
                 </div>
                 <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Phone Number</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('identity.phoneNumber')}</div>
                   <div style={{ fontWeight: '600', marginTop: '4px' }}>{selectedUser.PhoneNumber || 'N/A'}</div>
                 </div>
                 <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Account Status</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('identity.thAccountStatus')}</div>
                   <div style={{ marginTop: '6px' }}>{getStatusBadge(selectedUser.Status)}</div>
                 </div>
                 <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Registration Date</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('identity.registrationDate')}</div>
                   <div style={{ fontWeight: '600', marginTop: '4px' }}>
                     {selectedUser.CreatedDate ? new Date(selectedUser.CreatedDate).toLocaleString() : 'N/A'}
                   </div>
@@ -1017,16 +1038,16 @@ export default function UsersTab() {
             ) : detailTab === 'sessions' ? (
               userSessions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
-                  No active login sessions found for this account.
+                  {t('identity.noSessionsFound')}
                 </div>
               ) : (
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>IP Address</th>
-                      <th>User Agent / Device</th>
-                      <th>Login Time</th>
-                      <th style={{ textAlign: 'right' }}>Action</th>
+                      <th>{t('identity.thIpAddress')}</th>
+                      <th>{t('identity.thDeviceBrowser')}</th>
+                      <th>{t('identity.thLoginTimestamp')}</th>
+                      <th style={{ textAlign: 'right' }}>{t('identity.thActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1048,7 +1069,7 @@ export default function UsersTab() {
                               fontSize: '0.75rem'
                             }}
                           >
-                            Terminate Session
+                            {t('identity.terminateSessionBtn')}
                           </button>
                         </td>
                       </tr>
@@ -1059,7 +1080,7 @@ export default function UsersTab() {
             ) : (
               userAuditLogs.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
-                  No security audit history recorded.
+                  {t('identity.noAuditFound')}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -1093,9 +1114,9 @@ export default function UsersTab() {
       {showStatusModal && selectedUser && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ width: '400px' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Update User Account Status</h3>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '12px' }}>{t('identity.updateStatusTitle')}</h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
-              Select a new lifecycle status for <strong>{selectedUser.Username}</strong>:
+              {t('identity.updateStatusPrompt')} <strong>{selectedUser.Username}</strong>:
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
@@ -1127,7 +1148,7 @@ export default function UsersTab() {
                 onClick={() => setShowStatusModal(false)}
                 style={{ padding: '8px 16px', borderRadius: 'var(--border-radius-sm)', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', cursor: 'pointer' }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -1138,22 +1159,22 @@ export default function UsersTab() {
       {showDeleteModal && selectedUser && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ width: '400px' }}>
-            <h3 style={{ fontSize: '1.2rem', color: 'var(--color-danger)', marginBottom: '12px' }}>Confirm User Deletion</h3>
+            <h3 style={{ fontSize: '1.2rem', color: 'var(--color-danger)', marginBottom: '12px' }}>{t('identity.deleteUserTitle')}</h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
-              Are you sure you want to soft delete account <strong>{selectedUser.Username}</strong> ({selectedUser.Email})? The user will immediately lose platform access.
+              {t('identity.deleteUserPrompt')} <strong>{selectedUser.Username}</strong> ({selectedUser.Email})? {t('identity.deleteUserLostAccess')}
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button
                 onClick={() => setShowDeleteModal(false)}
                 style={{ padding: '8px 16px', borderRadius: 'var(--border-radius-sm)', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', cursor: 'pointer' }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleDeleteUser}
                 style={{ padding: '8px 16px', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-danger)', border: 'none', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
               >
-                Confirm Delete
+                {t('identity.confirmDeleteBtn')}
               </button>
             </div>
           </div>

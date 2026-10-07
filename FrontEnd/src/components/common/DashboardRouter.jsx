@@ -8,33 +8,35 @@ import {
   Users, ShieldCheck, FileText, ArrowUpRight, BarChart3
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../i18n';
 
 function AdminOverviewDashboard() {
   const navigate = useNavigate();
   const { user, isParkAdmin } = usePermissionContext();
+  const { t } = useTranslation();
 
   const parkCards = [
-    { title: 'Business Park Topology', desc: 'Campus, Buildings, Floors, Facilities', icon: Building2, path: '/parks/dashboard', permission: 'Building.Read' },
-    { title: 'Tenants & Leasing', desc: 'Directory, Leases, Space Allocations', icon: Users, path: '/tenants/dashboard', permission: 'Tenant.Read' },
-    { title: 'Service Requests Tracker', desc: '7-stage Status Lifecycle & Dispatches', icon: ListChecks, path: '/issues/dashboard', permission: 'Request.Read' },
-    { title: 'Executive BI & Analytics', desc: 'Cross-module telemetry, SLA & exports', icon: BarChart3, path: '/reports/dashboard', permission: 'Report.View' },
-    { title: 'Governance & RBAC Matrix', desc: 'Role definitions, permissions, audit', icon: ShieldCheck, path: '/roles/dashboard', permission: 'Role.Read' }
+    { title: t('dashboard.parkTopology', 'Business Park Topology'), desc: t('dashboard.parkTopologyDesc', 'Campus, Buildings, Floors, Facilities'), icon: Building2, path: '/parks/dashboard', permission: 'Building.Read' },
+    { title: t('dashboard.tenantsLeasing', 'Tenants & Leasing'), desc: t('dashboard.tenantsLeasingDesc', 'Directory, Leases, Space Allocations'), icon: Users, path: '/tenants/dashboard', permission: 'Tenant.Read' },
+    { title: t('dashboard.serviceRequestsTracker', 'Service Requests Tracker'), desc: t('dashboard.serviceRequestsTrackerDesc', '7-stage Status Lifecycle & Dispatches'), icon: ListChecks, path: '/issues/dashboard', permission: 'Request.Read' },
+    { title: t('dashboard.executiveBi', 'Executive BI & Analytics'), desc: t('dashboard.executiveBiDesc', 'Cross-module telemetry, SLA & exports'), icon: BarChart3, path: '/reports/dashboard', permission: 'Report.View' },
+    { title: t('dashboard.governanceRbac', 'Governance & RBAC Matrix'), desc: t('dashboard.governanceRbacDesc', 'Role definitions, permissions, audit'), icon: ShieldCheck, path: '/roles/dashboard', permission: 'Role.Read' }
   ];
 
   const tenantRepCards = [
-    { title: 'Company Overview & Space', desc: 'Active leases, office allocations & campus location', icon: Building2, path: '/tenants/dashboard', permission: 'Tenant.Read' },
-    { title: 'Company Requests Tracker', desc: 'Track tickets, resolution status & live updates', icon: ListChecks, path: '/issues/tracker', permission: 'Request.Read' },
-    { title: 'Service Catalog', desc: 'Explore park maintenance & support services', icon: ShieldCheck, path: '/services/directory', permission: 'Request.Read' },
-    { title: 'Lease Agreements', desc: 'Commercial lease contracts, terms & renewals', icon: FileText, path: '/tenants/leases', permission: 'Tenant.Read' },
-    { title: 'Reports & Performance', desc: 'Issue resolution analytics, SLA compliance & trends', icon: BarChart3, path: '/reports/dashboard', permission: 'Report.View' }
+    { title: t('dashboard.companyOverview', 'Company Overview & Space'), desc: t('dashboard.companyOverviewDesc', 'Active leases, office allocations & campus location'), icon: Building2, path: '/tenants/dashboard', permission: 'Tenant.Read' },
+    { title: t('dashboard.companyRequestsTracker', 'Company Requests Tracker'), desc: t('dashboard.companyRequestsTrackerDesc', 'Track tickets, resolution status & live updates'), icon: ListChecks, path: '/issues/tracker', permission: 'Request.Read' },
+    { title: t('dashboard.serviceCatalog', 'Service Catalog'), desc: t('dashboard.serviceCatalogDesc', 'Explore park maintenance & support services'), icon: ShieldCheck, path: '/services/directory', permission: 'Request.Read' },
+    { title: t('dashboard.leaseAgreements', 'Lease Agreements'), desc: t('dashboard.leaseAgreementsDesc', 'Commercial lease contracts, terms & renewals'), icon: FileText, path: '/tenants/leases', permission: 'Tenant.Read' },
+    { title: t('dashboard.reportsPerformance', 'Reports & Performance'), desc: t('dashboard.reportsPerformanceDesc', 'Issue resolution analytics, SLA compliance & trends'), icon: BarChart3, path: '/reports/dashboard', permission: 'Report.View' }
   ];
 
   const companyCards = [
-    { title: 'Company Organization', desc: 'Departments, Teams, Org Structure', icon: Building2, path: '/organization/dashboard', permission: 'Department.Read' },
-    { title: 'Company User Directory', desc: 'Employee Accounts, Password Resets & Roles', icon: Users, path: '/users/dashboard', permission: 'User.Read.Company' },
-    { title: 'Service Requests Tracker', desc: 'Issue Requests, Approvals & Status', icon: ListChecks, path: '/issues/dashboard', permission: 'Request.Read' },
-    { title: 'Operational Analytics', desc: 'Department metrics, turnaround & reports', icon: BarChart3, path: '/reports/dashboard', permission: 'Report.View' },
-    { title: 'Roles & Permission Matrix', desc: 'Custom Company Roles & Security', icon: ShieldCheck, path: '/roles/dashboard', permission: 'Role.Read' }
+    { title: t('dashboard.companyOrg', 'Company Organization'), desc: t('dashboard.companyOrgDesc', 'Departments, Teams, Org Structure'), icon: Building2, path: '/organization/dashboard', permission: 'Department.Read' },
+    { title: t('dashboard.companyUsers', 'Company User Directory'), desc: t('dashboard.companyUsersDesc', 'Employee Accounts, Password Resets & Roles'), icon: Users, path: '/users/dashboard', permission: 'User.Read.Company' },
+    { title: t('dashboard.serviceRequestsTracker', 'Service Requests Tracker'), desc: t('dashboard.serviceRequestsTrackerDesc', 'Issue Requests, Approvals & Status'), icon: ListChecks, path: '/issues/dashboard', permission: 'Request.Read' },
+    { title: t('dashboard.operationalAnalytics', 'Operational Analytics'), desc: t('dashboard.operationalAnalyticsDesc', 'Department metrics, turnaround & reports'), icon: BarChart3, path: '/reports/dashboard', permission: 'Report.View' },
+    { title: t('dashboard.governanceRbac', 'Roles & Permission Matrix'), desc: t('dashboard.governanceRbacDesc', 'Custom Company Roles & Security'), icon: ShieldCheck, path: '/roles/dashboard', permission: 'Role.Read' }
   ];
 
   const isTenantRep = !isParkAdmin && (
@@ -62,24 +64,24 @@ function AdminOverviewDashboard() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <span style={{ padding: '3px 10px', borderRadius: '12px', background: 'var(--accent-gradient)', color: '#fff', fontSize: '0.75rem', fontWeight: 800 }}>
-              {isParkAdmin ? 'Business Park Management' : isTenantRep ? 'Tenant Self-Service Portal' : 'Company Administration'}
+              {isParkAdmin ? t('dashboard.parkManagement', 'Business Park Management') : isTenantRep ? t('dashboard.tenantPortal', 'Tenant Self-Service Portal') : t('dashboard.companyAdmin', 'Company Administration')}
             </span>
           </div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
-            System Overview <span className="glow-text">Dashboard</span>
+            {t('dashboard.systemOverview', 'System Overview Dashboard')}
           </h1>
           <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
             {isParkAdmin
-              ? 'Welcome to the Business Park Service & IT Management Control Center.'
+              ? t('dashboard.parkSubtitle', 'Welcome to the Business Park Service & IT Management Control Center.')
               : isTenantRep
-                ? 'Welcome to your Tenant Self-Service Portal. Submit requests, view lease agreements, and track facilities services.'
-                : 'Welcome to your Company IT & Service Management Administration Workspace.'}
+                ? t('dashboard.tenantSubtitle', 'Welcome to your Tenant Self-Service Portal. Submit requests, view lease agreements, and track facilities services.')
+                : t('dashboard.companySubtitle', 'Welcome to your Company IT & Service Management Administration Workspace.')}
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa', fontSize: '0.78rem', fontWeight: 700 }}>
-            <Activity size={14} /> {isParkAdmin ? 'Multi-Tenant Active' : 'Company Isolated Scope'}
+            <Activity size={14} /> {isParkAdmin ? t('dashboard.multiTenantActive', 'Multi-Tenant Active') : t('dashboard.companyScope', 'Company Isolated Scope')}
           </span>
         </div>
       </div>
@@ -122,7 +124,7 @@ function AdminOverviewDashboard() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-primary)', marginTop: '12px' }}>
-                Launch Module <ArrowUpRight size={14} />
+                {t('common.launchModule', 'Launch Module')} <ArrowUpRight size={14} />
               </div>
             </div>
           );

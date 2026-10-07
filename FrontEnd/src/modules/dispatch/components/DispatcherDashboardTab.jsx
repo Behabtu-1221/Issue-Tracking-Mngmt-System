@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../i18n';
 import dispatchApi from '../api/dispatchApi';
 import ManualAssignModal from './ManualAssignModal';
 import { Search, Filter, Inbox, Zap, AlertTriangle, UserCheck, ArrowRight } from 'lucide-react';
 
 export default function DispatcherDashboardTab() {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -46,7 +48,7 @@ export default function DispatcherDashboardTab() {
           <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search unassigned queue by request title, number..."
+            placeholder={t('dispatch.searchQueuePlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -83,7 +85,7 @@ export default function DispatcherDashboardTab() {
                 transition: 'all 0.2s'
               }}
             >
-              {pr === 'ALL' ? 'All Priorities' : pr}
+              {pr === 'ALL' ? t('dispatch.allPriorities') : (t(`common.${pr.toLowerCase()}`, { defaultValue: pr }))}
             </button>
           ))}
         </div>
@@ -91,25 +93,25 @@ export default function DispatcherDashboardTab() {
 
       {/* Queue Table */}
       {loading ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading dispatch queue...</div>
+        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('dispatch.loadingQueue')}</div>
       ) : (!requests || requests.length === 0) ? (
         <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
           <Inbox size={42} style={{ opacity: 0.4, marginBottom: '12px', color: 'var(--accent-primary)' }} />
-          <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>Unassigned Queue Empty</div>
-          <div style={{ fontSize: '0.82rem' }}>All active service requests have been dispatched to technicians.</div>
+          <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>{t('dispatch.unassignedQueueEmpty')}</div>
+          <div style={{ fontSize: '0.82rem' }}>{t('dispatch.queueEmptyDesc')}</div>
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px', textAlign: 'left', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ color: 'var(--text-muted)', fontSize: '0.78rem', letterSpacing: '0.5px' }}>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>SERVICE REQUEST</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>REQUESTER</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>PRIORITY</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>DEPARTMENT</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>SERVICE</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>APPROVED DATE</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700', textAlign: 'right' }}>DISPATCH ACTION</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('dispatch.thServiceRequest')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('dispatch.thRequester')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('dispatch.thPriority')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('dispatch.thDepartment')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('dispatch.thService')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('dispatch.thApprovedDate')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700', textAlign: 'right' }}>{t('dispatch.thDispatchAction')}</th>
               </tr>
             </thead>
             <tbody>
@@ -134,7 +136,7 @@ export default function DispatcherDashboardTab() {
                         </span>
                         {isCritical && (
                           <span style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', fontSize: '0.7rem', fontWeight: '800', padding: '2px 6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                            <AlertTriangle size={12} /> Emergency
+                            <AlertTriangle size={12} /> {t('dispatch.emergencyBadge')}
                           </span>
                         )}
                       </div>
@@ -149,7 +151,7 @@ export default function DispatcherDashboardTab() {
 
                     <td style={{ padding: '16px 18px' }}>
                       <span className={`badge ${r.PriorityCode === 'CRITICAL' ? 'badge-danger' : r.PriorityCode === 'HIGH' ? 'badge-warning' : 'badge-info'}`}>
-                        {r.PriorityCode}
+                        {t(`common.${r.PriorityCode?.toLowerCase()}`, { defaultValue: r.PriorityCode })}
                       </span>
                     </td>
 
@@ -173,7 +175,7 @@ export default function DispatcherDashboardTab() {
                         className="btn btn-primary"
                         style={{ padding: '8px 16px', fontSize: '0.8rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                       >
-                        <UserCheck size={15} /> Dispatch <ArrowRight size={13} />
+                        <UserCheck size={15} /> {t('dispatch.btnDispatch')} <ArrowRight size={13} />
                       </button>
                     </td>
                   </tr>

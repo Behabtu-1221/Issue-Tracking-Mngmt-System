@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit3, Trash2, Sliders, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 import { DATA_TYPES } from '../constants/configConstants';
 
 export default function SystemSettingsTab() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -85,7 +87,7 @@ export default function SystemSettingsTab() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this setting?')) {
+    if (window.confirm(t('config.confirmDeleteSetting'))) {
       try {
         await configApi.deleteSystemSetting(id);
         fetchSettings();
@@ -102,7 +104,7 @@ export default function SystemSettingsTab() {
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
-            placeholder="Search settings by key or description..."
+            placeholder={t('config.searchSettingsPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -134,7 +136,7 @@ export default function SystemSettingsTab() {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> New System Setting
+          <Plus size={16} /> {t('config.newSettingBtn')}
         </button>
       </div>
 
@@ -142,23 +144,23 @@ export default function SystemSettingsTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-            <p>Loading system settings...</p>
+            <p>{t('config.loadingSettings')}</p>
           </div>
         ) : settings.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <Sliders size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-            <p>No system settings found matching filter.</p>
+            <p>{t('config.noSettingsFound')}</p>
           </div>
         ) : (
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Setting Key</th>
-                <th>Category</th>
-                <th>Data Type</th>
-                <th>Setting Value</th>
-                <th>Description</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('config.thSettingKey')}</th>
+                <th>{t('config.thCategory')}</th>
+                <th>{t('config.thDataType')}</th>
+                <th>{t('config.thSettingValue')}</th>
+                <th>{t('config.thDescription')}</th>
+                <th style={{ textAlign: 'right' }}>{t('config.thActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -226,7 +228,7 @@ export default function SystemSettingsTab() {
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '540px', padding: '28px', background: 'var(--bg-secondary)' }}>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? 'Edit System Setting' : 'Create System Setting'}
+              {editingItem ? t('config.editSettingTitle') : t('config.createSettingTitle')}
             </h3>
 
             {error && (
@@ -238,7 +240,7 @@ export default function SystemSettingsTab() {
             <form onSubmit={handleSubmit}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Category Code</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.categoryCodeLabel')}</label>
                   <input
                     type="text"
                     required
@@ -248,7 +250,7 @@ export default function SystemSettingsTab() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Data Type</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.dataTypeLabel')}</label>
                   <select
                     value={formData.dataType}
                     onChange={(e) => setFormData({ ...formData, dataType: e.target.value })}
@@ -262,7 +264,7 @@ export default function SystemSettingsTab() {
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Setting Key</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.settingKeyLabel')}</label>
                 <input
                   type="text"
                   required
@@ -275,7 +277,7 @@ export default function SystemSettingsTab() {
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Setting Value</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.settingValueLabel')}</label>
                 <textarea
                   rows={3}
                   required
@@ -287,12 +289,12 @@ export default function SystemSettingsTab() {
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Description</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.descriptionLabel')}</label>
                 <input
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Help text for administrators..."
+                  placeholder={t('config.descriptionPlaceholder')}
                   style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
@@ -303,14 +305,14 @@ export default function SystemSettingsTab() {
                   onClick={() => setIsModalOpen(false)}
                   style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
                   style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
                 >
-                  {submitting ? 'Saving...' : editingItem ? 'Update Setting' : 'Create Setting'}
+                  {submitting ? t('common.save') : editingItem ? t('config.updateSettingBtn') : t('config.createSettingBtn')}
                 </button>
               </div>
             </form>

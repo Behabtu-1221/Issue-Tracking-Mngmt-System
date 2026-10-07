@@ -19,6 +19,7 @@ import OfficeSpacesTab from '../components/OfficeSpacesTab';
 import FacilityZonesTab from '../components/FacilityZonesTab';
 import CampusLocationsTab from '../components/CampusLocationsTab';
 import parkApi from '../api/parkApi';
+import { useTranslation } from '../../../i18n';
 
 const ICON_MAP = {
   Building2: Building2,
@@ -39,6 +40,7 @@ const TAB_COMPONENTS = {
 };
 
 export default function BusinessParkPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl && TAB_COMPONENTS[tabFromUrl] ? tabFromUrl : 'parks');
@@ -77,18 +79,42 @@ export default function BusinessParkPage() {
   const ActiveComponent = TAB_COMPONENTS[activeTab];
 
   const occupancyRate = metrics.offices.totalOffices > 0 
-    ? Math.round((metrics.offices.occupiedOffices / metrics.offices.totalOffices) * 100)
+    ? Math.round((metrics.offices.occupiedOffices / metrics.offices.totalOffices) * 100) 
     : 0;
+
+  const getTabLabel = (id) => {
+    switch (id) {
+      case 'parks': return t('businessPark.parkProfile');
+      case 'buildings': return t('businessPark.buildingsBlocks');
+      case 'floors': return t('businessPark.floorsLevels');
+      case 'offices': return t('businessPark.officeUnits');
+      case 'zones': return t('businessPark.facilityZones');
+      case 'locations': return t('businessPark.campusLandmarks');
+      default: return id;
+    }
+  };
+
+  const getTabDesc = (id) => {
+    switch (id) {
+      case 'parks': return t('businessPark.parkProfileDesc');
+      case 'buildings': return t('businessPark.buildingsDesc');
+      case 'floors': return t('businessPark.floorsDesc');
+      case 'offices': return t('businessPark.officesDesc');
+      case 'zones': return t('businessPark.zonesDesc');
+      case 'locations': return t('businessPark.landmarksDesc');
+      default: return '';
+    }
+  };
 
   return (
     <div>
       {/* Page Header */}
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.2rem', marginBottom: '8px' }}>
-          Ethiopian IT Park <span className="glow-text">Campus Master</span>
+          {t('businessPark.campusMasterTitle')}
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Ethiopian IT Park — Central Campus Management for physical topology, commercial buildings, floors, office spaces, and facility zones hosting multiple tenant organizations.
+          {t('businessPark.campusMasterDesc')}
         </p>
       </div>
 
@@ -99,12 +125,12 @@ export default function BusinessParkPage() {
             <Building2 size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Business Park Campus</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.campusKpi')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {metrics.parks.totalParks || 1} Campus
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              {metrics.parks.totalParkArea ? `${Number(metrics.parks.totalParkArea).toLocaleString()} m² Total Area` : 'Primary Campus Site'}
+              {metrics.parks.totalParkArea ? `${Number(metrics.parks.totalParkArea).toLocaleString()} m² Total Area` : t('businessPark.primarySiteArea')}
             </div>
           </div>
         </div>
@@ -114,12 +140,12 @@ export default function BusinessParkPage() {
             <Building size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Buildings & Floors</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.buildingsFloorsKpi')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {metrics.buildings.totalBuildings || 0}
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              {metrics.buildings.totalFloors || 0} Floor Levels
+              {metrics.buildings.totalFloors || 0} {t('businessPark.totalLevelsCount')}
             </div>
           </div>
         </div>
@@ -129,12 +155,12 @@ export default function BusinessParkPage() {
             <Grid size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Office Spaces</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.officesKpi')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {metrics.offices.totalOffices || 0}
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--color-success)' }}>
-              {metrics.offices.vacantOffices || 0} Vacant Units Available
+              {metrics.offices.vacantOffices || 0} {t('businessPark.officesAvailableCount')}
             </div>
           </div>
         </div>
@@ -144,12 +170,12 @@ export default function BusinessParkPage() {
             <PieChart size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Occupancy Rate</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.occupancyRateKpi')}</div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {occupancyRate}%
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              {metrics.offices.occupiedOffices || 0} Occupied Units
+              {metrics.offices.occupiedOffices || 0} {t('businessPark.leasedUnitsCount')}
             </div>
           </div>
         </div>
@@ -174,7 +200,7 @@ export default function BusinessParkPage() {
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              title={tab.description}
+              title={getTabDesc(tab.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -193,7 +219,7 @@ export default function BusinessParkPage() {
               }}
             >
               {Icon && <Icon size={16} />}
-              {tab.label}
+              {getTabLabel(tab.id)}
             </button>
           );
         })}

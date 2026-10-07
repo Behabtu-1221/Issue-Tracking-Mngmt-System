@@ -32,7 +32,10 @@ const interactiveCard = (extra = {}) => ({
   ...extra
 });
 
+import { useTranslation } from '../../../i18n';
+
 export default function TenantDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -120,14 +123,13 @@ export default function TenantDashboardPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              Tenant Overview & <span className="glow-text">Analytics</span>
+              {t('nav.tenantOverview')}
             </h1>
             <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Enterprise Tenant Telemetry, Lease Portfolio Status, and Office Occupancy Analytics
+              {t('tenant.overviewSubtitle')}
             </p>
           </div>
 

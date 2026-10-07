@@ -7,6 +7,7 @@ import { PERMISSION_MODULE_TREE, DEFAULT_ROLE_PRESETS } from '../constants/permi
 import rbacApi from '../api/rbacApi';
 import { FormField } from '../../../components/common/FormField';
 import { rolePermissionSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 const SCOPE_COLORS = {
   OWN: { bg: 'rgba(234, 179, 8, 0.15)', text: 'var(--color-warning)', border: 'rgba(234, 179, 8, 0.35)' },
@@ -16,6 +17,7 @@ const SCOPE_COLORS = {
 };
 
 export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
+  const { t } = useTranslation();
   const [roleName, setRoleName] = useState('');
   const [roleCode, setRoleCode] = useState('');
   const [description, setDescription] = useState('');
@@ -249,10 +251,10 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
             </div>
             <div>
               <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 800 }}>
-                {roleToEdit ? 'Edit Enterprise Security Role' : 'Create Enterprise Security Role'}
+                {roleToEdit ? t('rbac.editRoleTitle', 'Edit Enterprise Security Role') : t('rbac.createRoleTitle', 'Create Enterprise Security Role')}
               </h3>
               <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                Define security role metadata and assign granular RBAC module permissions
+                {t('rbac.roleSubtitle', 'Define security role metadata and assign granular RBAC module permissions')}
               </p>
             </div>
           </div>
@@ -281,7 +283,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                   <Sparkles size={14} color="var(--accent-primary)" />
                   <span style={{ color: 'var(--text-primary)', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Quick Role Preset Blueprint (Optional)
+                    {t('rbac.quickBlueprint', 'Quick Role Preset Blueprint (Optional)')}
                   </span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -309,7 +311,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
             {/* Role Metadata Fields */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flexShrink: 0 }}>
               <FormField
-                label="Role Title"
+                label={t('rbac.roleTitle', 'Role Title')}
                 required
                 icon={Shield}
                 error={roleErrors.roleName}
@@ -344,7 +346,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
               </FormField>
 
               <FormField
-                label="Role Code"
+                label={t('rbac.roleCode', 'Role Code')}
                 required
                 icon={Tag}
                 error={roleErrors.roleCode}
@@ -378,7 +380,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
 
             <div style={{ flexShrink: 0 }}>
               <FormField
-                label="Role Scope Description (Optional)"
+                label={t('rbac.roleScopeDesc', 'Role Scope Description (Optional)')}
                 icon={FileText}
                 error={roleErrors.description}
                 id="company-role-desc"
@@ -416,7 +418,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                 <div style={{ position: 'relative', flex: 1, maxWidth: '300px' }}>
                   <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                   <input
-                    type="text" placeholder="Filter permissions..."
+                    type="text" placeholder={t('rbac.filterPermissions', 'Filter permissions...')}
                     value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                     style={{
                       width: '100%', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
@@ -431,7 +433,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                     borderRadius: '8px', padding: '8px 12px', color: 'var(--text-primary)', fontSize: '0.84rem', outline: 'none'
                   }}
                 >
-                  <option value="ALL">All Modules</option>
+                  <option value="ALL">{t('rbac.allModules', 'All Modules')}</option>
                   {PERMISSION_MODULE_TREE.map(mod => (
                     <option key={mod.moduleCode} value={mod.moduleCode}>{mod.moduleName}</option>
                   ))}
@@ -440,16 +442,16 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={{ color: 'var(--color-success)', fontWeight: 800, fontSize: '0.85rem' }}>
-                  ✓ {selectedPermissions.length} Granted
+                  ✓ {t('rbac.grantedCount', '{count} Granted', { count: selectedPermissions.length })}
                 </span>
                 <button type="button" onClick={expandAll} style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
-                  Expand All
+                  {t('rbac.expandAll', 'Expand All')}
                 </button>
                 <button type="button" onClick={collapseAll} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
-                  Collapse All
+                  {t('rbac.collapseAll', 'Collapse All')}
                 </button>
                 <button type="button" onClick={() => setSelectedPermissions([])} style={{ background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
-                  Clear All
+                  {t('rbac.clearAll', 'Clear All')}
                 </button>
               </div>
             </div>
@@ -485,7 +487,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                           color: grantedCount > 0 ? 'var(--accent-primary)' : 'var(--text-muted)',
                           fontSize: '0.74rem', fontWeight: 800, padding: '2px 8px', borderRadius: '10px'
                         }}>
-                          {grantedCount} / {totalCount} Granted
+                          {grantedCount} / {totalCount} {t('rbac.grantedCount', '{count} Granted', { count: '' }).trim()}
                         </span>
                       </div>
 
@@ -500,7 +502,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                             color: 'var(--accent-primary)', cursor: 'pointer'
                           }}
                         >
-                          {modCheckState === 'all' ? 'Deselect Module' : 'Select All Module'}
+                          {modCheckState === 'all' ? t('rbac.deselectModule', 'Deselect Module') : t('rbac.selectAllModule', 'Select All Module')}
                         </button>
                         <div onClick={(e) => { e.stopPropagation(); toggleModuleAll(mod); }} style={{ cursor: 'pointer' }}>
                           <CheckIcon state={modCheckState} />
@@ -555,7 +557,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                                       color: 'var(--accent-primary)', cursor: 'pointer', fontWeight: 700
                                     }}
                                   >
-                                    {grpCheckState === 'all' ? 'Deselect' : 'Select All'}
+                                    {grpCheckState === 'all' ? t('rbac.deselect', 'Deselect') : t('rbac.selectAll', 'Select All')}
                                   </button>
                                   <div onClick={(e) => { e.stopPropagation(); toggleGroupAll(grp.permissions); }} style={{ cursor: 'pointer' }}>
                                     <CheckIcon state={grpCheckState} size={14} />
@@ -628,7 +630,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
           paddingTop: '16px', borderTop: '1px solid var(--glass-border)', flexShrink: 0, marginTop: '12px'
         }}>
           <span style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', fontWeight: 600 }}>
-            ⚡ <strong>{selectedPermissions.length}</strong> permission{selectedPermissions.length !== 1 ? 's' : ''} assigned to this role
+            ⚡ <strong>{selectedPermissions.length}</strong> {t('rbac.permissionsAssigned', '{count} permissions assigned to this role', { count: selectedPermissions.length })}
           </span>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
@@ -639,7 +641,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                 fontSize: '0.88rem', cursor: 'pointer'
               }}
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit" form="roleForm" disabled={submitting}
@@ -652,7 +654,7 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
                 opacity: submitting ? 0.7 : 1
               }}
             >
-              <Save size={16} /> {submitting ? '⏳ Saving...' : '✓ Save Role & Permissions'}
+              <Save size={16} /> {submitting ? t('rbac.saving', '⏳ Saving...') : ('✓ ' + t('rbac.saveRolePermissions', 'Save Role & Permissions'))}
             </button>
           </div>
         </div>

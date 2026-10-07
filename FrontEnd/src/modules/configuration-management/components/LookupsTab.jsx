@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { List, Plus, Edit3, Trash2, RefreshCw, AlertCircle, Layers } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 
 export default function LookupsTab() {
+  const { t } = useTranslation();
   const [types, setTypes] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
   const [values, setValues] = useState([]);
@@ -94,7 +96,7 @@ export default function LookupsTab() {
   };
 
   const handleDeleteValue = async (valueId) => {
-    if (window.confirm('Delete this lookup value?')) {
+    if (window.confirm(t('config.confirmDeleteValue'))) {
       try {
         await configApi.deleteLookupValue(selectedType.LookupTypeID, valueId);
         fetchValues(selectedType.LookupTypeID);
@@ -109,7 +111,7 @@ export default function LookupsTab() {
       {/* Left Column: Lookup Types */}
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>Lookup Types</h4>
+          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>{t('config.lookupTypesTitle')}</h4>
           <button
             onClick={() => {
               setTypeForm({ lookupTypeCode: '', lookupTypeName: '' });
@@ -130,7 +132,7 @@ export default function LookupsTab() {
               gap: '4px'
             }}
           >
-            <Plus size={14} /> Add Type
+            <Plus size={14} /> {t('config.newTypeBtn')}
           </button>
         </div>
 
@@ -196,7 +198,7 @@ export default function LookupsTab() {
                   boxShadow: 'var(--glow-accent)'
                 }}
               >
-                <Plus size={16} /> Add Value
+                <Plus size={16} /> {t('config.newLookupValueBtn')}
               </button>
             </div>
 
@@ -204,22 +206,22 @@ export default function LookupsTab() {
               {loadingValues ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-                  <p>Loading values...</p>
+                  <p>{t('config.loadingValues')}</p>
                 </div>
               ) : values.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   <List size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-                  <p>No values added for this lookup type yet.</p>
+                  <p>{t('config.noValues')}</p>
                 </div>
               ) : (
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Value Code</th>
-                      <th>Value Display Name</th>
-                      <th>Display Order</th>
-                      <th>Status</th>
-                      <th style={{ textAlign: 'right' }}>Actions</th>
+                      <th>{t('config.thValueCode')}</th>
+                      <th>{t('config.thValueName')}</th>
+                      <th>{t('config.thDisplayOrder')}</th>
+                      <th>{t('common.status')}</th>
+                      <th style={{ textAlign: 'right' }}>{t('config.thActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -232,7 +234,7 @@ export default function LookupsTab() {
                         <td style={{ fontFamily: 'monospace' }}>{val.DisplayOrder ?? 0}</td>
                         <td>
                           <span className={`badge badge-${val.IsActive ? 'active' : 'inactive'}`}>
-                            {val.IsActive ? 'ACTIVE' : 'INACTIVE'}
+                            {val.IsActive ? t('common.active') : t('common.inactive')}
                           </span>
                         </td>
                         <td style={{ textAlign: 'right' }}>
@@ -264,7 +266,7 @@ export default function LookupsTab() {
         ) : (
           <div className="glass-panel" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
             <Layers size={40} style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <p>Select a lookup type on the left panel to manage values.</p>
+            <p>{t('config.selectTypePrompt')}</p>
           </div>
         )}
       </div>
@@ -273,11 +275,11 @@ export default function LookupsTab() {
       {isTypeModalOpen && (
         <div className="modal-overlay" onClick={() => setIsTypeModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '450px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Create Lookup Type</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.createLookupTypeTitle')}</h3>
             {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
             <form onSubmit={handleCreateType}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Type Code</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.typeCodeLabel')}</label>
                 <input
                   type="text"
                   required
@@ -288,7 +290,7 @@ export default function LookupsTab() {
                 />
               </div>
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Type Name</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.typeNameLabel')}</label>
                 <input
                   type="text"
                   required
@@ -299,8 +301,8 @@ export default function LookupsTab() {
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsTypeModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Type'}</button>
+                <button type="button" onClick={() => setIsTypeModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
+                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('common.save')}</button>
               </div>
             </form>
           </div>
@@ -311,11 +313,11 @@ export default function LookupsTab() {
       {isValueModalOpen && (
         <div className="modal-overlay" onClick={() => setIsValueModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '450px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Add Lookup Value ({selectedType?.LookupTypeCode})</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.createLookupValueTitle')} ({selectedType?.LookupTypeCode})</h3>
             {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
             <form onSubmit={handleCreateValue}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Value Code</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thValueCode')}</label>
                 <input
                   type="text"
                   required
@@ -326,7 +328,7 @@ export default function LookupsTab() {
                 />
               </div>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Value Name</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thValueName')}</label>
                 <input
                   type="text"
                   required
@@ -337,7 +339,7 @@ export default function LookupsTab() {
                 />
               </div>
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Display Order</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thDisplayOrder')}</label>
                 <input
                   type="number"
                   value={valueForm.displayOrder}
@@ -346,8 +348,8 @@ export default function LookupsTab() {
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsValueModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Add Value'}</button>
+                <button type="button" onClick={() => setIsValueModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
+                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('config.newLookupValueBtn')}</button>
               </div>
             </form>
           </div>

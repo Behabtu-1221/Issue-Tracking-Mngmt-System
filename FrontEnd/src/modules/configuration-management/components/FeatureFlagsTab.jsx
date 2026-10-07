@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Flag, Plus, Edit3, Trash2, ToggleLeft, ToggleRight, RefreshCw, AlertCircle } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 
 export default function FeatureFlagsTab() {
+  const { t } = useTranslation();
   const [flags, setFlags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,7 +92,7 @@ export default function FeatureFlagsTab() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this feature flag?')) {
+    if (window.confirm(t('config.confirmDeleteFlag'))) {
       try {
         await configApi.deleteFeatureFlag(id);
         fetchFlags();
@@ -104,8 +106,8 @@ export default function FeatureFlagsTab() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Runtime Feature Toggles</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Enable or disable system features dynamically without restarting services.</p>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>{t('config.flagsSectionTitle')}</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('config.flagsSectionDesc')}</p>
         </div>
 
         <button
@@ -125,7 +127,7 @@ export default function FeatureFlagsTab() {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> New Feature Flag
+          <Plus size={16} /> {t('config.newFlagBtn')}
         </button>
       </div>
 
@@ -133,22 +135,22 @@ export default function FeatureFlagsTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-            <p>Loading feature flags...</p>
+            <p>{t('config.loadingFlags')}</p>
           </div>
         ) : flags.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <Flag size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-            <p>No feature flags configured.</p>
+            <p>{t('config.noFlagsFound')}</p>
           </div>
         ) : (
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Flag Code</th>
-                <th>Feature Name</th>
-                <th>Description</th>
-                <th>State</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('config.thFlagCode')}</th>
+                <th>{t('config.thFeatureName')}</th>
+                <th>{t('config.thDescription')}</th>
+                <th>{t('config.thState')}</th>
+                <th style={{ textAlign: 'right' }}>{t('config.thActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -178,7 +180,7 @@ export default function FeatureFlagsTab() {
                       }}
                     >
                       {item.IsEnabled ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-                      {item.IsEnabled ? 'ENABLED' : 'DISABLED'}
+                      {item.IsEnabled ? t('config.stateEnabled') : t('config.stateDisabled')}
                     </button>
                   </td>
                   <td style={{ textAlign: 'right' }}>
@@ -230,7 +232,7 @@ export default function FeatureFlagsTab() {
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '500px', padding: '28px', background: 'var(--bg-secondary)' }}>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? 'Edit Feature Flag' : 'Create Feature Flag'}
+              {editingItem ? t('config.editFlagTitle') : t('config.createFlagTitle')}
             </h3>
 
             {error && (
@@ -241,7 +243,7 @@ export default function FeatureFlagsTab() {
 
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Flag Code</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.flagCodeLabel')}</label>
                 <input
                   type="text"
                   required
@@ -254,7 +256,7 @@ export default function FeatureFlagsTab() {
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Feature Name</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.featureNameLabel')}</label>
                 <input
                   type="text"
                   required
@@ -266,12 +268,12 @@ export default function FeatureFlagsTab() {
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Description</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.descriptionLabel')}</label>
                 <input
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Explains what this feature toggle controls..."
+                  placeholder={t('config.flagDescPlaceholder')}
                   style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
                 />
               </div>
@@ -282,14 +284,14 @@ export default function FeatureFlagsTab() {
                   onClick={() => setIsModalOpen(false)}
                   style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
                   style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
                 >
-                  {submitting ? 'Saving...' : editingItem ? 'Update Flag' : 'Create Flag'}
+                  {submitting ? t('common.save') : editingItem ? t('config.updateFlagBtn') : t('config.createFlagBtn')}
                 </button>
               </div>
             </form>

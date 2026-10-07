@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../i18n';
 import { useSearchParams } from 'react-router-dom';
 import dispatchApi from '../api/dispatchApi';
 import DispatchMetricsHeader from '../components/DispatchMetricsHeader';
@@ -9,6 +10,7 @@ import TechnicianTeamsTab from '../components/TechnicianTeamsTab';
 import { Send, Inbox, Wrench, Users, RefreshCw, Layers } from 'lucide-react';
 
 export default function DispatchPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'dispatcher';
   const [activeTab, setActiveTab] = useState(initialTab); // 'dispatcher' | 'workbench' | 'roster' | 'teams'
@@ -51,10 +53,10 @@ export default function DispatchPage() {
             </div>
             <div>
               <h1 style={{ fontSize: '1.75rem', fontWeight: '900', margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-                Assignment & Dispatch Management
+                {t('dispatch.pageTitle')}
               </h1>
               <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                Work distribution, technician workloads, field execution & dispatch routing
+                {t('dispatch.pageSubtitle')}
               </div>
             </div>
           </div>
@@ -65,7 +67,7 @@ export default function DispatchPage() {
           className="btn btn-secondary"
           style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
         >
-          <RefreshCw size={16} /> Refresh Metrics
+          <RefreshCw size={16} /> {t('dispatch.refreshMetrics')}
         </button>
       </div>
 
@@ -95,7 +97,7 @@ export default function DispatchPage() {
             display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
-          <Inbox size={16} /> Dispatcher Queue & Routing
+          <Inbox size={16} /> {t('dispatch.tabDispatcher')}
         </button>
 
         <button
@@ -112,7 +114,7 @@ export default function DispatchPage() {
             display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
-          <Wrench size={16} /> Field Technician Workbench
+          <Wrench size={16} /> {t('dispatch.tabWorkbench')}
         </button>
 
         <button
@@ -129,7 +131,7 @@ export default function DispatchPage() {
             display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
-          <Layers size={16} /> Technician Work Teams
+          <Layers size={16} /> {t('dispatch.tabTeams')}
         </button>
 
         <button
@@ -146,7 +148,7 @@ export default function DispatchPage() {
             display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
-          <Users size={16} /> Team Roster & Availability
+          <Users size={16} /> {t('dispatch.tabRoster')}
         </button>
       </div>
 

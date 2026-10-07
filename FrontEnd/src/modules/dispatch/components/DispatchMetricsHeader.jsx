@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from '../../../i18n';
 import { Inbox, Zap, AlertTriangle, Users, Clock, ArrowRight } from 'lucide-react';
 
 export default function DispatchMetricsHeader({ metrics, activeFilter, onFilterChange }) {
+  const { t } = useTranslation();
   const unassigned = metrics?.unassignedCount || 0;
   const active = metrics?.activeAssignmentsCount || 0;
   const emergency = metrics?.emergencyCount || 0;
@@ -10,9 +12,9 @@ export default function DispatchMetricsHeader({ metrics, activeFilter, onFilterC
   const cards = [
     {
       id: 'UNASSIGNED',
-      title: 'Unassigned Queue',
+      title: t('dispatch.unassignedQueue'),
       value: unassigned,
-      subtext: 'Awaiting dispatcher routing',
+      subtext: t('dispatch.unassignedSubtext'),
       icon: Inbox,
       color: '#f59e0b',
       bgGlow: 'rgba(245, 158, 11, 0.15)',
@@ -21,9 +23,9 @@ export default function DispatchMetricsHeader({ metrics, activeFilter, onFilterC
     },
     {
       id: 'ACTIVE',
-      title: 'Active Field Work',
+      title: t('dispatch.activeFieldWork'),
       value: active,
-      subtext: `${metrics?.inProgressCount || 0} Currently In-Progress`,
+      subtext: `${metrics?.inProgressCount || 0} ${t('dispatch.activeFieldWorkSubtext')}`,
       icon: Zap,
       color: '#6366f1',
       bgGlow: 'rgba(99, 102, 241, 0.15)',
@@ -31,9 +33,9 @@ export default function DispatchMetricsHeader({ metrics, activeFilter, onFilterC
     },
     {
       id: 'EMERGENCY',
-      title: 'Emergency Dispatch',
+      title: t('dispatch.emergencyDispatch'),
       value: emergency,
-      subtext: 'Critical priority override',
+      subtext: t('dispatch.emergencySubtext'),
       icon: AlertTriangle,
       color: '#ef4444',
       bgGlow: 'rgba(239, 68, 68, 0.15)',
@@ -42,9 +44,9 @@ export default function DispatchMetricsHeader({ metrics, activeFilter, onFilterC
     },
     {
       id: 'ROSTER',
-      title: 'Available Technicians',
+      title: t('dispatch.availableTechnicians'),
       value: availableTechs,
-      subtext: 'Ready for assignment',
+      subtext: t('dispatch.availableTechsSubtext'),
       icon: Users,
       color: '#10b981',
       bgGlow: 'rgba(16, 185, 129, 0.15)',

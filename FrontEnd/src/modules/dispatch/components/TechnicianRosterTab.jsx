@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../../i18n';
 import dispatchApi from '../api/dispatchApi';
 import { Users, Search, UserCheck, ShieldCheck, Activity } from 'lucide-react';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 
 export default function TechnicianRosterTab() {
+  const { t } = useTranslation();
   const [technicians, setTechnicians] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -37,7 +39,7 @@ export default function TechnicianRosterTab() {
       await dispatchApi.updateAvailability({ userId, statusCode: newStatus });
       fetchTechnicians();
     } catch (err) {
-      showAlert('Update Failed', err.response?.data?.message || 'Failed to update technician availability status.', 'error');
+      showAlert(t('dispatch.updateFailed'), err.response?.data?.message || t('dispatch.updateStatusFailed'), 'error');
     }
   };
 
@@ -56,7 +58,7 @@ export default function TechnicianRosterTab() {
           <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search technicians by name or email..."
+            placeholder={t('dispatch.searchTechniciansPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -80,7 +82,7 @@ export default function TechnicianRosterTab() {
                 fontWeight: '700', fontSize: '0.78rem', cursor: 'pointer'
               }}
             >
-              {st === 'ALL' ? 'All Statuses' : st}
+              {st === 'ALL' ? t('dispatch.allStatuses') : (t(`dispatch.status${st === 'AVAILABLE' ? 'Available' : st === 'BUSY' ? 'Busy' : st === 'ON_LEAVE' ? 'OnLeave' : 'Offline'}`))}
             </button>
           ))}
         </div>
@@ -88,9 +90,9 @@ export default function TechnicianRosterTab() {
 
       {/* Grid Roster */}
       {loading ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading technician roster...</div>
+        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('dispatch.loadingRoster')}</div>
       ) : technicians.length === 0 ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>No technicians found matching criteria.</div>
+        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('dispatch.noTechniciansFound')}</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '18px' }}>
           {technicians.map((tech) => {
@@ -126,8 +128,8 @@ export default function TechnicianRosterTab() {
                 {/* Status & Workload */}
                 <div style={{ background: 'var(--bg-tertiary)', padding: '12px 14px', borderRadius: '12px', marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--glass-border)' }}>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '700' }}>ACTIVE JOBS</div>
-                    <div style={{ fontWeight: '800', fontSize: '0.95rem', color: 'var(--accent-primary)' }}>{tech.ActiveWorkloadCount || 0} Assigned</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '700' }}>{t('dispatch.activeJobs')}</div>
+                    <div style={{ fontWeight: '800', fontSize: '0.95rem', color: 'var(--accent-primary)' }}>{tech.ActiveWorkloadCount || 0} {t('dispatch.assignedCount')}</div>
                   </div>
 
                   <select
@@ -144,10 +146,10 @@ export default function TechnicianRosterTab() {
                       outline: 'none'
                     }}
                   >
-                    <option value="AVAILABLE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>AVAILABLE</option>
-                    <option value="BUSY" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>BUSY</option>
-                    <option value="ON_LEAVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ON_LEAVE</option>
-                    <option value="OFFLINE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>OFFLINE</option>
+                    <option value="AVAILABLE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('dispatch.statusAvailable')}</option>
+                    <option value="BUSY" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('dispatch.statusBusy')}</option>
+                    <option value="ON_LEAVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('dispatch.statusOnLeave')}</option>
+                    <option value="OFFLINE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('dispatch.statusOffline')}</option>
                   </select>
                 </div>
               </div>

@@ -21,8 +21,10 @@ import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { tenantSchemas } from '../../../validation';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
+import { useTranslation } from '../../../i18n';
 
 export default function LeasesTab({ onRefreshMetrics }) {
+  const { t } = useTranslation();
   const { isParkAdmin } = usePermissionContext();
   const [leases, setLeases] = useState([]);
   const [expiringLeases, setExpiringLeases] = useState([]);
@@ -286,25 +288,25 @@ export default function LeasesTab({ onRefreshMetrics }) {
       case 'ACTIVE':
         return (
           <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <CheckCircle2 size={12} /> Active
+            <CheckCircle2 size={12} /> {t('tenant.active')}
           </span>
         );
       case 'DRAFT':
         return (
           <span className="badge badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <Clock size={12} /> Draft
+            <Clock size={12} /> {t('tenant.draft')}
           </span>
         );
       case 'EXPIRED':
         return (
           <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(234, 179, 8, 0.15)', color: '#eab308', fontSize: '0.75rem' }}>
-            Expired
+            {t('tenant.expired')}
           </span>
         );
       case 'TERMINATED':
         return (
           <span className="badge badge-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <XCircle size={12} /> Terminated
+            <XCircle size={12} /> {t('tenant.terminated')}
           </span>
         );
       default:
@@ -333,7 +335,7 @@ export default function LeasesTab({ onRefreshMetrics }) {
             <AlertTriangle color="#eab308" size={22} />
             <div>
               <div style={{ fontWeight: '600', color: '#fef08a' }}>
-                {expiringLeases.length} Lease Contract(s) Expiring Within 30 Days
+                {t('tenant.expiringAlert').replace('{count}', expiringLeases.length)}
               </div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Renewal action recommended for: {expiringLeases.map((l) => l.TenantCompanyName).join(', ')}
@@ -350,7 +352,7 @@ export default function LeasesTab({ onRefreshMetrics }) {
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search by agreement # or tenant company..."
+              placeholder={t('tenant.searchLeases')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -376,11 +378,11 @@ export default function LeasesTab({ onRefreshMetrics }) {
               fontSize: '0.85rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Lease Statuses</option>
-            <option value="DRAFT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Draft</option>
-            <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Active</option>
-            <option value="EXPIRED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Expired</option>
-            <option value="TERMINATED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Terminated</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.allLeaseStatuses')}</option>
+            <option value="DRAFT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.draft')}</option>
+            <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.active')}</option>
+            <option value="EXPIRED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.expired')}</option>
+            <option value="TERMINATED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.terminated')}</option>
           </select>
         </div>
 
@@ -401,7 +403,7 @@ export default function LeasesTab({ onRefreshMetrics }) {
               boxShadow: 'var(--glow-accent)'
             }}
           >
-            <Plus size={16} /> Draft New Lease
+            <Plus size={16} /> {t('tenant.draftNewLease')}
           </button>
         )}
       </div>
@@ -409,19 +411,19 @@ export default function LeasesTab({ onRefreshMetrics }) {
       {/* Leases Table */}
       <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading lease agreements...</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.loadingLeases')}</div>
         ) : leases.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No lease contracts found.</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.noLeasesFound')}</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
             <thead>
               <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                <th style={{ padding: '16px 20px' }}>Agreement # & Tenant</th>
-                <th style={{ padding: '16px 20px' }}>Lease Period</th>
-                <th style={{ padding: '16px 20px' }}>Monthly Rent</th>
-                <th style={{ padding: '16px 20px' }}>Security Deposit</th>
-                <th style={{ padding: '16px 20px' }}>Status</th>
-                <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.agreementAndTenant')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.leasePeriod')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.monthlyRent')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.securityDeposit')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('tenant.status')}</th>
+                <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -687,13 +689,13 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onClick={() => setIsModalOpen(false)}
                   style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)' }}
                 >
-                  {editingLease ? 'Save Lease' : 'Create Draft Lease'}
+                  {editingLease ? t('common.saveChanges') : t('tenant.draftNewLease')}
                 </button>
               </div>
             </form>
@@ -776,14 +778,14 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onClick={() => setStatusModalLease(null)}
                   style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={!targetStatus}
                   style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)', opacity: !targetStatus ? 0.5 : 1 }}
                 >
-                  Update Status
+                  {t('common.confirm')}
                 </button>
               </div>
             </form>

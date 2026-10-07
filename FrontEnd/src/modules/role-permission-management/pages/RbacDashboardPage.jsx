@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import rbacApi from '../api/rbacApi';
 import { usePermission } from '../hooks/usePermission';
+import { useTranslation } from '../../../i18n';
 
 const glassCard = {
   background: 'var(--glass-bg)',
@@ -16,6 +17,7 @@ const glassCard = {
 };
 
 export default function RbacDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isParkAdmin, userScope } = usePermission();
   const [stats, setStats] = useState({ roles: 0, permissions: 0, auditCount: 0 });
@@ -46,9 +48,9 @@ export default function RbacDashboardPage() {
   const rbacModules = [
     {
       id: 'management',
-      title: 'Role Definitions & Creation',
+      title: t('rbac.tabRoleDefinitions', 'Role Definitions & Creation'),
       desc: 'Create, edit, update, and manage system roles and custom tenant security roles',
-      val: loading ? '...' : `${stats.roles} Configured Roles`,
+      val: loading ? '...' : t('rbac.configuredRolesCount', { count: stats.roles }, `${stats.roles} Configured Roles`),
       icon: ShieldCheck,
       color: '#6366f1',
       bg: 'rgba(99, 102, 241, 0.15)',
@@ -56,9 +58,9 @@ export default function RbacDashboardPage() {
     },
     {
       id: 'matrix',
-      title: 'Permission Assignment Matrix',
+      title: t('rbac.tabPermissionMatrix', 'Permission Assignment Matrix'),
       desc: 'Assign, configure, and map granular CRUD resource permissions to created roles',
-      val: loading ? '...' : `${stats.permissions} System Actions`,
+      val: loading ? '...' : t('rbac.systemActionsCount', { count: stats.permissions }, `${stats.permissions} System Actions`),
       icon: Sliders,
       color: '#0284c7',
       bg: 'rgba(2, 132, 199, 0.15)',
@@ -66,7 +68,7 @@ export default function RbacDashboardPage() {
     },
     {
       id: 'assignments',
-      title: 'Role Assignments & Users',
+      title: t('rbac.tabRoleAssignments', 'Role Assignments & Users'),
       desc: 'User-to-role mappings, tenant company scope grants, and park administration access',
       val: 'User Assignments',
       icon: UserCheck,
@@ -76,9 +78,9 @@ export default function RbacDashboardPage() {
     },
     {
       id: 'audit',
-      title: 'Security Audit Trail',
+      title: t('rbac.tabAuditTrail', 'Security Audit Trail'),
       desc: 'Role change logs, permission mutation history, and governance security traces',
-      val: loading ? '...' : `${stats.auditCount} Security Events`,
+      val: loading ? '...' : t('rbac.securityEventsCount', { count: stats.auditCount }, `${stats.auditCount} Security Events`),
       icon: FileText,
       color: '#8b5cf6',
       bg: 'rgba(138, 75, 255, 0.15)',
@@ -94,10 +96,11 @@ export default function RbacDashboardPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              Role & Permission <span className="glow-text">Governance</span>
+              {t('rbac.governanceTitle', 'Role & Permission')}{' '}
+              <span className="glow-text">{t('rbac.governanceHighlight', 'Governance')}</span>
             </h1>
             <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Enterprise Role-Based Access Control (RBAC), multi-tenant administration scopes, and fine-grained resource permission matrix
+              {t('rbac.governanceSubtitle', 'Enterprise Role-Based Access Control (RBAC), multi-tenant administration scopes, and fine-grained resource permission matrix')}
             </p>
           </div>
 
@@ -113,10 +116,10 @@ export default function RbacDashboardPage() {
             <ShieldCheck size={20} color={isParkAdmin ? '#a855f7' : '#3b82f6'} />
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
-                Active Administration Scope
+                {t('rbac.activeAdminScope', 'Active Administration Scope')}
               </div>
               <div style={{ fontSize: '13px', fontWeight: 700, color: isParkAdmin ? '#a855f7' : '#3b82f6' }}>
-                {isParkAdmin ? '🏢 Business Park Administration Scope' : '🏬 Tenant Company Administration Scope'}
+                {isParkAdmin ? t('rbac.bpAdminScope', '🏢 Business Park Administration Scope') : t('rbac.tenantAdminScope', '🏬 Tenant Company Administration Scope')}
               </div>
             </div>
           </div>

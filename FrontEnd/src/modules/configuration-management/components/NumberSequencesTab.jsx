@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Hash, Plus, Edit3, Trash2, Zap, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 
 export default function NumberSequencesTab() {
+  const { t } = useTranslation();
   const [sequences, setSequences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatedResult, setGeneratedResult] = useState(null);
@@ -97,7 +99,7 @@ export default function NumberSequencesTab() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Delete this number sequence generator?')) {
+    if (window.confirm(t('config.confirmDeleteSequence'))) {
       try {
         await configApi.deleteNumberSequence(id);
         fetchSequences();
@@ -116,8 +118,8 @@ export default function NumberSequencesTab() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Auto-Numbering Sequences</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Generates unique formatted document & entity tracking numbers (e.g. Ticket IDs, Invoices).</p>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>{t('config.sequencesSectionTitle')}</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('config.sequencesSectionDesc')}</p>
         </div>
 
         <button
@@ -137,7 +139,7 @@ export default function NumberSequencesTab() {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> New Sequence
+          <Plus size={16} /> {t('config.newSequenceBtn')}
         </button>
       </div>
 
@@ -146,11 +148,11 @@ export default function NumberSequencesTab() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <CheckCircle size={20} />
             <div>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Generated Number: </span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t('config.generatedNumberLabel')}: </span>
               <strong style={{ fontFamily: 'monospace', fontSize: '1.1rem', color: 'white' }}>{generatedResult.value}</strong>
             </div>
           </div>
-          <button onClick={() => setGeneratedResult(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}>Dismiss</button>
+          <button onClick={() => setGeneratedResult(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}>{t('config.dismissBtn')}</button>
         </div>
       )}
 
@@ -158,23 +160,23 @@ export default function NumberSequencesTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-            <p>Loading number sequences...</p>
+            <p>{t('config.loadingSequences')}</p>
           </div>
         ) : sequences.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <Hash size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-            <p>No number sequences configured.</p>
+            <p>{t('config.noSequencesFound')}</p>
           </div>
         ) : (
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Sequence Code</th>
-                <th>Prefix</th>
-                <th>Next Number</th>
-                <th>Suffix</th>
-                <th>Formatted Preview</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('config.thSequenceCode')}</th>
+                <th>{t('config.thPrefix')}</th>
+                <th>{t('config.thNextNumber')}</th>
+                <th>{t('config.thSuffix')}</th>
+                <th>{t('config.thPreview')}</th>
+                <th style={{ textAlign: 'right' }}>{t('config.thActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -208,9 +210,9 @@ export default function NumberSequencesTab() {
                           fontSize: '0.8rem',
                           fontWeight: '600'
                         }}
-                        title="Generate Next ID"
+                        title={t('config.generateNextBtn')}
                       >
-                        <Zap size={14} /> Next
+                        <Zap size={14} /> {t('config.generateNextBtn')}
                       </button>
                       <button
                         onClick={() => handleOpenModal(item)}
@@ -259,7 +261,7 @@ export default function NumberSequencesTab() {
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)' }}>
             <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? 'Edit Number Sequence' : 'Create Number Sequence'}
+              {editingItem ? t('config.editSequenceTitle') : t('config.createSequenceTitle')}
             </h3>
 
             {error && (
@@ -270,7 +272,7 @@ export default function NumberSequencesTab() {
 
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Sequence Code</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.sequenceCodeLabel')}</label>
                 <input
                   type="text"
                   required
@@ -284,7 +286,7 @@ export default function NumberSequencesTab() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Prefix</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.prefixLabel')}</label>
                   <input
                     type="text"
                     placeholder="e.g. INC-"
@@ -294,7 +296,7 @@ export default function NumberSequencesTab() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Suffix</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.suffixLabel')}</label>
                   <input
                     type="text"
                     placeholder="e.g. -2026"
@@ -307,7 +309,7 @@ export default function NumberSequencesTab() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Next Number</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.nextNumberLabel')}</label>
                   <input
                     type="number"
                     required
@@ -317,7 +319,7 @@ export default function NumberSequencesTab() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Increment</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.incrementLabel')}</label>
                   <input
                     type="number"
                     required
@@ -327,7 +329,7 @@ export default function NumberSequencesTab() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Width</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.widthLabel')}</label>
                   <input
                     type="number"
                     required
@@ -344,14 +346,14 @@ export default function NumberSequencesTab() {
                   onClick={() => setIsModalOpen(false)}
                   style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
                   style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
                 >
-                  {submitting ? 'Saving...' : editingItem ? 'Update Sequence' : 'Create Sequence'}
+                  {submitting ? t('common.save') : editingItem ? t('config.updateSequenceBtn') : t('config.createSequenceBtn')}
                 </button>
               </div>
             </form>

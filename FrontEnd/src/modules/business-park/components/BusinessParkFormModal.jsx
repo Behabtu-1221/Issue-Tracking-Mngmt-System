@@ -7,6 +7,7 @@ import {
 import parkApi from '../api/parkApi';
 import { parkSchemas } from '../../../validation';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { useTranslation } from '../../../i18n';
 
 const TIMEZONE_OPTIONS = [
   { code: 'Africa/Addis_Ababa', label: 'Africa/Addis_Ababa (EAT, UTC+3)' },
@@ -30,6 +31,7 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, initialData = null }) {
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState('identity'); // 'identity' | 'contact' | 'location' | 'regional'
   const [formData, setFormData] = useState({
     BusinessParkCode: '',
@@ -173,27 +175,27 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
 
       if (initialData && initialData.BusinessParkID) {
         await parkApi.updatePark(initialData.BusinessParkID, payload);
-        showAlert('Success', `Business Park "${payload.BusinessParkName}" updated successfully.`, 'success');
+        showAlert(t('common.success', 'Success'), t('businessPark.parkUpdatedSuccess', { name: payload.BusinessParkName }, `Business Park "${payload.BusinessParkName}" updated successfully.`), 'success');
       } else {
         await parkApi.createPark(payload);
-        showAlert('Success', `Business Park "${payload.BusinessParkName}" registered successfully.`, 'success');
+        showAlert(t('common.success', 'Success'), t('businessPark.parkRegisteredSuccess', { name: payload.BusinessParkName }, `Business Park "${payload.BusinessParkName}" registered successfully.`), 'success');
       }
 
       onSuccess();
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to save Business Park data.';
+      const msg = err.response?.data?.message || t('businessPark.failedSavePark', 'Failed to save Business Park data.');
       setFormError(msg);
-      showAlert('Operation Failed', msg, 'error');
+      showAlert(t('common.operationFailed', 'Operation Failed'), msg, 'error');
     } finally {
       setFormSubmitting(false);
     }
   };
 
   const steps = [
-    { id: 'identity', label: '1. Identity & Legal', icon: Building2 },
-    { id: 'contact', label: '2. Contact & Digital', icon: Mail },
-    { id: 'location', label: '3. Location & Area', icon: MapPin },
-    { id: 'regional', label: '4. System & Defaults', icon: Globe }
+    { id: 'identity', label: t('businessPark.stepIdentity', '1. Identity & Legal'), icon: Building2 },
+    { id: 'contact', label: t('businessPark.stepContact', '2. Contact & Digital'), icon: Mail },
+    { id: 'location', label: t('businessPark.stepLocation', '3. Location & Area'), icon: MapPin },
+    { id: 'regional', label: t('businessPark.stepRegional', '4. System & Defaults'), icon: Globe }
   ];
 
   return (
@@ -245,10 +247,10 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
             </div>
             <div>
               <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--accent-primary)', letterSpacing: '0.5px' }}>
-                BUSINESS PARK TOPOLOGY CONFIGURATION
+                {t('businessPark.topologyConfiguration', 'BUSINESS PARK TOPOLOGY CONFIGURATION')}
               </span>
               <h3 style={{ margin: '2px 0 0', fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
-                {initialData ? `Edit Campus • ${formData.BusinessParkName || 'Business Park'}` : 'Register New Business Park Campus'}
+                {initialData ? t('businessPark.editCampusTitle', { name: formData.BusinessParkName || 'Business Park' }, `Edit Campus • ${formData.BusinessParkName || 'Business Park'}`) : t('businessPark.registerNewCampusTitle', 'Register New Business Park Campus')}
               </h3>
             </div>
           </div>
@@ -314,7 +316,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Business Park Code
+                      {t('businessPark.parkCode', 'Business Park Code')}
                     </label>
                     <input
                       type="text" required placeholder="e.g. BP_BOLE_01"
@@ -333,7 +335,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Business Park Name
+                      {t('businessPark.parkName', 'Business Park Name')}
                     </label>
                     <input
                       type="text" required placeholder="e.g. Bole Lemi Industrial & Technology Park"
@@ -354,7 +356,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Short Name / Alias
+                      {t('businessPark.shortNameAlias', 'Short Name / Alias')}
                     </label>
                     <input
                       type="text" placeholder="e.g. Bole Lemi Tech Park"
@@ -369,7 +371,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Registration Number
+                      {t('businessPark.registrationNumber', 'Registration Number')}
                     </label>
                     <input
                       type="text" placeholder="e.g. REG-ETH-2024-8841"
@@ -384,7 +386,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Tax Identification No (TIN)
+                      {t('businessPark.tinNumberLabel', 'Tax Identification No (TIN)')}
                     </label>
                     <input
                       type="text" placeholder="e.g. TIN-0098412491"
@@ -401,7 +403,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                    Campus Description & Scope Overview
+                    {t('businessPark.campusDescriptionOverview', 'Campus Description & Scope Overview')}
                   </label>
                   <textarea
                     rows={3} placeholder="Central business park campus scope, building layout, and facilities infrastructure description..."
@@ -417,7 +419,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                    Logo Image URL / Asset Path
+                    {t('businessPark.logoUrlAssetPath', 'Logo Image URL / Asset Path')}
                   </label>
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                     <input
@@ -450,7 +452,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Official Contact Email
+                      {t('businessPark.officialContactEmail', 'Official Contact Email')}
                     </label>
                     <input
                       type="email" placeholder="e.g. info@bolelemi.park.et"
@@ -468,7 +470,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Website URL
+                      {t('businessPark.websiteUrl', 'Website URL')}
                     </label>
                     <input
                       type="text" placeholder="e.g. https://bolelemitp.ethiopia.gov.et"
@@ -486,7 +488,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Landline Phone Number
+                      {t('businessPark.landlinePhoneNumber', 'Landline Phone Number')}
                     </label>
                     <input
                       type="text" placeholder="e.g. +251 11 662 1000"
@@ -501,7 +503,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Mobile / Emergency Hotline Number
+                      {t('businessPark.mobileHotlineNumber', 'Mobile / Emergency Hotline Number')}
                     </label>
                     <input
                       type="text" placeholder="e.g. +251 91 100 2233"
@@ -524,7 +526,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Country
+                      {t('businessPark.country', 'Country')}
                     </label>
                     <input
                       type="text" required placeholder="e.g. Ethiopia"
@@ -539,7 +541,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Region / State
+                      {t('businessPark.regionState', 'Region / State')}
                     </label>
                     <input
                       type="text" placeholder="e.g. Addis Ababa"
@@ -554,7 +556,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      City
+                      {t('businessPark.city', 'City')}
                     </label>
                     <input
                       type="text" required placeholder="e.g. Addis Ababa"
@@ -575,7 +577,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      SubCity
+                      {t('businessPark.subCity', 'SubCity')}
                     </label>
                     <input
                       type="text" placeholder="e.g. Bole"
@@ -590,7 +592,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Woreda
+                      {t('businessPark.woreda', 'Woreda')}
                     </label>
                     <input
                       type="text" placeholder="e.g. Woreda 03"
@@ -605,7 +607,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Postal Code
+                      {t('businessPark.postalCode', 'Postal Code')}
                     </label>
                     <input
                       type="text" placeholder="e.g. 1000"
@@ -623,7 +625,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Address Line 1 (Street / Main Gate)
+                      {t('businessPark.addressLine1', 'Address Line 1 (Street / Main Gate)')}
                     </label>
                     <input
                       type="text" placeholder="e.g. Ring Road, Near Bole Lemi Substation"
@@ -638,7 +640,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Address Line 2 (Secondary Building / Landmark)
+                      {t('businessPark.addressLine2', 'Address Line 2 (Secondary Building / Landmark)')}
                     </label>
                     <input
                       type="text" placeholder="e.g. Block A2 Administration HQ"
@@ -656,7 +658,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      GPS Latitude
+                      {t('businessPark.gpsLatitude', 'GPS Latitude')}
                     </label>
                     <input
                       type="number" step="any" placeholder="e.g. 8.98060300"
@@ -671,7 +673,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      GPS Longitude
+                      {t('businessPark.gpsLongitude', 'GPS Longitude')}
                     </label>
                     <input
                       type="number" step="any" placeholder="e.g. 38.75776000"
@@ -686,7 +688,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Total Area (m²)
+                      {t('businessPark.totalAreaSqM', 'Total Area (m²)')}
                     </label>
                     <input
                       type="number" min="0" placeholder="e.g. 150000.00"
@@ -712,7 +714,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      System TimeZone
+                      {t('businessPark.systemTimeZone', 'System TimeZone')}
                     </label>
                     <select
                       value={formData.TimeZone}
@@ -732,7 +734,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Default Currency Code
+                      {t('businessPark.defaultCurrencyCode', 'Default Currency Code')}
                     </label>
                     <select
                       value={formData.CurrencyCode}
@@ -752,7 +754,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Default Language
+                      {t('businessPark.defaultLanguage', 'Default Language')}
                     </label>
                     <select
                       value={formData.LanguageCode}
@@ -775,7 +777,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 {/* Status Controls */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '10px', textTransform: 'uppercase' }}>
-                    Campus Operational Status Flags
+                    {t('businessPark.operationalStatusFlags', 'Campus Operational Status Flags')}
                   </label>
                   <div style={{ display: 'flex', gap: '16px' }}>
                     <button
@@ -790,7 +792,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                       }}
                     >
                       {formData.IsOperational ? <CheckCircle2 size={18} /> : null}
-                      {formData.IsOperational ? 'Campus Operational' : 'Under Construction / Offline'}
+                      {formData.IsOperational ? t('businessPark.campusOperational', 'Campus Operational') : t('businessPark.underConstructionOffline', 'Under Construction / Offline')}
                     </button>
 
                     <button
@@ -805,7 +807,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                       }}
                     >
                       {formData.IsActive ? <CheckCircle2 size={18} /> : null}
-                      {formData.IsActive ? 'Record Active' : 'Record Deactivated'}
+                      {formData.IsActive ? t('businessPark.recordActive', 'Record Active') : t('businessPark.recordDeactivated', 'Record Deactivated')}
                     </button>
                   </div>
                 </div>
@@ -833,7 +835,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                     display: 'flex', alignItems: 'center', gap: '6px'
                   }}
                 >
-                  <ArrowLeft size={16} /> Back
+                  <ArrowLeft size={16} /> {t('common.back', 'Back')}
                 </button>
               )}
             </div>
@@ -848,7 +850,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer'
                 }}
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
 
               {activeStep !== 'regional' ? (
@@ -865,7 +867,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                     boxShadow: 'var(--glow-accent)'
                   }}
                 >
-                  Next Step <ArrowRight size={16} />
+                  {t('common.nextStep', 'Next Step')} <ArrowRight size={16} />
                 </button>
               ) : (
                 <button
@@ -879,7 +881,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   }}
                 >
                   {formSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                  {formSubmitting ? 'Saving Business Park...' : initialData ? '✓ Update Business Park' : '✓ Register Business Park'}
+                  {formSubmitting ? t('businessPark.savingPark', 'Saving Business Park...') : initialData ? t('businessPark.updateParkBtn', '✓ Update Business Park') : t('businessPark.registerParkBtn', '✓ Register Business Park')}
                 </button>
               )}
             </div>

@@ -9,8 +9,10 @@ import serviceCatalogApi from '../../service-catalog/api/serviceCatalogApi';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { requestSchemas } from '../../../validation';
 import { FormField } from '../../../components/common/FormField';
+import { useTranslation } from '../../../i18n';
 
 export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propServices = [] }) => {
+  const { t, isRTL } = useTranslation();
   const { user } = usePermissionContext();
   const [servicesList, setServicesList] = useState([]);
   const [selectedServiceMeta, setSelectedServiceMeta] = useState(null);
@@ -223,8 +225,8 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
               <Plus size={20} style={{ color: 'var(--color-primary)' }} />
             </div>
             <div>
-              <h2 style={{ fontWeight: '700', fontSize: '1.2rem', letterSpacing: '-0.3px' }}>Submit New Issue Request</h2>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Fill in details and attach supporting documents/photos</p>
+              <h2 style={{ fontWeight: '700', fontSize: '1.2rem', letterSpacing: '-0.3px' }}>{t('issues.submitServiceRequest', 'Submit New Issue Request')}</h2>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('issues.descPlaceholder', 'Fill in details and attach supporting documents/photos')}</p>
             </div>
           </div>
           <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', border: '1px solid var(--glass-border)', backgroundColor: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}>
@@ -244,7 +246,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             {/* Title */}
             <div style={{ gridColumn: '1 / -1' }}>
               <FormField
-                label="Issue Title"
+                label={t('issues.requestTitle', 'Issue Title')}
                 id="Title"
                 required
                 icon={Sparkles}
@@ -256,7 +258,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   type="text"
                   value={form.Title}
                   onChange={(e) => handleFieldChange('Title', e.target.value)}
-                  placeholder="e.g. AC unit in meeting room 302 not cooling properly"
+                  placeholder={t('issues.titlePlaceholder', 'e.g. AC unit in meeting room 302 not cooling properly')}
                   style={baseInputStyle(Boolean(fieldErrors.Title))}
                 />
               </FormField>
@@ -265,7 +267,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             {/* Description */}
             <div style={{ gridColumn: '1 / -1' }}>
               <FormField
-                label="Detailed Description"
+                label={t('issues.descriptionDetails', 'Detailed Description')}
                 id="Description"
                 required
                 icon={FileText}
@@ -277,7 +279,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   rows={4}
                   value={form.Description}
                   onChange={(e) => handleFieldChange('Description', e.target.value)}
-                  placeholder="Provide a comprehensive description of the problem..."
+                  placeholder={t('issues.descPlaceholder', 'Provide a comprehensive description of the problem...')}
                   style={{ ...baseInputStyle(Boolean(fieldErrors.Description)), resize: 'vertical' }}
                 />
               </FormField>
@@ -286,7 +288,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             {/* Service Selection */}
             <div>
               <FormField
-                label="Service Catalog Item"
+                label={t('issues.serviceItem', 'Service Catalog Item')}
                 id="ServiceID"
                 required
                 icon={Layers}
@@ -299,7 +301,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   onChange={(e) => handleServiceSelect(e.target.value)}
                   style={baseInputStyle(Boolean(fieldErrors.ServiceID))}
                 >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Select Service from Catalog --</option>
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- {t('issues.chooseService', 'Select Service from Catalog')} --</option>
                   {servicesList.map((svc) => (
                     <option key={svc.ServiceID} value={svc.ServiceID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                       {svc.ServiceName} ({svc.ServiceCode || `ID #${svc.ServiceID}`})
@@ -318,7 +320,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             {/* Request Type */}
             <div>
               <FormField
-                label="Request Classification"
+                label={t('issues.requestType', 'Request Classification')}
                 id="RequestTypeCode"
                 required
                 error={fieldErrors.RequestTypeCode}
@@ -329,11 +331,11 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   onChange={(e) => handleFieldChange('RequestTypeCode', e.target.value)}
                   style={baseInputStyle(Boolean(fieldErrors.RequestTypeCode))}
                 >
-                  <option value="INCIDENT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Incident</option>
-                  <option value="MAINTENANCE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Maintenance</option>
-                  <option value="COMPLAINT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Complaint</option>
-                  <option value="DISRUPTION" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Disruption</option>
-                  <option value="SERVICE_REQUEST" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Service Request</option>
+                  <option value="INCIDENT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.incident', 'Incident')}</option>
+                  <option value="MAINTENANCE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.maintenance', 'Maintenance')}</option>
+                  <option value="COMPLAINT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.complaint', 'Complaint')}</option>
+                  <option value="DISRUPTION" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.disruption', 'Disruption')}</option>
+                  <option value="SERVICE_REQUEST" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.serviceRequest', 'Service Request')}</option>
                 </select>
               </FormField>
             </div>
@@ -341,7 +343,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             {/* Priority */}
             <div>
               <FormField
-                label="Urgency / Priority"
+                label={t('issues.urgencyPriority', 'Urgency & Priority')}
                 id="PriorityCode"
                 required
                 icon={Clock}
@@ -353,10 +355,10 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   onChange={(e) => handleFieldChange('PriorityCode', e.target.value)}
                   style={baseInputStyle(Boolean(fieldErrors.PriorityCode))}
                 >
-                  <option value="LOW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Low — Routine</option>
-                  <option value="MEDIUM" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Medium — Standard</option>
-                  <option value="HIGH" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>High — Important</option>
-                  <option value="CRITICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Critical — Emergency</option>
+                  <option value="LOW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityLow', 'Low')} — Routine</option>
+                  <option value="MEDIUM" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityMedium', 'Medium')} — Standard</option>
+                  <option value="HIGH" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityHigh', 'High')} — Important</option>
+                  <option value="CRITICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityCritical', 'Critical')} — Emergency</option>
                 </select>
               </FormField>
             </div>
@@ -364,7 +366,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             {/* Category Code */}
             <div>
               <FormField
-                label="Category Code"
+                label={t('issues.category', 'Category Code')}
                 id="CategoryCode"
                 icon={Tag}
                 error={fieldErrors.CategoryCode}
@@ -384,7 +386,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             {/* Requester User ID */}
             <div>
               <FormField
-                label="Requester User ID"
+                label={t('issues.requester', 'Requester User ID')}
                 id="RequesterUserID"
                 required
                 icon={User}
@@ -411,14 +413,14 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   style={{ accentColor: '#ef4444', width: '16px', height: '16px' }}
                 />
                 <AlertTriangle size={14} style={{ color: '#f87171' }} />
-                Flag as Major Incident
+                {t('issues.flagMajorIncident', 'Flag as Major Incident')}
               </label>
             </div>
 
             {/* ── File & Document Attachment Section ── */}
             <div style={{ gridColumn: '1 / -1', borderTop: '1px dashed var(--glass-border)', paddingTop: '16px', marginTop: '6px' }}>
               <FormField
-                label="Attach Supporting Files & Documents"
+                label={t('issues.attachFiles', 'Attach Supporting Files & Documents')}
                 id="attachments"
                 icon={Paperclip}
                 error={fieldErrors.Attachments}
@@ -441,9 +443,9 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                     style={{ display: 'none' }}
                   />
                   <Paperclip size={24} color="var(--accent-primary)" style={{ marginBottom: '6px' }} />
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>Click to browse or attach files/photos</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>{t('issues.dragDropBrowse', 'Click to browse or attach files/photos')}</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                    Images, PDFs, Word, Excel, CSV (Saved directly to Document Repository)
+                    {t('issues.fileSupportHint', 'Images, PDFs, Word, Excel, CSV (Saved directly to Document Repository)')}
                   </div>
                 </div>
               </FormField>
@@ -470,10 +472,10 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
           {/* Footer */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--glass-border)' }}>
             <button type="button" onClick={onClose} style={{ padding: '10px 24px', borderRadius: '8px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: '600' }}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button type="submit" className="btn-primary" disabled={submitting} style={{ padding: '10px 28px' }}>
-              {submitting ? 'Submitting & Uploading Files...' : 'Submit Issue Request'}
+              {submitting ? t('issues.submitting', 'Submitting & Uploading Files...') : t('issues.submitServiceRequest', 'Submit Issue Request')}
             </button>
           </div>
         </form>

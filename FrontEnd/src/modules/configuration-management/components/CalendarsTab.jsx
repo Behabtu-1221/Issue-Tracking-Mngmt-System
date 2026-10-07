@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Plus, Trash2, RefreshCw, AlertCircle, Clock } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 
 export default function CalendarsTab() {
+  const { t } = useTranslation();
   const [calendars, setCalendars] = useState([]);
   const [selectedCalendar, setSelectedCalendar] = useState(null);
   const [holidays, setHolidays] = useState([]);
@@ -105,7 +107,7 @@ export default function CalendarsTab() {
   };
 
   const handleDeleteHoliday = async (holidayId) => {
-    if (window.confirm('Delete this holiday from calendar?')) {
+    if (window.confirm(t('config.confirmDeleteHoliday'))) {
       try {
         await configApi.deleteCalendarHoliday(selectedCalendar.WorkingCalendarID, holidayId);
         fetchHolidays(selectedCalendar.WorkingCalendarID);
@@ -120,7 +122,7 @@ export default function CalendarsTab() {
       {/* Left Column: Calendars */}
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>Working Calendars</h4>
+          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>{t('config.calendarsTitle')}</h4>
           <button
             onClick={() => {
               setCalendarForm({ calendarCode: '', calendarName: '', timeZone: 'UTC', workStartTime: '08:00', workEndTime: '17:00' });
@@ -141,7 +143,7 @@ export default function CalendarsTab() {
               gap: '4px'
             }}
           >
-            <Plus size={14} /> New Calendar
+            <Plus size={14} /> {t('config.newCalendarBtn')}
           </button>
         </div>
 
@@ -187,7 +189,7 @@ export default function CalendarsTab() {
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>
                   {selectedCalendar.CalendarName} <span style={{ fontSize: '0.85rem', fontFamily: 'monospace', color: 'var(--accent-secondary)' }}>({selectedCalendar.TimeZone || 'UTC'})</span>
                 </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Configured holiday schedules for SLA calculations.</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('config.calendarHolidaysDesc')}</p>
               </div>
 
               <button
@@ -211,7 +213,7 @@ export default function CalendarsTab() {
                   boxShadow: 'var(--glow-accent)'
                 }}
               >
-                <Plus size={16} /> Add Holiday
+                <Plus size={16} /> {t('config.addHolidayBtn')}
               </button>
             </div>
 
@@ -219,21 +221,21 @@ export default function CalendarsTab() {
               {loadingHolidays ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   <RefreshCw className="animate-spin" size={24} style={{ marginBottom: '12px' }} />
-                  <p>Loading holidays...</p>
+                  <p>{t('config.loadingHolidays')}</p>
                 </div>
               ) : holidays.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   <Calendar size={36} style={{ marginBottom: '12px', opacity: 0.5 }} />
-                  <p>No holidays configured for this calendar.</p>
+                  <p>{t('config.noHolidays')}</p>
                 </div>
               ) : (
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Holiday Name</th>
-                      <th>Date</th>
-                      <th>Recurring</th>
-                      <th style={{ textAlign: 'right' }}>Actions</th>
+                      <th>{t('config.thHolidayName')}</th>
+                      <th>{t('config.thHolidayDate')}</th>
+                      <th>{t('config.thRecurring')}</th>
+                      <th style={{ textAlign: 'right' }}>{t('config.thActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -245,7 +247,7 @@ export default function CalendarsTab() {
                         </td>
                         <td>
                           <span className={`badge badge-${h.IsRecurring ? 'boolean' : 'string'}`}>
-                            {h.IsRecurring ? 'RECURRING' : 'SINGLE'}
+                            {h.IsRecurring ? t('config.badgeRecurring') : t('config.badgeSingle')}
                           </span>
                         </td>
                         <td style={{ textAlign: 'right' }}>
@@ -277,7 +279,7 @@ export default function CalendarsTab() {
         ) : (
           <div className="glass-panel" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
             <Clock size={40} style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <p>Select a working calendar to view and manage holidays.</p>
+            <p>{t('config.selectCalendarPrompt')}</p>
           </div>
         )}
       </div>
@@ -286,11 +288,11 @@ export default function CalendarsTab() {
       {isCalendarModalOpen && (
         <div className="modal-overlay" onClick={() => setIsCalendarModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '480px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Create Working Calendar</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.newCalendarBtn')}</h3>
             {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
             <form onSubmit={handleCreateCalendar}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Calendar Code</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.calendarCodeLabel')}</label>
                 <input
                   type="text"
                   required
@@ -301,7 +303,7 @@ export default function CalendarsTab() {
                 />
               </div>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Calendar Name</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.calendarNameLabel')}</label>
                 <input
                   type="text"
                   required
@@ -313,7 +315,7 @@ export default function CalendarsTab() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Work Start Time</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.workStartTimeLabel')}</label>
                   <input
                     type="time"
                     value={calendarForm.workStartTime}
@@ -322,7 +324,7 @@ export default function CalendarsTab() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Work End Time</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.workEndTimeLabel')}</label>
                   <input
                     type="time"
                     value={calendarForm.workEndTime}
@@ -332,8 +334,8 @@ export default function CalendarsTab() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsCalendarModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Save Calendar'}</button>
+                <button type="button" onClick={() => setIsCalendarModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
+                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('common.save')}</button>
               </div>
             </form>
           </div>
@@ -344,11 +346,11 @@ export default function CalendarsTab() {
       {isHolidayModalOpen && (
         <div className="modal-overlay" onClick={() => setIsHolidayModalOpen(false)}>
           <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '450px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Add Holiday to Calendar</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.addHolidayBtn')}</h3>
             {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
             <form onSubmit={handleSaveHoliday}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Holiday Name</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thHolidayName')}</label>
                 <input
                   type="text"
                   required
@@ -359,7 +361,7 @@ export default function CalendarsTab() {
                 />
               </div>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Date</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thHolidayDate')}</label>
                 <input
                   type="date"
                   required
@@ -375,11 +377,11 @@ export default function CalendarsTab() {
                   checked={holidayForm.isRecurring}
                   onChange={(e) => setHolidayForm({ ...holidayForm, isRecurring: e.target.checked })}
                 />
-                <label htmlFor="isRecurring" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Recurring Annual Holiday</label>
+                <label htmlFor="isRecurring" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t('config.recurringAnnualLabel')}</label>
               </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsHolidayModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? 'Saving...' : 'Add Holiday'}</button>
+                <button type="button" onClick={() => setIsHolidayModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
+                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('config.addHolidayBtn')}</button>
               </div>
             </form>
           </div>

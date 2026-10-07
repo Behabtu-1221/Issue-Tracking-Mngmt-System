@@ -15,8 +15,10 @@ import LeasesTab from '../components/LeasesTab';
 import AllocationsTab from '../components/AllocationsTab';
 import SubTenantsTab from '../components/SubTenantsTab';
 import ContactsAddressesTab from '../components/ContactsAddressesTab';
+import { useTranslation } from '../../../i18n';
 
 export default function TenantPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('tenants');
   const [metrics, setMetrics] = useState(null);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
@@ -47,10 +49,11 @@ export default function TenantPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            Tenant Management & <span className="glow-text">Leasing Hub</span>
+            {t('tenant.hubTitlePrefix', 'Tenant Management &')}{' '}
+            <span className="glow-text">{t('tenant.leasingHub', 'Leasing Hub')}</span>
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
-            Enterprise Tenant Directory, Contract Lifecycle, Sub-tenant Hierarchy, and Office Space Allocations.
+            {t('tenant.hubSubtitle', 'Enterprise Tenant Directory, Contract Lifecycle, Sub-tenant Hierarchy, and Office Space Allocations.')}
           </p>
         </div>
       </div>
@@ -63,7 +66,7 @@ export default function TenantPage() {
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{tenantStats.totalTenants || 0}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Registered Companies</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('tenant.registeredCompanies', 'Registered Companies')}</div>
           </div>
         </div>
 
@@ -73,7 +76,7 @@ export default function TenantPage() {
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{tenantStats.activeTenants || 0}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Active Tenants</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('tenant.activeTenantsMetric', 'Active Tenants')}</div>
           </div>
         </div>
 
@@ -83,7 +86,7 @@ export default function TenantPage() {
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{leaseStats.activeLeases || 0}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Active Leases</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('tenant.activeLeasesMetric', 'Active Leases')}</div>
           </div>
         </div>
 
@@ -93,7 +96,7 @@ export default function TenantPage() {
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{allocStats.activeAllocations || 0}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Occupied Office Spaces</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('tenant.occupiedOfficeSpaces', 'Occupied Office Spaces')}</div>
           </div>
         </div>
       </div>
@@ -101,11 +104,11 @@ export default function TenantPage() {
       {/* Main Navigation Tabs */}
       <div style={{ borderBottom: '1px solid var(--glass-border)', display: 'flex', gap: '8px' }}>
         {[
-          { id: 'tenants', label: 'Tenants & Onboarding', icon: Users },
-          { id: 'leases', label: 'Lease Contracts', icon: FileText },
-          { id: 'allocations', label: 'Space Allocations', icon: Building2 },
-          { id: 'sub-tenants', label: 'Sub-Tenants Hierarchy', icon: Layers },
-          { id: 'contacts', label: 'Contacts & Addresses', icon: Building }
+          { id: 'tenants', label: t('tenant.tenantsOnboardingTab', 'Tenants & Onboarding'), icon: Users },
+          { id: 'leases', label: t('tenant.leaseContractsTab', 'Lease Contracts'), icon: FileText },
+          { id: 'allocations', label: t('tenant.spaceAllocationsTab', 'Space Allocations'), icon: Building2 },
+          { id: 'sub-tenants', label: t('tenant.subTenantsHierarchyTab', 'Sub-Tenants Hierarchy'), icon: Layers },
+          { id: 'contacts', label: t('tenant.contactsAddressesTab', 'Contacts & Addresses'), icon: Building }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

@@ -6,8 +6,10 @@ import RbacAuditLogsTab from '../components/RbacAuditLogsTab';
 import RbacRolesManagementPage from './RbacRolesManagementPage';
 import Can from '../guards/Can';
 import { usePermission } from '../hooks/usePermission';
+import { useTranslation } from '../../../i18n';
 
 export default function RolePermissionPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('management'); // management | matrix | audit
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [roleToEdit, setRoleToEdit] = useState(null);
@@ -29,10 +31,11 @@ export default function RolePermissionPage() {
       <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.2rem', marginBottom: '8px' }}>
-            Role & Permission <span className="glow-text">Governance</span>
+            {t('rbac.governanceTitle', 'Role & Permission')}{' '}
+            <span className="glow-text">{t('rbac.governanceHighlight', 'Governance')}</span>
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-            Enterprise Role-Based Access Control (RBAC), custom role creation, multi-tenant administration scopes, and resource permission matrix.
+            {t('rbac.governanceSubtitle', 'Enterprise Role-Based Access Control (RBAC), custom role creation, multi-tenant administration scopes, and resource permission matrix.')}
           </p>
         </div>
 
@@ -44,10 +47,10 @@ export default function RolePermissionPage() {
           <ShieldCheck size={20} color={isParkAdmin ? '#a855f7' : '#3b82f6'} />
           <div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
-              Active Administration Scope
+              {t('rbac.activeAdminScope', 'Active Administration Scope')}
             </div>
             <div style={{ fontSize: '13px', fontWeight: 700, color: isParkAdmin ? '#a855f7' : '#3b82f6' }}>
-              {isParkAdmin ? '🏢 Business Park Administration Scope' : '🏬 Tenant Company Administration Scope'}
+              {isParkAdmin ? t('rbac.bpAdminScope', '🏢 Business Park Administration Scope') : t('rbac.tenantAdminScope', '🏬 Tenant Company Administration Scope')}
             </div>
           </div>
         </div>
@@ -75,7 +78,7 @@ export default function RolePermissionPage() {
             fontSize: '0.88rem', cursor: 'pointer', boxShadow: activeTab === 'management' ? 'var(--glow-accent)' : 'none'
           }}
         >
-          <Shield size={16} /> Role Definitions & Creation
+          <Shield size={16} /> {t('rbac.tabRoleDefinitions', 'Role Definitions & Creation')}
         </button>
 
         <button
@@ -89,7 +92,7 @@ export default function RolePermissionPage() {
             fontSize: '0.88rem', cursor: 'pointer', boxShadow: activeTab === 'matrix' ? 'var(--glow-accent)' : 'none'
           }}
         >
-          <Sliders size={16} /> Permission Assignment Matrix
+          <Sliders size={16} /> {t('rbac.tabPermissionMatrix', 'Permission Assignment Matrix')}
         </button>
 
         <button
@@ -103,7 +106,7 @@ export default function RolePermissionPage() {
             fontSize: '0.88rem', cursor: 'pointer', boxShadow: activeTab === 'audit' ? 'var(--glow-accent)' : 'none'
           }}
         >
-          <FileText size={16} /> Security Audit Trail
+          <FileText size={16} /> {t('rbac.tabAuditTrail', 'Security Audit Trail')}
         </button>
       </div>
 

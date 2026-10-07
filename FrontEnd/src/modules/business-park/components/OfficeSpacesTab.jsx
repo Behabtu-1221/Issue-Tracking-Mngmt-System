@@ -19,8 +19,10 @@ import { OFFICE_AVAILABILITY_STATUSES } from '../constants/parkConstants';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { parkSchemas, BUSINESS_PARK_MESSAGES } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function OfficeSpacesTab() {
+  const { t } = useTranslation();
   const [offices, setOffices] = useState([]);
   const [floors, setFloors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -161,7 +163,7 @@ export default function OfficeSpacesTab() {
       fetchOfficesAndFloors();
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to update office status.';
-      showAlert('Action Failed', msg, 'error');
+      showAlert(t('common.error'), msg, 'error');
     }
   };
 
@@ -169,10 +171,10 @@ export default function OfficeSpacesTab() {
     setSelectedOffice(o);
     setConfirmConfig({
       isOpen: true,
-      title: 'Decommission Office Unit',
+      title: t('common.delete'),
       message: `Are you sure you want to delete office suite "${o.OfficeNumber} - ${o.OfficeName || 'Suite'}"?`,
       type: 'danger',
-      confirmText: 'Delete Office Unit',
+      confirmText: t('common.delete'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -181,7 +183,7 @@ export default function OfficeSpacesTab() {
           fetchOfficesAndFloors();
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete office space.';
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('common.error'), msg, 'error');
         }
       }
     });
@@ -221,11 +223,21 @@ export default function OfficeSpacesTab() {
     });
   };
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'VACANT': return t('businessPark.vacant');
+      case 'OCCUPIED': return t('businessPark.occupied');
+      case 'MAINTENANCE': return t('businessPark.maintenance');
+      case 'RESERVED': return t('businessPark.reserved');
+      default: return status;
+    }
+  };
+
   const getStatusBadge = (status) => {
     const matched = OFFICE_AVAILABILITY_STATUSES.find(s => s.value === status);
     return (
       <span className={`badge ${matched ? matched.badgeClass : 'badge-secondary'}`}>
-        {status}
+        {getStatusLabel(status)}
       </span>
     );
   };
@@ -239,7 +251,7 @@ export default function OfficeSpacesTab() {
             <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search offices by number or name"
+              placeholder={t('businessPark.searchOffices')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -266,9 +278,9 @@ export default function OfficeSpacesTab() {
               fontSize: '0.88rem'
             }}
           >
-            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Availability Statuses</option>
+            <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('businessPark.allStatuses')}</option>
             {OFFICE_AVAILABILITY_STATUSES.map(st => (
-              <option key={st.value} value={st.value} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{st.label}</option>
+              <option key={st.value} value={st.value} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{getStatusLabel(st.value)}</option>
             ))}
           </select>
         </div>
@@ -289,7 +301,7 @@ export default function OfficeSpacesTab() {
               fontSize: '0.88rem'
             }}
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
           </button>
 
           <button
@@ -313,7 +325,7 @@ export default function OfficeSpacesTab() {
               fontSize: '0.88rem'
             }}
           >
-            <Plus size={16} /> Add Office Space
+            <Plus size={16} /> {t('businessPark.addOffice')}
           </button>
         </div>
       </div>
@@ -323,12 +335,12 @@ export default function OfficeSpacesTab() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
-            <p>Loading office inventory</p>
+            <p>{t('businessPark.loadingOffices')}</p>
           </div>
         ) : offices.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <Grid size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
-            <p>No office spaces found matching criteria.</p>
+            <p>{t('businessPark.noOfficesFound')}</p>
           </div>
         ) : (
           <>
@@ -336,14 +348,14 @@ export default function OfficeSpacesTab() {
               <table className="custom-table" style={{ minWidth: '1150px' }}>
                 <thead>
                   <tr>
-                    <th>Office</th>
-                    <th>Office Name</th>
-                    <th>Building & Floor</th>
-                    <th>Area (SqM)</th>
-                    <th>Capacity</th>
-                    <th>Monthly Rent</th>
-                    <th>Availability Status</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th>{t('businessPark.office')}</th>
+                    <th>{t('businessPark.officeName')}</th>
+                    <th>{t('businessPark.buildingAndFloor')}</th>
+                    <th>{t('businessPark.areaSqM')}</th>
+                    <th>{t('businessPark.capacity')}</th>
+                    <th>{t('businessPark.monthlyRent')}</th>
+                    <th>{t('businessPark.availabilityStatus')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -352,14 +364,14 @@ export default function OfficeSpacesTab() {
                       <td style={{ fontFamily: 'monospace', fontWeight: '700', color: 'var(--accent-primary)' }}>{o.OfficeNumber}</td>
                       <td>
                         <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{o.OfficeName}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{o.OfficeTypeName || 'Commercial Unit'}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{o.OfficeTypeName || t('businessPark.commercialUnit')}</div>
                       </td>
                       <td>
-                        <div>{o.BuildingName || 'Building'}</div>
+                        <div>{o.BuildingName || t('businessPark.building')}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{o.FloorName}</div>
                       </td>
                       <td>{Number(o.SquareMeters).toLocaleString()} m²</td>
-                      <td>{o.MaxOccupancy ? `${o.MaxOccupancy} Persons` : '—'}</td>
+                      <td>{o.MaxOccupancy ? `${o.MaxOccupancy} ${t('businessPark.capacity')}` : '—'}</td>
                       <td style={{ fontWeight: '600' }}>
                         {o.MonthlyRentAmount ? `${Number(o.MonthlyRentAmount).toLocaleString()} ETB` : '—'}
                       </td>
@@ -368,7 +380,7 @@ export default function OfficeSpacesTab() {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                           <button
                             onClick={() => { setSelectedOffice(o); setShowStatusModal(true); }}
-                            title="Change Availability Status"
+                            title={t('businessPark.changeStatus')}
                             style={{
                               padding: '6px 10px',
                               borderRadius: 'var(--border-radius-sm)',
@@ -382,7 +394,7 @@ export default function OfficeSpacesTab() {
                           </button>
                           <button
                             onClick={() => openEditModal(o)}
-                            title="Edit Office Details"
+                            title={t('businessPark.editOffice')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -393,11 +405,11 @@ export default function OfficeSpacesTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Edit size={14} /> Edit
+                            <Edit size={14} /> {t('common.edit')}
                           </button>
                           <button
                             onClick={() => promptDeleteOffice(o)}
-                            title="Delete Office Unit"
+                            title={t('common.delete')}
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: '4px',
                               padding: '6px 12px', borderRadius: '8px',
@@ -408,7 +420,7 @@ export default function OfficeSpacesTab() {
                               cursor: 'pointer', transition: 'all 0.2s'
                             }}
                           >
-                            <Trash2 size={14} /> Delete
+                            <Trash2 size={14} /> {t('common.delete')}
                           </button>
                         </div>
                       </td>
@@ -429,10 +441,10 @@ export default function OfficeSpacesTab() {
               fontSize: '0.78rem',
               color: 'var(--text-muted)'
             }}>
-              <span>Showing <strong>{offices.length}</strong> office suite records</span>
+              <span>{t('common.showing')} <strong>{offices.length}</strong> {t('businessPark.showingOfficeRecords')}</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <ArrowLeftRight size={13} style={{ color: 'var(--accent-primary)' }} />
-                Use horizontal scroll bar to inspect full unit telemetry & pricing
+                {t('businessPark.useHorizontalScroll')}
               </span>
             </div>
           </>
@@ -469,10 +481,10 @@ export default function OfficeSpacesTab() {
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
-                      {selectedOffice ? 'Edit Office Space' : 'Add New Office Space'}
+                      {selectedOffice ? t('businessPark.editOffice') : t('businessPark.registerOffice')}
                     </h3>
                     <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      {selectedOffice ? 'Update unit dimensions and leasing status' : 'Register a new office space for tenant leasing'}
+                      {selectedOffice ? `${t('businessPark.modifyingStructure')}: ${selectedOffice.OfficeNumber}` : t('businessPark.officesSubtitle')}
                     </p>
                   </div>
                 </div>
@@ -502,7 +514,7 @@ export default function OfficeSpacesTab() {
                 {/* Floor Selector */}
                 <div style={{ marginBottom: '20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Floor Level Location <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{t('businessPark.selectFloor')} <span style={{ color: 'var(--color-danger)' }}>*</span></label>
                     {formData.FloorID && (() => {
                       const selF = floors.find(f => String(f.FloorID) === String(formData.FloorID));
                       if (!selF) return null;
@@ -517,7 +529,7 @@ export default function OfficeSpacesTab() {
                           padding: '2px 8px', borderRadius: '6px',
                           border: isFull ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)'
                         }}>
-                          🏢 Offices Configured: {currentCount} {maxLimit > 0 ? `/ ${maxLimit} Max` : ''} {isFull ? '(FULL)' : ''}
+                          🏢 {t('businessPark.officesConfigured')}: {currentCount} {maxLimit > 0 ? `/ ${maxLimit}` : ''} {isFull ? '(FULL)' : ''}
                         </span>
                       );
                     })()}
@@ -533,7 +545,7 @@ export default function OfficeSpacesTab() {
                       transition: 'border-color 0.2s, box-shadow 0.2s'
                     }}
                   >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Floor</option>
+                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('businessPark.selectFloor')}</option>
                     {floors.map(f => (
                       <option key={f.FloorID} value={f.FloorID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                         {f.BuildingName} - {f.FloorName} ({f.FloorCode}) {f.TotalOfficeSpaces ? `[${f.OfficeSpaceCount || 0}/${f.TotalOfficeSpaces}]` : ''}
@@ -551,10 +563,10 @@ export default function OfficeSpacesTab() {
                 <div style={{ marginBottom: '20px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Office Number <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>{t('businessPark.officeNumber')} <span style={{ color: 'var(--color-danger)' }}>*</span></label>
                       <input
                         type="text"
-                        placeholder="e.g. STE-402 or OF-101"
+                        placeholder={t('businessPark.enterOfficeNumber')}
                         value={formData.OfficeNumber}
                         onChange={(e) => handleFieldChange('OfficeNumber', e.target.value.toUpperCase())}
                         style={{
@@ -572,10 +584,10 @@ export default function OfficeSpacesTab() {
                       )}
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Office Display Name</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>{t('businessPark.officeName')}</label>
                       <input
                         type="text"
-                        placeholder="e.g. Executive Boardroom Alpha"
+                        placeholder={t('businessPark.enterOfficeName')}
                         value={formData.OfficeName}
                         onChange={(e) => handleFieldChange('OfficeName', e.target.value)}
                         style={{
@@ -599,7 +611,7 @@ export default function OfficeSpacesTab() {
                 <div style={{ marginBottom: '20px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '16px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Area (m²) <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>{t('businessPark.areaSqM')} <span style={{ color: 'var(--color-danger)' }}>*</span></label>
                       <input
                         type="number" min="1" placeholder="e.g. 120"
                         value={formData.SquareMeters}
@@ -618,7 +630,7 @@ export default function OfficeSpacesTab() {
                       )}
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Max Persons</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>{t('businessPark.capacity')}</label>
                       <input
                         type="number" min="1" placeholder="e.g. 10"
                         value={formData.MaxOccupancy}
@@ -637,7 +649,7 @@ export default function OfficeSpacesTab() {
                       )}
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Monthly Rent (ETB)</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>{t('businessPark.monthlyRent')}</label>
                       <input
                         type="number" min="0" placeholder="e.g. 25000"
                         value={formData.MonthlyRentAmount}
@@ -656,7 +668,7 @@ export default function OfficeSpacesTab() {
                       )}
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 700 }}>Availability Status </label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 700 }}>{t('businessPark.availabilityStatus')} </label>
                       <select
                         value={formData.AvailabilityStatus}
                         onChange={(e) => handleFieldChange('AvailabilityStatus', e.target.value)}
@@ -669,7 +681,7 @@ export default function OfficeSpacesTab() {
                       >
                         {OFFICE_AVAILABILITY_STATUSES.map(s => (
                           <option key={s.value} value={s.value} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                            {s.label}
+                            {getStatusLabel(s.value)}
                           </option>
                         ))}
                       </select>
@@ -684,7 +696,7 @@ export default function OfficeSpacesTab() {
 
                 {/* Description */}
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>Description & Notes</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: 600 }}>{t('common.description')}</label>
                   <textarea
                     rows={3}
                     placeholder="Office suite specifications, corner window view, electrical outlets..."
@@ -707,10 +719,10 @@ export default function OfficeSpacesTab() {
                 {/* Footer Actions */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid var(--glass-border)' }}>
                   <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '10px 22px', borderRadius: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.88rem' }}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" disabled={formSubmitting} style={{ padding: '10px 24px', borderRadius: '10px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', opacity: formSubmitting ? 0.7 : 1 }}>
-                    {formSubmitting ? '⏳ Saving...' : selectedOffice ? '✓ Update Office' : '✓ Add Office'}
+                    {formSubmitting ? `⏳ ${t('common.loading')}` : selectedOffice ? `✓ ${t('businessPark.updateOffice')}` : `✓ ${t('businessPark.addOffice')}`}
                   </button>
                 </div>
               </form>
@@ -751,7 +763,7 @@ export default function OfficeSpacesTab() {
                   <ShieldAlert size={20} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Update Availability Status</h3>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>{t('businessPark.changeStatus')}</h3>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                     {selectedOffice.OfficeNumber} — {selectedOffice.OfficeName}
                   </div>
@@ -765,7 +777,7 @@ export default function OfficeSpacesTab() {
             {/* Modal Body Options */}
             <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <p style={{ margin: '0 0 8px', fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
-                Select new operational availability state for this office unit:
+                {t('businessPark.availabilityStatus')}:
               </p>
 
               {OFFICE_AVAILABILITY_STATUSES.map(st => {
@@ -785,7 +797,7 @@ export default function OfficeSpacesTab() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <span className={`badge ${st.badgeClass}`} style={{ fontSize: '0.82rem', padding: '5px 12px' }}>
-                        {st.label}
+                        {getStatusLabel(st.value)}
                       </span>
                     </div>
                     {isCurrent && <Check size={18} color="var(--accent-primary)" />}
@@ -804,7 +816,7 @@ export default function OfficeSpacesTab() {
                   color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer'
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>

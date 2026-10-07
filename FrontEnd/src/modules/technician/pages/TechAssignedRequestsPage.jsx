@@ -7,8 +7,10 @@ import {
 } from 'lucide-react';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import technicianApi from '../api/technicianApi';
+import { useTranslation } from '../../../i18n';
 
-export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
+export default function TechAssignedRequestsPage({ defaultStatus = 'ALL', customTitle = null }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialPriority = searchParams.get('priority') || 'ALL';
@@ -68,13 +70,13 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
     switch (p) {
       case 'CRITICAL':
       case 'URGENT':
-        return { label: p, bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' };
+        return { label: t('issues.priorityUrgent', 'Urgent'), bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' };
       case 'HIGH':
-        return { label: 'High', bg: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.3)' };
+        return { label: t('issues.priorityHigh', 'High'), bg: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.3)' };
       case 'LOW':
-        return { label: 'Low', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: t('issues.priorityLow', 'Low'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
       default:
-        return { label: 'Medium', bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
+        return { label: t('issues.priorityMedium', 'Medium'), bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
     }
   };
 
@@ -83,18 +85,18 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
     switch (s) {
       case 'ASSIGNED':
       case 'NEW':
-        return { label: 'Assigned', bg: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: 'rgba(168, 85, 247, 0.3)' };
+        return { label: t('issues.statusAssigned', 'Assigned'), bg: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: 'rgba(168, 85, 247, 0.3)' };
       case 'ACCEPTED':
       case 'IN_PROGRESS':
-        return { label: 'In Progress', bg: 'rgba(234, 179, 8, 0.15)', color: '#facc15', border: 'rgba(234, 179, 8, 0.3)' };
+        return { label: t('issues.statusInProgress', 'In Progress'), bg: 'rgba(234, 179, 8, 0.15)', color: '#facc15', border: 'rgba(234, 179, 8, 0.3)' };
       case 'PAUSED':
       case 'PENDING':
-        return { label: 'Pending', bg: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: 'rgba(249, 115, 22, 0.3)' };
+        return { label: t('issues.statusPending', 'Pending'), bg: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: 'rgba(249, 115, 22, 0.3)' };
       case 'COMPLETED':
       case 'RESOLVED':
-        return { label: 'Resolved', bg: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: 'rgba(34, 197, 94, 0.3)' };
+        return { label: t('issues.statusResolved', 'Resolved'), bg: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: 'rgba(34, 197, 94, 0.3)' };
       default:
-        return { label: s || 'Active', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: s || t('issues.statusSubmitted', 'Active'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
     }
   };
 
@@ -107,12 +109,12 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
         <div>
           <h1 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Wrench size={26} color="var(--accent-primary)" />
-            Technician Work Roster <span className="glow-text">
+            {customTitle || t('techAssigned.title', 'Technician Work Roster')} <span className="glow-text">
               {statusFilter !== 'ALL' ? `(${statusFilter})` : ''}
             </span>
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            View and manage service requests assigned directly to your technical workload.
+            {t('techAssigned.subtitle', 'View and manage service requests assigned directly to your technical workload.')}
           </p>
         </div>
 
@@ -125,7 +127,7 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
             display: 'flex', alignItems: 'center', gap: '6px'
           }}
         >
-          <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh Roster
+          <RefreshCw size={14} className={loading ? 'spin' : ''} /> {t('techAssigned.refreshRoster', 'Refresh Roster')}
         </button>
       </div>
 
@@ -136,7 +138,7 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
-            placeholder="Search by title, request #, or requester..."
+            placeholder={t('techAssigned.searchPlaceholder', 'Search by title, request #, or requester...')}
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
             style={{
@@ -159,11 +161,11 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
               color: 'var(--text-primary)', fontSize: '0.83rem', outline: 'none', cursor: 'pointer'
             }}
           >
-            <option value="ALL">All Statuses</option>
-            <option value="ASSIGNED">Assigned / New</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="PAUSED">Pending / Paused</option>
-            <option value="COMPLETED">Resolved / Completed</option>
+            <option value="ALL">{t('techAssigned.allStatuses', 'All Statuses')}</option>
+            <option value="ASSIGNED">{t('techAssigned.assignedNew', 'Assigned / New')}</option>
+            <option value="IN_PROGRESS">{t('techAssigned.inProgress', 'In Progress')}</option>
+            <option value="PAUSED">{t('techAssigned.pendingPaused', 'Pending / Paused')}</option>
+            <option value="COMPLETED">{t('techAssigned.resolvedCompleted', 'Resolved / Completed')}</option>
           </select>
         </div>
 
@@ -179,11 +181,11 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
               color: 'var(--text-primary)', fontSize: '0.83rem', outline: 'none', cursor: 'pointer'
             }}
           >
-            <option value="ALL">All Priorities</option>
-            <option value="CRITICAL">Critical</option>
-            <option value="HIGH">High</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="LOW">Low</option>
+            <option value="ALL">{t('techAssigned.allPriorities', 'All Priorities')}</option>
+            <option value="CRITICAL">{t('issues.priorityCritical', 'Critical')}</option>
+            <option value="HIGH">{t('issues.priorityHigh', 'High')}</option>
+            <option value="MEDIUM">{t('issues.priorityMedium', 'Medium')}</option>
+            <option value="LOW">{t('issues.priorityLow', 'Low')}</option>
           </select>
         </div>
       </div>
@@ -192,28 +194,28 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
       <div className="glass-panel" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Fetching technician assigned requests...
+            {t('techAssigned.loading', 'Fetching technician assigned requests...')}
           </div>
         ) : requests.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
             <ListChecks size={40} color="var(--text-muted)" style={{ marginBottom: '12px' }} />
-            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Assigned Requests Found</div>
-            <div style={{ fontSize: '0.82rem', marginTop: '4px' }}>There are no work orders matching your selected filters.</div>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('techAssigned.emptyTitle', 'No Assigned Requests Found')}</div>
+            <div style={{ fontSize: '0.82rem', marginTop: '4px' }}>{t('techAssigned.emptyDesc', 'There are no active assigned requests matching your filter criteria.')}</div>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', textAlign: 'left' }}>
               <thead>
                 <tr style={{ background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  <th style={{ padding: '14px 16px' }}>Request #</th>
-                  <th style={{ padding: '14px 16px' }}>Subject Title</th>
-                  <th style={{ padding: '14px 16px' }}>Service Offering</th>
-                  <th style={{ padding: '14px 16px' }}>Requester</th>
-                  <th style={{ padding: '14px 16px' }}>Department</th>
-                  <th style={{ padding: '14px 16px' }}>Priority</th>
-                  <th style={{ padding: '14px 16px' }}>Status</th>
-                  <th style={{ padding: '14px 16px' }}>Assigned Date</th>
-                  <th style={{ padding: '14px 16px', textAlign: 'right' }}>Action</th>
+                  <th style={{ padding: '14px 16px' }}>{t('techAssigned.requestNumber', 'Request #')}</th>
+                  <th style={{ padding: '14px 16px' }}>{t('techAssigned.subject', 'Subject')}</th>
+                  <th style={{ padding: '14px 16px' }}>{t('issues.service', 'Service')}</th>
+                  <th style={{ padding: '14px 16px' }}>{t('techAssigned.requester', 'Requester')}</th>
+                  <th style={{ padding: '14px 16px' }}>{t('profile.department', 'Department')}</th>
+                  <th style={{ padding: '14px 16px' }}>{t('techAssigned.priority', 'Priority')}</th>
+                  <th style={{ padding: '14px 16px' }}>{t('techAssigned.status', 'Status')}</th>
+                  <th style={{ padding: '14px 16px' }}>{t('techAssigned.assignedDate', 'Assigned Date')}</th>
+                  <th style={{ padding: '14px 16px', textAlign: 'right' }}>{t('techAssigned.action', 'Action')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -263,7 +265,7 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
                             boxShadow: 'var(--glow-accent)'
                           }}
                         >
-                          <Eye size={13} /> Open Detail
+                          <Eye size={13} /> {t('techAssigned.openWorkspace', 'Open Workspace')}
                         </button>
                       </td>
                     </tr>
@@ -277,7 +279,7 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
         {/* Pagination Footer */}
         <div style={{ padding: '14px 20px', background: 'var(--bg-tertiary)', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Showing {requests.length} of {totalCount} assigned requests
+            {t('common.showing', 'Showing')} {requests.length} {t('common.of', 'of')} {totalCount} {t('techAssigned.recordsCount', { count: totalCount }, 'assigned requests')}
           </span>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
@@ -289,10 +291,10 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
                 fontSize: '0.78rem', cursor: page <= 1 ? 'not-allowed' : 'pointer', opacity: page <= 1 ? 0.5 : 1
               }}
             >
-              <ChevronLeft size={14} /> Prev
+              <ChevronLeft size={14} /> {t('common.prev', 'Prev')}
             </button>
             <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-              Page {page} of {totalPages}
+              {t('common.page', 'Page')} {page} {t('common.of', 'of')} {totalPages}
             </span>
             <button
               disabled={page >= totalPages}
@@ -303,7 +305,7 @@ export default function TechAssignedRequestsPage({ defaultStatus = 'ALL' }) {
                 fontSize: '0.78rem', cursor: page >= totalPages ? 'not-allowed' : 'pointer', opacity: page >= totalPages ? 0.5 : 1
               }}
             >
-              Next <ChevronRight size={14} />
+              {t('common.next', 'Next')} <ChevronRight size={14} />
             </button>
           </div>
         </div>

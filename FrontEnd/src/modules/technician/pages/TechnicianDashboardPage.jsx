@@ -7,8 +7,10 @@ import {
 } from 'lucide-react';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import technicianApi from '../api/technicianApi';
+import { useTranslation } from '../../../i18n';
 
 export default function TechnicianDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = usePermissionContext();
 
@@ -67,13 +69,13 @@ export default function TechnicianDashboardPage() {
     switch (p) {
       case 'CRITICAL':
       case 'URGENT':
-        return { label: p, bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' };
+        return { label: t('issues.priorityUrgent', 'Urgent'), bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' };
       case 'HIGH':
-        return { label: 'High', bg: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.3)' };
+        return { label: t('issues.priorityHigh', 'High'), bg: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.3)' };
       case 'LOW':
-        return { label: 'Low', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: t('issues.priorityLow', 'Low'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
       default:
-        return { label: 'Medium', bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
+        return { label: t('issues.priorityMedium', 'Medium'), bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
     }
   };
 
@@ -82,18 +84,18 @@ export default function TechnicianDashboardPage() {
     switch (s) {
       case 'ASSIGNED':
       case 'NEW':
-        return { label: 'Assigned', bg: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: 'rgba(168, 85, 247, 0.3)' };
+        return { label: t('issues.statusAssigned', 'Assigned'), bg: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: 'rgba(168, 85, 247, 0.3)' };
       case 'ACCEPTED':
       case 'IN_PROGRESS':
-        return { label: 'In Progress', bg: 'rgba(234, 179, 8, 0.15)', color: '#facc15', border: 'rgba(234, 179, 8, 0.3)' };
+        return { label: t('issues.statusInProgress', 'In Progress'), bg: 'rgba(234, 179, 8, 0.15)', color: '#facc15', border: 'rgba(234, 179, 8, 0.3)' };
       case 'PAUSED':
       case 'PENDING':
-        return { label: 'Pending', bg: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: 'rgba(249, 115, 22, 0.3)' };
+        return { label: t('issues.statusPending', 'Pending'), bg: 'rgba(249, 115, 22, 0.15)', color: '#fb923c', border: 'rgba(249, 115, 22, 0.3)' };
       case 'COMPLETED':
       case 'RESOLVED':
-        return { label: 'Resolved', bg: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: 'rgba(34, 197, 94, 0.3)' };
+        return { label: t('issues.statusResolved', 'Resolved'), bg: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', border: 'rgba(34, 197, 94, 0.3)' };
       default:
-        return { label: s || 'Active', bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: s || t('issues.statusSubmitted', 'Active'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
     }
   };
 
@@ -124,14 +126,14 @@ export default function TechnicianDashboardPage() {
               background: 'var(--accent-gradient)', color: '#ffffff',
               fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px'
             }}>
-              Field Operations Workbench
+              {t('technician.workbench', 'Field Operations Workbench')}
             </span>
           </div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
-            Welcome Back, <span className="glow-text">{fName}</span>
+            {t('technician.welcomeBack', 'Welcome Back')}, <span className="glow-text">{fName}</span>
           </h1>
           <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Track assigned service requests, record technical diagnostics, and resolve field dispatches.
+            {t('technician.deskSubtitle', 'Track assigned service requests, record technical diagnostics, and resolve field dispatches.')}
           </p>
         </div>
 
@@ -145,7 +147,7 @@ export default function TechnicianDashboardPage() {
               color: 'var(--text-primary)', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer'
             }}
           >
-            <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh Roster
+            <RefreshCw size={14} className={loading ? 'spin' : ''} /> {t('technician.refreshRoster', 'Refresh Roster')}
           </button>
           <button
             onClick={() => navigate('/technician/assigned')}
@@ -157,7 +159,7 @@ export default function TechnicianDashboardPage() {
               boxShadow: 'var(--glow-accent)'
             }}
           >
-            <Wrench size={14} /> My Assigned Requests ({activeWorklist.length})
+            <Wrench size={14} /> {t('technician.myAssignedRequests', 'My Assigned Requests')} ({activeWorklist.length})
           </button>
         </div>
       </div>
@@ -165,12 +167,12 @@ export default function TechnicianDashboardPage() {
       {/* ── KPI CARDS GRID ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
         {[
-          { label: 'Assigned Requests', count: metrics.assigned, icon: Wrench, color: '#c084fc', path: '/technician/assigned' },
-          { label: 'New Assignments', count: metrics.newAssignments, icon: Sparkles, color: '#60a5fa', path: '/technician/assigned' },
-          { label: 'In Progress', count: metrics.inProgress, icon: RefreshCw, color: '#facc15', path: '/technician/in-progress' },
-          { label: 'Pending', count: metrics.pending, icon: Clock, color: '#fb923c', path: '/technician/pending' },
-          { label: 'Resolved', count: metrics.resolved, icon: CheckCircle2, color: '#4ade80', path: '/technician/resolved' },
-          { label: 'SLA At Risk', count: metrics.slaAtRisk, icon: AlertTriangle, color: '#f87171', path: '/technician/assigned?priority=HIGH' }
+          { label: t('technician.assignedWorkload', 'Assigned Requests'), count: metrics.assigned, icon: Wrench, color: '#c084fc', path: '/technician/assigned' },
+          { label: t('technician.newAssignments', 'New Assignments'), count: metrics.newAssignments, icon: Sparkles, color: '#60a5fa', path: '/technician/assigned' },
+          { label: t('technician.inProgress', 'In Progress'), count: metrics.inProgress, icon: RefreshCw, color: '#facc15', path: '/technician/in-progress' },
+          { label: t('technician.pending', 'Pending'), count: metrics.pending, icon: Clock, color: '#fb923c', path: '/technician/pending' },
+          { label: t('technician.resolved', 'Resolved'), count: metrics.resolved, icon: CheckCircle2, color: '#4ade80', path: '/technician/resolved' },
+          { label: t('technician.slaAtRisk', 'SLA At Risk'), count: metrics.slaAtRisk, icon: AlertTriangle, color: '#f87171', path: '/technician/assigned?priority=HIGH' }
         ].map((card, idx) => {
           const Icon = card.icon;
           return (
@@ -208,31 +210,31 @@ export default function TechnicianDashboardPage() {
       {/* ── QUICK ACTIONS TOOLBAR ── */}
       <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          Quick Navigation:
+          {t('technician.quickNav', 'Quick Navigation')}:
         </span>
         <button
           onClick={() => navigate('/technician/assigned')}
           style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
-          <ListChecks size={14} color="var(--accent-primary)" /> View Assigned Requests
+          <ListChecks size={14} color="var(--accent-primary)" /> {t('technician.viewAssigned', 'View Assigned Requests')}
         </button>
         <button
           onClick={() => navigate('/technician/assigned?priority=HIGH')}
           style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
-          <AlertTriangle size={14} color="#f87171" /> View High Priority
+          <AlertTriangle size={14} color="#f87171" /> {t('technician.viewHighPriority', 'View High Priority')}
         </button>
         <button
           onClick={() => navigate('/technician/pending')}
           style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
-          <Clock size={14} color="#fb923c" /> View Pending
+          <Clock size={14} color="#fb923c" /> {t('technician.viewPending', 'View Pending')}
         </button>
         <button
           onClick={() => navigate('/issues/known')}
           style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
-          <BookOpen size={14} color="#60a5fa" /> Open Knowledge Base
+          <BookOpen size={14} color="#60a5fa" /> {t('technician.openKnowledgeBase', 'Open Knowledge Base')}
         </button>
       </div>
 
@@ -244,41 +246,41 @@ export default function TechnicianDashboardPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  Active Assigned Work Queue
+                  {t('technician.activeQueue', 'Active Assigned Work Queue')}
                 </h3>
                 <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  Requests currently assigned to your roster requiring field acceptance or technical progress.
+                  {t('technician.activeQueueDesc', 'Requests currently assigned to your roster requiring field acceptance or technical progress.')}
                 </p>
               </div>
               <button
                 onClick={() => navigate('/technician/assigned')}
                 style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
               >
-                View All ({activeWorklist.length}) <ArrowRight size={14} />
+                {t('technician.viewAllWithCount', 'View All')} ({activeWorklist.length}) <ArrowRight size={14} />
               </button>
             </div>
 
             {loading ? (
               <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                Loading assigned workload...
+                {t('common.loading', 'Loading assigned workload...')}
               </div>
             ) : activeWorklist.length === 0 ? (
               <div style={{ padding: '40px', textAlign: 'center', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px dashed var(--glass-border)' }}>
                 <CheckCircle2 size={32} color="#4ade80" style={{ marginBottom: '8px' }} />
-                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>All Assigned Requests Clear!</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>You currently have no pending field work orders.</div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{t('technician.allClear', 'All Assigned Requests Clear!')}</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>{t('technician.noPendingWork', 'You currently have no pending field work orders.')}</div>
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '10px 12px' }}>Request #</th>
-                      <th style={{ padding: '10px 12px' }}>Subject</th>
-                      <th style={{ padding: '10px 12px' }}>Service</th>
-                      <th style={{ padding: '10px 12px' }}>Priority</th>
-                      <th style={{ padding: '10px 12px' }}>Status</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'right' }}>Action</th>
+                      <th style={{ padding: '10px 12px' }}>{t('issues.ticketNumber', 'Request #')}</th>
+                      <th style={{ padding: '10px 12px' }}>{t('technician.subject', 'Subject')}</th>
+                      <th style={{ padding: '10px 12px' }}>{t('issues.service', 'Service')}</th>
+                      <th style={{ padding: '10px 12px' }}>{t('issues.priority', 'Priority')}</th>
+                      <th style={{ padding: '10px 12px' }}>{t('issues.status', 'Status')}</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'right' }}>{t('common.actions', 'Action')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -318,7 +320,7 @@ export default function TechnicianDashboardPage() {
                                 display: 'inline-flex', alignItems: 'center', gap: '4px'
                               }}
                             >
-                              <Eye size={12} /> Open Workspace
+                              <Eye size={12} /> {t('technician.openWorkspace', 'Open Workspace')}
                             </button>
                           </td>
                         </tr>
@@ -336,11 +338,11 @@ export default function TechnicianDashboardPage() {
           {/* High Priority Emergency Requests */}
           <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#f87171', fontWeight: 700, fontSize: '0.92rem' }}>
-              <ShieldAlert size={18} /> High Priority Dispatches
+              <ShieldAlert size={18} /> {t('technician.highPriorityDispatches', 'High Priority Dispatches')}
             </div>
             {highPriorityList.length === 0 ? (
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '16px' }}>
-                No active critical or high priority tickets.
+                {t('technician.noCriticalTickets', 'No active critical or high priority tickets.')}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -372,11 +374,11 @@ export default function TechnicianDashboardPage() {
           {/* Recently Resolved Work */}
           <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#4ade80', fontWeight: 700, fontSize: '0.92rem' }}>
-              <CheckCircle2 size={18} /> Recently Resolved
+              <CheckCircle2 size={18} /> {t('technician.recentlyResolved', 'Recently Resolved')}
             </div>
             {recentlyResolvedList.length === 0 ? (
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '16px' }}>
-                No recently resolved tickets.
+                {t('technician.noRecentTickets', 'No recently resolved tickets.')}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

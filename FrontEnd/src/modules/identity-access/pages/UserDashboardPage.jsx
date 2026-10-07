@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../../i18n';
 import {
   Users, UserCheck, ShieldCheck, Monitor, FileText,
-  Home, ChevronRight, Activity, ExternalLink, ArrowUpRight,
-  BarChart2, Lock
+  Activity, ExternalLink, ArrowUpRight
 } from 'lucide-react';
 import identityApi from '../api/identityApi';
 
 export default function UserDashboardPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [metrics, setMetrics] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -65,32 +66,29 @@ export default function UserDashboardPage() {
   };
 
   const kpiCards = [
-    { key: 'total', label: 'Total Registered', value: loading ? '...' : metrics.totalUsers, sub: 'Staff & tenant user accounts', icon: Users, color: 'var(--accent-primary)', bg: 'rgba(138, 75, 255, 0.15)', border: 'var(--accent-primary)', route: '/users/directory' },
-    { key: 'active', label: 'Active Accounts', value: loading ? '...' : metrics.activeUsers, sub: 'Operational user status', icon: UserCheck, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)', border: '#4ade80', route: '/users/directory' },
-    { key: 'roles', label: 'Configured Roles', value: loading ? '...' : metrics.rolesCount, sub: 'RBAC permission profiles', icon: ShieldCheck, color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)', border: '#0ea5e9', route: '/users/roles' },
-    { key: 'sessions', label: 'Live Sessions', value: loading ? '...' : metrics.activeSessions, sub: 'Current active logins', icon: Monitor, color: '#facc15', bg: 'rgba(250, 158, 11, 0.15)', border: '#facc15', route: '/users/sessions' }
+    { key: 'total', label: t('identity.totalRegistered'), value: loading ? '...' : metrics.totalUsers, sub: t('identity.subStaffTenant'), icon: Users, color: 'var(--accent-primary)', bg: 'rgba(138, 75, 255, 0.15)', border: 'var(--accent-primary)', route: '/users/directory' },
+    { key: 'active', label: t('identity.activeAccounts'), value: loading ? '...' : metrics.activeUsers, sub: t('identity.subOperational'), icon: UserCheck, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)', border: '#4ade80', route: '/users/directory' },
+    { key: 'roles', label: t('identity.configuredRoles'), value: loading ? '...' : metrics.rolesCount, sub: t('identity.subRbacProfiles'), icon: ShieldCheck, color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)', border: '#0ea5e9', route: '/users/roles' },
+    { key: 'sessions', label: t('identity.liveSessions'), value: loading ? '...' : metrics.activeSessions, sub: t('identity.subActiveLogins'), icon: Monitor, color: '#facc15', bg: 'rgba(250, 158, 11, 0.15)', border: '#facc15', route: '/users/sessions' }
   ];
 
   return (
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
-          <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              User Directory & <span className="glow-text">Identity Governance</span>
-            </h1>
-            <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Enterprise authentication, RBAC permission roles, staff user directory, and active sessions
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(138,75,255,0.15)', border: '1px solid rgba(138,75,255,0.3)', color: 'var(--accent-primary)', fontSize: '0.78rem', fontWeight: 700 }}>
-              <Activity size={14} /> Identity Security Active
-            </span>
-          </div>
-        <div style={{ marginBottom: '24px' }}>
-</div>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {t('identity.dashboardTitle')} <span className="glow-text">{t('identity.dashboardHighlight')}</span>
+          </h1>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+            {t('identity.dashboardSubtitle')}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(138,75,255,0.15)', border: '1px solid rgba(138,75,255,0.3)', color: 'var(--accent-primary)', fontSize: '0.78rem', fontWeight: 700 }}>
+            <Activity size={14} /> {t('identity.securityActiveBadge')}
+          </span>
+        </div>
       </div>
 
       {/* KPI Cards Grid */}
@@ -122,7 +120,7 @@ export default function UserDashboardPage() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '14px', fontSize: '0.72rem', fontWeight: 600, color: card.color, opacity: isHovered ? 1 : 0.5, transition: 'opacity 0.3s' }}>
-                <ExternalLink size={11} /> Open sub-module view
+                <ExternalLink size={11} /> {t('identity.openSubmodule')}
               </div>
             </div>
           );
@@ -135,11 +133,11 @@ export default function UserDashboardPage() {
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>User Accounts Directory</h3>
-              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>Registered staff and tenant users</p>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>{t('identity.panelAccountsDirectory')}</h3>
+              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('identity.panelAccountsDirectoryDesc')}</p>
             </div>
             <button onClick={() => navigate('/users/directory')} style={{ background: 'rgba(138,75,255,0.1)', border: '1px solid rgba(138,75,255,0.3)', color: 'var(--accent-primary)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px' }}>
-              View Directory <ArrowUpRight size={13} />
+              {t('identity.btnViewDirectory')} <ArrowUpRight size={13} />
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -147,11 +145,11 @@ export default function UserDashboardPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(138,75,255,0.15)', color: 'var(--accent-primary)' }}><Users size={20} /></div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Staff & User Accounts</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{metrics.totalUsers} registered users in directory</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>{t('identity.panelStaffAccounts')}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{metrics.totalUsers} {t('identity.panelRegisteredInDirectory')}</div>
                 </div>
               </div>
-              <span className="badge badge-success">Active</span>
+              <span className="badge badge-success">{t('identity.statusActive')}</span>
             </div>
           </div>
         </div>
@@ -160,20 +158,20 @@ export default function UserDashboardPage() {
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Security & RBAC Controls</h3>
-              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>Role configurations & active session monitoring</p>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>{t('identity.panelSecurityControls')}</h3>
+              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('identity.panelSecurityControlsDesc')}</p>
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div onClick={() => navigate('/roles/matrix')} style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
               <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(14,165,233,0.15)', color: '#0ea5e9', width: 'fit-content', marginBottom: '10px' }}><ShieldCheck size={18} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>RBAC Governance</div>
-              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>Role Matrix</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('identity.labelRbacGovernance')}</div>
+              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{t('identity.labelRoleMatrix')}</div>
             </div>
             <div onClick={() => navigate('/users/sessions')} style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
               <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(245,158,11,0.15)', color: '#facc15', width: 'fit-content', marginBottom: '10px' }}><Monitor size={18} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Security</div>
-              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>Active Sessions</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('identity.labelSecurity')}</div>
+              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{t('identity.labelActiveSessions')}</div>
             </div>
           </div>
         </div>
@@ -181,13 +179,13 @@ export default function UserDashboardPage() {
 
       {/* Shortcuts Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-md)', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>User Directory Shortcuts</div>
+        <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>{t('identity.shortcutsBarTitle')}</div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           {[
-            { label: 'Users & Staff Directory', icon: Users, route: '/users/directory' },
-            { label: 'Role & RBAC Governance', icon: ShieldCheck, route: '/roles/matrix' },
-            { label: 'Active Sessions & Security', icon: Monitor, route: '/users/sessions' },
-            { label: 'Security Audit Logs', icon: FileText, route: '/users/audit' }
+            { label: t('identity.shortcutUsers'), icon: Users, route: '/users/directory' },
+            { label: t('identity.shortcutRoles'), icon: ShieldCheck, route: '/roles/matrix' },
+            { label: t('identity.shortcutSessions'), icon: Monitor, route: '/users/sessions' },
+            { label: t('identity.shortcutAudit'), icon: FileText, route: '/users/audit' }
           ].map((s) => {
             const ShortIcon = s.icon;
             return (

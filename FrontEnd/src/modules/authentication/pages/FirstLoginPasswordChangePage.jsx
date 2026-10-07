@@ -4,8 +4,10 @@ import { Eye, EyeOff, Loader2, CheckCircle2, XCircle, AlertCircle, ArrowLeft, Lo
 import { useAuth } from '../contexts/AuthContext';
 import authApi from '../api/authApi';
 import { validatePasswordComplexity } from '../utils/passwordValidation';
+import { useTranslation, LanguageSelector } from '../../../i18n';
 
 export default function FirstLoginPasswordChangePage() {
+  const { t, isRTL } = useTranslation();
   const navigate = useNavigate();
   const { completePasswordChange, logout } = useAuth();
 
@@ -78,6 +80,17 @@ export default function FirstLoginPasswordChangePage() {
       boxSizing: 'border-box',
       overflowY: 'auto'
     }}>
+      {/* Top Language Bar */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: isRTL ? 'auto' : '24px',
+        left: isRTL ? '24px' : 'auto',
+        zIndex: 50
+      }}>
+        <LanguageSelector variant="auth" />
+      </div>
+
       {/* Subtle Brand Glow Orb */}
       <div style={{
         position: 'absolute', top: '10%', left: '15%', width: '400px', height: '400px',
@@ -140,7 +153,7 @@ export default function FirstLoginPasswordChangePage() {
             ITMS
           </h1>
           <p style={{ margin: 0, color: '#475569', fontSize: '0.85rem', fontWeight: 500 }}>
-            Mandatory Security Password Setup
+            {t('auth.mandatorySecuritySetup', 'Mandatory Security Password Setup')}
           </p>
         </div>
 
@@ -150,10 +163,10 @@ export default function FirstLoginPasswordChangePage() {
               <CheckCircle2 size={34} />
             </div>
             <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', fontFamily: "'Outfit', sans-serif" }}>
-              Password Updated Successfully
+              {t('auth.passwordUpdatedSuccess', 'Password Updated Successfully')}
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '24px' }}>
-              Your permanent security credentials have been established. Redirecting to workspace...
+              {t('auth.passwordUpdatedSuccessDesc', 'Your permanent security credentials have been established. Redirecting to workspace...')}
             </p>
             <Loader2 size={24} style={{ animation: 'spin 1s linear infinite', color: '#0284c7' }} />
           </div>
@@ -161,10 +174,10 @@ export default function FirstLoginPasswordChangePage() {
           <>
             <div style={{ marginBottom: '18px', paddingBottom: '12px', borderBottom: '1px solid #e2e8f0' }}>
               <span style={{ fontSize: '0.86rem', fontWeight: 700, color: '#1e293b', fontFamily: "'Outfit', sans-serif" }}>
-                Set Your Permanent Password
+                {t('auth.setPermanentPassword', 'Set Your Permanent Password')}
               </span>
               <span style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '2px', display: 'block' }}>
-                Temporary password detected. Please choose a new secure password to access your account.
+                {t('auth.tempPasswordDetected', 'Temporary password detected. Please choose a new secure password to access your account.')}
               </span>
             </div>
 
@@ -177,20 +190,20 @@ export default function FirstLoginPasswordChangePage() {
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '7px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                  Current / Temporary Password
+                  {t('auth.currentTempPassword', 'Current / Temporary Password')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showCurrent ? 'text' : 'password'}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter temporary password"
+                    placeholder={t('auth.enterTempPassword', 'Enter temporary password')}
                     autoFocus
-                    style={{ width: '100%', padding: '13px 44px 13px 14px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                     onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}
                     onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f8fafc'; }}
                   />
-                  <button type="button" onClick={() => setShowCurrent(!showCurrent)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => setShowCurrent(!showCurrent)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
                     {showCurrent ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
@@ -198,19 +211,19 @@ export default function FirstLoginPasswordChangePage() {
 
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '7px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                  New Permanent Password *
+                  {t('auth.newPermanentPassword', 'New Permanent Password *')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showNew ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new strong password"
-                    style={{ width: '100%', padding: '13px 44px 13px 14px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
+                    placeholder={t('auth.enterNewPassword', 'Enter new strong password')}
+                    style={{ width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                     onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}
                     onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f8fafc'; }}
                   />
-                  <button type="button" onClick={() => setShowNew(!showNew)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => setShowNew(!showNew)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
                     {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
@@ -219,8 +232,10 @@ export default function FirstLoginPasswordChangePage() {
               {newPassword && (
                 <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#64748b', fontWeight: 700, marginBottom: '6px' }}>
-                    <span>PASSWORD SCORE</span>
-                    <span style={{ color: getStrengthColor(complexity.score) }}>{complexity.score >= 100 ? 'STRONG' : complexity.score >= 60 ? 'MEDIUM' : 'WEAK'}</span>
+                    <span>{t('auth.passwordScore', 'PASSWORD SCORE')}</span>
+                    <span style={{ color: getStrengthColor(complexity.score) }}>
+                      {complexity.score >= 100 ? t('auth.strengthStrong', 'STRONG') : complexity.score >= 60 ? t('auth.strengthMedium', 'MEDIUM') : t('auth.strengthWeak', 'WEAK')}
+                    </span>
                   </div>
                   <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{ width: `${complexity.score}%`, height: '100%', background: getStrengthColor(complexity.score), transition: 'all 0.3s ease' }} />
@@ -230,26 +245,26 @@ export default function FirstLoginPasswordChangePage() {
 
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '7px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                  Confirm New Password *
+                  {t('auth.confirmNewPassword', 'Confirm New Password *')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showConfirm ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="confirm new password"
-                    style={{ width: '100%', padding: '13px 44px 13px 14px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
+                    placeholder={t('auth.confirmNewPasswordPlaceholder', 'confirm new password')}
+                    style={{ width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                     onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}
                     onBlur={(e) => { e.target.style.borderColor = '#cbd5e1'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f8fafc'; }}
                   />
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer' }}>
                     {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 {confirmPassword && (
                   <span style={{ fontSize: '0.78rem', color: passwordsMatch ? '#059669' : '#dc2626', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '6px' }}>
                     {passwordsMatch ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
-                    {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                    {passwordsMatch ? t('auth.passwordsMatch', 'Passwords match') : t('auth.passwordsDoNotMatch', 'Passwords do not match')}
                   </span>
                 )}
               </div>
@@ -266,7 +281,7 @@ export default function FirstLoginPasswordChangePage() {
                   marginBottom: '14px'
                 }}
               >
-                {loading ? <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> Establishing Permanent Credentials...</> : 'Save Permanent Password & Continue'}
+                {loading ? <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.savingPermanentPassword', 'Establishing Permanent Credentials...')}</> : t('auth.savePermanentPassword', 'Save Permanent Password & Continue')}
               </button>
 
               <button
@@ -282,7 +297,7 @@ export default function FirstLoginPasswordChangePage() {
                 onMouseEnter={(e) => { e.currentTarget.style.background = '#e2e8f0'; e.currentTarget.style.color = '#0f172a'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(241, 245, 249, 0.8)'; e.currentTarget.style.color = '#475569'; }}
               >
-                <ArrowLeft size={16} /> Sign Out & Return to Login Screen
+                <ArrowLeft size={16} /> {t('auth.signOutReturnLogin', 'Sign Out & Return to Login Screen')}
               </button>
             </form>
           </>
@@ -291,7 +306,7 @@ export default function FirstLoginPasswordChangePage() {
 
       {/* Footer */}
       <div style={{ marginTop: '20px', textAlign: 'center', color: '#ffffff', fontSize: '0.8rem', fontWeight: '600', textShadow: '0 2px 6px rgba(0,0,0,0.6)', zIndex: 10 }}>
-        Enterprise Issue Tracking System • Copyright © {new Date().getFullYear()} All Rights Reserved
+        {t('app.copyright', 'Enterprise Issue Tracking System • Copyright © {year} All Rights Reserved', { year: new Date().getFullYear() })}
       </div>
 
       <style>{`

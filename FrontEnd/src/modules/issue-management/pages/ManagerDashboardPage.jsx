@@ -23,8 +23,10 @@ import {
 import approvalApi from '../../approval/api/approvalApi';
 import dispatchApi from '../../dispatch/api/dispatchApi';
 import issueManagementApi from '../api/issueManagementApi';
+import { useTranslation } from '../../../i18n';
 
 export default function ManagerDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState({
     pendingApprovals: 0,
@@ -98,14 +100,14 @@ export default function ManagerDashboardPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <span style={{ padding: '4px 12px', borderRadius: '12px', background: 'var(--accent-gradient)', color: '#fff', fontSize: '0.75rem', fontWeight: 800 }}>
-              Department Operations Control
+              {t('manager.opsControl', 'Department Operations Control')}
             </span>
           </div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 900, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
-            Manager & Dispatch <span className="glow-text">Workbench</span>
+            {t('manager.workbenchTitle', 'Manager & Dispatch Workbench')}
           </h1>
           <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Department workforce coordination, request approvals, workload dispatching, and SLA management.
+            {t('manager.workbenchSubtitle', 'Department workforce coordination, request approvals, workload dispatching, and SLA management.')}
           </p>
         </div>
 
@@ -114,19 +116,19 @@ export default function ManagerDashboardPage() {
           className="btn btn-secondary"
           style={{ padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '8px', borderRadius: '12px' }}
         >
-          <RefreshCw size={16} className={loading ? 'spin' : ''} /> Refresh Data
+          <RefreshCw size={16} className={loading ? 'spin' : ''} /> {t('manager.refreshData', 'Refresh Data')}
         </button>
       </div>
 
       {/* Operational Metric KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
         {[
-          { label: 'Pending Approval', count: metrics.pendingApprovals, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', icon: CheckSquare, path: '/approvals/queue' },
-          { label: 'Awaiting Assignment', count: metrics.awaitingAssignment, color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)', icon: Send, path: '/dispatch/queue' },
-          { label: 'In Progress Work', count: metrics.inProgress, color: '#6366f1', bg: 'rgba(99, 102, 241, 0.12)', icon: RefreshCw, path: '/issues/tracker?status=IN_PROGRESS' },
-          { label: 'SLA At Risk', count: metrics.slaAtRisk, color: '#ec4899', bg: 'rgba(236, 72, 153, 0.12)', icon: AlertTriangle, path: '/sla/clocks' },
-          { label: 'SLA Breached', count: metrics.slaBreached, color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', icon: ShieldAlert, path: '/sla/breaches' },
-          { label: 'Resolved (Pending)', count: metrics.resolved, color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', icon: CheckCircle2, path: '/issues/tracker?status=RESOLVED' }
+          { label: t('manager.pendingApproval', 'Pending Approval'), count: metrics.pendingApprovals, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', icon: CheckSquare, path: '/approvals/queue' },
+          { label: t('manager.awaitingAssignment', 'Awaiting Assignment'), count: metrics.awaitingAssignment, color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)', icon: Send, path: '/dispatch/queue' },
+          { label: t('manager.inProgressWork', 'In Progress Work'), count: metrics.inProgress, color: '#6366f1', bg: 'rgba(99, 102, 241, 0.12)', icon: RefreshCw, path: '/issues/tracker?status=IN_PROGRESS' },
+          { label: t('manager.slaAtRisk', 'SLA At Risk'), count: metrics.slaAtRisk, color: '#ec4899', bg: 'rgba(236, 72, 153, 0.12)', icon: AlertTriangle, path: '/sla/clocks' },
+          { label: t('manager.slaBreached', 'SLA Breached'), count: metrics.slaBreached, color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', icon: ShieldAlert, path: '/sla/breaches' },
+          { label: t('manager.resolvedPending', 'Resolved (Pending)'), count: metrics.resolved, color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', icon: CheckCircle2, path: '/issues/tracker?status=RESOLVED' }
         ].map((card) => {
           const Icon = card.icon;
           return (
@@ -174,16 +176,21 @@ export default function ManagerDashboardPage() {
         <div className="glass-panel" style={{ padding: '24px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Wrench size={18} color="var(--accent-primary)" /> TECHNICIAN WORKLOAD & AVAILABILITY
+              <Wrench size={18} color="var(--accent-primary)" /> {t('manager.techWorkloadTitle', 'TECHNICIAN WORKLOAD & AVAILABILITY')}
             </div>
             <button onClick={() => navigate('/dispatch/workbench')} style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer' }}>
-              View Roster <ArrowRight size={13} />
+              {t('manager.viewRoster', 'View Roster')} <ArrowRight size={13} />
             </button>
           </div>
 
-          {technicians.length === 0 ? (
+          {loading ? (
             <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              No technicians assigned to your department roster.
+              <RefreshCw className="animate-spin" size={24} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.7 }} />
+              {t('common.loading', 'Loading data...')}
+            </div>
+          ) : technicians.length === 0 ? (
+            <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              {t('manager.noTechs', 'No technicians assigned to your department roster.')}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -213,7 +220,7 @@ export default function ManagerDashboardPage() {
                         {tech.FullName || `${tech.FirstName} ${tech.LastName}`}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                        {tech.TeamName ? `Team: ${tech.TeamName}` : 'Individual Dispatch'}
+                        {tech.TeamName ? `${t('manager.team', 'Team')}: ${tech.TeamName}` : t('manager.individualDispatch', 'Individual Dispatch')}
                       </div>
                     </div>
                   </div>
@@ -221,10 +228,10 @@ export default function ManagerDashboardPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '0.85rem', fontWeight: '800', color: tech.ActiveAssignmentCount > 4 ? '#ef4444' : '#10b981' }}>
-                        {tech.ActiveAssignmentCount || 0} active
+                        {tech.ActiveAssignmentCount || 0} {t('manager.activeCount', 'active')}
                       </div>
                       <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                        {tech.SLARiskCount > 0 ? `${tech.SLARiskCount} SLA Risk` : 'Optimal load'}
+                        {tech.SLARiskCount > 0 ? `${tech.SLARiskCount} ${t('manager.slaRiskText', 'SLA Risk')}` : t('manager.optimalLoad', 'Optimal load')}
                       </div>
                     </div>
                   </div>
@@ -238,16 +245,21 @@ export default function ManagerDashboardPage() {
         <div className="glass-panel" style={{ padding: '24px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Users size={18} color="var(--accent-primary)" /> OPERATIONAL WORK TEAMS
+              <Users size={18} color="var(--accent-primary)" /> {t('manager.workTeamsTitle', 'OPERATIONAL WORK TEAMS')}
             </div>
             <button onClick={() => navigate('/dispatch/teams')} style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer' }}>
-              Manage Teams <ArrowRight size={13} />
+              {t('manager.manageTeams', 'Manage Teams')} <ArrowRight size={13} />
             </button>
           </div>
 
-          {teamsWorkload.length === 0 ? (
+          {loading ? (
             <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              No operational teams created in your department.
+              <RefreshCw className="animate-spin" size={24} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.7 }} />
+              {t('common.loading', 'Loading data...')}
+            </div>
+          ) : teamsWorkload.length === 0 ? (
+            <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              {t('manager.noTeams', 'No operational teams created in your department.')}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -269,7 +281,7 @@ export default function ManagerDashboardPage() {
                       {team.TeamName}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Leader: {team.LeaderName || 'Unassigned'} • {team.MemberCount || 0} Members
+                      {t('manager.leader', 'Leader')}: {team.LeaderName || t('manager.unassigned', 'Unassigned')} • {team.MemberCount || 0} {t('manager.members', 'Members')}
                     </div>
                   </div>
 
@@ -279,7 +291,7 @@ export default function ManagerDashboardPage() {
                       background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)',
                       fontSize: '0.78rem', fontWeight: '800'
                     }}>
-                      {team.ActiveRequestsCount || 0} Active Queue
+                      {team.ActiveRequestsCount || 0} {t('manager.activeQueueText', 'Active Queue')}
                     </span>
                   </div>
                 </div>
@@ -293,11 +305,16 @@ export default function ManagerDashboardPage() {
       {/* Real-time Department Activity Feed */}
       <div className="glass-panel" style={{ padding: '24px', borderRadius: '20px' }}>
         <div style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--text-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Activity size={18} color="var(--accent-primary)" /> RECENT DEPARTMENT ACTIVITY STREAM
+          <Activity size={18} color="var(--accent-primary)" /> {t('manager.activityStream', 'RECENT DEPARTMENT ACTIVITY STREAM')}
         </div>
 
-        {activities.length === 0 ? (
-          <div style={{ padding: '20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No recent department activity logs.</div>
+        {loading ? (
+          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+            <RefreshCw className="animate-spin" size={20} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.7 }} />
+            {t('common.loading', 'Loading data...')}
+          </div>
+        ) : activities.length === 0 ? (
+          <div style={{ padding: '20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('manager.noActivity', 'No recent department activity logs.')}</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {activities.map((req) => (
@@ -321,7 +338,7 @@ export default function ManagerDashboardPage() {
                   </span>
                   <div>
                     <div style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-primary)' }}>{req.Title}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Requester: {req.RequesterName} • Category: {req.CategoryName}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('manager.requester', 'Requester')}: {req.RequesterName} • {t('manager.category', 'Category')}: {req.CategoryName}</div>
                   </div>
                 </div>
 

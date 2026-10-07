@@ -1,7 +1,10 @@
 import React from 'react';
-import { ShieldAlert, ArrowLeft, Lock } from 'lucide-react';
+import { ShieldAlert, ArrowLeft } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 
 export default function AccessDeniedPage({ requiredPermission, onBack }) {
+  const { t } = useTranslation();
+
   return (
     <div style={{
       display: 'flex',
@@ -40,7 +43,7 @@ export default function AccessDeniedPage({ requiredPermission, onBack }) {
           color: 'var(--text-primary)',
           margin: '0 0 10px 0'
         }}>
-          403 — Access Denied
+          403 — {t('common.accessDenied', 'Access Denied')}
         </h2>
 
         <p style={{
@@ -49,7 +52,7 @@ export default function AccessDeniedPage({ requiredPermission, onBack }) {
           lineHeight: '1.6',
           marginBottom: '20px'
         }}>
-          You do not have the required security authority or granular permission to access this enterprise module.
+          {t('common.accessDeniedDesc', 'You do not have the required security authority or granular permission to access this enterprise module.')}
         </p>
 
         {requiredPermission && (
@@ -62,7 +65,7 @@ export default function AccessDeniedPage({ requiredPermission, onBack }) {
             fontSize: '0.8rem',
             color: 'var(--text-muted)'
           }}>
-            Missing Required Permission Code:{' '}
+            {t('common.missingPermission', 'Missing Required Permission Code')}:{' '}
             <code style={{ color: '#ef4444', fontWeight: '700' }}>
               {requiredPermission}
             </code>
@@ -87,7 +90,7 @@ export default function AccessDeniedPage({ requiredPermission, onBack }) {
                 fontSize: '0.88rem'
               }}
             >
-              <ArrowLeft size={16} /> Return to Dashboard
+              <ArrowLeft size={16} /> {t('common.backToDashboard', 'Back to Dashboard')}
             </button>
           )}
         </div>

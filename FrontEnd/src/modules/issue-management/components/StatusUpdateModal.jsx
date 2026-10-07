@@ -3,6 +3,7 @@ import { X, RefreshCw, MessageSquare, ShieldAlert } from 'lucide-react';
 import issueManagementApi from '../api/issueManagementApi';
 import { requestSchemas } from '../../../validation';
 import { FormField } from '../../../components/common/FormField';
+import { useTranslation } from '../../../i18n';
 
 const STATUS_TRANSITIONS = {
   NEW: ['APPROVED', 'ASSIGNED', 'IN_PROGRESS', 'CANCELLED'],
@@ -17,6 +18,7 @@ const STATUS_TRANSITIONS = {
 };
 
 export const StatusUpdateModal = ({ isOpen, onClose, issue, onStatusUpdated }) => {
+  const { t } = useTranslation();
   const [newStatus, setNewStatus] = useState('');
   const [remarks, setRemarks] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -124,9 +126,9 @@ export const StatusUpdateModal = ({ isOpen, onClose, issue, onStatusUpdated }) =
               <RefreshCw size={20} style={{ color: 'var(--color-primary)' }} />
             </div>
             <div>
-              <h2 style={{ fontWeight: '700', fontSize: '1.1rem' }}>Update Status</h2>
+              <h2 style={{ fontWeight: '700', fontSize: '1.1rem' }}>{t('issues.updateStatusTitle', 'Update Status')}</h2>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {issue.RequestNumber} — Current: <strong style={{ color: getStatusColor(issue.StatusCode) }}>{issue.StatusCode?.replace('_', ' ')}</strong>
+                {issue.RequestNumber} — {t('common.status', 'Current')}: <strong style={{ color: getStatusColor(issue.StatusCode) }}>{issue.StatusCode?.replace('_', ' ')}</strong>
               </p>
             </div>
           </div>
@@ -145,19 +147,19 @@ export const StatusUpdateModal = ({ isOpen, onClose, issue, onStatusUpdated }) =
 
           {availableStatuses.length === 0 ? (
             <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              <p style={{ fontWeight: '600', marginBottom: '4px' }}>No transitions available</p>
-              <p style={{ fontSize: '0.85rem' }}>This issue is in a terminal state ({issue.StatusCode}).</p>
+              <p style={{ fontWeight: '600', marginBottom: '4px' }}>{t('issues.noTransitionsAvailable', 'No transitions available')}</p>
+              <p style={{ fontSize: '0.85rem' }}>{t('issues.terminalStateDesc', { status: issue.StatusCode }, `This issue is in a terminal state (${issue.StatusCode}).`)}</p>
             </div>
           ) : (
             <>
               {/* Status Select Buttons */}
               <FormField
-                label="Target Status Transition"
+                label={t('issues.targetStatusTransition', 'Target Status Transition')}
                 id="newStatus"
                 required
                 icon={RefreshCw}
                 error={fieldErrors.Status}
-                helpText="Select the next allowable lifecycle status for this request."
+                helpText={t('issues.selectNextStatusHelp', 'Select the next allowable lifecycle status for this request.')}
               >
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                   {availableStatuses.map((status) => (
@@ -185,19 +187,19 @@ export const StatusUpdateModal = ({ isOpen, onClose, issue, onStatusUpdated }) =
 
               {/* Status Remarks */}
               <FormField
-                label="Transition Remarks / Justification"
+                label={t('issues.transitionRemarks', 'Transition Remarks / Justification')}
                 id="remarks"
                 required={isJustificationRequired}
                 icon={MessageSquare}
                 error={fieldErrors.Remarks}
-                helpText={isJustificationRequired ? 'Reason is required when placing on hold or cancelling.' : 'Optional explanation or status notes.'}
+                helpText={isJustificationRequired ? t('issues.justificationRequiredHelp', 'Reason is required when placing on hold or cancelling.') : t('issues.optionalStatusNotesHelp', 'Optional explanation or status notes.')}
               >
                 <textarea
                   id="remarks"
                   rows={3}
                   value={remarks}
                   onChange={(e) => handleRemarksChange(e.target.value)}
-                  placeholder={isJustificationRequired ? 'Provide the specific reason or blocker for this status update...' : 'Optional notes about this status change...'}
+                  placeholder={isJustificationRequired ? t('issues.provideReasonPlaceholder', 'Provide the specific reason or blocker for this status update...') : t('issues.optionalNotesPlaceholder', 'Optional notes about this status change...')}
                   style={{
                     width: '100%',
                     padding: '10px 14px',
@@ -226,7 +228,7 @@ export const StatusUpdateModal = ({ isOpen, onClose, issue, onStatusUpdated }) =
                     fontWeight: '600'
                   }}
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -234,7 +236,7 @@ export const StatusUpdateModal = ({ isOpen, onClose, issue, onStatusUpdated }) =
                   disabled={submitting}
                   style={{ padding: '10px 24px' }}
                 >
-                  {submitting ? 'Updating...' : 'Update Status'}
+                  {submitting ? t('issues.updatingStatus', 'Updating...') : t('issues.updateStatusBtn', 'Update Status')}
                 </button>
               </div>
             </>

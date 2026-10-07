@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserCheck, Search, ShieldCheck, Users, RefreshCw } from 'lucide-react';
 import rbacApi from '../api/rbacApi';
 import UserRoleAssignModal from '../components/UserRoleAssignModal';
+import { useTranslation } from '../../../i18n';
 
 const glassCard = {
   background: 'var(--glass-bg)',
@@ -12,6 +13,7 @@ const glassCard = {
 };
 
 export default function RbacAssignmentsPage() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -46,10 +48,10 @@ export default function RbacAssignmentsPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              Role Assignments & <span className="glow-text">User Access</span>
+              {t('rbac.tabRoleAssignments', 'Role Assignments & User Access')}
             </h1>
             <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Manage user-to-role mappings, tenant administration scope access, and park admin grants
+              {t('rbac.governanceSubtitle', 'Manage user-to-role mappings, tenant administration scope access, and park admin grants')}
             </p>
           </div>
 
@@ -74,7 +76,7 @@ export default function RbacAssignmentsPage() {
               }}
             >
               <RefreshCw size={15} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
-              Refresh List
+              {t('common.refresh', 'Refresh List')}
             </button>
           </div>
         </div>
@@ -106,10 +108,10 @@ export default function RbacAssignmentsPage() {
         <table className="custom-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: 'var(--bg-tertiary)', borderBottom: '1px solid rgba(148, 163, 184, 0.12)' }}>
-              <th style={{ padding: '16px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>User / Account</th>
-              <th style={{ padding: '16px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>Assigned Role</th>
-              <th style={{ padding: '16px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>Admin Scope</th>
-              <th style={{ padding: '16px 20px', textAlign: 'right', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>Action</th>
+              <th style={{ padding: '16px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>{t('rbac.selectUserLabel', 'User / Account')}</th>
+              <th style={{ padding: '16px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>{t('rbac.selectRoleLabel', 'Assigned Role')}</th>
+              <th style={{ padding: '16px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>{t('rbac.scope', 'Admin Scope')}</th>
+              <th style={{ padding: '16px 20px', textAlign: 'right', color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 700 }}>{t('common.actions', 'Action')}</th>
             </tr>
           </thead>
           <tbody>
@@ -174,7 +176,7 @@ export default function RbacAssignmentsPage() {
                           transition: 'all 0.2s'
                         }}
                       >
-                        <UserCheck size={14} /> Assign Role
+                        <UserCheck size={14} /> {t('rbac.assignRoleBtn', 'Assign Role')}
                       </button>
                     </td>
                   </tr>

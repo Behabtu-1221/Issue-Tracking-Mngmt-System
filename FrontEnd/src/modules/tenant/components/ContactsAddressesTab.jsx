@@ -17,8 +17,10 @@ import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { tenantSchemas } from '../../../validation';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
+import { useTranslation } from '../../../i18n';
 
 export default function ContactsAddressesTab() {
+  const { t } = useTranslation();
   const { isParkAdmin, user } = usePermissionContext();
   const [activeSection, setActiveSection] = useState('contacts'); // 'contacts' | 'addresses'
   const [contacts, setContacts] = useState([]);
@@ -334,7 +336,7 @@ export default function ContactsAddressesTab() {
                 gap: '6px'
               }}
             >
-              <Phone size={14} /> Contact Channels
+              <Phone size={14} /> {t('tenant.contactChannels')}
             </button>
             <button
               onClick={() => setActiveSection('addresses')}
@@ -352,7 +354,7 @@ export default function ContactsAddressesTab() {
                 gap: '6px'
               }}
             >
-              <MapPin size={14} /> Registered Addresses
+              <MapPin size={14} /> {t('tenant.registeredAddresses')}
             </button>
           </div>
 
@@ -370,10 +372,10 @@ export default function ContactsAddressesTab() {
                 minWidth: '220px'
               }}
             >
-              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Tenants</option>
-              {tenants.map((t) => (
-                <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                  {t.CompanyName}
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('tenant.allTenants')}</option>
+              {tenants.map((tn) => (
+                <option key={tn.TenantID} value={tn.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                  {tn.CompanyName}
                 </option>
               ))}
             </select>
@@ -396,7 +398,7 @@ export default function ContactsAddressesTab() {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> {activeSection === 'contacts' ? 'Add Contact Point' : 'Add Registered Address'}
+          <Plus size={16} /> {activeSection === 'contacts' ? t('tenant.addContactPoint') : t('tenant.addRegisteredAddress')}
         </button>
       </div>
 
@@ -404,18 +406,18 @@ export default function ContactsAddressesTab() {
       {activeSection === 'contacts' ? (
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading tenant contacts...</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.loadingContacts')}</div>
           ) : contacts.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No contacts found for target criteria.</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.noContactsFound')}</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '16px 20px' }}>Tenant Company</th>
-                  <th style={{ padding: '16px 20px' }}>Type & Label</th>
-                  <th style={{ padding: '16px 20px' }}>Contact Value</th>
-                  <th style={{ padding: '16px 20px' }}>Primary Flag</th>
-                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '16px 20px' }}>{t('tenant.tenantCompany')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('tenant.typeAndLabel')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('tenant.contactValue')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('tenant.primaryFlag')}</th>
+                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -435,10 +437,10 @@ export default function ContactsAddressesTab() {
                     <td style={{ padding: '16px 20px' }}>
                       {c.IsPrimary ? (
                         <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <Star size={12} fill="#4ade80" /> Primary Channel
+                          <Star size={12} fill="#4ade80" /> {t('tenant.primaryChannel')}
                         </span>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Secondary</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{t('tenant.secondaryChannel')}</span>
                       )}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
@@ -459,9 +461,9 @@ export default function ContactsAddressesTab() {
         /* Address Section Cards */
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
           {loading ? (
-            <div style={{ gridColumn: '1 / -1', padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading addresses...</div>
+            <div style={{ gridColumn: '1 / -1', padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.loadingAddresses')}</div>
           ) : addresses.length === 0 ? (
-            <div style={{ gridColumn: '1 / -1', padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No addresses found.</div>
+            <div style={{ gridColumn: '1 / -1', padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('tenant.noAddressesFound')}</div>
           ) : (
             addresses.map((a) => (
               <div className="glass-card" key={a.TenantAddressID} style={{ padding: '20px', position: 'relative' }}>

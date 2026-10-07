@@ -1,8 +1,11 @@
 import React from 'react';
+import { useTranslation } from '../../../i18n';
 import { Send, Zap, AlertTriangle, ShieldCheck, RefreshCw } from 'lucide-react';
 import DispatcherDashboardTab from '../components/DispatcherDashboardTab';
 
 export default function DispatchQueuePage() {
+  const { t } = useTranslation();
+
   return (
     <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
       {/* Multi-Tone Brand Vector Banner Header */}
@@ -32,11 +35,11 @@ export default function DispatchQueuePage() {
               <Send size={20} />
             </div>
             <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.85rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
-              Service Dispatcher & Routing Queue
+              {t('dispatch.queuePageTitle')}
             </h1>
           </div>
           <p style={{ margin: 0, color: '#cbd5e1', fontSize: '0.92rem', maxWidth: '750px' }}>
-            Unassigned issue request queue, intelligent auto-routing algorithm, field technician workload balancing, and SLA emergency dispatch.
+            {t('dispatch.queuePageSubtitle')}
           </p>
         </div>
 
@@ -48,10 +51,10 @@ export default function DispatchQueuePage() {
             <Zap size={20} color="#818cf8" />
             <div>
               <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
-                Smart Routing Engine
+                {t('dispatch.smartRoutingEngine')}
               </div>
               <div style={{ fontSize: '13px', fontWeight: 800, color: '#34d399' }}>
-                ● Active & Ready
+                {t('dispatch.smartRoutingActive')}
               </div>
             </div>
           </div>
