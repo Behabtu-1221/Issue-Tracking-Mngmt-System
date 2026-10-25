@@ -52,7 +52,7 @@ export const authorizedRecipientService = {
     const getRequester = async () => {
       if (!issue?.RequesterUserID) return null;
       const [u] = await query(
-        `SELECT u.UserID, u.Email, CONCAT(u.FirstName, ' ', u.LastName) AS FullName, u.TenantID
+        `SELECT u.UserID, u.Email, CONCAT(u.FirstName, ' ', u.LastName) AS FullName, u.TenantID, 'REQUESTER' AS RoleCode
          FROM \`User\` u WHERE u.UserID = ? AND u.IsActive = 1 AND u.IsDeleted = 0`,
         [issue.RequesterUserID]
       );
@@ -105,7 +105,7 @@ export const authorizedRecipientService = {
          FROM \`User\` u
          LEFT JOIN UserRole ur ON ur.UserID = u.UserID
          LEFT JOIN Role r ON ur.RoleID = r.RoleID
-         WHERE (r.RoleCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN') OR u.UserTypeCode = 'PARK_ADMIN')
+         WHERE (r.RoleCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN') OR u.UserTypeCode IN ('PARK_ADMIN', 'PARK_SUPER_ADMIN') OR u.UserID = 1)
            AND u.IsActive = 1 AND u.IsDeleted = 0`
       );
     };
@@ -141,6 +141,24 @@ export const authorizedRecipientService = {
       return [];
     };
 
+    const getRequestApprovers = async (reqId) => {
+      if (!reqId) return [];
+      try {
+        return await query(
+          `SELECT DISTINCT u.UserID, u.Email, CONCAT(u.FirstName, ' ', u.LastName) AS FullName, 'APPROVER' AS RoleCode
+           FROM Approval a
+           JOIN ApprovalStage ast ON a.ApprovalID = ast.ApprovalID
+           LEFT JOIN ApprovalDecision ad ON ast.ApprovalStageID = ad.ApprovalStageID
+           LEFT JOIN \`User\` u ON (u.UserID = ad.DecisionUserID OR u.UserID = ast.ApproverUserID)
+           WHERE a.RequestID = ? AND u.UserID IS NOT NULL AND u.IsActive = 1 AND u.IsDeleted = 0`,
+          [reqId]
+        );
+      } catch (err) {
+        console.warn('getRequestApprovers error:', err.message);
+        return [];
+      }
+    };
+
     // 2. Event-Specific Authoritative Resolution
     switch (eventCode) {
       case 'ISSUE_CREATED':
@@ -174,13 +192,18 @@ export const authorizedRecipientService = {
       }
 
       case 'DEPARTMENT_APPROVED': {
-        // Requester informed
+        // A. Requester informed of Stage 1 sign-off
         const requester = await getRequester();
         if (requester) addRecipient(requester);
+
+        // B. Administrators informed that request advanced to higher-level review
+        const parkAdmins = await getParkAdministrators();
+        parkAdmins.forEach(addRecipient);
         break;
       }
 
-      case 'APPROVAL_COMPLETED': {
+      case 'APPROVAL_COMPLETED':
+      case 'ISSUE_APPROVED_FOR_DISPATCH': {
         // A. Requester informed that work is fully authorized
         const requester = await getRequester();
         if (requester) addRecipient(requester);
@@ -249,12 +272,40 @@ export const authorizedRecipientService = {
       }
 
       case 'REQUEST_STATUS_CHANGED': {
-        // Requester informed of in-progress or status updates
+        // Requester informed of all status transitions
         const requester = await getRequester();
         if (requester) addRecipient(requester);
 
+        // Approvers informed of progress and status changes
+        const approvers = await getRequestApprovers(requestId);
+        approvers.forEach(addRecipient);
+
+        // Department Manager informed
         const deptMgrs = await getDepartmentManagers(deptId);
         deptMgrs.forEach(addRecipient);
+
+        // Assigned technicians informed
+        const techs = await getAssignedTechnicians(requestId);
+        techs.forEach(addRecipient);
+        break;
+      }
+
+      case 'REQUEST_PROGRESS_UPDATED': {
+        // Requester informed of real-time progress update
+        const requester = await getRequester();
+        if (requester) addRecipient(requester);
+
+        // Approvers informed of field work execution progress
+        const approvers = await getRequestApprovers(requestId);
+        approvers.forEach(addRecipient);
+
+        // Department Manager informed
+        const deptMgrs = await getDepartmentManagers(deptId);
+        deptMgrs.forEach(addRecipient);
+
+        // Technicians
+        const techs = await getAssignedTechnicians(requestId);
+        techs.forEach(addRecipient);
         break;
       }
 
@@ -263,15 +314,36 @@ export const authorizedRecipientService = {
         const requester = await getRequester();
         if (requester) addRecipient(requester);
 
+        // Approvers informed of resolution
+        const approvers = await getRequestApprovers(requestId);
+        approvers.forEach(addRecipient);
+
         // Department Manager informed
         const deptMgrs = await getDepartmentManagers(deptId);
         deptMgrs.forEach(addRecipient);
+
+        // Assigned technicians
+        const techs = await getAssignedTechnicians(requestId);
+        techs.forEach(addRecipient);
         break;
       }
 
       case 'REQUEST_CLOSED': {
+        // Requester informed of closure
         const requester = await getRequester();
         if (requester) addRecipient(requester);
+
+        // Approvers informed of closure
+        const approvers = await getRequestApprovers(requestId);
+        approvers.forEach(addRecipient);
+
+        // Department Manager informed
+        const deptMgrs = await getDepartmentManagers(deptId);
+        deptMgrs.forEach(addRecipient);
+
+        // Assigned technicians
+        const techs = await getAssignedTechnicians(requestId);
+        techs.forEach(addRecipient);
         break;
       }
 
@@ -279,8 +351,14 @@ export const authorizedRecipientService = {
         const requester = await getRequester();
         if (requester) addRecipient(requester);
 
+        const approvers = await getRequestApprovers(requestId);
+        approvers.forEach(addRecipient);
+
         const deptMgrs = await getDepartmentManagers(deptId);
         deptMgrs.forEach(addRecipient);
+
+        const techs = await getAssignedTechnicians(requestId);
+        techs.forEach(addRecipient);
         break;
       }
 

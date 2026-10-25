@@ -21,7 +21,6 @@ import TenantsTab from '../components/tabs/TenantsTab';
 import DepartmentsTab from '../components/tabs/DepartmentsTab';
 import ApprovalsTab from '../components/tabs/ApprovalsTab';
 import AuditTab from '../components/tabs/AuditTab';
-import KnowledgeTab from '../components/tabs/KnowledgeTab';
 import SavedReportsTab from '../components/tabs/SavedReportsTab';
 import SchedulesTab from '../components/tabs/SchedulesTab';
 
@@ -125,9 +124,6 @@ export default function ReportsDashboardPage({ defaultTab = 'executive' }) {
         case 'audit':
           res = await reportingApi.getAuditAnalytics(queryParams);
           break;
-        case 'knowledge':
-          res = await reportingApi.getKnowledgeAnalytics();
-          break;
         case 'saved': {
           const [savedRes] = await Promise.all([reportingApi.getSavedReports()]);
           setSavedReports(savedRes.data?.data || []);
@@ -181,7 +177,6 @@ export default function ReportsDashboardPage({ defaultTab = 'executive' }) {
     { id: 'departments', label: 'Departments', icon: Network },
     { id: 'approvals', label: 'Approvals', icon: CheckSquare },
     { id: 'audit', label: 'Audit Telemetry', icon: Shield },
-    { id: 'knowledge', label: 'Knowledge Base', icon: BookOpen },
     { id: 'saved', label: 'Saved Reports', icon: Bookmark },
     { id: 'schedules', label: 'Schedules', icon: Calendar }
   ];
@@ -198,15 +193,15 @@ export default function ReportsDashboardPage({ defaultTab = 'executive' }) {
         marginBottom: '4px'
       }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <h1 style={{ fontSize: 'clamp(1.3rem, 3.5vw, 1.8rem)', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
             Analysis & <span className="glow-text">Reporting Intelligence</span>
           </h1>
-          <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Multi-tenant executive performance dashboards, operational SLA telemetry, and cross-module reporting
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <span style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -263,6 +258,7 @@ export default function ReportsDashboardPage({ defaultTab = 'executive' }) {
         display: 'flex',
         overflowX: 'auto',
         gap: '6px',
+        WebkitOverflowScrolling: 'touch',
         border: '1px solid var(--glass-border, rgba(148, 163, 184, 0.2))'
       }}>
         {tabs.map((tab) => {
@@ -339,10 +335,6 @@ export default function ReportsDashboardPage({ defaultTab = 'executive' }) {
 
         {currentTab === 'audit' && (
           <AuditTab data={tabData} loading={loading} filters={filters} />
-        )}
-
-        {currentTab === 'knowledge' && (
-          <KnowledgeTab data={tabData} loading={loading} />
         )}
 
         {currentTab === 'saved' && (

@@ -12,6 +12,9 @@ import {
 import tenantApi from '../api/tenantApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 import { tenantSchemas } from '../../../validation';
 import { useTranslation } from '../../../i18n';
 
@@ -312,20 +315,18 @@ export default function SubTenantsTab() {
                     )}
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="edit"
                         onClick={() => handleOpenEdit(st)}
-                        style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
+                        title={t('common.edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDelete(st.SubTenantID, st.CompanyName)}
-                        style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                        title={t('common.delete')}
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -335,137 +336,107 @@ export default function SubTenantsTab() {
       </div>
 
       {/* Modal: Create/Edit Sub-Tenant */}
-      {isModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <Users color="var(--accent-primary)" />
-              {editingSubTenant ? 'Edit Sub-Tenant Entity' : 'Add New Sub-Tenant Entity'}
-            </h2>
+      <ModalCard
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingSubTenant ? 'Edit Sub-Tenant Entity' : 'Add New Sub-Tenant Entity'}
+        subtitle={editingSubTenant ? 'Sub-entity under parent account' : 'Register a subsidiary, affiliate, joint venture or sub-lease tenant entity'}
+        category="Tenant Entity Governance"
+        icon={Users}
+        accentStrip="brand"
+        maxWidth="540px"
+        onSubmit={handleSubmit}
+        submitText={editingSubTenant ? 'Save Changes' : 'Create Sub-Tenant'}
+        cancelText="Cancel"
+        error={errorMsg && Object.keys(fieldErrors).length === 0 ? errorMsg : ''}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <FormField label="Parent Tenant *" error={fieldErrors.ParentTenantID} icon={Building2}>
+            <select
+              disabled={!!editingSubTenant}
+              value={formData.ParentTenantID}
+              onChange={(e) => handleFieldChange('ParentTenantID', e.target.value)}
+              onBlur={() => handleBlur('ParentTenantID')}
+              style={{
+                width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                border: `1px solid ${fieldErrors.ParentTenantID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+              }}
+            >
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Active Parent Tenant</option>
+              {parentTenants.map((pt) => (
+                <option key={pt.TenantID} value={pt.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                  {pt.CompanyName} ({pt.TenantCode})
+                </option>
+              ))}
+            </select>
+          </FormField>
 
-            {errorMsg && Object.keys(fieldErrors).length === 0 && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
+          <FormField label="Sub-Tenant Company Name *" error={fieldErrors.CompanyName} icon={Users}>
+            <input
+              type="text"
+              placeholder="e.g. Acme Logistics Division"
+              value={formData.CompanyName}
+              onChange={(e) => handleFieldChange('CompanyName', e.target.value)}
+              onBlur={() => handleBlur('CompanyName')}
+              style={{
+                width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                border: `1px solid ${fieldErrors.CompanyName ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+              }}
+            />
+          </FormField>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Parent Tenant *</label>
-                <select
-                  disabled={!!editingSubTenant}
-                  value={formData.ParentTenantID}
-                  onChange={(e) => handleFieldChange('ParentTenantID', e.target.value)}
-                  onBlur={() => handleBlur('ParentTenantID')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.ParentTenantID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Active Parent Tenant</option>
-                  {parentTenants.map((pt) => (
-                    <option key={pt.TenantID} value={pt.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {pt.CompanyName} ({pt.TenantCode})
-                    </option>
-                  ))}
-                </select>
-                {fieldErrors.ParentTenantID && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.ParentTenantID}
-                  </span>
-                )}
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+            <FormField label="Relationship Type *" icon={Building2}>
+              <select
+                value={formData.RelationshipType}
+                onChange={(e) => handleFieldChange('RelationshipType', e.target.value)}
+                onBlur={() => handleBlur('RelationshipType')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)',
+                  color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              >
+                <option value="SUBSIDIARY" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>SUBSIDIARY</option>
+                <option value="AFFILIATE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>AFFILIATE</option>
+                <option value="JOINT_VENTURE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>JOINT VENTURE</option>
+                <option value="SUBLEASE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>SUBLEASE TENANT</option>
+              </select>
+            </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Sub-Tenant Company Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Acme Logistics Division"
-                  value={formData.CompanyName}
-                  onChange={(e) => handleFieldChange('CompanyName', e.target.value)}
-                  onBlur={() => handleBlur('CompanyName')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.CompanyName ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                />
-                {fieldErrors.CompanyName && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.CompanyName}
-                  </span>
-                )}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Relationship Type *</label>
-                  <select
-                    value={formData.RelationshipType}
-                    onChange={(e) => handleFieldChange('RelationshipType', e.target.value)}
-                    onBlur={() => handleBlur('RelationshipType')}
-                    style={{ width: '100%', padding: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)' }}
-                  >
-                    <option value="SUBSIDIARY" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>SUBSIDIARY</option>
-                    <option value="AFFILIATE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>AFFILIATE</option>
-                    <option value="JOINT_VENTURE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>JOINT VENTURE</option>
-                    <option value="SUBLEASE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>SUBLEASE TENANT</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Registration Number</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. SUB-REG-991"
-                    value={formData.RegistrationNumber}
-                    onChange={(e) => handleFieldChange('RegistrationNumber', e.target.value)}
-                    onBlur={() => handleBlur('RegistrationNumber')}
-                    style={{
-                      width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                      border: fieldErrors.RegistrationNumber ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px', color: 'var(--text-primary)'
-                    }}
-                  />
-                  {fieldErrors.RegistrationNumber && (
-                    <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                      ⚠️ {fieldErrors.RegistrationNumber}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Description / Notes</label>
-                <textarea
-                  rows="2"
-                  placeholder="Optional notes regarding this subsidiary relationship..."
-                  value={formData.Description}
-                  onChange={(e) => handleFieldChange('Description', e.target.value)}
-                  style={{ width: '100%', padding: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {editingSubTenant ? 'Save Changes' : 'Create Sub-Tenant'}
-                </button>
-              </div>
-            </form>
+            <FormField label="Registration Number" error={fieldErrors.RegistrationNumber} icon={Users}>
+              <input
+                type="text"
+                placeholder="e.g. SUB-REG-991"
+                value={formData.RegistrationNumber}
+                onChange={(e) => handleFieldChange('RegistrationNumber', e.target.value)}
+                onBlur={() => handleBlur('RegistrationNumber')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${fieldErrors.RegistrationNumber ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
           </div>
+
+          <FormField label="Description / Notes" icon={Users}>
+            <textarea
+              rows="3"
+              placeholder="Optional notes regarding this subsidiary relationship..."
+              value={formData.Description}
+              onChange={(e) => handleFieldChange('Description', e.target.value)}
+              style={{
+                width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)',
+                color: 'var(--text-primary)', fontSize: '0.88rem', resize: 'vertical'
+              }}
+            />
+          </FormField>
         </div>
-      )}
+      </ModalCard>
 
       {/* Shared Glass Modals */}
       <ConfirmDialogModal

@@ -4,6 +4,7 @@ import {
   Inbox, Sparkles, ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../../../modules/authentication/contexts/AuthContext';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import communicationApi from '../api/communicationApi';
 import CommMetricsHeader from '../components/CommMetricsHeader';
 import RequestCommentsTab from '../components/RequestCommentsTab';
@@ -14,6 +15,7 @@ import ConversationListPanel from '../components/ConversationListPanel';
 import ConversationPanel from '../components/ConversationPanel';
 
 export default function CommunicationPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const currentUserId = user?.id || user?.userId || user?.UserID || 1;
   const userRole = (user?.role || user?.RoleName || '').toUpperCase();
@@ -45,24 +47,24 @@ export default function CommunicationPage() {
   }, []);
 
   const navTabs = [
-    { id: 'conversations', label: 'Conversations & Chat', icon: MessageSquare },
-    { id: 'comments', label: 'Ticket Comments', icon: Inbox },
-    { id: 'announcements', label: 'Campus Bulletins', icon: Megaphone },
-    { id: 'discussions', label: 'Team Channels', icon: Users },
-    { id: 'timeline', label: 'Audit Timeline', icon: Activity }
+    { id: 'conversations', label: t('communication.tabs.conversations', 'Conversations & Chat'), icon: MessageSquare },
+    { id: 'comments', label: t('communication.tabs.comments', 'Ticket Comments'), icon: Inbox },
+    { id: 'announcements', label: t('communication.tabs.announcements', 'Campus Bulletins'), icon: Megaphone },
+    { id: 'discussions', label: t('communication.tabs.discussions', 'Team Channels'), icon: Users },
+    { id: 'timeline', label: t('communication.tabs.timeline', 'Audit Timeline'), icon: Activity }
   ];
 
   const getRoleBadge = () => {
     if (['SUPER_ADMIN', 'PARK_ADMIN', 'ADMIN'].some(r => userRole.includes(r))) {
-      return { label: 'Admin Command', color: '#818cf8', bg: 'rgba(99, 102, 241, 0.15)', border: 'rgba(99, 102, 241, 0.35)' };
+      return { label: t('communication.roleBadges.admin', 'Admin Command'), color: '#818cf8', bg: 'rgba(99, 102, 241, 0.15)', border: 'rgba(99, 102, 241, 0.35)' };
     }
     if (userRole.includes('TECH')) {
-      return { label: 'Technician Desk', color: '#34d399', bg: 'rgba(52, 211, 153, 0.15)', border: 'rgba(52, 211, 153, 0.35)' };
+      return { label: t('communication.roleBadges.tech', 'Technician Desk'), color: '#34d399', bg: 'rgba(52, 211, 153, 0.15)', border: 'rgba(52, 211, 153, 0.35)' };
     }
     if (userRole.includes('MANAGER')) {
-      return { label: 'Department Dispatch', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.35)' };
+      return { label: t('communication.roleBadges.manager', 'Department Dispatch'), color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.35)' };
     }
-    return { label: 'Requester Portal', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' };
+    return { label: t('communication.roleBadges.requester', 'Requester Portal'), color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' };
   };
 
   const roleMeta = getRoleBadge();
@@ -89,10 +91,10 @@ export default function CommunicationPage() {
             display: 'flex', alignItems: 'center', gap: '10px'
           }}>
             <MessageSquare size={isMobile ? 24 : 28} color="#6366f1" />
-            Communication & Collaboration Hub
+            {t('communication.title', 'Communication & Collaboration Hub')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.86rem' }}>
-            Interactive ticket discussions, staff diagnostics, team channels, campus bulletins & audit history
+            {t('communication.subtitle', 'Interactive ticket discussions, staff diagnostics, team channels, campus bulletins & audit history')}
           </p>
         </div>
 
@@ -109,7 +111,7 @@ export default function CommunicationPage() {
           onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
         >
           <RefreshCw size={15} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
-          <span>Refresh</span>
+          <span>{t('communication.refreshBtn', 'Refresh')}</span>
         </button>
       </div>
 
@@ -169,6 +171,7 @@ export default function CommunicationPage() {
                   <span>Back to Discussions List</span>
                 </button>
                 <ConversationPanel
+                  conversationId={selectedConv.ConversationID}
                   issueRequestId={selectedConv.ReferenceIssueRequestID}
                   currentUserId={currentUserId}
                 />
@@ -188,6 +191,7 @@ export default function CommunicationPage() {
               />
               {selectedConv && (
                 <ConversationPanel
+                  conversationId={selectedConv.ConversationID}
                   issueRequestId={selectedConv.ReferenceIssueRequestID}
                   currentUserId={currentUserId}
                 />

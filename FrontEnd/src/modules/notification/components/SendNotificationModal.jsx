@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import notificationApi from '../api/notificationApi';
 import { useAuth } from '../../authentication/contexts/AuthContext';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 const glassCard = {
   background: 'var(--glass-bg)',
@@ -17,6 +18,7 @@ const glassCard = {
 
 export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const currentUserId = user?.id || user?.userId || user?.UserID || 1;
   const currentUserEmail = user?.email || user?.Email || '';
 
@@ -119,12 +121,15 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
       backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center',
       justifyContent: 'center', zIndex: 10000, padding: '20px'
     }} onClick={onClose}>
-      <div style={{
-        ...glassCard, width: '560px', maxWidth: '100%',
-        border: '1px solid rgba(99, 102, 241, 0.35)',
-        boxShadow: '0 24px 64px rgba(0, 0, 0, 0.6)',
-        animation: 'fadeInUp 0.25s ease-out'
-      }} onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-card accent-strip-brand"
+        style={{
+          width: '560px', maxWidth: '100%',
+          padding: '24px',
+          animation: 'fadeInUp 0.25s ease-out'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -137,10 +142,10 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
             </div>
             <div>
               <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 800 }}>
-                Notification Dispatch & SMTP Test
+                {t('notifications.modal.sendTitle', 'Notification Dispatch & SMTP Test')}
               </h3>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Trigger system event notifications or test production mail delivery
+                {t('notifications.modal.sendSubtitle', 'Trigger system event notifications or test production mail delivery')}
               </span>
             </div>
           </div>
@@ -166,7 +171,7 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
             }}
           >
             <Sparkles size={14} />
-            <span>Event Dispatch (In-App)</span>
+            <span>{t('notifications.modal.tabDispatch', 'Event Dispatch (In-App)')}</span>
           </button>
 
           <button
@@ -181,7 +186,7 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
             }}
           >
             <Mail size={14} />
-            <span>SMTP Mail Test</span>
+            <span>{t('notifications.modal.tabTestEmail', 'SMTP Mail Test')}</span>
           </button>
         </div>
 
@@ -205,7 +210,7 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
             {templates.length > 0 && (
               <div>
                 <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700, marginBottom: '6px' }}>
-                  Pre-Fill from Existing Template (Optional)
+                  {t('notifications.modal.templateSelect', 'Pre-Fill from Existing Template (Optional)')}
                 </label>
                 <select
                   onChange={(e) => handleTemplateSelect(e.target.value)}
@@ -215,7 +220,7 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
                     color: 'var(--text-primary)', fontSize: '0.84rem', outline: 'none', boxSizing: 'border-box'
                   }}
                 >
-                  <option value="">Select a template to pre-fill subject & body...</option>
+                  <option value="">{t('notifications.modal.templatePlaceholder', 'Select a template to pre-fill subject & body...')}</option>
                   {templates.map(t => (
                     <option key={t.NotificationTemplateID} value={t.NotificationTemplateID}>
                       {t.TemplateCode} &bull; {t.TypeName || t.TemplateCode}
@@ -228,7 +233,7 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
                 <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700, marginBottom: '6px' }}>
-                  Event Type
+                  {t('notifications.modal.eventType', 'Event Type')}
                 </label>
                 <select
                   value={typeCode}
@@ -248,7 +253,7 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
 
               <div>
                 <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700, marginBottom: '6px' }}>
-                  Target Request Number
+                  {t('notifications.modal.targetRequest', 'Target Request Number')}
                 </label>
                 <input
                   type="text"
@@ -266,13 +271,13 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
 
             <div>
               <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700, marginBottom: '6px' }}>
-                Notification Title / Subject
+                {t('notifications.modal.subjectLabel', 'Notification Title / Subject')}
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Alert title (e.g. Server Room Temperature Alert)"
+                placeholder={t('notifications.modal.subjectPlaceholder', 'Alert title (e.g. Server Room Temperature Alert)')}
                 style={{
                   width: '100%', padding: '9px 12px', borderRadius: '10px',
                   background: 'var(--bg-tertiary)', border: '1px solid rgba(99, 102, 241, 0.3)',
@@ -283,13 +288,13 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
 
             <div>
               <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700, marginBottom: '6px' }}>
-                Message Content
+                {t('notifications.modal.messageLabel', 'Message Content')}
               </label>
               <textarea
                 rows={3}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Message body content..."
+                placeholder={t('notifications.modal.messagePlaceholder', 'Message body content...')}
                 style={{
                   width: '100%', padding: '9px 12px', borderRadius: '10px',
                   background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
@@ -303,35 +308,30 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
               <button
                 type="button"
                 onClick={onClose}
-                style={{
-                  padding: '9px 18px', borderRadius: '10px',
-                  background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
-                  color: 'var(--text-secondary)', fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer'
-                }}
+                className="btn btn-secondary"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
 
               <button
                 type="submit"
                 disabled={loading}
+                className="btn btn-primary"
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '8px',
-                  padding: '9px 22px', borderRadius: '10px', border: 'none',
-                  background: 'var(--accent-gradient)', color: '#fff',
-                  fontSize: '0.84rem', fontWeight: 700, cursor: loading ? 'wait' : 'pointer',
-                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)'
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}
               >
                 {loading ? (
                   <>
                     <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />
-                    <span>Dispatching...</span>
+                    <span>{t('notifications.modal.sending', 'Dispatching...')}</span>
                   </>
                 ) : (
                   <>
                     <Send size={15} />
-                    <span>Dispatch Alert</span>
+                    <span>{t('notifications.modal.sendBtn', 'Dispatch Alert')}</span>
                   </>
                 )}
               </button>
@@ -347,13 +347,13 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
             }}>
               <Mail size={18} color="#10b981" />
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                Sends an HTML validation email through the active SMTP transport to verify mail server credentials and template rendering.
+                {t('notifications.modal.smtpNote', 'Sends an HTML validation email through the active SMTP transport to verify mail server credentials and template rendering.')}
               </div>
             </div>
 
             <div>
               <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700, marginBottom: '6px' }}>
-                Recipient Email Address *
+                {t('notifications.modal.recipientLabel', 'Recipient Email Address *')}
               </label>
               <input
                 type="email"
@@ -361,11 +361,7 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
                 value={toEmail}
                 onChange={(e) => setToEmail(e.target.value)}
                 placeholder="name@domain.com"
-                style={{
-                  width: '100%', padding: '10px 14px', borderRadius: '10px',
-                  background: 'var(--bg-tertiary)', border: '1px solid rgba(16, 185, 129, 0.3)',
-                  color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
-                }}
+                className="form-control"
               />
             </div>
 
@@ -373,36 +369,30 @@ export default function SendNotificationModal({ isOpen, onClose, onSuccess }) {
               <button
                 type="button"
                 onClick={onClose}
-                style={{
-                  padding: '9px 18px', borderRadius: '10px',
-                  background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
-                  color: 'var(--text-secondary)', fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer'
-                }}
+                className="btn btn-secondary"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
 
               <button
                 type="submit"
                 disabled={loading || !toEmail.trim()}
+                className="btn btn-primary"
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '8px',
-                  padding: '9px 22px', borderRadius: '10px', border: 'none',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  color: '#fff', fontSize: '0.84rem', fontWeight: 700,
-                  cursor: loading ? 'wait' : 'pointer',
-                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)'
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}
               >
                 {loading ? (
                   <>
                     <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />
-                    <span>Delivering...</span>
+                    <span>{t('notifications.modal.delivering', 'Delivering...')}</span>
                   </>
                 ) : (
                   <>
                     <Mail size={15} />
-                    <span>Send Test Email</span>
+                    <span>{t('notifications.modal.sendTestBtn', 'Send Test Email')}</span>
                   </>
                 )}
               </button>

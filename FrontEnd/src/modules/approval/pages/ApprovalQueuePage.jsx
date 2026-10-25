@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, RefreshCw } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import approvalApi from '../api/approvalApi';
 import ApprovalListView from '../components/ApprovalListView';
 import ApprovalDetailModal from '../components/ApprovalDetailModal';
 import CreateWorkflowModal from '../components/CreateWorkflowModal';
 
 export default function ApprovalQueuePage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialStatus = searchParams.get('status') || 'ALL';
 
@@ -60,24 +62,23 @@ export default function ApprovalQueuePage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-{/* Header */}
-          <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>Approvals & Workflows Queue</h1>
-            <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Multi-level governance queue, approval decision logs, and workflow histories
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={fetchApprovals} className="btn btn-secondary" style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <RefreshCw size={16} /> Refresh
-            </button>
-            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary" style={{ padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Plus size={18} /> Initiate Workflow
-            </button>
-          </div>
-        <div style={{ marginBottom: '24px' }}>
-</div>
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>
+            {t('approval.title', 'Approvals & Workflows Queue')}
+          </h1>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+            {t('approval.subtitle', 'Multi-level governance queue, approval decision logs, and workflow histories')}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={fetchApprovals} className="btn btn-secondary" style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <RefreshCw size={16} /> {t('approval.refreshBtn', 'Refresh')}
+          </button>
+          <button onClick={() => setShowCreateModal(true)} className="btn btn-primary" style={{ padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Plus size={18} /> {t('approval.workflowModal.title', 'Initiate Workflow')}
+          </button>
+        </div>
       </div>
 
       <ApprovalListView

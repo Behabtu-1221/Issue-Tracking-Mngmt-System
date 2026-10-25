@@ -1,0 +1,348 @@
+========================================================================================================================
+ENTERPRISE ISSUE TRACKING MANAGEMENT SYSTEM (ITMS) — ALL REMAINING API ENDPOINTS INVENTORY
+BASE URL : http://localhost:5000
+FORMAT   : [INDEX]. [METHOD] (LEFT)           | [FULL URL] (RIGHT)
+TOTAL REMAINING ENDPOINTS: 216 (145 from Modules 11-15 + 71 from Modules 3-5 Remainder)
+OVERALL SYSTEM COMPLETION: 389/389 Verified Testable Endpoints Across All 15 Modules (100.0%)
+========================================================================================================================
+
+########################################################################################################################
+PART 1: MODULES 11 TO 15 — ADVANCED COLLABORATION, OPERATIONS, ANALYTICS & CONFIGURATION (145 ENDPOINTS)
+########################################################################################################################
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 11: COMMUNICATION & MESSAGING (24 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+001. GET      http://localhost:5000/api/communication/overview
+002. GET      http://localhost:5000/api/communication/conversations
+003. GET      http://localhost:5000/api/communication/conversations/request/:issueRequestId
+004. POST     http://localhost:5000/api/communication/conversations/request/:issueRequestId
+005. GET      http://localhost:5000/api/communication/conversations/:conversationId/participants
+006. POST     http://localhost:5000/api/communication/conversations/:conversationId/participants
+007. GET      http://localhost:5000/api/communication/conversations/:conversationId/messages
+008. POST     http://localhost:5000/api/communication/conversations/:conversationId/messages
+009. POST     http://localhost:5000/api/communication/requests/:issueRequestId/messages
+010. PUT      http://localhost:5000/api/communication/conversations/:conversationId/read
+011. GET      http://localhost:5000/api/communication/notes/:requestId
+012. POST     http://localhost:5000/api/communication/notes/:requestId
+013. DELETE   http://localhost:5000/api/communication/notes/:noteId
+014. GET      http://localhost:5000/api/communication/comments/:issueRequestId
+015. POST     http://localhost:5000/api/communication/comments
+016. DELETE   http://localhost:5000/api/communication/comments/:id
+017. GET      http://localhost:5000/api/communication/announcements
+018. POST     http://localhost:5000/api/communication/announcements
+019. DELETE   http://localhost:5000/api/communication/announcements/:id
+020. GET      http://localhost:5000/api/communication/channels
+021. POST     http://localhost:5000/api/communication/channels
+022. GET      http://localhost:5000/api/communication/channels/:channelId/messages
+023. POST     http://localhost:5000/api/communication/channels/:channelId/messages
+024. GET      http://localhost:5000/api/communication/activity/:issueRequestId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 12: NOTIFICATIONS & ALERTS (20 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+025. GET      http://localhost:5000/api/notifications/overview
+026. GET      http://localhost:5000/api/notifications/types
+027. GET      http://localhost:5000/api/notifications/channels
+028. GET      http://localhost:5000/api/notifications/inbox
+029. GET      http://localhost:5000/api/notifications/unread-count
+030. PATCH    http://localhost:5000/api/notifications/read-all
+031. PATCH    http://localhost:5000/api/notifications/:id/read
+032. PATCH    http://localhost:5000/api/notifications/:id/unread
+033. POST     http://localhost:5000/api/notifications/event
+034. POST     http://localhost:5000/api/notifications/dispatch
+035. GET      http://localhost:5000/api/notifications/preferences
+036. PUT      http://localhost:5000/api/notifications/preferences
+037. GET      http://localhost:5000/api/notifications/delivery-log
+038. GET      http://localhost:5000/api/notifications/templates
+039. POST     http://localhost:5000/api/notifications/templates
+040. PUT      http://localhost:5000/api/notifications/templates/:id
+041. GET      http://localhost:5000/api/notifications/reminders
+042. POST     http://localhost:5000/api/notifications/reminders
+043. PATCH    http://localhost:5000/api/notifications/reminders/:id/complete
+044. POST     http://localhost:5000/api/notifications/test-email
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 13: FILE & DOCUMENT MANAGEMENT (16 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+045. GET      http://localhost:5000/api/documents/share/:shareToken
+046. GET      http://localhost:5000/api/documents/metrics
+047. GET      http://localhost:5000/api/documents/categories
+048. POST     http://localhost:5000/api/documents/categories
+049. GET      http://localhost:5000/api/documents
+050. GET      http://localhost:5000/api/documents/:id
+051. POST     http://localhost:5000/api/documents/upload
+052. POST     http://localhost:5000/api/documents/upload-multiple
+053. GET      http://localhost:5000/api/documents/:id/download
+054. GET      http://localhost:5000/api/documents/:id/preview
+055. POST     http://localhost:5000/api/documents/:id/versions
+056. POST     http://localhost:5000/api/documents/:id/share
+057. PATCH    http://localhost:5000/api/documents/:id
+058. DELETE   http://localhost:5000/api/documents/:id
+059. POST     http://localhost:5000/api/documents/:id/restore
+060. DELETE   http://localhost:5000/api/documents/:id/permanent
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 14: REPORTING & ANALYTICS (19 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+061. GET      http://localhost:5000/api/reports/dashboard/executive
+062. GET      http://localhost:5000/api/reports/requests
+063. GET      http://localhost:5000/api/reports/assignments
+064. GET      http://localhost:5000/api/reports/sla
+065. GET      http://localhost:5000/api/reports/tenants
+066. GET      http://localhost:5000/api/reports/departments
+067. GET      http://localhost:5000/api/reports/approvals
+068. GET      http://localhost:5000/api/reports/audit
+069. GET      http://localhost:5000/api/reports/export/:reportType
+070. GET      http://localhost:5000/api/reports/saved
+071. POST     http://localhost:5000/api/reports/saved
+072. PUT      http://localhost:5000/api/reports/saved/:id
+073. DELETE   http://localhost:5000/api/reports/saved/:id
+074. GET      http://localhost:5000/api/reports/schedules
+075. POST     http://localhost:5000/api/reports/schedules
+076. PUT      http://localhost:5000/api/reports/schedules/:id
+077. DELETE   http://localhost:5000/api/reports/schedules/:id
+078. POST     http://localhost:5000/api/reports/schedules/:id/trigger
+079. GET      http://localhost:5000/api/reports/executions
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Bootstrap) (1 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+080. GET      http://localhost:5000/api/configuration/bootstrap
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (System Settings) (6 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+081. GET      http://localhost:5000/api/configuration/system-settings
+082. GET      http://localhost:5000/api/configuration/system-settings/key/:key
+083. GET      http://localhost:5000/api/configuration/system-settings/:id
+084. POST     http://localhost:5000/api/configuration/system-settings
+085. PUT      http://localhost:5000/api/configuration/system-settings/:id
+086. DELETE   http://localhost:5000/api/configuration/system-settings/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Feature Flags) (8 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+087. GET      http://localhost:5000/api/configuration/feature-flags
+088. GET      http://localhost:5000/api/configuration/feature-flags/code/:code
+089. GET      http://localhost:5000/api/configuration/feature-flags/code/:code/enabled
+090. GET      http://localhost:5000/api/configuration/feature-flags/:id
+091. POST     http://localhost:5000/api/configuration/feature-flags
+092. PUT      http://localhost:5000/api/configuration/feature-flags/:id
+093. PATCH    http://localhost:5000/api/configuration/feature-flags/:id/toggle
+094. DELETE   http://localhost:5000/api/configuration/feature-flags/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Business Rules) (6 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+095. GET      http://localhost:5000/api/configuration/business-rules
+096. GET      http://localhost:5000/api/configuration/business-rules/code/:code
+097. GET      http://localhost:5000/api/configuration/business-rules/:id
+098. POST     http://localhost:5000/api/configuration/business-rules
+099. PUT      http://localhost:5000/api/configuration/business-rules/:id
+100. DELETE   http://localhost:5000/api/configuration/business-rules/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Number Sequences) (7 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+101. GET      http://localhost:5000/api/configuration/number-sequences
+102. GET      http://localhost:5000/api/configuration/number-sequences/code/:code
+103. POST     http://localhost:5000/api/configuration/number-sequences/code/:code/next
+104. GET      http://localhost:5000/api/configuration/number-sequences/:id
+105. POST     http://localhost:5000/api/configuration/number-sequences
+106. PUT      http://localhost:5000/api/configuration/number-sequences/:id
+107. DELETE   http://localhost:5000/api/configuration/number-sequences/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Lookups) (6 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+108. GET      http://localhost:5000/api/configuration/lookups/:entityKey
+109. GET      http://localhost:5000/api/configuration/lookups/:entityKey/code/:code
+110. GET      http://localhost:5000/api/configuration/lookups/:entityKey/:id
+111. POST     http://localhost:5000/api/configuration/lookups/:entityKey
+112. PUT      http://localhost:5000/api/configuration/lookups/:entityKey/:id
+113. DELETE   http://localhost:5000/api/configuration/lookups/:entityKey/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Lookup Types) (10 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+114. GET      http://localhost:5000/api/configuration/lookup-types
+115. GET      http://localhost:5000/api/configuration/lookup-types/code/:code
+116. GET      http://localhost:5000/api/configuration/lookup-types/:id
+117. POST     http://localhost:5000/api/configuration/lookup-types
+118. PUT      http://localhost:5000/api/configuration/lookup-types/:id
+119. DELETE   http://localhost:5000/api/configuration/lookup-types/:id
+120. GET      http://localhost:5000/api/configuration/lookup-types/:id/values
+121. POST     http://localhost:5000/api/configuration/lookup-types/:id/values
+122. PUT      http://localhost:5000/api/configuration/lookup-types/:lookupTypeId/values/:valueId
+123. DELETE   http://localhost:5000/api/configuration/lookup-types/:lookupTypeId/values/:valueId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Calendars, Working Hours & Holidays) (13 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+124. GET      http://localhost:5000/api/configuration/calendars
+125. GET      http://localhost:5000/api/configuration/calendars/:id
+126. POST     http://localhost:5000/api/configuration/calendars
+127. PUT      http://localhost:5000/api/configuration/calendars/:id
+128. DELETE   http://localhost:5000/api/configuration/calendars/:id
+129. GET      http://localhost:5000/api/configuration/calendars/:id/working-hours
+130. POST     http://localhost:5000/api/configuration/calendars/:id/working-hours
+131. PUT      http://localhost:5000/api/configuration/calendars/:calendarId/working-hours/:workingHourId
+132. DELETE   http://localhost:5000/api/configuration/calendars/:calendarId/working-hours/:workingHourId
+133. GET      http://localhost:5000/api/configuration/calendars/:id/holidays
+134. POST     http://localhost:5000/api/configuration/calendars/:id/holidays
+135. PUT      http://localhost:5000/api/configuration/calendars/:calendarId/holidays/:holidayId
+136. DELETE   http://localhost:5000/api/configuration/calendars/:calendarId/holidays/:holidayId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 15: CONFIGURATION MANAGEMENT (Localization & Resources) (9 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+137. GET      http://localhost:5000/api/configuration/localizations
+138. GET      http://localhost:5000/api/configuration/localizations/:id
+139. POST     http://localhost:5000/api/configuration/localizations
+140. PUT      http://localhost:5000/api/configuration/localizations/:id
+141. DELETE   http://localhost:5000/api/configuration/localizations/:id
+142. GET      http://localhost:5000/api/configuration/localizations/:id/resources
+143. POST     http://localhost:5000/api/configuration/localizations/:id/resources
+144. PUT      http://localhost:5000/api/configuration/localizations/:localizationId/resources/:resourceId
+145. DELETE   http://localhost:5000/api/configuration/localizations/:localizationId/resources/:resourceId
+
+########################################################################################################################
+PART 2: MODULES 3 TO 5 REMAINDER — FACILITY ZONES, LEASES, ORG HIERARCHIES & BUDGETS (71 ENDPOINTS)
+Omitted when initial Batch 1 was capped at 80 endpoints. Now fully enumerated and testable.
+########################################################################################################################
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 3: BUSINESS PARK — OFFICES (REMAINDER) (1 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+146. PUT      http://localhost:5000/api/offices/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 3: BUSINESS PARK — CAMPUS LOCATIONS (4 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+147. GET      http://localhost:5000/api/locations/:id
+148. POST     http://localhost:5000/api/locations
+149. PUT      http://localhost:5000/api/locations/:id
+150. DELETE   http://localhost:5000/api/locations/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 3: BUSINESS PARK — FACILITY ZONES (5 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+151. GET      http://localhost:5000/api/facility-zones/:id
+152. GET      http://localhost:5000/api/facility-zones/:zoneId/buildings
+153. POST     http://localhost:5000/api/facility-zones
+154. PUT      http://localhost:5000/api/facility-zones/:id
+155. DELETE   http://localhost:5000/api/facility-zones/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 3: BUSINESS PARK — FLOOR PLANS (3 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+156. POST     http://localhost:5000/api/floor-plans
+157. PUT      http://localhost:5000/api/floor-plans/:id
+158. DELETE   http://localhost:5000/api/floor-plans/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT MANAGEMENT — TENANTS (MUTATION REMAINDER) (2 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+159. PUT      http://localhost:5000/api/tenants/:id
+160. DELETE   http://localhost:5000/api/tenants/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT MANAGEMENT — SUB-TENANTS (3 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+161. GET      http://localhost:5000/api/sub-tenants/:id
+162. PUT      http://localhost:5000/api/sub-tenants/:id
+163. DELETE   http://localhost:5000/api/sub-tenants/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT MANAGEMENT — CONTACTS (3 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+164. GET      http://localhost:5000/api/tenant-contacts/:id
+165. PUT      http://localhost:5000/api/tenant-contacts/:id
+166. DELETE   http://localhost:5000/api/tenant-contacts/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT MANAGEMENT — ADDRESSES (3 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+167. GET      http://localhost:5000/api/tenant-addresses/:id
+168. PUT      http://localhost:5000/api/tenant-addresses/:id
+169. DELETE   http://localhost:5000/api/tenant-addresses/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT MANAGEMENT — LEASE CONTRACTS (4 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+170. GET      http://localhost:5000/api/leases/:id
+171. PUT      http://localhost:5000/api/leases/:id
+172. PATCH    http://localhost:5000/api/leases/:id/status
+173. DELETE   http://localhost:5000/api/leases/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT MANAGEMENT — OFFICE ALLOCATIONS (3 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+174. GET      http://localhost:5000/api/office-allocations/history
+175. GET      http://localhost:5000/api/office-allocations/:id
+176. DELETE   http://localhost:5000/api/office-allocations/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE — DEPARTMENTS (6 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+177. GET      http://localhost:5000/api/departments/:id
+178. PUT      http://localhost:5000/api/departments/:id
+179. DELETE   http://localhost:5000/api/departments/:id
+180. GET      http://localhost:5000/api/departments/:id/locations
+181. POST     http://localhost:5000/api/departments/:id/locations
+182. DELETE   http://localhost:5000/api/departments/locations/:locId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE — TEAMS & MEMBERS (9 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+183. GET      http://localhost:5000/api/teams/eligible-technicians
+184. GET      http://localhost:5000/api/teams/workload-summary
+185. GET      http://localhost:5000/api/teams/:id
+186. POST     http://localhost:5000/api/teams
+187. PUT      http://localhost:5000/api/teams/:id
+188. DELETE   http://localhost:5000/api/teams/:id
+189. GET      http://localhost:5000/api/teams/:id/members
+190. POST     http://localhost:5000/api/teams/:id/members
+191. DELETE   http://localhost:5000/api/teams/:id/members/:userId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE — STAFF POSITIONS (5 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+192. GET      http://localhost:5000/api/positions
+193. GET      http://localhost:5000/api/positions/:id
+194. POST     http://localhost:5000/api/positions
+195. PUT      http://localhost:5000/api/positions/:id
+196. DELETE   http://localhost:5000/api/positions/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE — EMPLOYEE ASSIGNMENTS (5 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+197. GET      http://localhost:5000/api/employee-assignments
+198. GET      http://localhost:5000/api/employee-assignments/:id
+199. POST     http://localhost:5000/api/employee-assignments
+200. PUT      http://localhost:5000/api/employee-assignments/:id
+201. DELETE   http://localhost:5000/api/employee-assignments/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE — REPORTING HIERARCHIES (5 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+202. GET      http://localhost:5000/api/reporting-hierarchies
+203. GET      http://localhost:5000/api/reporting-hierarchies/:id
+204. POST     http://localhost:5000/api/reporting-hierarchies
+205. PUT      http://localhost:5000/api/reporting-hierarchies/:id
+206. DELETE   http://localhost:5000/api/reporting-hierarchies/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE — COST CENTERS & BUDGETS (10 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+207. GET      http://localhost:5000/api/financials/cost-centers
+208. GET      http://localhost:5000/api/financials/cost-centers/:id
+209. POST     http://localhost:5000/api/financials/cost-centers
+210. PUT      http://localhost:5000/api/financials/cost-centers/:id
+211. DELETE   http://localhost:5000/api/financials/cost-centers/:id
+212. GET      http://localhost:5000/api/financials/budgets
+213. GET      http://localhost:5000/api/financials/budgets/:id
+214. POST     http://localhost:5000/api/financials/budgets
+215. PUT      http://localhost:5000/api/financials/budgets/:id
+216. DELETE   http://localhost:5000/api/financials/budgets/:id

@@ -9,6 +9,7 @@ import notificationApi from '../api/notificationApi';
 import NotifMetricsHeader from '../components/NotifMetricsHeader';
 import SendNotificationModal from '../components/SendNotificationModal';
 import { useAuth } from '../../authentication/contexts/AuthContext';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 const glassCard = {
   background: 'var(--glass-bg)',
@@ -22,6 +23,7 @@ const glassCard = {
 export default function NotifDashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [metrics, setMetrics] = useState(null);
   const [recentNotifications, setRecentNotifications] = useState([]);
   const [recentReminders, setRecentReminders] = useState([]);
@@ -36,10 +38,10 @@ export default function NotifDashboardPage() {
   const isManager = userRole.includes('MANAGER');
 
   const getRoleBadge = () => {
-    if (isAdmin) return { label: 'Admin Command', color: '#818cf8', bg: 'rgba(99, 102, 241, 0.15)', border: 'rgba(99, 102, 241, 0.35)' };
-    if (isTech) return { label: 'Technician Desk', color: '#34d399', bg: 'rgba(52, 211, 153, 0.15)', border: 'rgba(52, 211, 153, 0.35)' };
-    if (isManager) return { label: 'Department Dispatch', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.35)' };
-    return { label: 'Requester Portal', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' };
+    if (isAdmin) return { label: t('approval.adminCommand', 'Admin Command'), color: '#818cf8', bg: 'rgba(99, 102, 241, 0.15)', border: 'rgba(99, 102, 241, 0.35)' };
+    if (isTech) return { label: t('approval.technicianDesk', 'Technician Desk'), color: '#34d399', bg: 'rgba(52, 211, 153, 0.15)', border: 'rgba(52, 211, 153, 0.35)' };
+    if (isManager) return { label: t('approval.departmentDispatch', 'Department Dispatch'), color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.35)' };
+    return { label: t('approval.requesterPortal', 'Requester Portal'), color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' };
   };
 
   const roleMeta = getRoleBadge();
@@ -80,9 +82,9 @@ export default function NotifDashboardPage() {
   const allNavCards = [
     {
       id: 'inbox',
-      title: 'Alert Feed & Inbox',
-      desc: 'Personalized broadcast alerts, work assignments, and unread feeds',
-      val: (m.unreadInApp || m.unreadCount || 0) + ' Unread',
+      title: t('notifications.tabs.inbox', 'Alert Feed & Inbox'),
+      desc: t('notifications.inboxTab.subtitle', 'Personalized broadcast alerts, work assignments, and unread feeds'),
+      val: (m.unreadInApp || m.unreadCount || 0) + ' ' + t('notifications.unread', 'Unread'),
       icon: Inbox,
       color: '#6366f1',
       bg: 'rgba(99, 102, 241, 0.15)',
@@ -90,19 +92,19 @@ export default function NotifDashboardPage() {
     },
     {
       id: 'preferences',
-      title: 'Delivery Preferences',
-      desc: 'Configure email vs in-app delivery toggles per operational event',
-      val: 'Custom Channels',
+      title: t('notifications.tabs.preferences', 'Delivery Preferences'),
+      desc: t('notifications.preferencesTab.subtitle', 'Configure email vs in-app delivery toggles per operational event'),
+      val: t('notifications.preferencesTab.title', 'Custom Channels'),
       icon: Sliders,
       color: '#0ea5e9',
       bg: 'rgba(14, 165, 233, 0.15)',
-      route: '/notifications/preferences'
+      route: '/profile?tab=notifications'
     },
     {
       id: 'reminders',
-      title: 'Automated Reminders',
-      desc: 'Scheduled SLA escalation checkpoints and pending task reminders',
-      val: (m.pendingReminders || 0) + ' Scheduled',
+      title: t('notifications.tabs.reminders', 'Automated Reminders'),
+      desc: t('notifications.remindersTab.subtitle', 'Scheduled SLA escalation checkpoints and pending task reminders'),
+      val: (m.pendingReminders || 0) + ' ' + t('notifications.pending', 'Scheduled'),
       icon: Clock,
       color: '#f59e0b',
       bg: 'rgba(245, 158, 11, 0.15)',
@@ -110,9 +112,9 @@ export default function NotifDashboardPage() {
     },
     {
       id: 'templates',
-      title: 'Notification Layouts',
-      desc: 'Mustache HTML email bodies, placeholders, and trigger parameters',
-      val: 'Production Templates',
+      title: t('notifications.tabs.templates', 'Notification Layouts'),
+      desc: t('notifications.templatesTab.subtitle', 'Mustache HTML email bodies, placeholders, and trigger parameters'),
+      val: t('notifications.templatesTab.title', 'Production Templates'),
       icon: BookOpen,
       color: '#10b981',
       bg: 'rgba(16, 185, 129, 0.15)',
@@ -121,9 +123,9 @@ export default function NotifDashboardPage() {
     },
     {
       id: 'log',
-      title: 'Delivery Audit Log',
-      desc: 'Historical SMTP transmission logs, latency traces, and delivery audits',
-      val: (m.emailsDelivered || 0) + ' Delivered',
+      title: t('notifications.tabs.log', 'Delivery Audit Log'),
+      desc: t('notifications.deliveryLogTab.subtitle', 'Historical SMTP transmission logs, latency traces, and delivery audits'),
+      val: (m.emailsDelivered || 0) + ' ' + t('notifications.delivered', 'Delivered'),
       icon: History,
       color: '#8b5cf6',
       bg: 'rgba(139, 92, 246, 0.15)',
@@ -139,7 +141,7 @@ export default function NotifDashboardPage() {
     const now = new Date();
     const date = new Date(d);
     const diffSec = Math.floor((now - date) / 1000);
-    if (diffSec < 60) return 'Just now';
+    if (diffSec < 60) return t('common.justNow', 'Just now');
     if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
     if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -166,7 +168,7 @@ export default function NotifDashboardPage() {
               color: '#4ade80', fontSize: '0.72rem', fontWeight: 700
             }}>
               <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }} />
-              Live Notification Engine
+              {t('notifications.engineBadge', 'Live Notification Engine')}
             </span>
           </div>
 
@@ -175,10 +177,10 @@ export default function NotifDashboardPage() {
             color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px'
           }}>
             <Bell size={32} color="#6366f1" />
-            Alerts & Notification <span style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Operations</span>
+            {t('notifications.title', 'Alerts & Notification')} <span style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('common.operations', 'Operations')}</span>
           </h1>
           <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Real-time SMTP alert transmission, personalized delivery preferences, templates & automated SLA reminders
+            {t('notifications.managementSubtitle', 'Real-time SMTP alert transmission, personalized delivery preferences, templates & automated SLA reminders')}
           </p>
         </div>
 
@@ -203,7 +205,7 @@ export default function NotifDashboardPage() {
               }}
             >
               <Send size={15} />
-              <span>Dispatch / Test Email</span>
+              <span>{t('notifications.sendNotifBtn', 'Dispatch / Test Email')}</span>
             </button>
           )}
 
@@ -229,7 +231,7 @@ export default function NotifDashboardPage() {
             onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
           >
             <RefreshCw size={14} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
-            <span>Refresh</span>
+            <span>{t('common.refresh', 'Refresh')}</span>
           </button>
         </div>
       </div>
@@ -244,7 +246,7 @@ export default function NotifDashboardPage() {
           margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: '8px'
         }}>
           <BarChart2 size={18} color="#6366f1" />
-          Notification Workflows & Functional Centers
+          {t('notifications.workflowsTitle', 'Notification Workflows & Functional Centers')}
         </h2>
 
         <div style={{
@@ -288,7 +290,7 @@ export default function NotifDashboardPage() {
                     color: isHovered ? card.color : 'var(--text-muted)',
                     fontSize: '0.78rem', fontWeight: 700, transition: 'color 0.2s'
                   }}>
-                    <span>Open Module</span>
+                    <span>{t('notifications.openModule', 'Open Module')}</span>
                     <ArrowUpRight size={14} />
                   </div>
                 </div>
@@ -335,10 +337,10 @@ export default function NotifDashboardPage() {
               </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Recent Notifications Stream
+                  {t('notifications.recentStreamTitle', 'Recent Notifications Stream')}
                 </h3>
                 <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                  Latest alerts dispatched to your account
+                  {t('notifications.recentStreamSub', 'Latest alerts dispatched to your account')}
                 </span>
               </div>
             </div>
@@ -352,7 +354,7 @@ export default function NotifDashboardPage() {
                 color: '#818cf8', fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer'
               }}
             >
-              <span>View All</span>
+              <span>{t('notifications.viewAll', 'View All')}</span>
               <ArrowUpRight size={13} />
             </button>
           </div>
@@ -361,7 +363,7 @@ export default function NotifDashboardPage() {
             {loading ? (
               <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)' }}>
                 <RefreshCw size={20} style={{ animation: 'spin 1s linear infinite', margin: '0 auto 8px', color: '#6366f1' }} />
-                <span style={{ fontSize: '0.8rem' }}>Loading alerts...</span>
+                <span style={{ fontSize: '0.8rem' }}>{t('common.loading', 'Loading alerts...')}</span>
               </div>
             ) : recentNotifications.length === 0 ? (
               <div style={{
@@ -370,8 +372,8 @@ export default function NotifDashboardPage() {
                 color: 'var(--text-muted)'
               }}>
                 <Bell size={28} color="rgba(148, 163, 184, 0.3)" style={{ marginBottom: '8px' }} />
-                <div style={{ fontSize: '0.86rem', fontWeight: 600 }}>Your inbox is all clear</div>
-                <div style={{ fontSize: '0.76rem', marginTop: '2px' }}>No pending alerts or notifications.</div>
+                <div style={{ fontSize: '0.86rem', fontWeight: 600 }}>{t('notifications.inboxTab.emptyTitle', 'Your inbox is all clear')}</div>
+                <div style={{ fontSize: '0.76rem', marginTop: '2px' }}>{t('notifications.inboxTab.emptyDesc', 'No pending alerts or notifications.')}</div>
               </div>
             ) : (
               recentNotifications.map((n) => (
@@ -431,10 +433,10 @@ export default function NotifDashboardPage() {
               </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Active Scheduled Reminders
+                  {t('notifications.remindersTab.title', 'Active Scheduled Reminders')}
                 </h3>
                 <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                  Automated SLA alerts & task checkpoints
+                  {t('notifications.remindersTab.subtitle', 'Automated SLA alerts & task checkpoints')}
                 </span>
               </div>
             </div>
@@ -448,7 +450,7 @@ export default function NotifDashboardPage() {
                 color: '#f59e0b', fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer'
               }}
             >
-              <span>View All</span>
+              <span>{t('notifications.viewAll', 'View All')}</span>
               <ArrowUpRight size={13} />
             </button>
           </div>
@@ -457,7 +459,7 @@ export default function NotifDashboardPage() {
             {loading ? (
               <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)' }}>
                 <RefreshCw size={20} style={{ animation: 'spin 1s linear infinite', margin: '0 auto 8px', color: '#f59e0b' }} />
-                <span style={{ fontSize: '0.8rem' }}>Loading reminders...</span>
+                <span style={{ fontSize: '0.8rem' }}>{t('common.loading', 'Loading reminders...')}</span>
               </div>
             ) : recentReminders.length === 0 ? (
               <div style={{
@@ -466,8 +468,8 @@ export default function NotifDashboardPage() {
                 color: 'var(--text-muted)'
               }}>
                 <Clock size={28} color="rgba(148, 163, 184, 0.3)" style={{ marginBottom: '8px' }} />
-                <div style={{ fontSize: '0.86rem', fontWeight: 600 }}>No scheduled reminders</div>
-                <div style={{ fontSize: '0.76rem', marginTop: '2px' }}>Set up reminders for SLA checks or ticket follow-ups.</div>
+                <div style={{ fontSize: '0.86rem', fontWeight: 600 }}>{t('notifications.noReminders', 'No scheduled reminders')}</div>
+                <div style={{ fontSize: '0.76rem', marginTop: '2px' }}>{t('notifications.noRemindersSub', 'Set up reminders for SLA checks or ticket follow-ups.')}</div>
               </div>
             ) : (
               recentReminders.map((r) => {

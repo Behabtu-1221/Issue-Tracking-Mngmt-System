@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import {
   Layers,
   Plus,
@@ -20,12 +22,23 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import serviceCatalogApi from '../api/serviceCatalogApi';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { serviceSchemas } from '../../../validation';
 import { FormField } from '../../../components/common/FormField';
 
 export default function ServicesTab({ categories = [], onServiceUpdated }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user, isParkAdmin, isCompanyAdmin, hasPermission } = usePermissionContext();
+  const roleCode = (user?.userTypeCode || user?.UserTypeCode || (user?.roles && user?.roles[0]?.RoleCode) || '').toUpperCase();
+  const isEmployee = roleCode === 'EMPLOYEE' || (!isParkAdmin && !isCompanyAdmin && !hasPermission('Service.Create'));
+  const canCreateService = !isEmployee && (hasPermission('Service.Create') || isParkAdmin || isCompanyAdmin);
+  const canEditService = !isEmployee && (hasPermission('Service.Update') || isParkAdmin || isCompanyAdmin);
+  const canDeleteService = !isEmployee && (hasPermission('Service.Delete') || isParkAdmin || isCompanyAdmin);
+
   const [internalCategories, setInternalCategories] = useState([]);
   const effectiveCategories = categories.length > 0 ? categories : internalCategories;
   const [services, setServices] = useState([]);
@@ -156,7 +169,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
     const validation = serviceSchemas.serviceOfferingForm(formData, Boolean(editingService));
     if (!validation.isValid) {
       setFieldErrors(validation.errors);
-      setError('Please review and correct the highlighted form fields below.');
+      setError(t('catalog.servicesTab.validationError', 'Please review and correct the highlighted form fields below.'));
       return;
     }
 
@@ -168,10 +181,10 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
 
       if (editingService) {
         await serviceCatalogApi.updateService(editingService.ServiceID, payload);
-        setSuccess(`Service '${payload.ServiceName}' updated successfully.`);
+        setSuccess(t('catalog.servicesTab.updatedSuccess', `Service '${payload.ServiceName}' updated successfully.`, { name: payload.ServiceName }));
       } else {
         await serviceCatalogApi.createService(payload);
-        setSuccess(`Service '${payload.ServiceName}' created successfully.`);
+        setSuccess(t('catalog.servicesTab.createdSuccess', `Service '${payload.ServiceName}' created successfully.`, { name: payload.ServiceName }));
       }
 
       setModalOpen(false);
@@ -188,23 +201,23 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
   const handleDelete = (id, name) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Decommission Service Offering',
-      message: `Are you sure you want to delete service offering '${name}'? Existing issue requests will retain their service records.`,
+      title: t('catalog.servicesTab.decommissionTitle', 'Decommission Service Offering'),
+      message: t('catalog.servicesTab.decommissionMessage', `Are you sure you want to delete service offering '${name}'? Existing issue requests will retain their service records.`, { name }),
       type: 'danger',
-      confirmText: 'Delete Service',
+      confirmText: t('catalog.servicesTab.deleteBtn', 'Delete Service'),
       onConfirm: async () => {
         try {
           setError(null);
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
           await serviceCatalogApi.deleteService(id);
-          setSuccess(`Service offering '${name}' deleted successfully.`);
+          setSuccess(t('catalog.servicesTab.deletedSuccess', `Service offering '${name}' deleted successfully.`, { name }));
           fetchServices();
           if (onServiceUpdated) onServiceUpdated();
           setTimeout(() => setSuccess(null), 4000);
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete service';
           setError(msg);
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('catalog.servicesTab.actionRestricted', 'Action Restricted'), msg, 'error');
         }
       }
     });
@@ -219,7 +232,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
             <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search services by name, code, description..."
+              placeholder={t('catalog.servicesTab.searchPlaceholder', 'Search services by name...')}
               value={search}
               onChange={handleSearchChange}
               style={{
@@ -248,7 +261,9 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                 fontSize: '0.9rem'
               }}
             >
-              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Categories</option>
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                {t('catalog.servicesTab.allCategories', 'All Categories')}
+              </option>
               {effectiveCategories.map((c) => (
                 <option key={c.ServiceCategoryID} value={c.ServiceCategoryID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                   {c.CategoryName}
@@ -258,25 +273,27 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
           </div>
         </div>
 
-        <button
-          onClick={() => handleOpenModal()}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 20px',
-            background: 'var(--accent-gradient)',
-            border: 'none',
-            borderRadius: 'var(--border-radius-sm)',
-            color: '#fff',
-            fontWeight: '600',
-            cursor: 'pointer',
-            boxShadow: 'var(--shadow-lg)'
-          }}
-        >
-          <Plus size={18} />
-          Create Service Offering
-        </button>
+        {canCreateService && (
+          <button
+            onClick={() => handleOpenModal()}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              background: 'var(--accent-gradient)',
+              border: 'none',
+              borderRadius: 'var(--border-radius-sm)',
+              color: '#fff',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-lg)'
+            }}
+          >
+            <Plus size={18} />
+            {t('catalog.servicesTab.createServiceBtn', 'Create Service Offering')}
+          </button>
+        )}
       </div>
 
       {/* Notifications */}
@@ -293,24 +310,24 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
 
       {/* Table / List View */}
       {loading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading services catalog...</div>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          {t('catalog.servicesTab.loadingServices', 'Loading services catalog...')}
+        </div>
       ) : services.length === 0 ? (
         <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-          No service offerings found matching criteria. Click "Create Service Offering" to add one.
+          {t('catalog.servicesTab.noServicesFound', 'No service offerings found matching criteria. Click "Create Service Offering" to add one.')}
         </div>
       ) : (
         <div className="glass-panel" style={{ overflowX: 'auto' }}>
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Service Offering</th>
-                <th>Category</th>
-                <th>Service Type / Level</th>
-                <th>Est. Cost</th>
-                <th>Billing Model</th>
-                <th>Requirements</th>
-                <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>{t('catalog.servicesTab.thOffering', 'Service Offering')}</th>
+                <th>{t('catalog.servicesTab.thCategory', 'Category')}</th>
+                <th>{t('catalog.servicesTab.thTypeLevel', 'Service Type / Level')}</th>
+                <th>{t('catalog.servicesTab.thEstCost', 'Est. Cost')}</th>
+                <th>{t('catalog.servicesTab.thStatus', 'Status')}</th>
+                <th style={{ textAlign: 'right' }}>{t('catalog.servicesTab.thActions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -333,36 +350,14 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
 
                   <td>
                     <div style={{ fontSize: '0.85rem' }}>
-                      <div>{svc.ServiceTypeName || 'Standard Service'}</div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{svc.ServiceLevelName || 'Default SLA'}</span>
+                      <div>{svc.ServiceTypeName || t('catalog.servicesTab.standardService', 'Standard Service')}</div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{svc.ServiceLevelName || t('catalog.servicesTab.defaultSla', 'Default SLA')}</span>
                     </div>
                   </td>
 
                   <td>
                     <div style={{ fontWeight: '600', color: '#10b981', fontSize: '0.9rem' }}>
-                      {Number(svc.EstimatedCost) > 0 ? `${svc.EstimatedCost} ${svc.CurrencyCode}` : 'Free / Included'}
-                    </div>
-                  </td>
-
-                  <td>
-                    <span
-                      style={{
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        fontSize: '0.75rem',
-                        fontWeight: '600',
-                        backgroundColor: svc.BillingType === 'BILLABLE' ? 'rgba(14, 165, 233, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                        color: svc.BillingType === 'BILLABLE' ? '#0ea5e9' : 'var(--text-secondary)'
-                      }}
-                    >
-                      {svc.PricingModel || 'FLAT_RATE'} ({svc.BillingType || 'NON_BILLABLE'})
-                    </span>
-                  </td>
-
-                  <td>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                      <div>Form Fields: <strong>{svc.RequirementCount || 0}</strong></div>
-                      <div>Attachments: <strong>{svc.AttachmentRequirementCount || 0}</strong></div>
+                      {Number(svc.EstimatedCost) > 0 ? `${svc.EstimatedCost} ${svc.CurrencyCode}` : t('catalog.servicesTab.freeIncluded', 'Free / Included')}
                     </div>
                   </td>
 
@@ -381,55 +376,45 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                       }}
                     >
                       {svc.IsActive ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
-                      {svc.IsActive ? 'Active' : 'Inactive'}
+                      {svc.IsActive ? t('catalog.servicesTab.active', 'Active') : t('catalog.servicesTab.inactive', 'Inactive')}
                     </span>
                   </td>
 
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: '8px' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="neutral"
                         onClick={() => handleOpenDetail(svc)}
-                        title="View Details"
-                        style={{
-                          padding: '6px',
-                          borderRadius: 'var(--border-radius-sm)',
-                          border: '1px solid var(--glass-border)',
-                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                          color: 'var(--text-secondary)',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Eye size={15} />
-                      </button>
-                      <button
-                        onClick={() => handleOpenModal(svc)}
-                        title="Edit Service"
-                        style={{
-                          padding: '6px',
-                          borderRadius: 'var(--border-radius-sm)',
-                          border: '1px solid var(--glass-border)',
-                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                          color: 'var(--text-secondary)',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Edit2 size={15} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(svc.ServiceID, svc.ServiceName)}
-                        title="Delete Service"
-                        style={{
-                          padding: '6px',
-                          borderRadius: 'var(--border-radius-sm)',
-                          border: '1px solid rgba(239, 68, 68, 0.3)',
-                          backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                          color: '#ef4444',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
+                        title={t('catalog.servicesTab.viewDetails', 'View Details')}
+                        icon={<Eye size={14} />}
+                      />
+
+                      {isEmployee && (
+                        <ActionButton
+                          variant="success"
+                          label={t('catalog.requestBtn', 'Request')}
+                          onClick={() => navigate(`/issues/create?serviceId=${svc.ServiceID}`)}
+                          title={t('catalog.requestThisService', 'Request This Service')}
+                          icon={<Plus size={13} />}
+                        />
+                      )}
+
+                      {canEditService && (
+                        <ActionButton
+                          variant="edit"
+                          onClick={() => handleOpenModal(svc)}
+                          title={t('catalog.servicesTab.editService', 'Edit Service')}
+                        />
+                      )}
+
+                      {canDeleteService && (
+                        <ActionButton
+                          variant="delete"
+                          onClick={() => handleDelete(svc.ServiceID, svc.ServiceName)}
+                          title={t('catalog.servicesTab.deleteService', 'Delete Service')}
+                        />
+                      )}
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -473,36 +458,57 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.9rem' }}>
               <div style={{ padding: '14px', borderRadius: 'var(--border-radius-sm)', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--glass-border)' }}>
-                <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>Description</strong>
-                <p style={{ margin: 0, color: 'var(--text-primary)' }}>{selectedService.Description || 'No description provided.'}</p>
+                <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  {t('catalog.servicesTab.description', 'Description')}
+                </strong>
+                <p style={{ margin: 0, color: 'var(--text-primary)' }}>{selectedService.Description || t('catalog.servicesTab.noDescription', 'No description provided.')}</p>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div style={{ padding: '12px', borderRadius: 'var(--border-radius-sm)', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--glass-border)' }}>
-                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>Category</strong>
+                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    {t('catalog.servicesTab.categoryLabel', 'Category')}
+                  </strong>
                   <span style={{ color: 'var(--text-primary)' }}>{selectedService.CategoryName}</span>
                 </div>
                 <div style={{ padding: '12px', borderRadius: 'var(--border-radius-sm)', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--glass-border)' }}>
-                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>Estimated Cost</strong>
-                  <span style={{ color: '#10b981', fontWeight: '600' }}>{Number(selectedService.EstimatedCost) > 0 ? `${selectedService.EstimatedCost} ${selectedService.CurrencyCode}` : 'Free / Included'}</span>
+                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    {t('catalog.servicesTab.estCostLabel', 'Estimated Cost')}
+                  </strong>
+                  <span style={{ color: '#10b981', fontWeight: '600' }}>
+                    {Number(selectedService.EstimatedCost) > 0 ? `${selectedService.EstimatedCost} ${selectedService.CurrencyCode}` : t('catalog.servicesTab.freeIncluded', 'Free / Included')}
+                  </span>
                 </div>
                 <div style={{ padding: '12px', borderRadius: 'var(--border-radius-sm)', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--glass-border)' }}>
-                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>Service Type</strong>
-                  <span style={{ color: 'var(--text-primary)' }}>{selectedService.ServiceTypeName || 'Standard'}</span>
+                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    {t('catalog.servicesTab.serviceType', 'Service Type')}
+                  </strong>
+                  <span style={{ color: 'var(--text-primary)' }}>{selectedService.ServiceTypeName || t('catalog.servicesTab.standardService', 'Standard Service')}</span>
                 </div>
                 <div style={{ padding: '12px', borderRadius: 'var(--border-radius-sm)', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--glass-border)' }}>
-                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>Service Level</strong>
-                  <span style={{ color: 'var(--text-primary)' }}>{selectedService.ServiceLevelName || 'Default SLA'}</span>
+                  <strong style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    {t('catalog.servicesTab.serviceLevel', 'Service Level')}
+                  </strong>
+                  <span style={{ color: 'var(--text-primary)' }}>{selectedService.ServiceLevelName || t('catalog.servicesTab.defaultSla', 'Default SLA')}</span>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
               <button
                 onClick={() => setDetailModalOpen(false)}
-                style={{ padding: '10px 20px', borderRadius: 'var(--border-radius-sm)', border: 'none', background: 'var(--accent-gradient)', color: '#fff', fontWeight: '600', cursor: 'pointer' }}
+                style={{ padding: '10px 20px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', fontWeight: '600', cursor: 'pointer' }}
               >
-                Close Details
+                {t('catalog.servicesTab.close', 'Close')}
+              </button>
+              <button
+                onClick={() => {
+                  setDetailModalOpen(false);
+                  navigate(`/issues/create?serviceId=${selectedService.ServiceID}`);
+                }}
+                style={{ padding: '10px 20px', borderRadius: 'var(--border-radius-sm)', border: 'none', background: 'var(--accent-gradient)', color: '#fff', fontWeight: '700', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Plus size={16} /> {t('catalog.requestThisService', 'Request This Service')}
               </button>
             </div>
           </div>
@@ -510,7 +516,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
       )}
 
       {/* Modal Create/Edit */}
-      {modalOpen && (
+      {modalOpen && (canCreateService || canEditService) && (
         <div
           style={{
             position: 'fixed',
@@ -563,10 +569,10 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                 </div>
                 <div>
                   <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>
-                    {editingService ? 'Edit Service Offering' : 'Create Service Offering'}
+                    {editingService ? t('catalog.servicesTab.editTitle', 'Edit Service Offering') : t('catalog.servicesTab.createTitle', 'Create Service Offering')}
                   </h2>
                   <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    Define catalog service specifications, classification, and pricing
+                    {t('catalog.servicesTab.formSubtitle', 'Define catalog service specifications and classification')}
                   </p>
                 </div>
               </div>
@@ -590,7 +596,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
               {/* Category & Service Code */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <FormField
-                  label="Category"
+                  label={t('catalog.servicesTab.categoryLabel', 'Category')}
                   id="ServiceCategoryID"
                   required
                   icon={Layers}
@@ -608,7 +614,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                       fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
                     }}
                   >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Category</option>
+                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('catalog.servicesTab.selectCategory', 'Select Category')}</option>
                     {effectiveCategories.map((c) => (
                       <option key={c.ServiceCategoryID} value={c.ServiceCategoryID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                         📂 {c.CategoryName}
@@ -618,12 +624,12 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                 </FormField>
 
                 <FormField
-                  label="Service Code"
+                  label={t('catalog.servicesTab.codeLabel', 'Service Code')}
                   id="ServiceCode"
                   required
                   icon={Tag}
                   error={fieldErrors.ServiceCode}
-                  helpText={editingService ? 'Service codes are immutable once created.' : 'Uppercase code e.g. SVC-HVAC-01'}
+                  helpText={editingService ? t('catalog.servicesTab.codeHelpImmutable', 'Service codes are immutable once created.') : t('catalog.servicesTab.codeHelp', 'Uppercase code e.g. SVC-HVAC-01')}
                 >
                   <input
                     id="ServiceCode"
@@ -647,7 +653,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
 
               {/* Service Name */}
               <FormField
-                label="Service Title / Name"
+                label={t('catalog.servicesTab.nameLabel', 'Service Title / Name')}
                 id="ServiceName"
                 required
                 icon={Sparkles}
@@ -656,7 +662,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                 <input
                   id="ServiceName"
                   type="text"
-                  placeholder="e.g. HVAC Repair & Climate Maintenance"
+                  placeholder={t('catalog.servicesTab.namePlaceholder', 'e.g. HVAC Repair & Climate Maintenance')}
                   value={formData.ServiceName}
                   onChange={(e) => handleFieldChange('ServiceName', e.target.value)}
                   style={{
@@ -672,7 +678,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
               {/* Estimated Cost & Currency */}
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
                 <FormField
-                  label="Estimated Unit Cost"
+                  label={t('catalog.servicesTab.estCostLabel', 'Estimated Unit Cost')}
                   id="EstimatedCost"
                   icon={DollarSign}
                   error={fieldErrors.EstimatedCost}
@@ -696,7 +702,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                 </FormField>
 
                 <FormField
-                  label="Currency"
+                  label={t('catalog.servicesTab.currencyLabel', 'Currency')}
                   id="CurrencyCode"
                   icon={Globe}
                   error={fieldErrors.CurrencyCode}
@@ -722,16 +728,16 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
 
               {/* Description */}
               <FormField
-                label="Detailed Service Scope & Description"
+                label={t('catalog.servicesTab.scopeLabel', 'Detailed Service Scope & Description')}
                 id="Description"
                 icon={FileText}
                 error={fieldErrors.Description}
-                helpText="Explain what is covered in this service (up to 1000 characters)."
+                helpText={t('catalog.servicesTab.scopeHelp', 'Explain what is covered in this service (up to 1000 characters).')}
               >
                 <textarea
                   id="Description"
                   rows={3}
-                  placeholder="Provide comprehensive details about what is included in this service offering..."
+                  placeholder={t('catalog.servicesTab.scopePlaceholder', 'Provide comprehensive details about what is included in this service offering...')}
                   value={formData.Description}
                   onChange={(e) => handleFieldChange('Description', e.target.value)}
                   style={{
@@ -751,7 +757,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                   fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px'
                 }}>
-                  <ShieldCheck size={14} color="var(--accent-primary)" /> Availability Status
+                  <ShieldCheck size={14} color="var(--accent-primary)" /> {t('catalog.servicesTab.availabilityStatus', 'Availability Status')}
                 </label>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -766,7 +772,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <CheckCircle2 size={16} color={Number(formData.IsActive) === 1 ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Published & Active</span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t('catalog.servicesTab.publishedActive', 'Published & Active')}</span>
                     </div>
                   </div>
 
@@ -781,7 +787,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <XCircle size={16} color={Number(formData.IsActive) === 0 ? '#fbbf24' : 'var(--text-muted)'} />
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Draft / Inactive</span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t('catalog.servicesTab.draftInactive', 'Draft / Inactive')}</span>
                     </div>
                   </div>
                 </div>
@@ -801,7 +807,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                     color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer'
                   }}
                 >
-                  Cancel
+                  {t('catalog.servicesTab.cancel', 'Cancel')}
                 </button>
 
                 <button
@@ -815,7 +821,7 @@ export default function ServicesTab({ categories = [], onServiceUpdated }) {
                   }}
                 >
                   {submitting && <RefreshCw size={14} className="spin" />}
-                  {submitting ? 'Saving Service...' : editingService ? 'Update Service' : 'Create Service Offering'}
+                  {submitting ? t('catalog.servicesTab.saving', 'Saving Service...') : editingService ? t('catalog.servicesTab.updateBtn', 'Update Service') : t('catalog.servicesTab.createBtn', 'Create Service Offering')}
                 </button>
               </div>
             </form>

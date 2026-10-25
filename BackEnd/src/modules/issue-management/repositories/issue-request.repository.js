@@ -54,8 +54,8 @@ export const issueRequestRepository = {
       SELECT ir.*,
         CAST(ir.RowVersion AS CHAR) AS RowVersion,
         t.CompanyName AS TenantName,
-        s.ServiceName,
-        sc.CategoryName,
+        COALESCE(s.ServiceName, 'General Request') AS ServiceName,
+        COALESCE(sc.CategoryName, ir.CategoryCode, 'General') AS CategoryName,
         CONCAT(u.FirstName, ' ', u.LastName) AS RequesterName,
         u.Email AS RequesterEmail,
         b.BuildingName,
@@ -65,8 +65,8 @@ export const issueRequestRepository = {
         res.ResolutionID
       FROM IssueRequest ir
       LEFT JOIN Tenant t ON ir.TenantID = t.TenantID
-      JOIN Service s ON ir.ServiceID = s.ServiceID
-      JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
+      LEFT JOIN Service s ON ir.ServiceID = s.ServiceID
+      LEFT JOIN ServiceCategory sc ON (s.ServiceCategoryID = sc.ServiceCategoryID OR (ir.ServiceID IS NULL AND ir.CategoryCode = sc.CategoryCode))
       JOIN \`User\` u ON ir.RequesterUserID = u.UserID
       LEFT JOIN Building b ON ir.BuildingID = b.BuildingID
       LEFT JOIN OfficeSpace os ON ir.OfficeSpaceID = os.OfficeSpaceID
@@ -168,10 +168,10 @@ export const issueRequestRepository = {
       SELECT ir.*,
         CAST(ir.RowVersion AS CHAR) AS RowVersion,
         t.CompanyName AS TenantName,
-        s.ServiceName,
+        COALESCE(s.ServiceName, 'General Request') AS ServiceName,
         s.ServiceCode,
-        sc.CategoryName,
-        sc.CategoryCode,
+        COALESCE(sc.CategoryName, ir.CategoryCode, 'General') AS CategoryName,
+        COALESCE(sc.CategoryCode, ir.CategoryCode) AS CategoryCode,
         CONCAT(u.FirstName, ' ', u.LastName) AS RequesterName,
         u.Email AS RequesterEmail,
         b.BuildingName,
@@ -193,8 +193,8 @@ export const issueRequestRepository = {
         CONCAT(ru.FirstName, ' ', ru.LastName) AS ResolverName
       FROM IssueRequest ir
       LEFT JOIN Tenant t ON ir.TenantID = t.TenantID
-      JOIN Service s ON ir.ServiceID = s.ServiceID
-      JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
+      LEFT JOIN Service s ON ir.ServiceID = s.ServiceID
+      LEFT JOIN ServiceCategory sc ON (s.ServiceCategoryID = sc.ServiceCategoryID OR (ir.ServiceID IS NULL AND ir.CategoryCode = sc.CategoryCode))
       JOIN \`User\` u ON ir.RequesterUserID = u.UserID
       LEFT JOIN Building b ON ir.BuildingID = b.BuildingID
       LEFT JOIN OfficeSpace os ON ir.OfficeSpaceID = os.OfficeSpaceID
@@ -251,7 +251,7 @@ export const issueRequestRepository = {
     const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
     const result = await runner(sql, [
       data.TenantID ?? null,
-      data.ServiceID,
+      data.ServiceID ? Number(data.ServiceID) : null,
       requestNumber,
       data.Title,
       data.Description,

@@ -13,10 +13,14 @@ import parkApi from '../../business-park/api/parkApi';
 import identityApi from '../../identity-access/api/identityApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { FormField } from '../../../components/common/FormField';
 import { orgSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
+  const { t } = useTranslation();
   const [departments, setDepartments] = useState([]);
   const [parks, setParks] = useState([]);
   const [users, setUsers] = useState([]);
@@ -255,7 +259,7 @@ export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search by department name or code..."
+              placeholder={t('organization.departmentsTab.searchPlaceholder', 'Search by department name or code...')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -287,26 +291,26 @@ export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> Add Department
+          <Plus size={16} /> {t('organization.departmentsTab.addDeptBtn', 'Add Department')}
         </button>
       </div>
 
       {/* Directory Table */}
       <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading departments...</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.loadingDepartments', 'Loading departments...')}</div>
         ) : departments.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No departments found matching criteria.</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.noDepartmentsFound', 'No departments found matching criteria.')}</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
             <thead>
               <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                <th style={{ padding: '16px 20px' }}>Department Name & Code</th>
-                <th style={{ padding: '16px 20px' }}>Business Park</th>
-                <th style={{ padding: '16px 20px' }}>Department Manager</th>
-                <th style={{ padding: '16px 20px' }}>Teams / Staff</th>
-                <th style={{ padding: '16px 20px' }}>Locations</th>
-                <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '16px 20px' }}>{t('organization.departmentsTab.thDeptName', 'Department Name & Code')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('organization.departmentsTab.thCampus', 'Business Park')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('organization.departmentsTab.thManager', 'Department Manager')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('organization.departmentsTab.thTeamsStaff', 'Teams / Staff')}</th>
+                <th style={{ padding: '16px 20px' }}>{t('organization.departmentsTab.thLocations', 'Locations')}</th>
+                <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('organization.departmentsTab.thActions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -357,20 +361,18 @@ export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
                     </button>
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="edit"
                         onClick={() => handleOpenDeptEdit(d)}
-                        style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
+                        title={t('common.edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDeptDelete(d.DepartmentID, d.DepartmentName)}
-                        style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                        title={t('common.delete')}
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -381,207 +383,189 @@ export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
 
       {/* Modal: Create/Edit Department */}
       {isDeptModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <Building2 color="var(--accent-primary)" />
-              {editingDept ? 'Edit Department' : 'Add Department'}
-            </h2>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
+        <ModalCard
+          isOpen={isDeptModalOpen}
+          onClose={() => setIsDeptModalOpen(false)}
+          title={editingDept ? t('organization.departmentsTab.editModalTitle', 'Edit Department') : t('organization.departmentsTab.createModalTitle', 'Add Department')}
+          subtitle={t('organization.departmentsTab.departmentDetails', 'Configure organizational division metadata')}
+          icon={Building2}
+          accentStrip="brand"
+          maxWidth="540px"
+          error={errorMsg}
+          onSubmit={handleDeptSubmit}
+          submitText={t('organization.departmentsTab.saveBtn', 'Save Department')}
+          cancelText={t('common.cancel', 'Cancel')}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('organization.departmentsTab.businessParkLabel', 'Business Park Name')}</label>
+              <div style={{ width: '100%', padding: '10px 14px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.25)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.88rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Building2 size={16} color="var(--accent-primary)" />
+                {parks.length > 0
+                  ? `${parks[0].BusinessParkName} (${parks[0].BusinessParkCode})`
+                  : 'Loading...'}
               </div>
-            )}
+            </div>
 
-            <form onSubmit={handleDeptSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Business Park Name</label>
-                <div style={{ width: '100%', padding: '10px 14px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.25)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.88rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Building2 size={16} color="var(--accent-primary)" />
-                  {parks.length > 0
-                    ? `${parks[0].BusinessParkName} (${parks[0].BusinessParkCode})`
-                    : 'Loading...'}
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
-                <FormField
-                  label="Code"
-                  required
-                  error={deptErrors.DepartmentCode}
-                  icon={Building2}
-                  hint="Format: DEPT-01"
-                >
-                  <input
-                    type="text"
-                    placeholder="e.g. DEPT-IT"
-                    value={deptForm.DepartmentCode}
-                    onChange={(e) => {
-                      setDeptForm({ ...deptForm, DepartmentCode: e.target.value });
-                      clearDeptError('DepartmentCode');
-                    }}
-                    style={{
-                      width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                      border: `1px solid ${deptErrors.DepartmentCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
-                </FormField>
-
-                <FormField
-                  label="Department Name"
-                  required
-                  error={deptErrors.DepartmentName}
-                  icon={Building2}
-                >
-                  <input
-                    type="text"
-                    placeholder="e.g. Information Technology"
-                    value={deptForm.DepartmentName}
-                    onChange={(e) => {
-                      setDeptForm({ ...deptForm, DepartmentName: e.target.value });
-                      clearDeptError('DepartmentName');
-                    }}
-                    style={{
-                      width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                      border: `1px solid ${deptErrors.DepartmentName ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
-                </FormField>
-              </div>
-
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
               <FormField
-                label="Department Manager (Optional)"
-                error={deptErrors.ManagerUserID}
-                icon={UserCheck}
+                label={t('organization.departmentsTab.deptCodeLabel', 'Code')}
+                required
+                error={deptErrors.DepartmentCode}
+                icon={Building2}
+                hint="Format: DEPT-01"
               >
-                <select
-                  value={deptForm.ManagerUserID}
+                <input
+                  type="text"
+                  placeholder="e.g. DEPT-IT"
+                  value={deptForm.DepartmentCode}
                   onChange={(e) => {
-                    setDeptForm({ ...deptForm, ManagerUserID: e.target.value });
-                    clearDeptError('ManagerUserID');
+                    setDeptForm({ ...deptForm, DepartmentCode: e.target.value });
+                    clearDeptError('DepartmentCode');
                   }}
+                  className={`enterprise-input ${deptErrors.DepartmentCode ? 'input-error' : ''}`}
                   style={{
                     width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                    border: '1px solid var(--glass-border)', borderRadius: '8px',
-                    color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                    border: `1px solid ${deptErrors.DepartmentCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
                   }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Manager Assigned --</option>
-                  {users.map((u) => (
-                    <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
-                    </option>
-                  ))}
-                </select>
+                />
               </FormField>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsDeptModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '8px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Save Department
-                </button>
-              </div>
-            </form>
+              <FormField
+                label={t('organization.departmentsTab.deptNameLabel', 'Department Name')}
+                required
+                error={deptErrors.DepartmentName}
+                icon={Building2}
+              >
+                <input
+                  type="text"
+                  placeholder="e.g. Information Technology"
+                  value={deptForm.DepartmentName}
+                  onChange={(e) => {
+                    setDeptForm({ ...deptForm, DepartmentName: e.target.value });
+                    clearDeptError('DepartmentName');
+                  }}
+                  className={`enterprise-input ${deptErrors.DepartmentName ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                    border: `1px solid ${deptErrors.DepartmentName ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                  }}
+                />
+              </FormField>
+            </div>
+
+            <FormField
+              label={t('organization.departmentsTab.managerLabel', 'Department Manager (Optional)')}
+              error={deptErrors.ManagerUserID}
+              icon={UserCheck}
+            >
+              <select
+                value={deptForm.ManagerUserID}
+                onChange={(e) => {
+                  setDeptForm({ ...deptForm, ManagerUserID: e.target.value });
+                  clearDeptError('ManagerUserID');
+                }}
+                className={`enterprise-input ${deptErrors.ManagerUserID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: '8px',
+                  color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Manager Assigned --</option>
+                {users.map((u) => (
+                  <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
+                  </option>
+                ))}
+              </select>
+            </FormField>
           </div>
-        </div>
+        </ModalCard>
       )}
 
       {/* Modal: Department Office Space Location Mappings */}
       {locationModalDept && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '560px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-                <MapPin color="var(--accent-primary)" />
-                Office Spaces for {locationModalDept.DepartmentName}
-              </h2>
-              <button
-                onClick={() => setLocationModalDept(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '1.5rem', cursor: 'pointer' }}
-              >
-                ×
-              </button>
-            </div>
+        <ModalCard
+          isOpen={!!locationModalDept}
+          onClose={() => setLocationModalDept(null)}
+          title={`Office Spaces for ${locationModalDept.DepartmentName}`}
+          subtitle="Map physical business park offices and rooms to this operational department"
+          icon={MapPin}
+          accentStrip="purple"
+          maxWidth="580px"
+          cancelText={t('common.close', 'Close')}
+        >
+          {/* Map new office space form */}
+          <form onSubmit={handleAddLocation} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+            <FormField
+              label="Select Office Space"
+              required
+              error={locationError}
+              icon={MapPin}
+            >
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <select
+                  value={selectedOfficeId}
+                  onChange={(e) => {
+                    setSelectedOfficeId(e.target.value);
+                    if (locationError) setLocationError('');
+                  }}
+                  className={`enterprise-input ${locationError ? 'input-error' : ''}`}
+                  style={{
+                    flex: 1, padding: '10px 12px', background: 'var(--bg-tertiary)',
+                    border: `1px solid ${locationError ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none'
+                  }}
+                >
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Office Space to Map</option>
+                  {offices.map((o) => (
+                    <option key={o.OfficeSpaceID} value={o.OfficeSpaceID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      Office {o.OfficeNumber} - {o.OfficeName} ({o.SquareMeters} m²)
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="btn btn-primary touch-target-sm"
+                  style={{ whiteSpace: 'nowrap' }}
+                >
+                  Map Office
+                </button>
+              </div>
+            </FormField>
+          </form>
 
-            {/* Map new office space form */}
-            <form onSubmit={handleAddLocation} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-              <FormField
-                label="Select Office Space"
-                required
-                error={locationError}
-                icon={MapPin}
-              >
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <select
-                    value={selectedOfficeId}
-                    onChange={(e) => {
-                      setSelectedOfficeId(e.target.value);
-                      if (locationError) setLocationError('');
-                    }}
-                    style={{
-                      flex: 1, padding: '10px 12px', background: 'var(--bg-tertiary)',
-                      border: `1px solid ${locationError ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Office Space to Map</option>
-                    {offices.map((o) => (
-                      <option key={o.OfficeSpaceID} value={o.OfficeSpaceID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        Office {o.OfficeNumber} - {o.OfficeName} ({o.SquareMeters} m²)
-                      </option>
-                    ))}
-                  </select>
+          {/* Current Office mappings list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '300px', overflowY: 'auto' }}>
+            {deptLocations.length === 0 ? (
+              <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                No office spaces currently mapped to this department.
+              </div>
+            ) : (
+              deptLocations.map((loc) => (
+                <div key={loc.DepartmentLocationID} className="glass-card" style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px' }}>
+                  <div>
+                    <div style={{ fontWeight: '600', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+                      Office {loc.OfficeNumber} ({loc.OfficeName})
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      {loc.BuildingName} • {loc.FloorName} ({loc.SquareMeters} m²)
+                    </div>
+                  </div>
                   <button
-                    type="submit"
-                    style={{ padding: '10px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '8px', color: '#ffffff', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    onClick={() => handleRemoveLocation(loc.DepartmentLocationID)}
+                    style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', color: '#f87171', cursor: 'pointer', fontSize: '0.78rem' }}
                   >
-                    Map Office
+                    Remove
                   </button>
                 </div>
-              </FormField>
-            </form>
-
-            {/* Current Office mappings list */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '300px', overflowY: 'auto' }}>
-              {deptLocations.length === 0 ? (
-                <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                  No office spaces currently mapped to this department.
-                </div>
-              ) : (
-                deptLocations.map((loc) => (
-                  <div key={loc.DepartmentLocationID} className="glass-card" style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
-                        Office {loc.OfficeNumber} ({loc.OfficeName})
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                        {loc.BuildingName} • {loc.FloorName} ({loc.SquareMeters} m²)
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveLocation(loc.DepartmentLocationID)}
-                      style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer', fontSize: '0.78rem' }}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
+              ))
+            )}
           </div>
-        </div>
+        </ModalCard>
       )}
 
       {/* Glass Modals */}

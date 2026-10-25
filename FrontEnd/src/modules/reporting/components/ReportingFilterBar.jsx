@@ -50,7 +50,7 @@ export default function ReportingFilterBar({
 
   return (
     <div className="glass-panel" style={{
-      padding: '18px 22px',
+      padding: 'clamp(12px, 2vw, 18px) clamp(14px, 2.5vw, 22px)',
       borderRadius: '16px',
       marginBottom: '24px',
       display: 'flex',
@@ -73,7 +73,8 @@ export default function ReportingFilterBar({
                   type="button"
                   onClick={() => handlePresetClick(p.id)}
                   style={{
-                    padding: '5px 13px',
+                    padding: '6px 13px',
+                    minHeight: '34px',
                     borderRadius: '20px',
                     fontSize: '0.78rem',
                     fontWeight: 700,
@@ -104,6 +105,7 @@ export default function ReportingFilterBar({
                 alignItems: 'center',
                 gap: '6px',
                 padding: '6px 12px',
+                minHeight: '34px',
                 fontSize: '0.78rem',
                 borderRadius: '10px',
                 fontWeight: 600
@@ -151,7 +153,7 @@ export default function ReportingFilterBar({
       )}
 
       {/* Selectors Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', alignItems: 'flex-end' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: '12px', alignItems: 'flex-end' }}>
         {/* Tenant Filter (Park Admins only) */}
         {isParkAdmin && (
           <div>

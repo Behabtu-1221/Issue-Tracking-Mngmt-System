@@ -108,19 +108,12 @@ export default function TechnicianDashboardPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '32px' }}>
       {/* ── HEADER BANNER ── */}
-      <div className="glass-panel" style={{
-        padding: '24px 28px',
+      <div className="glass-panel p-4 sm:p-6 lg:p-7 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4" style={{
         background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.12) 0%, rgba(59, 130, 246, 0.12) 100%)',
-        borderRadius: '16px',
-        border: '1px solid rgba(147, 51, 234, 0.25)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '16px'
+        border: '1px solid rgba(147, 51, 234, 0.25)'
       }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+          <div className="flex items-center gap-2 mb-1.5">
             <span style={{
               padding: '3px 10px', borderRadius: '12px',
               background: 'var(--accent-gradient)', color: '#ffffff',
@@ -129,19 +122,19 @@ export default function TechnicianDashboardPage() {
               {t('technician.workbench', 'Field Operations Workbench')}
             </span>
           </div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[var(--text-primary)] m-0">
             {t('technician.welcomeBack', 'Welcome Back')}, <span className="glow-text">{fName}</span>
           </h1>
-          <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+          <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
             {t('technician.deskSubtitle', 'Track assigned service requests, record technical diagnostics, and resolve field dispatches.')}
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto">
           <button
             onClick={fetchDashboardData}
+            className="touch-target-sm flex items-center justify-center gap-2"
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
               padding: '8px 16px', borderRadius: 'var(--border-radius-sm)',
               background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
               color: 'var(--text-primary)', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer'
@@ -151,8 +144,8 @@ export default function TechnicianDashboardPage() {
           </button>
           <button
             onClick={() => navigate('/technician/assigned')}
+            className="touch-target-sm flex items-center justify-center gap-2"
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
               padding: '8px 18px', borderRadius: 'var(--border-radius-sm)',
               background: 'var(--accent-gradient)', border: 'none',
               color: '#ffffff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer',
@@ -165,7 +158,7 @@ export default function TechnicianDashboardPage() {
       </div>
 
       {/* ── KPI CARDS GRID ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
         {[
           { label: t('technician.assignedWorkload', 'Assigned Requests'), count: metrics.assigned, icon: Wrench, color: '#c084fc', path: '/technician/assigned' },
           { label: t('technician.newAssignments', 'New Assignments'), count: metrics.newAssignments, icon: Sparkles, color: '#60a5fa', path: '/technician/assigned' },
@@ -181,8 +174,8 @@ export default function TechnicianDashboardPage() {
               className="glass-panel"
               onClick={() => navigate(card.path)}
               style={{
-                padding: '18px 20px', borderRadius: '14px', cursor: 'pointer',
-                transition: 'all 0.2s ease', display: 'flex', flexDirection: 'column', gap: '10px'
+                padding: '14px 16px', borderRadius: '14px', cursor: 'pointer',
+                transition: 'all 0.2s ease', display: 'flex', flexDirection: 'column', gap: '8px'
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.borderColor = card.color;
@@ -194,12 +187,12 @@ export default function TechnicianDashboardPage() {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>{card.label}</span>
-                <div style={{ padding: '8px', borderRadius: '10px', background: `${card.color}15`, color: card.color }}>
-                  <Icon size={18} />
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>{card.label}</span>
+                <div style={{ padding: '6px', borderRadius: '8px', background: `${card.color}15`, color: card.color }}>
+                  <Icon size={16} />
                 </div>
               </div>
-              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                 {loading ? '...' : card.count}
               </div>
             </div>
@@ -208,44 +201,41 @@ export default function TechnicianDashboardPage() {
       </div>
 
       {/* ── QUICK ACTIONS TOOLBAR ── */}
-      <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          {t('technician.quickNav', 'Quick Navigation')}:
+      <div className="glass-panel p-3 sm:p-4 rounded-xl flex items-center gap-2 overflow-x-auto max-w-full" style={{ scrollbarWidth: 'none' }}>
+        <span className="shrink-0 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+          {t('technician.quickNav', 'Quick Nav')}:
         </span>
         <button
           onClick={() => navigate('/technician/assigned')}
-          style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          className="touch-target-sm shrink-0 whitespace-nowrap"
+          style={{ padding: '7px 12px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
           <ListChecks size={14} color="var(--accent-primary)" /> {t('technician.viewAssigned', 'View Assigned Requests')}
         </button>
         <button
           onClick={() => navigate('/technician/assigned?priority=HIGH')}
-          style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          className="touch-target-sm shrink-0 whitespace-nowrap"
+          style={{ padding: '7px 12px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
           <AlertTriangle size={14} color="#f87171" /> {t('technician.viewHighPriority', 'View High Priority')}
         </button>
         <button
           onClick={() => navigate('/technician/pending')}
-          style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          className="touch-target-sm shrink-0 whitespace-nowrap"
+          style={{ padding: '7px 12px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
           <Clock size={14} color="#fb923c" /> {t('technician.viewPending', 'View Pending')}
-        </button>
-        <button
-          onClick={() => navigate('/issues/known')}
-          style={{ padding: '8px 14px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-        >
-          <BookOpen size={14} color="#60a5fa" /> {t('technician.openKnowledgeBase', 'Open Knowledge Base')}
         </button>
       </div>
 
       {/* ── MAIN WORKBENCH GRID ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
         {/* Left Column: Active Assigned Work */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
+          <div className="glass-panel p-3.5 sm:p-5 rounded-2xl">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {t('technician.activeQueue', 'Active Assigned Work Queue')}
                 </h3>
                 <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>

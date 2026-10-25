@@ -21,6 +21,7 @@ import dispatchApi from '../api/dispatchApi';
 import api from '../../../api/client';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { FormField } from '../../../components/common/FormField';
 import { dispatchSchemas } from '../../../validation';
 
@@ -72,6 +73,24 @@ export default function TechnicianTeamsTab() {
   useEffect(() => {
     fetchTeams();
   }, [search]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showTeamModal) {
+          setShowTeamModal(false);
+          setTeamFieldErrors({});
+        } else if (selectedTeam) {
+          setSelectedTeam(null);
+          setMemberError('');
+        }
+      }
+    };
+    if (showTeamModal || selectedTeam) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showTeamModal, selectedTeam]);
 
   const fetchTeams = async () => {
     try {
@@ -352,26 +371,18 @@ export default function TechnicianTeamsTab() {
                 >
                   <UserPlus size={14} /> Members & Workload
                 </button>
-                <button
-                  onClick={() => handleOpenEditModal(team)}
-                  style={{
-                    padding: '7px 12px', borderRadius: '10px', border: '1px solid var(--glass-border)',
-                    background: 'var(--bg-secondary)', color: 'var(--text-secondary)',
-                    fontWeight: '700', fontSize: '0.78rem', cursor: 'pointer'
-                  }}
-                >
-                  <Edit2 size={14} />
-                </button>
-                <button
-                  onClick={() => handleDeleteTeam(team)}
-                  style={{
-                    padding: '7px 12px', borderRadius: '10px', border: '1px solid rgba(239, 68, 68, 0.3)',
-                    background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444',
-                    fontWeight: '700', fontSize: '0.78rem', cursor: 'pointer'
-                  }}
-                >
-                  <Trash2 size={14} />
-                </button>
+                <ActionGroup align="right">
+                  <ActionButton
+                    variant="edit"
+                    onClick={() => handleOpenEditModal(team)}
+                    title="Edit Team"
+                  />
+                  <ActionButton
+                    variant="delete"
+                    onClick={() => handleDeleteTeam(team)}
+                    title="Delete Team"
+                  />
+                </ActionGroup>
               </div>
             </div>
           ))}
@@ -380,124 +391,207 @@ export default function TechnicianTeamsTab() {
 
       {/* CREATE / EDIT TEAM MODAL */}
       {showTeamModal && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px'
-        }}>
-          <div style={{
-            background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
-            borderRadius: '24px', width: '100%', maxWidth: '540px', padding: '24px',
-            boxShadow: '0 25px 70px rgba(0, 0, 0, 0.5)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '900', color: 'var(--text-primary)' }}>
-                {editingTeam ? 'Edit Technician Team' : 'Create Technician Work Team'}
-              </h3>
-              <button onClick={() => setShowTeamModal(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                <X size={20} />
+        <div 
+          onClick={() => {
+            setShowTeamModal(false);
+            setTeamFieldErrors({});
+          }}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="team-modal-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
+              borderRadius: 'var(--border-radius-lg, 18px)', width: '100%', maxWidth: '540px',
+              display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden',
+              boxShadow: 'var(--modal-shadow, 0 25px 70px rgba(0, 0, 0, 0.5))',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  background: 'var(--accent-gradient)',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--glow-accent)',
+                  flexShrink: 0
+                }}>
+                  <Users size={20} />
+                </div>
+                <div>
+                  <h3 id="team-modal-title" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {editingTeam ? 'Edit Technician Team' : 'Create Technician Work Team'}
+                  </h3>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    Configure dispatch group credentials and operational lead
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowTeamModal(false);
+                  setTeamFieldErrors({});
+                }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '6px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveTeam} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <FormField
-                label="Team Name"
-                required
-                error={teamFieldErrors.TeamName}
-                icon={Users}
-              >
-                <input
-                  type="text"
-                  placeholder="e.g. Network & Connectivity Support Team"
-                  value={teamForm.TeamName}
-                  onChange={(e) => {
-                    setTeamForm({ ...teamForm, TeamName: e.target.value });
-                    clearTeamFieldError('TeamName');
-                  }}
-                  style={{
-                    width: '100%', padding: '12px', borderRadius: '10px',
-                    border: `1px solid ${teamFieldErrors.TeamName ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                    background: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
-                  }}
-                />
-              </FormField>
-
-              <FormField
-                label="Team Code"
-                required
-                error={teamFieldErrors.TeamCode}
-                icon={ShieldCheck}
-                helpText="2 to 50 alphanumeric characters (dashes and underscores allowed)"
-              >
-                <input
-                  type="text"
-                  placeholder="e.g. TEAM-NET-01"
-                  value={teamForm.TeamCode}
-                  onChange={(e) => {
-                    setTeamForm({ ...teamForm, TeamCode: e.target.value });
-                    clearTeamFieldError('TeamCode');
-                  }}
-                  style={{
-                    width: '100%', padding: '12px', borderRadius: '10px',
-                    border: `1px solid ${teamFieldErrors.TeamCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                    background: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
-                  }}
-                />
-              </FormField>
-
-              <FormField
-                label="Team Lead (Optional)"
-                error={teamFieldErrors.LeaderUserID}
-                icon={UserCheck}
-              >
-                <select
-                  value={teamForm.LeaderUserID}
-                  onChange={(e) => {
-                    setTeamForm({ ...teamForm, LeaderUserID: e.target.value });
-                    clearTeamFieldError('LeaderUserID');
-                  }}
-                  style={{
-                    width: '100%', padding: '12px', borderRadius: '10px',
-                    border: `1px solid ${teamFieldErrors.LeaderUserID ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                    background: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
-                  }}
+            {/* Modal Body & Form */}
+            <form onSubmit={handleSaveTeam} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+              <div style={{
+                padding: 'clamp(16px, 3vw, 24px)',
+                overflowY: 'auto',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+              }}>
+                <FormField
+                  label="Team Name"
+                  required
+                  error={teamFieldErrors.TeamName}
+                  icon={Users}
                 >
-                  <option value="">-- Unassigned Team Lead --</option>
-                  {eligibleTechs.map((tech) => (
-                    <option key={tech.UserID} value={tech.UserID}>
-                      {tech.FirstName} {tech.LastName} ({tech.Email})
-                    </option>
-                  ))}
-                </select>
-              </FormField>
+                  <input
+                    type="text"
+                    placeholder="e.g. Network & Connectivity Support Team"
+                    value={teamForm.TeamName}
+                    onChange={(e) => {
+                      setTeamForm({ ...teamForm, TeamName: e.target.value });
+                      clearTeamFieldError('TeamName');
+                    }}
+                    style={{
+                      width: '100%', padding: '12px', borderRadius: '10px',
+                      border: `1px solid ${teamFieldErrors.TeamName ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
+                    }}
+                  />
+                </FormField>
 
-              <FormField
-                label="Description & Responsibilities (Optional)"
-                error={teamFieldErrors.Description}
-                icon={FileText}
-              >
-                <textarea
-                  rows={3}
-                  placeholder="Operational responsibilities, coverage zones, escalation handling..."
-                  value={teamForm.Description}
-                  onChange={(e) => {
-                    setTeamForm({ ...teamForm, Description: e.target.value });
-                    clearTeamFieldError('Description');
-                  }}
-                  style={{
-                    width: '100%', padding: '12px', borderRadius: '10px',
-                    border: `1px solid ${teamFieldErrors.Description ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                    background: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box',
-                    resize: 'vertical'
-                  }}
-                />
-              </FormField>
+                <FormField
+                  label="Team Code"
+                  required
+                  error={teamFieldErrors.TeamCode}
+                  icon={ShieldCheck}
+                  helpText="2 to 50 alphanumeric characters (dashes and underscores allowed)"
+                >
+                  <input
+                    type="text"
+                    placeholder="e.g. TEAM-NET-01"
+                    value={teamForm.TeamCode}
+                    onChange={(e) => {
+                      setTeamForm({ ...teamForm, TeamCode: e.target.value });
+                      clearTeamFieldError('TeamCode');
+                    }}
+                    style={{
+                      width: '100%', padding: '12px', borderRadius: '10px',
+                      border: `1px solid ${teamFieldErrors.TeamCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
+                    }}
+                  />
+                </FormField>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '12px' }}>
+                <FormField
+                  label="Team Lead (Optional)"
+                  error={teamFieldErrors.LeaderUserID}
+                  icon={UserCheck}
+                >
+                  <select
+                    value={teamForm.LeaderUserID}
+                    onChange={(e) => {
+                      setTeamForm({ ...teamForm, LeaderUserID: e.target.value });
+                      clearTeamFieldError('LeaderUserID');
+                    }}
+                    style={{
+                      width: '100%', padding: '12px', borderRadius: '10px',
+                      border: `1px solid ${teamFieldErrors.LeaderUserID ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
+                    }}
+                  >
+                    <option value="">-- Unassigned Team Lead --</option>
+                    {eligibleTechs.map((tech) => (
+                      <option key={tech.UserID} value={tech.UserID}>
+                        {tech.FirstName} {tech.LastName} ({tech.Email})
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+
+                <FormField
+                  label="Description & Responsibilities (Optional)"
+                  error={teamFieldErrors.Description}
+                  icon={FileText}
+                >
+                  <textarea
+                    rows={3}
+                    placeholder="Operational responsibilities, coverage zones, escalation handling..."
+                    value={teamForm.Description}
+                    onChange={(e) => {
+                      setTeamForm({ ...teamForm, Description: e.target.value });
+                      clearTeamFieldError('Description');
+                    }}
+                    style={{
+                      width: '100%', padding: '12px', borderRadius: '10px',
+                      border: `1px solid ${teamFieldErrors.Description ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box',
+                      resize: 'vertical'
+                    }}
+                  />
+                </FormField>
+              </div>
+
+              {/* Modal Footer */}
+              <div style={{
+                padding: '16px 20px',
+                borderTop: '1px solid var(--glass-border)',
+                background: 'var(--bg-tertiary)',
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end',
+                flexShrink: 0
+              }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -505,11 +599,16 @@ export default function TechnicianTeamsTab() {
                     setTeamFieldErrors({});
                   }}
                   className="btn btn-secondary"
-                  style={{ padding: '10px 18px' }}
+                  style={{ padding: '9px 18px', borderRadius: 'var(--border-radius-sm)' }}
                 >
                   Cancel
                 </button>
-                <button type="submit" disabled={submittingTeam} className="btn btn-primary" style={{ padding: '10px 22px' }}>
+                <button 
+                  type="submit" 
+                  disabled={submittingTeam} 
+                  className="btn btn-primary" 
+                  style={{ padding: '9px 22px', borderRadius: 'var(--border-radius-sm)' }}
+                >
                   {submittingTeam ? 'Saving Team...' : editingTeam ? 'Update Team' : 'Create Team'}
                 </button>
               </div>
@@ -520,147 +619,234 @@ export default function TechnicianTeamsTab() {
 
       {/* TEAM MEMBERSHIP & WORKLOAD DRAWER / MODAL */}
       {selectedTeam && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px'
-        }}>
-          <div style={{
-            background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
-            borderRadius: '24px', width: '100%', maxWidth: '680px', maxHeight: '90vh', padding: '24px',
-            display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 25px 70px rgba(0, 0, 0, 0.5)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px' }}>
-              <div>
-                <span style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--accent-primary)', background: 'rgba(99, 102, 241, 0.12)', padding: '2px 8px', borderRadius: '6px' }}>
-                  {selectedTeam.TeamCode}
-                </span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '1.2rem', fontWeight: '900', color: 'var(--text-primary)' }}>
-                  {selectedTeam.TeamName} — Roster & Workload
-                </h3>
+        <div 
+          onClick={() => {
+            setSelectedTeam(null);
+            setMemberError('');
+          }}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="roster-modal-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
+              borderRadius: 'var(--border-radius-lg, 18px)', width: '100%', maxWidth: '680px', maxHeight: '90vh',
+              display: 'flex', flexDirection: 'column', overflow: 'hidden',
+              boxShadow: 'var(--modal-shadow, 0 25px 70px rgba(0, 0, 0, 0.5))',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  background: 'var(--accent-gradient)',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--glow-accent)',
+                  flexShrink: 0
+                }}>
+                  <Users size={20} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h3 id="roster-modal-title" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      {selectedTeam.TeamName}
+                    </h3>
+                    <span style={{ fontSize: '0.72rem', fontWeight: '800', color: 'var(--accent-primary)', background: 'rgba(99, 102, 241, 0.12)', padding: '2px 8px', borderRadius: '6px' }}>
+                      {selectedTeam.TeamCode}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    Team roster allocation and real-time workload monitoring
+                  </div>
+                </div>
               </div>
+
               <button
                 onClick={() => {
                   setSelectedTeam(null);
                   setMemberError('');
                 }}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '6px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            {/* Add Technician Form */}
+            {/* Modal Body */}
             <div style={{
-              background: 'var(--bg-tertiary)', padding: '16px', borderRadius: '16px',
-              border: '1px solid var(--glass-border)', display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap'
+              padding: 'clamp(16px, 3vw, 24px)',
+              overflowY: 'auto',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px'
             }}>
-              <div style={{ flex: 1, minWidth: '220px' }}>
-                <FormField
-                  label="Add Eligible Department Technician"
-                  required
-                  error={memberError}
-                  icon={UserPlus}
-                >
-                  <select
-                    value={selectedTechToAdd}
-                    onChange={(e) => {
-                      setSelectedTechToAdd(e.target.value);
-                      if (memberError) setMemberError('');
-                    }}
-                    style={{
-                      width: '100%', padding: '10px', borderRadius: '10px',
-                      border: `1px solid ${memberError ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      background: 'var(--bg-secondary)',
-                      color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none'
-                    }}
+              {/* Add Technician Form */}
+              <div style={{
+                background: 'var(--bg-tertiary)', padding: '16px', borderRadius: '14px',
+                border: '1px solid var(--glass-border)', display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap'
+              }}>
+                <div style={{ flex: 1, minWidth: '220px' }}>
+                  <FormField
+                    label="Add Eligible Department Technician"
+                    required
+                    error={memberError}
+                    icon={UserPlus}
                   >
-                    <option value="">-- Select Eligible Technician --</option>
-                    {eligibleTechs
-                      .filter((t) => !members.some((m) => m.UserID === t.UserID))
-                      .map((t) => (
-                        <option key={t.UserID} value={t.UserID}>
-                          {t.FirstName} {t.LastName} ({t.Email})
-                        </option>
-                      ))}
-                  </select>
-                </FormField>
+                    <select
+                      value={selectedTechToAdd}
+                      onChange={(e) => {
+                        setSelectedTechToAdd(e.target.value);
+                        if (memberError) setMemberError('');
+                      }}
+                      style={{
+                        width: '100%', padding: '10px', borderRadius: '10px',
+                        border: `1px solid ${memberError ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                        background: 'var(--bg-secondary)',
+                        color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none'
+                      }}
+                    >
+                      <option value="">-- Select Eligible Technician --</option>
+                      {eligibleTechs
+                        .filter((t) => !members.some((m) => m.UserID === t.UserID))
+                        .map((t) => (
+                          <option key={t.UserID} value={t.UserID}>
+                            {t.FirstName} {t.LastName} ({t.Email})
+                          </option>
+                        ))}
+                    </select>
+                  </FormField>
+                </div>
+
+                <button
+                  onClick={handleAddMember}
+                  disabled={addingMember}
+                  className="btn btn-primary"
+                  style={{ padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '22px', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  <UserPlus size={15} /> {addingMember ? 'Adding...' : 'Add to Team'}
+                </button>
               </div>
 
-              <button
-                onClick={handleAddMember}
-                disabled={addingMember}
-                className="btn btn-primary"
-                style={{ padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '22px' }}
-              >
-                <UserPlus size={15} /> {addingMember ? 'Adding...' : 'Add to Team'}
-              </button>
+              {/* Team Members List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
+                  CURRENT TEAM MEMBERS ({members.length})
+                </div>
+
+                {loadingMembers ? (
+                  <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading team members...</div>
+                ) : members.length === 0 ? (
+                  <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--glass-border)', fontSize: '0.85rem' }}>
+                    No technicians assigned to this team yet. Use the selector above to assign department technicians.
+                  </div>
+                ) : (
+                  members.map((member) => (
+                    <div
+                      key={member.UserID}
+                      style={{
+                        padding: '14px 18px', borderRadius: '14px',
+                        background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{
+                          width: '38px', height: '38px', borderRadius: '50%',
+                          background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800'
+                        }}>
+                          {member.FirstName[0]}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                            {member.FirstName} {member.LastName}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            {member.Email}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '800', color: member.ActiveRequestsCount > 4 ? '#ef4444' : '#10b981' }}>
+                            {member.ActiveRequestsCount || 0} active work items
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                            {member.SLARiskCount > 0 ? `${member.SLARiskCount} SLA Risk` : 'Optimal load'}
+                          </div>
+                        </div>
+
+                        <ActionButton
+                          variant="delete"
+                          label="Remove"
+                          size="sm"
+                          onClick={() => handleRemoveMember(member.UserID, `${member.FirstName} ${member.LastName}`)}
+                          title="Remove Member"
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
 
-            {/* Team Members List */}
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
-                CURRENT TEAM MEMBERS ({members.length})
-              </div>
-
-              {loadingMembers ? (
-                <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading team members...</div>
-              ) : members.length === 0 ? (
-                <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--glass-border)', fontSize: '0.85rem' }}>
-                  No technicians assigned to this team yet. Use the selector above to assign department technicians.
-                </div>
-              ) : (
-                members.map((member) => (
-                  <div
-                    key={member.UserID}
-                    style={{
-                      padding: '14px 18px', borderRadius: '14px',
-                      background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{
-                        width: '38px', height: '38px', borderRadius: '50%',
-                        background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800'
-                      }}>
-                        {member.FirstName[0]}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                          {member.FirstName} {member.LastName}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                          {member.Email}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.82rem', fontWeight: '800', color: member.ActiveRequestsCount > 4 ? '#ef4444' : '#10b981' }}>
-                          {member.ActiveRequestsCount || 0} active work items
-                        </div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                          {member.SLARiskCount > 0 ? `${member.SLARiskCount} SLA Risk` : 'Optimal load'}
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => handleRemoveMember(member.UserID, `${member.FirstName} ${member.LastName}`)}
-                        style={{
-                          padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)',
-                          background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444',
-                          fontWeight: '700', fontSize: '0.75rem', cursor: 'pointer'
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
+            {/* Modal Footer */}
+            <div style={{
+              padding: '14px 20px',
+              borderTop: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              flexShrink: 0
+            }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedTeam(null);
+                  setMemberError('');
+                }}
+                className="btn btn-secondary"
+                style={{ padding: '8px 20px', borderRadius: 'var(--border-radius-sm)' }}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

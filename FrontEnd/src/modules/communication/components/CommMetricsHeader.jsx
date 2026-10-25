@@ -1,7 +1,9 @@
 import React from 'react';
 import { MessageSquare, ShieldAlert, Megaphone, Users, TrendingUp } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function CommMetricsHeader({ metrics, activeTab, onTabChange }) {
+  const { t } = useTranslation();
   const totalComments = metrics?.totalComments || 0;
   const internalNotes = metrics?.internalNotesCount || 0;
   const announcements = metrics?.activeAnnouncementsCount || 0;
@@ -10,9 +12,9 @@ export default function CommMetricsHeader({ metrics, activeTab, onTabChange }) {
   const cards = [
     {
       id: 'comments',
-      title: 'Total Comments',
+      title: t('communication.metrics.totalComments', 'Total Comments'),
       value: totalComments,
-      subtext: 'Request discussions & notes',
+      subtext: t('communication.metrics.commentsSub', 'Request discussions & notes'),
       icon: MessageSquare,
       color: '#6366f1',
       bgGlow: 'rgba(99, 102, 241, 0.18)',
@@ -20,9 +22,9 @@ export default function CommMetricsHeader({ metrics, activeTab, onTabChange }) {
     },
     {
       id: 'notes',
-      title: 'Internal Staff Notes',
+      title: t('communication.metrics.internalNotes', 'Internal Staff Notes'),
       value: internalNotes,
-      subtext: 'Private staff-only annotations',
+      subtext: t('communication.metrics.notesSub', 'Private staff-only annotations'),
       icon: ShieldAlert,
       color: '#f59e0b',
       bgGlow: 'rgba(245, 158, 11, 0.18)',
@@ -30,9 +32,9 @@ export default function CommMetricsHeader({ metrics, activeTab, onTabChange }) {
     },
     {
       id: 'announcements',
-      title: 'Broadcast Announcements',
+      title: t('communication.metrics.broadcastAnnouncements', 'Broadcast Announcements'),
       value: announcements,
-      subtext: 'Active system-wide broadcasts',
+      subtext: t('communication.metrics.announcementsSub', 'Active system-wide broadcasts'),
       icon: Megaphone,
       color: '#10b981',
       bgGlow: 'rgba(16, 185, 129, 0.18)',
@@ -40,9 +42,9 @@ export default function CommMetricsHeader({ metrics, activeTab, onTabChange }) {
     },
     {
       id: 'discussions',
-      title: 'Team Channels',
+      title: t('communication.metrics.teamChannels', 'Team Channels'),
       value: channels,
-      subtext: 'Active collaboration channels',
+      subtext: t('communication.metrics.channelsSub', 'Active collaboration channels'),
       icon: Users,
       color: '#ec4899',
       bgGlow: 'rgba(236, 72, 153, 0.18)',

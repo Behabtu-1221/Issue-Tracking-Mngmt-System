@@ -1,3 +1,4 @@
+import { query } from '../../../database/connection.js';
 import approvalRepository from '../repositories/approval.repository.js';
 import approvalDelegationRepository from '../repositories/approval-delegation.repository.js';
 import approvalGroupRepository from '../repositories/approval-group.repository.js';
@@ -149,12 +150,21 @@ export const approvalService = {
     }
 
     // Role verification for decisionUserId
-    const [userRole] = await query(
-      `SELECT r.RoleCode FROM UserRole ur JOIN Role r ON ur.RoleID = r.RoleID WHERE ur.UserID = ?`,
+    const userRoles = await query(
+      `SELECT r.RoleCode FROM UserRole ur JOIN Role r ON ur.RoleID = r.RoleID WHERE ur.UserID = ? AND ur.IsActive = 1 AND ur.IsDeleted = 0`,
       [decisionUserId]
     );
-    const roleCode = userRole ? userRole.RoleCode : '';
-    const isSuperAdmin = decisionUserId === 1 || ['PARK_SUPER_ADMIN', 'PARK_ADMIN'].includes(roleCode);
+    const roleCodes = userRoles.map((r) => (r.RoleCode || '').toUpperCase());
+
+    const [userRecord] = await query(
+      `SELECT UserTypeCode FROM \`User\` WHERE UserID = ?`,
+      [decisionUserId]
+    );
+    const userTypeCode = (userRecord?.UserTypeCode || '').toUpperCase();
+    if (userTypeCode) roleCodes.push(userTypeCode);
+
+    const isSuperAdmin = decisionUserId === 1 ||
+      roleCodes.some((rc) => ['PARK_SUPER_ADMIN', 'PARK_ADMIN', 'SUPER_ADMIN'].includes(rc));
 
     let isAuthorized = false;
 
@@ -172,7 +182,7 @@ export const approvalService = {
         );
         if (dept) isAuthorized = true;
       }
-      // 3. User with DEPARTMENT_MANAGER role assigned to that department
+      // 3. User with DEPARTMENT_MANAGER, MANAGER, or DISPATCHER role assigned to that department
       if (!isAuthorized && issue.AssignedDepartmentID) {
         const [empDept] = await query(
           `SELECT ea.UserID 
@@ -180,24 +190,32 @@ export const approvalService = {
            JOIN UserRole ur ON ea.UserID = ur.UserID
            JOIN Role r ON ur.RoleID = r.RoleID
            WHERE ea.DepartmentID = ? AND ea.UserID = ? AND ea.IsActive = 1 AND ea.IsDeleted = 0
-             AND r.RoleCode = 'DEPARTMENT_MANAGER'`,
+             AND r.RoleCode IN ('DEPARTMENT_MANAGER', 'MANAGER', 'DISPATCHER', 'FACILITY_MANAGER')`,
           [issue.AssignedDepartmentID, decisionUserId]
         );
         if (empDept) isAuthorized = true;
       }
-      // 4. Delegations
+      // 4. Any user who is a department manager in Department table if no department assigned yet
+      if (!isAuthorized && !issue.AssignedDepartmentID) {
+        const [anyDept] = await query(
+          `SELECT DepartmentID FROM Department WHERE ManagerUserID = ? AND IsDeleted = 0 LIMIT 1`,
+          [decisionUserId]
+        );
+        if (anyDept) isAuthorized = true;
+      }
+      // 5. Delegations
       if (!isAuthorized && currentStage.ApproverUserID) {
         const isDelegated = await approvalDelegationRepository.isUserDelegated(currentStage.ApproverUserID, decisionUserId);
         if (isDelegated) isAuthorized = true;
       }
-      // 5. System Administrator override
+      // 6. System Administrator override
       if (!isAuthorized && isSuperAdmin) {
         isAuthorized = true;
       }
 
       if (!isAuthorized) {
         throw new AppError(
-          `Unauthorized: Only the Department Manager for department #${issue.AssignedDepartmentID} or an authorized supervisor can approve Stage 1.`,
+          `Unauthorized: Only the Department Manager for department #${issue.AssignedDepartmentID || 'N/A'} or an authorized supervisor can approve Stage 1.`,
           403
         );
       }
@@ -224,7 +242,9 @@ export const approvalService = {
       }
     }
 
-    return await unitOfWork.execute(async (tx) => {
+    let isFinalApprovalCompleted = false;
+
+    await unitOfWork.execute(async (tx) => {
       // 1. Record decision in ApprovalDecision table
       await approvalRepository.recordDecision({
         ApprovalStageID: currentStage.ApprovalStageID,
@@ -250,7 +270,7 @@ export const approvalService = {
             ModifiedBy: decisionUserId
           }, tx);
 
-          // Set IssueRequest StatusCode to 'APPROVED' with optimistic locking check
+          // Set IssueRequest StatusCode to 'APPROVED' (Authorized for Dispatch Assignment)
           await issueRequestRepository.update(approval.RequestID, {
             StatusCode: 'APPROVED',
             expectedRowVersion,
@@ -265,7 +285,7 @@ export const approvalService = {
             OldValue: issue.StatusCode,
             NewValue: 'APPROVED',
             ActionTypeCode: 'STATUS_CHANGED',
-            Remarks: `Full approval workflow completed (${approval.TotalStages} stage(s) approved). Authorized for dispatch assignment.`
+            Remarks: `Full approval workflow completed (${approval.TotalStages} stage(s) approved). Authorized and ready for technician dispatch.`
           }, tx);
 
           // Record Approval History
@@ -276,24 +296,34 @@ export const approvalService = {
             Remarks: `All ${approval.TotalStages} stage(s) approved. Final authorization granted. Request is now in APPROVED state awaiting technician assignment.`
           }, tx);
 
-          // Start SLA Clock upon final approval
-          try {
-            await slaClockService.startClockForIssue(approval.RequestID, 1, issue.PriorityCode || 'MEDIUM', decisionUserId);
-          } catch (slaErr) {
-            console.warn('SLA Clock start notice upon approval:', slaErr.message);
-          }
+          isFinalApprovalCompleted = true;
 
-          // Emit Centralized Outbox Event
+          // Emit Centralized Outbox Events
           await outboxService.emit(tx, {
             aggregateType: 'IssueRequest',
             aggregateId: approval.RequestID,
             eventType: 'APPROVAL_COMPLETED',
             payload: {
-              issue,
+              issue: { ...issue, StatusCode: 'APPROVED' },
               requestId: approval.RequestID,
+              departmentId: issue.AssignedDepartmentID,
               title: issue.Title,
               requestNumber: issue.RequestNumber,
               remarks: data.Comments,
+              actorUserId: decisionUserId
+            }
+          });
+
+          await outboxService.emit(tx, {
+            aggregateType: 'IssueRequest',
+            aggregateId: approval.RequestID,
+            eventType: 'ISSUE_APPROVED_FOR_DISPATCH',
+            payload: {
+              issue: { ...issue, StatusCode: 'APPROVED' },
+              requestId: approval.RequestID,
+              departmentId: issue.AssignedDepartmentID,
+              title: issue.Title,
+              requestNumber: issue.RequestNumber,
               actorUserId: decisionUserId
             }
           });
@@ -305,6 +335,24 @@ export const approvalService = {
             CurrentStageNumber: nextStageNumber,
             ModifiedBy: decisionUserId
           }, tx);
+
+          // Locate next stage in pipeline
+          const nextStage = (approval.stages || []).find((st) => st.StageNumber === nextStageNumber);
+          if (nextStage && !nextStage.ApproverUserID && !nextStage.ApproverGroupID) {
+            // Assign primary Business Park Administrator if approver was not explicitly preset
+            const [adminUser] = await query(
+              `SELECT u.UserID 
+               FROM \`User\` u
+               LEFT JOIN UserRole ur ON u.UserID = ur.UserID
+               LEFT JOIN Role r ON ur.RoleID = r.RoleID
+               WHERE (r.RoleCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN') OR u.UserTypeCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN') OR u.UserID = 1)
+                 AND u.IsActive = 1 AND u.IsDeleted = 0
+               ORDER BY u.UserID ASC
+               LIMIT 1`
+            );
+            const defaultAdminId = adminUser ? adminUser.UserID : 1;
+            await approvalRepository.updateStageApprover(nextStage.ApprovalStageID, defaultAdminId, null, decisionUserId, tx);
+          }
 
           await approvalHistoryRepository.create({
             ApprovalID: approval.ApprovalID,
@@ -323,7 +371,7 @@ export const approvalService = {
             Remarks: `Department Manager review approved. Awaiting higher-level Business Park Administrator authorization.`
           }, tx);
 
-          // Outbox event: Department Approved / Higher-Level Required
+          // Outbox event 1: Department Approved for requester & audit tracking
           await outboxService.emit(tx, {
             aggregateType: 'Approval',
             aggregateId: approval.ApprovalID,
@@ -333,7 +381,28 @@ export const approvalService = {
               requestId: approval.RequestID,
               title: issue.Title,
               requestNumber: issue.RequestNumber,
-              remarks: data.Comments,
+              departmentName: issue.DepartmentName,
+              stageNumber: currentStage.StageNumber,
+              remarks: data.Comments || 'Department Manager review approved.',
+              actorUserId: decisionUserId
+            }
+          });
+
+          // Outbox event 2: Higher Level Approval Required - alerts Business Park Administrators
+          await outboxService.emit(tx, {
+            aggregateType: 'Approval',
+            aggregateId: approval.ApprovalID,
+            eventType: 'HIGHER_APPROVAL_REQUIRED',
+            payload: {
+              issue,
+              requestId: approval.RequestID,
+              title: issue.Title,
+              requestNumber: issue.RequestNumber,
+              departmentName: issue.DepartmentName,
+              priority: issue.PriorityCode,
+              estimatedCost: issue.EstimatedCost,
+              stageNumber: nextStageNumber,
+              remarks: data.Comments || `Stage ${currentStage.StageNumber} Department Manager approval signed off. Higher-level authorization required from Business Park Administrators for Stage ${nextStageNumber}.`,
               actorUserId: decisionUserId
             }
           });
@@ -426,9 +495,17 @@ export const approvalService = {
           Remarks: `Returned for correction at Stage ${currentStage.StageNumber}. Comments: ${returnReason}`
         }, tx);
       }
-
-      return approvalRepository.findById(approval.ApprovalID);
     });
+
+    if (isFinalApprovalCompleted) {
+      try {
+        await slaClockService.startClockForIssue(approval.RequestID, 1, issue.PriorityCode || 'MEDIUM', decisionUserId);
+      } catch (slaErr) {
+        console.warn('SLA Clock start notice upon approval:', slaErr.message);
+      }
+    }
+
+    return approvalRepository.findById(approval.ApprovalID);
   }
 };
 

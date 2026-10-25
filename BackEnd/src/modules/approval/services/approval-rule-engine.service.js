@@ -145,15 +145,15 @@ export const approvalRuleEngineService = {
     }
 
     // 6. Look up Business Park Administrator (Stage 2 Approver)
-    let parkAdminUserId = null;
+    let parkAdminUserId = 1; // Default to System Administrator (UserID 1)
     if (requiresHigherApproval) {
       try {
         const [adminUser] = await query(
           `SELECT u.UserID 
-           FROM User u
-           JOIN UserRole ur ON u.UserID = ur.UserID
-           JOIN Role r ON ur.RoleID = r.RoleID
-           WHERE r.RoleCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN')
+           FROM \`User\` u
+           LEFT JOIN UserRole ur ON u.UserID = ur.UserID
+           LEFT JOIN Role r ON ur.RoleID = r.RoleID
+           WHERE (r.RoleCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN') OR u.UserTypeCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN') OR u.UserID = 1)
              AND u.IsActive = 1 AND u.IsDeleted = 0
            ORDER BY u.UserID ASC
            LIMIT 1`
@@ -185,7 +185,7 @@ export const approvalRuleEngineService = {
         StageName: 'Business Park Administrator Approval',
         ApproverRoleCode: 'PARK_SUPER_ADMIN',
         DepartmentID: null,
-        ApproverUserID: parkAdminUserId,
+        ApproverUserID: parkAdminUserId || 1,
         SequenceNumber: 2,
         Description: `Higher-level administrative authorization: ${reasons.join(' | ')}`
       });

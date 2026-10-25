@@ -5,6 +5,7 @@ import {
   Sliders, ShieldCheck, Sparkles, ArrowRight
 } from 'lucide-react';
 import notificationApi from '../api/notificationApi';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import NotifMetricsHeader from '../components/NotifMetricsHeader';
 import NotifInboxTab from '../components/NotifInboxTab';
 import NotifTemplatesTab from '../components/NotifTemplatesTab';
@@ -15,6 +16,7 @@ import SendNotificationModal from '../components/SendNotificationModal';
 import { useAuth } from '../../authentication/contexts/AuthContext';
 
 export default function NotificationPage({ initialTab = 'inbox' }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -70,30 +72,25 @@ export default function NotificationPage({ initialTab = 'inbox' }) {
   const allNavTabs = [
     {
       id: 'inbox',
-      label: 'Inbox & Alerts',
+      label: t('notifications.tabs.inbox', 'Inbox & Alerts'),
       icon: Inbox,
       count: metrics?.unreadInApp || metrics?.unreadCount || undefined
     },
     {
-      id: 'preferences',
-      label: 'Delivery Preferences',
-      icon: Sliders
-    },
-    {
       id: 'reminders',
-      label: 'Automated Reminders',
+      label: t('notifications.tabs.reminders', 'Automated Reminders'),
       icon: Clock,
       count: metrics?.pendingReminders || undefined
     },
     {
       id: 'templates',
-      label: 'Notification Layouts',
+      label: t('notifications.tabs.templates', 'Notification Layouts'),
       icon: BookOpen,
       adminOnly: true
     },
     {
       id: 'log',
-      label: 'Delivery Audit Log',
+      label: t('notifications.tabs.log', 'Delivery Audit Log'),
       icon: History,
       adminOnly: true,
       count: metrics?.emailsDelivered || undefined
@@ -134,10 +131,10 @@ export default function NotificationPage({ initialTab = 'inbox' }) {
             display: 'flex', alignItems: 'center', gap: '10px'
           }}>
             <Bell size={28} color="#6366f1" />
-            Notification & Alert Center
+            {t('notifications.managementTitle', 'Notification & Alert Center')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.86rem' }}>
-            Real-time event broadcasting, personal alert feeds, delivery channels, and scheduled task reminders
+            {t('notifications.managementSubtitle', 'Real-time event broadcasting, personal alert feeds, delivery channels, and scheduled task reminders')}
           </p>
         </div>
 
@@ -162,7 +159,7 @@ export default function NotificationPage({ initialTab = 'inbox' }) {
               }}
             >
               <Send size={15} />
-              <span>Dispatch / Test Alert</span>
+              <span>{t('notifications.sendNotifBtn', 'Dispatch / Test Alert')}</span>
             </button>
           )}
 

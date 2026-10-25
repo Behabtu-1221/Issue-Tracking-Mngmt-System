@@ -65,6 +65,18 @@ export default function TeamDiscussionsTab() {
     loadChannels();
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && showCreateModal) {
+        setShowCreateModal(false);
+      }
+    };
+    if (showCreateModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreateModal]);
+
   const selectChannel = async (ch, isSilent = false) => {
     setSelectedChannel(ch);
     const channelId = ch.TeamDiscussionID || ch.DiscussionGroupID;
@@ -489,16 +501,27 @@ export default function TeamDiscussionsTab() {
 
       {/* ── Modal: Create Channel (Staff/Admin) ── */}
       {showCreateModal && canCreateChannel && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 9999,
-          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
-        }}>
-          <div style={{
-            width: '100%', maxWidth: '480px', background: 'var(--bg-secondary)',
-            borderRadius: '20px', border: '1px solid var(--glass-border-accent)',
-            padding: '24px', boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
-          }}>
+        <div 
+          onClick={() => setShowCreateModal(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="channel-create-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              width: '100%', maxWidth: '480px', background: 'var(--bg-secondary)',
+              borderRadius: 'var(--border-radius-lg, 18px)', border: '1px solid var(--glass-border-accent)',
+              padding: '24px', boxShadow: 'var(--modal-shadow, 0 25px 50px rgba(0,0,0,0.5))',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                 Create Team Channel

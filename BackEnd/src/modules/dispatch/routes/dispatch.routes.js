@@ -26,6 +26,8 @@ router.post('/assignments/:id/accept', authorizePermissions('Issue.AcceptAssignm
 router.post('/assignments/:id/reject', authorizePermissions('Issue.AcceptAssignment', 'Issue.Read.Assigned', 'Issue.Resolve'), assignmentController.rejectAssignment);
 router.post('/assignments/:id/start', authorizePermissions('Issue.Update.Assigned', 'Issue.Read.Assigned', 'Issue.Resolve'), assignmentController.startWork);
 router.post('/assignments/:id/pause', authorizePermissions('Issue.Update.Assigned', 'Issue.Read.Assigned', 'Issue.Resolve'), assignmentController.pauseWork);
+router.post('/assignments/:id/resume', authorizePermissions('Issue.Update.Assigned', 'Issue.Read.Assigned', 'Issue.Resolve'), assignmentController.resumeWork);
+router.post('/assignments/:id/progress', authorizePermissions('Issue.Update.Assigned', 'Issue.Read.Assigned', 'Issue.Resolve'), assignmentController.updateProgress);
 router.post('/assignments/:id/complete', authorizePermissions('Issue.Resolve', 'Issue.Update.Assigned'), assignmentController.completeWork);
 router.post('/assignments/:id/escalate', authorizePermissions('Issue.Escalate.Assigned', 'Issue.Read.Assigned', 'Issue.Resolve'), assignmentController.escalateWork);
 router.get('/my-workbench', authorizePermissions('Issue.Read.Assigned', 'Issue.Resolve'), assignmentController.getMyAssignedRequests);

@@ -8,7 +8,20 @@ import logger from '../../../shared/utils/logger.js';
 const isParkAdminActor = (actor) => {
   if (!actor) return false;
   const code = (actor.userTypeCode || '').toUpperCase();
-  return ['SUPER_ADMIN', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN'].includes(code);
+  return [
+    'SUPER_ADMIN',
+    'PARK_ADMIN',
+    'PARK_SUPER_ADMIN',
+    'BUSINESS_PARK_ADMIN',
+    'DEPARTMENT_MANAGER',
+    'MANAGER',
+    'DISPATCHER',
+    'PARK_DISPATCHER',
+    'TECHNICIAN',
+    'PARK_TECHNICIAN',
+    'PARK_STAFF',
+    'STAFF'
+  ].includes(code);
 };
 
 class FileDocumentService {
@@ -28,7 +41,10 @@ class FileDocumentService {
   }
 
   async getDocumentById(documentId, actor) {
-    const doc = await fileDocumentRepository.findById(documentId);
+    const isUUID = typeof documentId === 'string' && (documentId.includes('-') || isNaN(Number(documentId)));
+    const doc = isUUID
+      ? await fileDocumentRepository.findByUUID(documentId)
+      : await fileDocumentRepository.findById(documentId);
     if (!doc) throw new AppError('Document not found', 404);
 
     if (!isParkAdminActor(actor) && doc.TenantID && doc.TenantID !== actor?.tenantId) {
@@ -36,7 +52,7 @@ class FileDocumentService {
     }
     
     // Fetch version history
-    const versions = await fileDocumentRepository.findVersionsByDocumentId(documentId);
+    const versions = await fileDocumentRepository.findVersionsByDocumentId(doc.DocumentID);
     return { ...doc, versions };
   }
 
@@ -134,8 +150,8 @@ class FileDocumentService {
       throw new AppError('File content is missing from disk storage', 404);
     }
 
-    await fileDocumentRepository.incrementDownloadCount(documentId);
-    await fileDocumentRepository.logAudit(documentId, 'DOWNLOAD', actorId, ipAddress, `Downloaded ${doc.FileName}`);
+    await fileDocumentRepository.incrementDownloadCount(doc.DocumentID);
+    await fileDocumentRepository.logAudit(doc.DocumentID, 'DOWNLOAD', actorId, ipAddress, `Downloaded ${doc.FileName}`);
 
     return {
       stream: fs.createReadStream(doc.FilePath),
@@ -151,13 +167,14 @@ class FileDocumentService {
       throw new AppError('File not found on storage disk', 404);
     }
 
-    await fileDocumentRepository.logAudit(documentId, 'VIEW', actorId, null, `Previewed file ${doc.FileName}`);
+    await fileDocumentRepository.logAudit(doc.DocumentID, 'VIEW', actorId, null, `Previewed file ${doc.FileName}`);
 
     return {
       stream: fs.createReadStream(doc.FilePath),
       fileName: doc.FileName,
       mimeType: doc.MimeType,
-      fileSize: doc.FileSize
+      fileSize: doc.FileSize,
+      filePath: doc.FilePath
     };
   }
 

@@ -10,7 +10,7 @@ import issueManagementApi from '../../issue-management/api/issueManagementApi';
 const glassCard = {
   background: 'var(--glass-bg)',
   border: '1px solid var(--glass-border)',
-  borderRadius: '20px',
+  borderRadius: 'var(--border-radius-lg, 18px)',
   backdropFilter: 'blur(16px)',
   padding: '24px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
@@ -50,6 +50,18 @@ export default function NotifRemindersTab({ onRefreshMetrics }) {
   useEffect(() => {
     loadReminders();
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && showModal) {
+        setShowModal(false);
+      }
+    };
+    if (showModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showModal]);
 
   // Fetch requests list for the dropdown
   useEffect(() => {
@@ -275,7 +287,7 @@ export default function NotifRemindersTab({ onRefreshMetrics }) {
               onClick={() => setActiveFilter(chip.id)}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
-                padding: '7px 14px', borderRadius: '20px',
+                padding: '7px 14px', borderRadius: 'var(--border-radius-lg, 18px)',
                 fontSize: '0.78rem', fontWeight: isActive ? 700 : 500,
                 background: isActive ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'var(--bg-tertiary)',
                 border: isActive ? '1px solid transparent' : '1px solid var(--glass-border)',
@@ -453,11 +465,12 @@ export default function NotifRemindersTab({ onRefreshMetrics }) {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{
-                  width: '36px', height: '36px', borderRadius: '10px',
+                  width: '38px', height: '38px', borderRadius: '10px',
                   background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)', flexShrink: 0
                 }}>
-                  <Clock size={18} />
+                  <Clock size={20} />
                 </div>
                 <div>
                   <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 800 }}>
@@ -470,9 +483,11 @@ export default function NotifRemindersTab({ onRefreshMetrics }) {
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 

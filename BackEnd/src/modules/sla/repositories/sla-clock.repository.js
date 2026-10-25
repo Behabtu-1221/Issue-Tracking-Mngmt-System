@@ -23,13 +23,13 @@ export const slaClockRepository = {
         ir.Title AS RequestTitle,
         ir.PriorityCode,
         ir.StatusCode AS RequestStatusCode,
-        s.ServiceName,
+        COALESCE(s.ServiceName, 'General Request') AS ServiceName,
         st.TargetResponseMinutes,
         st.TargetResolutionMinutes
       FROM SLAClock c
       JOIN IssueRequest ir ON c.IssueRequestID = ir.IssueRequestID
-      JOIN Service s ON ir.ServiceID = s.ServiceID
-      JOIN SLAStage st ON c.SLAStageID = st.SLAStageID
+      LEFT JOIN Service s ON ir.ServiceID = s.ServiceID
+      LEFT JOIN SLAStage st ON c.SLAStageID = st.SLAStageID
       WHERE c.IsDeleted = 0
     `;
 
@@ -64,10 +64,10 @@ export const slaClockRepository = {
         ir.Title AS RequestTitle,
         ir.PriorityCode,
         ir.StatusCode AS RequestStatusCode,
-        s.ServiceName
+        COALESCE(s.ServiceName, 'General Request') AS ServiceName
       FROM SLAClock c
       JOIN IssueRequest ir ON c.IssueRequestID = ir.IssueRequestID
-      JOIN Service s ON ir.ServiceID = s.ServiceID
+      LEFT JOIN Service s ON ir.ServiceID = s.ServiceID
       WHERE c.SLAClockID = ? AND c.IsDeleted = 0
     `;
     const rows = await query(sql, [clockId]);

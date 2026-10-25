@@ -74,12 +74,6 @@ router.get(
   reportingController.getAuditAnalytics
 );
 
-router.get(
-  '/knowledge',
-  authorizePermissions('Report.View', 'Knowledge.Read'),
-  reportingController.getKnowledgeAnalytics
-);
-
 // ── Universal Export Endpoint ──
 router.get(
   '/export/:reportType',

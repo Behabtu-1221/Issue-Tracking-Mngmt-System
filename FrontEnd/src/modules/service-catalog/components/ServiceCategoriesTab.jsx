@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import {
   FolderKanban,
   Plus,
@@ -23,10 +25,19 @@ import { parkApi } from '../../business-park/api/parkApi';
 import orgApi from '../../organization/api/orgApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { serviceSchemas } from '../../../validation';
 import { FormField } from '../../../components/common/FormField';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function ServiceCategoriesTab({ onCategoryUpdated }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user, isParkAdmin, isCompanyAdmin, hasPermission } = usePermissionContext();
+  const roleCode = (user?.userTypeCode || user?.UserTypeCode || (user?.roles && user?.roles[0]?.RoleCode) || '').toUpperCase();
+  const isEmployee = roleCode === 'EMPLOYEE' || (!isParkAdmin && !isCompanyAdmin && !hasPermission('Service.Create'));
+  const canManageCategories = !isEmployee && (hasPermission('Service.Create') || hasPermission('Service.Update') || isParkAdmin || isCompanyAdmin);
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -148,7 +159,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
     const validation = serviceSchemas.categoryForm(formData, Boolean(editingCategory));
     if (!validation.isValid) {
       setFieldErrors(validation.errors);
-      setError('Please review and correct the invalid category fields below.');
+      setError(t('catalog.categoriesTab.validationError', 'Please review and correct the invalid category fields below.'));
       return;
     }
 
@@ -165,10 +176,10 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
           DepartmentID: sanitized.DepartmentID,
           IsActive: sanitized.IsActive
         });
-        setSuccess(`Category '${sanitized.CategoryName}' updated successfully.`);
+        setSuccess(t('catalog.categoriesTab.updatedSuccess', { name: sanitized.CategoryName }, `Category '${sanitized.CategoryName}' updated successfully.`));
       } else {
         await serviceCatalogApi.createCategory(sanitized);
-        setSuccess(`Category '${sanitized.CategoryName}' created successfully.`);
+        setSuccess(t('catalog.categoriesTab.createdSuccess', { name: sanitized.CategoryName }, `Category '${sanitized.CategoryName}' created successfully.`));
       }
 
       setModalOpen(false);
@@ -185,8 +196,8 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
   const handleDelete = async (id, name, serviceCount) => {
     if (serviceCount > 0) {
       showAlert(
-        'Category Cannot Be Deleted',
-        `Category '${name}' cannot be deleted because it currently has ${serviceCount} active services associated with it. Reassign or delete those services first.`,
+        t('catalog.categoriesTab.cannotDeleteTitle', 'Category Cannot Be Deleted'),
+        t('catalog.categoriesTab.cannotDeleteMsg', { name, count: serviceCount }, `Category '${name}' cannot be deleted because it currently has ${serviceCount} active services associated with it. Reassign or delete those services first.`),
         'warning'
       );
       return;
@@ -194,23 +205,23 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
     
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Service Category',
-      message: `Are you sure you want to delete category '${name}'?`,
+      title: t('catalog.categoriesTab.deleteTitle', 'Delete Service Category'),
+      message: t('catalog.categoriesTab.deleteConfirm', { name }, `Are you sure you want to delete category '${name}'?`),
       type: 'danger',
-      confirmText: 'Delete Category',
+      confirmText: t('catalog.categoriesTab.deleteBtn', 'Delete Category'),
       onConfirm: async () => {
         try {
           setError(null);
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
           await serviceCatalogApi.deleteCategory(id);
-          setSuccess(`Category '${name}' deleted successfully.`);
+          setSuccess(t('catalog.categoriesTab.deletedSuccess', { name }, `Category '${name}' deleted successfully.`));
           fetchCategories();
           if (onCategoryUpdated) onCategoryUpdated();
           setTimeout(() => setSuccess(null), 4000);
         } catch (err) {
           const msg = err.response?.data?.message || 'Failed to delete category';
           setError(msg);
-          showAlert('Action Restricted', msg, 'error');
+          showAlert(t('catalog.categoriesTab.actionRestricted', 'Action Restricted'), msg, 'error');
         }
       }
     });
@@ -241,7 +252,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
           <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search categories by name, code, description..."
+            placeholder={t('catalog.categoriesTab.searchPlaceholder', 'Search categories by name, code, description...')}
             value={search}
             onChange={handleSearchChange}
             style={{
@@ -256,25 +267,27 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
           />
         </div>
 
-        <button
-          onClick={() => handleOpenModal()}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 20px',
-            background: 'var(--accent-gradient)',
-            border: 'none',
-            borderRadius: 'var(--border-radius-sm)',
-            color: '#fff',
-            fontWeight: '600',
-            cursor: 'pointer',
-            boxShadow: 'var(--shadow-lg)'
-          }}
-        >
-          <Plus size={18} />
-          Create Category
-        </button>
+        {canManageCategories && (
+          <button
+            onClick={() => handleOpenModal()}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              background: 'var(--accent-gradient)',
+              border: 'none',
+              borderRadius: 'var(--border-radius-sm)',
+              color: '#fff',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-lg)'
+            }}
+          >
+            <Plus size={18} />
+            {t('catalog.categoriesTab.createBtn', 'Create Category')}
+          </button>
+        )}
       </div>
 
       {/* Notifications */}
@@ -291,10 +304,10 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
 
       {/* Categories Grid */}
       {loading ? (
-        <div style={{ padding: '40px', textStyle: 'center', color: 'var(--text-muted)' }}>Loading categories...</div>
+        <div style={{ padding: '40px', textStyle: 'center', color: 'var(--text-muted)' }}>{t('catalog.categoriesTab.loading', 'Loading categories...')}</div>
       ) : categories.length === 0 ? (
         <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-          No service categories found. Click "Create Category" to get started.
+          {t('catalog.categoriesTab.noCategories', 'No service categories found. Click "Create Category" to get started.')}
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
@@ -341,7 +354,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                     }}
                   >
                     {cat.IsActive ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
-                    {cat.IsActive ? 'Active' : 'Inactive'}
+                    {cat.IsActive ? t('catalog.categoriesTab.active', 'Active') : t('catalog.categoriesTab.inactive', 'Inactive')}
                   </span>
                 </div>
 
@@ -364,66 +377,54 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                     border: '1px solid var(--glass-border)'
                   }}>
                     <ArrowRight size={12} color="var(--accent-primary)" />
-                    <span style={{ color: 'var(--text-muted)' }}>Ticket Routing:</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{t('catalog.categoriesTab.ticketRouting', 'Ticket Routing:')}</span>
                     {cat.RoutedDepartmentName ? (
                       <span style={{ color: '#60a5fa', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <Building2 size={12} /> {cat.RoutedDepartmentName}
                       </span>
                     ) : (
-                      <span style={{ color: '#f59e0b', fontStyle: 'italic' }}>Unmapped (No auto-dispatch)</span>
+                      <span style={{ color: '#f59e0b', fontStyle: 'italic' }}>{t('catalog.categoriesTab.unmappedRouting', 'Unmapped (No auto-dispatch)')}</span>
                     )}
                   </div>
                 </div>
 
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: '1.4' }}>
-                  {cat.Description || 'No description provided.'}
+                  {cat.Description || t('catalog.servicesTab.noDescription', 'No description provided.')}
                 </p>
               </div>
 
               <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '12px', marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   <Layers size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                  <strong>{cat.ServiceCount || 0}</strong> Services Offered
+                  <strong>{cat.ServiceCount || 0}</strong> {t('catalog.categoriesTab.servicesOfferedCount', { count: cat.ServiceCount || 0 }, '{count} Services Offered')}
                 </span>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={() => handleOpenModal(cat)}
-                    style={{
-                      padding: '6px 10px',
-                      borderRadius: 'var(--border-radius-sm)',
-                      border: '1px solid var(--glass-border)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      color: 'var(--text-secondary)',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <Edit2 size={14} />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(cat.ServiceCategoryID, cat.CategoryName, cat.ServiceCount)}
-                    style={{
-                      padding: '6px 10px',
-                      borderRadius: 'var(--border-radius-sm)',
-                      border: '1px solid rgba(239, 68, 68, 0.3)',
-                      backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                      color: '#ef4444',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <Trash2 size={14} />
-                    Delete
-                  </button>
-                </div>
+                <ActionGroup align="right">
+                  {canManageCategories ? (
+                    <>
+                      <ActionButton
+                        variant="edit"
+                        label={t('catalog.categoriesTab.edit', 'Edit')}
+                        onClick={() => handleOpenModal(cat)}
+                        title={t('catalog.categoriesTab.edit', 'Edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
+                        label={t('catalog.categoriesTab.delete', 'Delete')}
+                        onClick={() => handleDelete(cat.ServiceCategoryID, cat.CategoryName, cat.ServiceCount)}
+                        title={t('catalog.categoriesTab.delete', 'Delete')}
+                      />
+                    </>
+                  ) : (
+                    <ActionButton
+                      variant="primary"
+                      label={t('catalog.viewCategoryServices', 'Browse Services')}
+                      onClick={() => navigate(`/services/directory?category=${cat.ServiceCategoryID}`)}
+                      title={t('catalog.viewCategoryServices', 'Browse Services')}
+                      icon={<Layers size={13} />}
+                    />
+                  )}
+                </ActionGroup>
               </div>
             </div>
           ))}
@@ -431,26 +432,36 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
       )}
 
       {/* CREATE / EDIT CATEGORY MODAL */}
-      {modalOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 9999,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
-          backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-          animation: 'fadeIn 0.2s ease-out'
-        }}>
-          <div style={{
-            width: '600px', maxWidth: '95vw', maxHeight: '90vh',
-            backgroundColor: 'var(--bg-secondary)',
-            border: '1px solid var(--glass-border)',
-            borderRadius: 'var(--border-radius-lg)',
-            boxShadow: 'var(--shadow-lg)',
-            display: 'flex', flexDirection: 'column',
-            overflow: 'hidden', animation: 'slideUp 0.3s ease-out'
-          }}>
+      {modalOpen && canManageCategories && (
+        <div 
+          onClick={() => setModalOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            animation: 'fadeIn 0.2s ease-out', padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="category-modal-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              width: '600px', maxWidth: '100%', maxHeight: '90vh',
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--glass-border-accent)',
+              borderRadius: 'var(--border-radius-lg, 18px)',
+              boxShadow: 'var(--modal-shadow, var(--shadow-lg))',
+              display: 'flex', flexDirection: 'column',
+              overflow: 'hidden', position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
             <div style={{
-              padding: '20px 24px',
+              padding: '16px 20px',
               borderBottom: '1px solid var(--glass-border)',
               background: 'var(--bg-tertiary)',
               display: 'flex',
@@ -458,22 +469,22 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
               alignItems: 'center',
               flexShrink: 0
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
-                  padding: '8px',
-                  borderRadius: '10px',
-                  background: 'rgba(138, 75, 255, 0.15)',
-                  color: 'var(--accent-primary)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  width: '38px', height: '38px', borderRadius: '10px',
+                  background: 'var(--accent-gradient)',
+                  color: '#ffffff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: 'var(--glow-accent)', flexShrink: 0
                 }}>
-                  <FolderKanban size={18} />
+                  <FolderKanban size={20} />
                 </div>
                 <div>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>
-                    {editingCategory ? 'Edit Service Category' : 'Create Service Category'}
+                  <h2 id="category-modal-title" style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>
+                    {editingCategory ? t('catalog.categoriesTab.editModalTitle', 'Edit Service Category') : t('catalog.categoriesTab.createModalTitle', 'Create Service Category')}
                   </h2>
-                  <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    Define catalog service classification and organization grouping
+                  <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {t('catalog.categoriesTab.modalSubtitle', 'Define catalog service classification and organization grouping')}
                   </p>
                 </div>
               </div>
@@ -481,9 +492,11 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
                 style={{
-                  background: 'none', border: 'none', color: 'var(--text-muted)',
-                  cursor: 'pointer', padding: '6px', borderRadius: '50%',
+                  background: 'transparent', border: 'none', color: 'var(--text-muted)',
+                  cursor: 'pointer', padding: '6px', borderRadius: '8px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}
               >
@@ -492,13 +505,14 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', overflowY: 'auto', flex: 1 }}>
-              <FormField
-                label="Target Business Park Campus"
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+              <div style={{ padding: 'clamp(16px, 3vw, 24px)', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                <FormField
+                label={t('catalog.categoriesTab.campusLabel', 'Target Business Park Campus')}
                 id="TenantID"
                 icon={Building2}
                 error={fieldErrors.TenantID}
-                helpText="Optional: Leave blank to make this category globally accessible park-wide."
+                helpText={t('catalog.categoriesTab.campusHelp', 'Optional: Leave blank to make this category globally accessible park-wide.')}
               >
                 <select
                   id="TenantID"
@@ -512,7 +526,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                     fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
                   }}
                 >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Global (All Business Park Campuses)</option>
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('catalog.categoriesTab.campusGlobal', 'Global (All Business Park Campuses)')}</option>
                   {parks.map((p) => (
                     <option key={p.BusinessParkID} value={p.BusinessParkID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                       🏞️ {p.BusinessParkName} ({p.BusinessParkCode})
@@ -522,11 +536,11 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
               </FormField>
 
               <FormField
-                label="Responsible Department (Ticket Auto-Routing)"
+                label={t('catalog.categoriesTab.deptAutoRouting', 'Responsible Department (Ticket Auto-Routing)')}
                 id="DepartmentID"
                 icon={Building2}
                 error={fieldErrors.DepartmentID}
-                helpText="Issues and tickets filed under this category will automatically route to this department."
+                helpText={t('catalog.categoriesTab.deptAutoRoutingHelp', 'Issues and tickets filed under this category will automatically route to this department.')}
               >
                 <select
                   id="DepartmentID"
@@ -540,7 +554,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                     fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
                   }}
                 >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Routing Department (Manual Dispatch) --</option>
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('catalog.categoriesTab.deptNone', '-- No Routing Department (Manual Dispatch) --')}</option>
                   {departments.map((d) => (
                     <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                       🏢 {d.DepartmentName} ({d.DepartmentCode || 'DEPT'})
@@ -551,18 +565,18 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '16px' }}>
                 <FormField
-                  label="Category Code"
+                  label={t('catalog.categoriesTab.codeLabel', 'Category Code')}
                   id="CategoryCode"
                   required
                   icon={Tag}
                   error={fieldErrors.CategoryCode}
-                  helpText={editingCategory ? 'Category codes are immutable.' : 'e.g. IT-NET'}
+                  helpText={editingCategory ? t('catalog.categoriesTab.codeImmutable', 'Category codes are immutable.') : t('catalog.categoriesTab.codePlaceholder', 'e.g. IT-NET')}
                 >
                   <input
                     id="CategoryCode"
                     type="text"
                     disabled={!!editingCategory}
-                    placeholder="e.g. IT-NET"
+                    placeholder={t('catalog.categoriesTab.codePlaceholder', 'e.g. IT-NET')}
                     value={formData.CategoryCode}
                     onChange={(e) => handleFieldChange('CategoryCode', e.target.value.toUpperCase())}
                     style={{
@@ -578,7 +592,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                 </FormField>
 
                 <FormField
-                  label="Category Name"
+                  label={t('catalog.categoriesTab.nameLabel', 'Category Name')}
                   id="CategoryName"
                   required
                   icon={Sparkles}
@@ -587,7 +601,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                   <input
                     id="CategoryName"
                     type="text"
-                    placeholder="e.g. IT & Network Infrastructure"
+                    placeholder={t('catalog.categoriesTab.namePlaceholder', 'e.g. IT & Network Infrastructure')}
                     value={formData.CategoryName}
                     onChange={(e) => handleFieldChange('CategoryName', e.target.value)}
                     style={{
@@ -602,16 +616,16 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
               </div>
 
               <FormField
-                label="Category Description"
+                label={t('catalog.categoriesTab.descLabel', 'Category Description')}
                 id="Description"
                 icon={FileText}
                 error={fieldErrors.Description}
-                helpText="Overview of services included in this category classification."
+                helpText={t('catalog.categoriesTab.descHelp', 'Overview of services included in this category classification.')}
               >
                 <textarea
                   id="Description"
                   rows={3}
-                  placeholder="Overview of services included in this category classification..."
+                  placeholder={t('catalog.categoriesTab.descPlaceholder', 'Overview of services included in this category classification...')}
                   value={formData.Description}
                   onChange={(e) => handleFieldChange('Description', e.target.value)}
                   style={{
@@ -631,7 +645,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                   fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px'
                 }}>
-                  <ShieldCheck size={14} color="var(--accent-primary)" /> Status
+                  <ShieldCheck size={14} color="var(--accent-primary)" /> {t('catalog.categoriesTab.statusLabel', 'Status')}
                 </label>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -646,7 +660,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <CheckCircle2 size={16} color={Number(formData.IsActive) === 1 ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Active Category</span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t('catalog.categoriesTab.activeCategory', 'Active Category')}</span>
                     </div>
                   </div>
 
@@ -661,40 +675,39 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <XCircle size={16} color={Number(formData.IsActive) === 0 ? '#fbbf24' : 'var(--text-muted)'} />
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Inactive</span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t('catalog.categoriesTab.inactiveCategory', 'Inactive')}</span>
                     </div>
                   </div>
                 </div>
               </div>
+              </div>
 
-              {/* Actions */}
+              {/* Actions Footer */}
               <div style={{
-                display: 'flex', justifyContent: 'flex-end', gap: '12px',
-                marginTop: '8px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)'
+                padding: '14px 20px', borderTop: '1px solid var(--glass-border)',
+                background: 'var(--bg-tertiary)', display: 'flex', gap: '12px',
+                justifyContent: 'flex-end', flexShrink: 0
               }}>
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
+                  className="btn btn-secondary touch-target-sm"
                   style={{
-                    padding: '10px 18px', borderRadius: 'var(--border-radius-sm)',
-                    border: '1px solid var(--glass-border)', background: 'transparent',
-                    color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer'
+                    padding: '9px 18px', borderRadius: 'var(--border-radius-sm)'
                   }}
                 >
-                  Cancel
+                  {t('catalog.categoriesTab.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
+                  className="btn btn-primary touch-target-sm"
                   style={{
-                    padding: '10px 22px', borderRadius: 'var(--border-radius-sm)', border: 'none',
-                    background: 'var(--accent-gradient)', color: '#ffffff', fontWeight: '700',
-                    fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                    boxShadow: 'var(--glow-accent)'
+                    padding: '9px 22px', borderRadius: 'var(--border-radius-sm)'
                   }}
                 >
                   {submitting && <RefreshCw size={14} className="spin" />}
-                  {submitting ? 'Saving Category...' : editingCategory ? 'Update Category' : 'Create Category'}
+                  {submitting ? t('catalog.categoriesTab.saving', 'Saving Category...') : editingCategory ? t('catalog.categoriesTab.updateBtn', 'Update Category') : t('catalog.categoriesTab.createActionBtn', 'Create Category')}
                 </button>
               </div>
             </form>

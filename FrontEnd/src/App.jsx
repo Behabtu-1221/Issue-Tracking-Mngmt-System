@@ -65,14 +65,10 @@ import TenantContactsPage from './modules/tenant/pages/TenantContactsPage';
 import ServiceDashboardPage from './modules/service-catalog/pages/ServiceDashboardPage';
 import ServiceDirectoryPage from './modules/service-catalog/pages/ServiceDirectoryPage';
 import ServiceCategoriesPage from './modules/service-catalog/pages/ServiceCategoriesPage';
-import ServicePricingPage from './modules/service-catalog/pages/ServicePricingPage';
-import ServiceRequirementsPage from './modules/service-catalog/pages/ServiceRequirementsPage';
-import ServiceGovernancePage from './modules/service-catalog/pages/ServiceGovernancePage';
 import ServiceCategoryMappingsPage from './modules/service-catalog/pages/ServiceCategoryMappingsPage';
 
 import IssueDashboardPage from './modules/issue-management/pages/IssueDashboardPage';
 import IssueTrackerPage from './modules/issue-management/pages/IssueTrackerPage';
-import IssueKnownPage from './modules/issue-management/pages/IssueKnownPage';
 import IssueStatusFlowPage from './modules/issue-management/pages/IssueStatusFlowPage';
 import CreateRequestPage from './modules/issue-management/pages/CreateRequestPage';
 import MyRequestsPage from './modules/issue-management/pages/MyRequestsPage';
@@ -159,11 +155,8 @@ function AuthenticatedShell() {
           <Route path="services" element={<Navigate to="/services/dashboard" replace />} />
           <Route path="services/dashboard" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><ServiceDashboardPage /></ProtectedRoute>} />
           <Route path="services/directory" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><ServiceDirectoryPage /></ProtectedRoute>} />
-          <Route path="services/categories" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><ServiceCategoriesPage /></ProtectedRoute>} />
-          <Route path="services/category-mappings" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><ServiceCategoryMappingsPage /></ProtectedRoute>} />
-          <Route path="services/pricing" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><ServicePricingPage /></ProtectedRoute>} />
-          <Route path="services/requirements" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><ServiceRequirementsPage /></ProtectedRoute>} />
-          <Route path="services/governance" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><ServiceGovernancePage /></ProtectedRoute>} />
+          <Route path="services/categories" element={<ProtectedRoute permission="Service.Read" onBack={() => handleNavigate('dashboard')}><ServiceCategoriesPage /></ProtectedRoute>} />
+          <Route path="services/category-mappings" element={<ProtectedRoute permission="Service.Update" onBack={() => handleNavigate('dashboard')}><ServiceCategoryMappingsPage /></ProtectedRoute>} />
           
           <Route path="issues" element={<Navigate to="/issues/my-requests" replace />} />
           <Route path="issues/dashboard" element={<ProtectedRoute permission="Report.View" onBack={() => handleNavigate('dashboard')}><IssueDashboardPage /></ProtectedRoute>} />
@@ -172,7 +165,7 @@ function AuthenticatedShell() {
           <Route path="issues/my-requests" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><MyRequestsPage /></ProtectedRoute>} />
           <Route path="issues/history" element={<ProtectedRoute permission="Request.Read" onBack={() => handleNavigate('dashboard')}><RequestHistoryPage /></ProtectedRoute>} />
           <Route path="issues/status-flow" element={<ProtectedRoute permission="Request.Update" onBack={() => handleNavigate('dashboard')}><IssueStatusFlowPage /></ProtectedRoute>} />
-          <Route path="issues/known" element={<ProtectedRoute permission="Knowledge.Read" onBack={() => handleNavigate('dashboard')}><IssueKnownPage /></ProtectedRoute>} />
+          <Route path="issues/known" element={<Navigate to="/issues/tracker" replace />} />
           
           <Route path="approvals" element={<Navigate to="/approvals/dashboard" replace />} />
           <Route path="approvals/dashboard" element={<ProtectedRoute permission="Request.Approve" onBack={() => handleNavigate('dashboard')}><ApprovalDashboardPage /></ProtectedRoute>} />
@@ -202,7 +195,7 @@ function AuthenticatedShell() {
           <Route path="notifications" element={<Navigate to="/notifications/dashboard" replace />} />
           <Route path="notifications/dashboard" element={<ProtectedRoute anyPermission={['Notification.Manage', 'Request.Read', 'Communication.Read']} onBack={() => handleNavigate('dashboard')}><NotifDashboardPage /></ProtectedRoute>} />
           <Route path="notifications/inbox" element={<ProtectedRoute anyPermission={['Notification.Manage', 'Request.Read', 'Communication.Read']} onBack={() => handleNavigate('dashboard')}><NotifInboxPage /></ProtectedRoute>} />
-          <Route path="notifications/preferences" element={<ProtectedRoute anyPermission={['Notification.Manage', 'Request.Read', 'Communication.Read']} onBack={() => handleNavigate('dashboard')}><NotifPreferencesPage /></ProtectedRoute>} />
+          <Route path="notifications/preferences" element={<Navigate to="/profile?tab=notifications" replace />} />
           <Route path="notifications/reminders" element={<ProtectedRoute anyPermission={['Notification.Manage', 'Request.Read', 'Communication.Read']} onBack={() => handleNavigate('dashboard')}><NotifRemindersPage /></ProtectedRoute>} />
           <Route path="notifications/templates" element={<ProtectedRoute permission="Notification.Manage" onBack={() => handleNavigate('dashboard')}><NotifTemplatesPage /></ProtectedRoute>} />
           <Route path="notifications/log" element={<ProtectedRoute permission="Notification.Manage" onBack={() => handleNavigate('dashboard')}><NotifDeliveryLogPage /></ProtectedRoute>} />

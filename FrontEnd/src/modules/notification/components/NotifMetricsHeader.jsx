@@ -1,7 +1,9 @@
 import React from 'react';
 import { Send, Bell, Mail, Clock } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function NotifMetricsHeader({ metrics, activeTab, onTabChange }) {
+  const { t } = useTranslation();
   const totalSent = metrics?.totalSent || 0;
   const unreadInApp = metrics?.unreadInApp || 0;
   const emailsDelivered = metrics?.emailsDelivered || 0;
@@ -10,9 +12,9 @@ export default function NotifMetricsHeader({ metrics, activeTab, onTabChange }) 
   const cards = [
     {
       id: 'inbox',
-      title: 'Unread In-App Alerts',
+      title: t('notifications.metrics.unreadAlerts', 'Unread In-App Alerts'),
       value: unreadInApp,
-      subtext: 'Requires user attention',
+      subtext: t('notifications.metrics.unreadAlertsSub', 'Requires user attention'),
       icon: Bell,
       color: '#ef4444',
       bgGlow: 'rgba(239, 68, 68, 0.18)',
@@ -21,9 +23,9 @@ export default function NotifMetricsHeader({ metrics, activeTab, onTabChange }) 
     },
     {
       id: 'log',
-      title: 'Emails Delivered',
+      title: t('notifications.metrics.emailsDelivered', 'Emails Delivered'),
       value: emailsDelivered,
-      subtext: 'Real SMTP email deliveries',
+      subtext: t('notifications.metrics.emailsDeliveredSub', 'Real SMTP email deliveries'),
       icon: Mail,
       color: '#10b981',
       bgGlow: 'rgba(16, 185, 129, 0.18)',
@@ -31,9 +33,9 @@ export default function NotifMetricsHeader({ metrics, activeTab, onTabChange }) 
     },
     {
       id: 'reminders',
-      title: 'Active Reminders',
+      title: t('notifications.metrics.activeReminders', 'Active Reminders'),
       value: pendingReminders,
-      subtext: 'Scheduled automated reminders',
+      subtext: t('notifications.metrics.activeRemindersSub', 'Scheduled automated reminders'),
       icon: Clock,
       color: '#f59e0b',
       bgGlow: 'rgba(245, 158, 11, 0.18)',
@@ -41,9 +43,9 @@ export default function NotifMetricsHeader({ metrics, activeTab, onTabChange }) 
     },
     {
       id: 'templates',
-      title: 'Total Dispatched',
+      title: t('notifications.metrics.totalDispatched', 'Total Dispatched'),
       value: totalSent,
-      subtext: 'Master notifications sent',
+      subtext: t('notifications.metrics.totalDispatchedSub', 'Master notifications sent'),
       icon: Send,
       color: '#6366f1',
       bgGlow: 'rgba(99, 102, 241, 0.18)',

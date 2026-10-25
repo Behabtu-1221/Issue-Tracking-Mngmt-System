@@ -86,7 +86,8 @@ export const approvalRepository = {
     };
   },
 
-  async findById(id) {
+  async findById(id, tx = null) {
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
     const sql = `
       SELECT a.*,
         ir.RequestNumber,
@@ -120,7 +121,7 @@ export const approvalRepository = {
       LEFT JOIN \`User\` fa ON a.FinalActionedByUserID = fa.UserID
       WHERE a.ApprovalID = ? AND a.IsDeleted = 0
     `;
-    const rows = await query(sql, [id]);
+    const rows = await runner(sql, [id]);
     if (!rows[0]) return null;
 
     const approval = rows[0];
@@ -144,7 +145,7 @@ export const approvalRepository = {
       WHERE st.ApprovalID = ? AND st.IsDeleted = 0
       ORDER BY st.StageNumber ASC, st.SequenceNumber ASC
     `;
-    approval.stages = await query(stagesSql, [id]);
+    approval.stages = await runner(stagesSql, [id]);
 
     // Fetch history logs
     const historySql = `
@@ -154,7 +155,7 @@ export const approvalRepository = {
       WHERE h.ApprovalID = ? AND h.IsDeleted = 0
       ORDER BY h.CreatedDate ASC
     `;
-    approval.history = await query(historySql, [id]);
+    approval.history = await runner(historySql, [id]);
 
     // Fetch documents attached to this issue/approval
     const docsSql = `
@@ -166,7 +167,7 @@ export const approvalRepository = {
       ) AND IsArchived = 0
       ORDER BY CreatedAt DESC
     `;
-    approval.documents = await query(docsSql, [approval.RequestID, approval.ApprovalID]);
+    approval.documents = await runner(docsSql, [approval.RequestID, approval.ApprovalID]);
 
     return approval;
   },
@@ -326,6 +327,19 @@ export const approvalRepository = {
     `;
     const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
     await runner(sql, [statusCode, userId || 1, stageId]);
+  },
+
+  async updateStageApprover(stageId, approverUserId, approverGroupId = null, userId = null, tx = null) {
+    const sql = `
+      UPDATE ApprovalStage SET
+        ApproverUserID = COALESCE(?, ApproverUserID),
+        ApproverGroupID = COALESCE(?, ApproverGroupID),
+        ModifiedBy = ?,
+        ModifiedDate = CURRENT_TIMESTAMP(6)
+      WHERE ApprovalStageID = ? AND IsDeleted = 0
+    `;
+    const runner = (tx && typeof tx.query === 'function') ? tx.query.bind(tx) : query;
+    await runner(sql, [approverUserId ?? null, approverGroupId ?? null, userId || 1, stageId]);
   },
 
   async recordDecision(data, tx = null) {

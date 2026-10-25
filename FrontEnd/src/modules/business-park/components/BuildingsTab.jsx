@@ -3,6 +3,7 @@ import { Building, Search, Plus, RefreshCw, Edit, Trash2, X, Layers, MapPin, Arr
 import parkApi from '../api/parkApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { parkSchemas } from '../../../validation';
 import { useTranslation } from '../../../i18n';
 
@@ -376,38 +377,20 @@ export default function BuildingsTab() {
                         <span className="badge badge-info">{b.OfficeCount || 0} {t('businessPark.offices')}</span>
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                          <button
+                        <ActionGroup align="right">
+                          <ActionButton
+                            variant="edit"
+                            label={t('common.edit')}
                             onClick={() => openEditModal(b)}
                             title={t('businessPark.editBuilding')}
-                            style={{
-                              display: 'inline-flex', alignItems: 'center', gap: '4px',
-                              padding: '6px 12px', borderRadius: '8px',
-                              background: 'rgba(99, 102, 241, 0.15)',
-                              border: '1px solid rgba(99, 102, 241, 0.35)',
-                              color: 'var(--accent-primary)',
-                              fontWeight: 700, fontSize: '0.8rem',
-                              cursor: 'pointer', transition: 'all 0.2s'
-                            }}
-                          >
-                            <Edit size={14} /> {t('common.edit')}
-                          </button>
-                          <button
+                          />
+                          <ActionButton
+                            variant="delete"
+                            label={t('common.delete')}
                             onClick={() => promptDeleteBuilding(b)}
                             title={t('businessPark.deleteBuilding')}
-                            style={{
-                              display: 'inline-flex', alignItems: 'center', gap: '4px',
-                              padding: '6px 12px', borderRadius: '8px',
-                              background: 'rgba(239, 68, 68, 0.12)',
-                              border: '1px solid rgba(239, 68, 68, 0.35)',
-                              color: 'var(--color-danger)',
-                              fontWeight: 700, fontSize: '0.8rem',
-                              cursor: 'pointer', transition: 'all 0.2s'
-                            }}
-                          >
-                            <Trash2 size={14} /> {t('common.delete')}
-                          </button>
-                        </div>
+                          />
+                        </ActionGroup>
                       </td>
                     </tr>
                   ))}
@@ -438,45 +421,81 @@ export default function BuildingsTab() {
 
       {/* Register / Edit Modal */}
       {showCreateModal && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
-          backdropFilter: 'blur(8px)', zIndex: 1000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
-        }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '640px', overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div 
+          onClick={() => setShowCreateModal(false)}
+          style={{
+            position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="building-modal-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{ 
+              width: '100%', maxWidth: '640px', maxHeight: '90vh', 
+              borderRadius: 'var(--border-radius-lg, 18px)',
+              display: 'flex', flexDirection: 'column', overflow: 'hidden',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--glass-border)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div style={{ padding: '10px', borderRadius: '12px', background: 'var(--accent-gradient)', color: '#fff' }}>
-                    <Building size={20} />
-                  </div>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {selectedBuilding ? t('businessPark.editBuildingBlock') : t('businessPark.registerBuilding')}
-                    </h3>
-                    <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {selectedBuilding ? `${t('businessPark.modifyingStructure')}: ${selectedBuilding.BuildingCode}` : t('businessPark.defineBuildingDetails')}
-                    </p>
-                  </div>
+            <div style={{ 
+              padding: '16px 20px', 
+              borderBottom: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  width: '38px', height: '38px', borderRadius: '10px', 
+                  background: 'var(--accent-gradient)', color: '#fff', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: 'var(--glow-accent)', flexShrink: 0 
+                }}>
+                  <Building size={20} />
                 </div>
-                <button onClick={() => setShowCreateModal(false)} style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px' }}>
-                  <X size={18} />
-                </button>
+                <div>
+                  <h3 id="building-modal-title" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {selectedBuilding ? t('businessPark.editBuildingBlock') : t('businessPark.registerBuilding')}
+                  </h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {selectedBuilding ? `${t('businessPark.modifyingStructure')}: ${selectedBuilding.BuildingCode}` : t('businessPark.defineBuildingDetails')}
+                  </p>
+                </div>
               </div>
+              <button 
+                onClick={() => setShowCreateModal(false)} 
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ 
+                  background: 'transparent', border: 'none', 
+                  borderRadius: '8px', color: 'var(--text-muted)', cursor: 'pointer', 
+                  padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                }}
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            {/* Form Content */}
-            <div style={{ padding: '24px 28px' }}>
-              {formError && (
-                <div style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', fontSize: '0.84rem', marginBottom: '20px', fontWeight: 600 }}>
-                  ⚠️ {formError}
-                </div>
-              )}
-
-              <form onSubmit={handleSaveBuilding} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }} noValidate>
+            {/* Modal Body */}
+            <form onSubmit={handleSaveBuilding} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }} noValidate>
+              <div style={{ 
+                padding: 'clamp(16px, 3vw, 24px)', 
+                overflowY: 'auto', flex: 1, 
+                display: 'flex', flexDirection: 'column', gap: '16px' 
+              }}>
+                {formError && (
+                  <div style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', fontSize: '0.84rem', fontWeight: 600 }}>
+                    ⚠️ {formError}
+                  </div>
+                )}
                 {/* Parent Hierarchy Selection */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
                       1. {t('businessPark.businessPark')}
@@ -529,7 +548,7 @@ export default function BuildingsTab() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>{t('businessPark.buildingName')} *</label>
                     <input
@@ -572,7 +591,7 @@ export default function BuildingsTab() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
                       {t('businessPark.enterTotalFloors')} *
@@ -638,22 +657,37 @@ export default function BuildingsTab() {
                     </span>
                   )}
                 </div>
+              </div>
 
-                {/* Footer Actions */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)' }}>
-                  <button type="button" onClick={() => setShowCreateModal(false)} style={{ padding: '10px 22px', borderRadius: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.88rem' }}>
-                    {t('common.cancel')}
-                  </button>
-                  <button type="submit" disabled={formSubmitting} style={{ padding: '10px 24px', borderRadius: '10px', background: 'var(--accent-gradient)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', opacity: formSubmitting ? 0.7 : 1 }}>
-                    {formSubmitting ? `⏳ ${t('common.loading')}` : selectedBuilding ? `✓ ${t('businessPark.updateBuilding')}` : `✓ ${t('businessPark.addBuilding')}`}
-                  </button>
-                </div>
-              </form>
-            </div>
+              {/* Pinned Modal Footer */}
+              <div style={{ 
+                padding: '14px 20px', 
+                borderTop: '1px solid var(--glass-border)', 
+                background: 'var(--bg-tertiary)', 
+                display: 'flex', gap: '12px', justifyContent: 'flex-end', 
+                flexShrink: 0 
+              }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowCreateModal(false)} 
+                  className="btn btn-secondary touch-target-sm" 
+                  style={{ padding: '9px 18px', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  {t('common.cancel')}
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={formSubmitting} 
+                  className="btn btn-primary touch-target-sm" 
+                  style={{ padding: '9px 22px', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  {formSubmitting ? `⏳ ${t('common.loading')}` : selectedBuilding ? `✓ ${t('businessPark.updateBuilding')}` : `✓ ${t('businessPark.addBuilding')}`}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-
       {/* Shared Glass Modals */}
       <ConfirmDialogModal
         isOpen={confirmConfig.isOpen}

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Cpu, Plus, Edit3, Trash2, ToggleLeft, ToggleRight, RefreshCw, AlertCircle } from 'lucide-react';
 import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 
 export default function BusinessRulesTab() {
   const { t } = useTranslation();
@@ -112,20 +115,7 @@ export default function BusinessRulesTab() {
 
         <button
           onClick={() => handleOpenModal()}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 18px',
-            borderRadius: 'var(--border-radius-sm)',
-            background: 'var(--accent-gradient)',
-            color: 'white',
-            border: 'none',
-            fontWeight: '600',
-            fontSize: '0.88rem',
-            cursor: 'pointer',
-            boxShadow: 'var(--glow-accent)'
-          }}
+          className="btn btn-primary"
         >
           <Plus size={16} /> {t('config.newRuleBtn')}
         </button>
@@ -185,42 +175,18 @@ export default function BusinessRulesTab() {
                     </button>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="edit"
                         onClick={() => handleOpenModal(item)}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid var(--glass-border)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--text-secondary)'
-                        }}
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                      <button
+                        title={t('common.edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDelete(item.BusinessRuleID)}
-                        style={{
-                          background: 'rgba(239, 68, 68, 0.1)',
-                          border: '1px solid rgba(239, 68, 68, 0.2)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--color-danger)'
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                        title={t('common.delete')}
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -229,77 +195,56 @@ export default function BusinessRulesTab() {
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? t('config.editRuleTitle') : t('config.createRuleTitle')}
-            </h3>
+      <ModalCard
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingItem ? t('config.editRuleTitle') : t('config.createRuleTitle')}
+        subtitle={t('config.rulesSectionDesc')}
+        icon={Cpu}
+        accentStrip="brand"
+        maxWidth="540px"
+        onSubmit={handleSubmit}
+        submitting={submitting}
+        submitText={submitting ? t('common.save') : editingItem ? t('config.updateRuleBtn') : t('config.createRuleBtn')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <FormField label={t('config.ruleCodeLabel')} required icon={Cpu}>
+          <input
+            type="text"
+            className="form-control"
+            required
+            disabled={!!editingItem}
+            placeholder="e.g. HIGH_PRIORITY_ESCALATION"
+            value={formData.ruleCode}
+            onChange={(e) => setFormData({ ...formData, ruleCode: e.target.value.toUpperCase() })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
 
-            {error && (
-              <div style={{ padding: '10px 14px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={16} /> {error}
-              </div>
-            )}
+        <FormField label={t('config.ruleNameLabel')} required>
+          <input
+            type="text"
+            className="form-control"
+            required
+            placeholder="e.g. High Priority SLA Escalation"
+            value={formData.ruleName}
+            onChange={(e) => setFormData({ ...formData, ruleName: e.target.value })}
+          />
+        </FormField>
 
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.ruleCodeLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  disabled={!!editingItem}
-                  placeholder="e.g. HIGH_PRIORITY_ESCALATION"
-                  value={formData.ruleCode}
-                  onChange={(e) => setFormData({ ...formData, ruleCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.ruleNameLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. High Priority SLA Escalation"
-                  value={formData.ruleName}
-                  onChange={(e) => setFormData({ ...formData, ruleName: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.ruleExpressionLabel')}</label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="e.g. priority == 'HIGH' && responseTime > 30"
-                  value={formData.ruleExpression}
-                  onChange={(e) => setFormData({ ...formData, ruleExpression: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {submitting ? t('common.save') : editingItem ? t('config.updateRuleBtn') : t('config.createRuleBtn')}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+        <FormField label={t('config.ruleExpressionLabel')} required hint="Boolean expression evaluated during automatic routing">
+          <textarea
+            rows={4}
+            className="form-control"
+            required
+            placeholder="e.g. priority == 'HIGH' && responseTime > 30"
+            value={formData.ruleExpression}
+            onChange={(e) => setFormData({ ...formData, ruleExpression: e.target.value })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
+      </ModalCard>
     </div>
   );
 }

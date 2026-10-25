@@ -376,10 +376,10 @@ export default function TechRequestDetailPage() {
       </div>
 
       {/* ── REQUEST WORKSPACE HEADER CARD ── */}
-      <div className="glass-panel" style={{ padding: '24px 28px', borderRadius: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="glass-panel p-4 sm:p-6 lg:p-7 rounded-2xl">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
                 {reqNum}
               </span>
@@ -391,17 +391,17 @@ export default function TechRequestDetailPage() {
               </span>
             </div>
 
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 6px', color: 'var(--text-primary)' }}>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] mb-1.5">
               {reqTitle}
             </h1>
-            <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] m-0">
               Service: <strong>{assignment?.ServiceName || issueDetail?.ServiceName || 'General Maintenance'}</strong> •
               Department: <strong>{assignment?.DepartmentName || issueDetail?.AssignedDepartmentName || 'Technical Support'}</strong>
             </p>
           </div>
 
           {/* SLA Indicator */}
-          <div style={{ padding: '12px 18px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', textAlign: 'right' }}>
+          <div className="w-full sm:w-auto p-3 sm:p-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--glass-border)] text-left sm:text-right">
             <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700 }}>
               Resolution SLA Target
             </div>
@@ -412,13 +412,14 @@ export default function TechRequestDetailPage() {
         </div>
 
         {/* ── TECHNICIAN ACTION TOOLBAR ── */}
-        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="mt-5 pt-4 border-t border-[var(--glass-border)] flex flex-wrap items-center gap-2.5">
           {['ASSIGNED', 'NEW'].includes(statusCode) && (
             <button
               onClick={handleAccept} disabled={actionSubmitting}
+              className="touch-target-sm w-full sm:w-auto"
               style={{
                 padding: '9px 18px', borderRadius: '8px', background: 'var(--accent-gradient)', border: 'none',
-                color: '#ffffff', fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px'
+                color: '#ffffff', fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
               }}
             >
               <Check size={16} /> Accept Assignment
@@ -428,9 +429,10 @@ export default function TechRequestDetailPage() {
           {['ACCEPTED', 'ASSIGNED', 'PAUSED'].includes(statusCode) && (
             <button
               onClick={handleStartWork} disabled={actionSubmitting}
+              className="touch-target-sm w-full sm:w-auto"
               style={{
                 padding: '9px 18px', borderRadius: '8px', background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)',
-                color: '#4ade80', fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px'
+                color: '#4ade80', fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
               }}
             >
               <Play size={16} /> Start Field Work
@@ -440,9 +442,10 @@ export default function TechRequestDetailPage() {
           {statusCode === 'IN_PROGRESS' && (
             <button
               onClick={handlePauseWork} disabled={actionSubmitting}
+              className="touch-target-sm w-full sm:w-auto"
               style={{
                 padding: '9px 18px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.2)', border: '1px solid rgba(245, 158, 11, 0.4)',
-                color: '#fbbf24', fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px'
+                color: '#fbbf24', fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
               }}
             >
               <Pause size={16} /> Pause Work
@@ -457,12 +460,13 @@ export default function TechRequestDetailPage() {
                   setShowInfoModal(true);
                 }}
                 disabled={actionSubmitting}
+                className="touch-target-sm flex-1 sm:flex-initial"
                 style={{
                   padding: '9px 16px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
-                  color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px'
+                  color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                 }}
               >
-                <HelpCircle size={15} color="#60a5fa" /> Request Information
+                <HelpCircle size={15} color="#60a5fa" /> Request Info
               </button>
 
               <button
@@ -471,12 +475,13 @@ export default function TechRequestDetailPage() {
                   setShowEscalationModal(true);
                 }}
                 disabled={actionSubmitting}
+                className="touch-target-sm flex-1 sm:flex-initial"
                 style={{
                   padding: '9px 16px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)',
-                  color: '#f87171', fontWeight: 600, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px'
+                  color: '#f87171', fontWeight: 600, fontSize: '0.83rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                 }}
               >
-                <ShieldAlert size={15} /> Escalate Request
+                <ShieldAlert size={15} /> Escalate
               </button>
 
               <button
@@ -485,10 +490,11 @@ export default function TechRequestDetailPage() {
                   setShowResolutionModal(true);
                 }}
                 disabled={actionSubmitting}
+                className="touch-target w-full sm:w-auto sm:ml-auto"
                 style={{
-                  padding: '9px 20px', borderRadius: '8px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none',
-                  color: '#ffffff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)', marginLeft: 'auto'
+                  padding: '10px 20px', borderRadius: '8px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none',
+                  color: '#ffffff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)'
                 }}
               >
                 <CheckCircle2 size={16} /> Mark Resolved
@@ -499,11 +505,11 @@ export default function TechRequestDetailPage() {
       </div>
 
       {/* ── WORKSPACE DETAIL TABS & PANELS ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
         {/* Left Column: Main Tabs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Tab Navigation */}
-          <div className="glass-panel" style={{ padding: '6px', borderRadius: '12px', display: 'flex', gap: '6px' }}>
+          {/* Tab Navigation with horizontal scrolling on mobile */}
+          <div className="glass-panel p-1.5 rounded-xl flex items-center gap-1.5 overflow-x-auto max-w-full" style={{ scrollbarWidth: 'none' }}>
             {[
               { id: 'timeline', label: 'Activity Timeline', icon: Clock },
               { id: 'investigation', label: 'Investigation & Findings', icon: FileText },
@@ -516,8 +522,9 @@ export default function TechRequestDetailPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
+                  className="touch-target-sm shrink-0 whitespace-nowrap"
                   style={{
-                    flex: 1, padding: '10px 14px', borderRadius: '8px', border: 'none',
+                    padding: '8px 14px', borderRadius: '8px', border: 'none',
                     background: isActive ? 'var(--accent-gradient)' : 'transparent',
                     color: isActive ? '#ffffff' : 'var(--text-muted)',
                     fontWeight: isActive ? 700 : 600, fontSize: '0.82rem', cursor: 'pointer',
@@ -732,18 +739,75 @@ export default function TechRequestDetailPage() {
         </div>
       </div>
 
-      {/* ── MODAL: REQUEST ADDITIONAL INFO ── */}
+            {/* ── MODAL: REQUEST ADDITIONAL INFO ── */}
       {showInfoModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '24px', borderRadius: '16px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <HelpCircle size={20} color="var(--accent-primary)" /> Request Additional Information
-            </h3>
-            <p style={{ margin: '0 0 16px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Send a request to the requester for additional details or asset numbers needed to proceed.
-            </p>
-            <form onSubmit={handleRequestInfo} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <FormField
+        <div 
+          onClick={() => {
+            setShowInfoModal(false);
+            setInfoError('');
+          }}
+          style={{ 
+            position: 'fixed', inset: 0, 
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', 
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            zIndex: 1000, padding: '20px' 
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="info-modal-title"
+            className="modal-card accent-strip-brand enterprise-card" 
+            style={{ 
+              width: '100%', maxWidth: '480px', maxHeight: '90vh', 
+              display: 'flex', flexDirection: 'column', 
+              borderRadius: 'var(--border-radius-lg, 18px)', 
+              overflow: 'hidden', position: 'relative' 
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              padding: '16px 20px', borderBottom: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  width: '38px', height: '38px', borderRadius: '10px', 
+                  background: 'var(--accent-gradient)', color: '#fff', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  boxShadow: 'var(--glow-accent)', flexShrink: 0 
+                }}>
+                  <HelpCircle size={20} />
+                </div>
+                <div>
+                  <h3 id="info-modal-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    Request Additional Information
+                  </h3>
+                  <div style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Inquire additional technical specs or asset tags from requester
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowInfoModal(false);
+                  setInfoError('');
+                }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <form onSubmit={handleRequestInfo} noValidate style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+              <div style={{ padding: 'clamp(16px, 3vw, 24px)', display: 'flex', flexDirection: 'column', gap: '14px', overflowY: 'auto', flex: 1 }}>
+                <FormField
                 label="Information Inquired / Question"
                 required
                 error={infoError}
@@ -767,21 +831,32 @@ export default function TechRequestDetailPage() {
                   }}
                 />
               </FormField>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              </div>
+
+              {/* Footer */}
+              <div style={{ 
+                padding: '14px 20px', borderTop: '1px solid var(--glass-border)', 
+                background: 'var(--bg-tertiary)', display: 'flex', gap: '12px', 
+                justifyContent: 'flex-end', flexShrink: 0 
+              }}>
                 <button
-                  type="button" onClick={() => {
+                  type="button" 
+                  onClick={() => {
                     setShowInfoModal(false);
                     setInfoError('');
                   }}
-                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                  className="btn btn-secondary touch-target-sm"
+                  style={{ padding: '8px 16px', borderRadius: 'var(--border-radius-sm)' }}
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit" disabled={actionSubmitting}
-                  style={{ padding: '8px 18px', borderRadius: '8px', background: 'var(--accent-gradient)', border: 'none', color: '#ffffff', fontWeight: 700, cursor: 'pointer' }}
+                  type="submit" 
+                  disabled={actionSubmitting}
+                  className="btn btn-primary touch-target-sm"
+                  style={{ padding: '8px 20px', borderRadius: 'var(--border-radius-sm)' }}
                 >
-                  Send Request
+                  {actionSubmitting ? 'Sending Request...' : 'Send Inquiry to Requester'}
                 </button>
               </div>
             </form>
@@ -791,16 +866,73 @@ export default function TechRequestDetailPage() {
 
       {/* ── MODAL: ESCALATE REQUEST ── */}
       {showEscalationModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '500px', padding: '24px', borderRadius: '16px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700, color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <ShieldAlert size={20} /> Escalate Request to Management
-            </h3>
-            <p style={{ margin: '0 0 16px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Submit an escalation for manager or dispatcher intervention due to scope or technical blocker.
-            </p>
-            <form onSubmit={handleEscalateSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <FormField
+        <div 
+          onClick={() => {
+            setShowEscalationModal(false);
+            setEscalationErrors({});
+          }}
+          style={{ 
+            position: 'fixed', inset: 0, 
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', 
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            zIndex: 1000, padding: '20px' 
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="escalation-modal-title"
+            className="modal-card accent-strip-danger enterprise-card" 
+            style={{ 
+              width: '100%', maxWidth: '500px', maxHeight: '90vh', 
+              display: 'flex', flexDirection: 'column', 
+              borderRadius: 'var(--border-radius-lg, 18px)', 
+              overflow: 'hidden', position: 'relative' 
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              padding: '16px 20px', borderBottom: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  width: '38px', height: '38px', borderRadius: '10px', 
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#fff', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)', flexShrink: 0 
+                }}>
+                  <ShieldAlert size={20} />
+                </div>
+                <div>
+                  <h3 id="escalation-modal-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    Escalate Request to Management
+                  </h3>
+                  <div style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Submit escalation for management or dispatcher intervention
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowEscalationModal(false);
+                  setEscalationErrors({});
+                }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <form onSubmit={handleEscalateSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+              <div style={{ padding: 'clamp(16px, 3vw, 24px)', display: 'flex', flexDirection: 'column', gap: '14px', overflowY: 'auto', flex: 1 }}>
+                <FormField
                 label="Escalation Reason"
                 required
                 error={escalationErrors.reason}
@@ -846,22 +978,37 @@ export default function TechRequestDetailPage() {
                   }}
                 />
               </FormField>
+              </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              {/* Footer */}
+              <div style={{ 
+                padding: '14px 20px', borderTop: '1px solid var(--glass-border)', 
+                background: 'var(--bg-tertiary)', display: 'flex', gap: '12px', 
+                justifyContent: 'flex-end', flexShrink: 0 
+              }}>
                 <button
-                  type="button" onClick={() => {
+                  type="button" 
+                  onClick={() => {
                     setShowEscalationModal(false);
                     setEscalationErrors({});
                   }}
-                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                  className="btn btn-secondary touch-target-sm"
+                  style={{ padding: '8px 16px', borderRadius: 'var(--border-radius-sm)' }}
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit" disabled={actionSubmitting}
-                  style={{ padding: '8px 18px', borderRadius: '8px', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', border: 'none', color: '#ffffff', fontWeight: 700, cursor: 'pointer' }}
+                  type="submit" 
+                  disabled={actionSubmitting}
+                  className="touch-target-sm"
+                  style={{ 
+                    padding: '8px 20px', borderRadius: 'var(--border-radius-sm)', 
+                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', 
+                    border: 'none', color: '#ffffff', fontWeight: 700, cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
+                  }}
                 >
-                  Submit Escalation
+                  {actionSubmitting ? 'Escalating...' : 'Submit Escalation'}
                 </button>
               </div>
             </form>
@@ -871,17 +1018,73 @@ export default function TechRequestDetailPage() {
 
       {/* ── MODAL: STRUCTURED RESOLUTION FORM ── */}
       {showResolutionModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '560px', padding: '24px', borderRadius: '16px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CheckCircle2 size={22} color="#10b981" /> Structured Request Resolution
-            </h3>
-            <p style={{ margin: '0 0 16px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Complete resolution details to mark this work order as RESOLVED.
-            </p>
+        <div 
+          onClick={() => {
+            setShowResolutionModal(false);
+            setResolutionErrors({});
+          }}
+          style={{ 
+            position: 'fixed', inset: 0, 
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', 
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            zIndex: 1000, padding: '20px' 
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="resolution-modal-title"
+            className="modal-card accent-strip-success enterprise-card" 
+            style={{ 
+              width: '100%', maxWidth: '560px', maxHeight: '90vh', 
+              display: 'flex', flexDirection: 'column', 
+              borderRadius: 'var(--border-radius-lg, 18px)', 
+              overflow: 'hidden', position: 'relative' 
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              padding: '16px 20px', borderBottom: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  width: '38px', height: '38px', borderRadius: '10px', 
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#fff', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)', flexShrink: 0 
+                }}>
+                  <CheckCircle2 size={20} />
+                </div>
+                <div>
+                  <h3 id="resolution-modal-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    Structured Request Resolution
+                  </h3>
+                  <div style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Complete resolution details to mark this work order as resolved
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowResolutionModal(false);
+                  setResolutionErrors({});
+                }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-            <form onSubmit={handleResolveSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <FormField
+            {/* Body */}
+            <form onSubmit={handleResolveSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+              <div style={{ padding: 'clamp(16px, 3vw, 24px)', display: 'flex', flexDirection: 'column', gap: '14px', overflowY: 'auto', flex: 1 }}>
+                <FormField
                 label="Resolution Type"
                 required
                 error={resolutionErrors.ResolutionTypeCode}
@@ -975,22 +1178,37 @@ export default function TechRequestDetailPage() {
                   }}
                 />
               </FormField>
+              </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+              {/* Footer */}
+              <div style={{ 
+                padding: '14px 20px', borderTop: '1px solid var(--glass-border)', 
+                background: 'var(--bg-tertiary)', display: 'flex', gap: '12px', 
+                justifyContent: 'flex-end', flexShrink: 0 
+              }}>
                 <button
-                  type="button" onClick={() => {
+                  type="button" 
+                  onClick={() => {
                     setShowResolutionModal(false);
                     setResolutionErrors({});
                   }}
-                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                  className="btn btn-secondary touch-target-sm"
+                  style={{ padding: '8px 16px', borderRadius: 'var(--border-radius-sm)' }}
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit" disabled={actionSubmitting}
-                  style={{ padding: '10px 22px', borderRadius: '8px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: '#ffffff', fontWeight: 800, cursor: 'pointer' }}
+                  type="submit" 
+                  disabled={actionSubmitting}
+                  className="touch-target-sm"
+                  style={{ 
+                    padding: '10px 22px', borderRadius: 'var(--border-radius-sm)', 
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
+                    border: 'none', color: '#ffffff', fontWeight: 800, cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
+                  }}
                 >
-                  Confirm & Resolve Request
+                  {actionSubmitting ? 'Resolving...' : 'Confirm & Resolve Request'}
                 </button>
               </div>
             </form>

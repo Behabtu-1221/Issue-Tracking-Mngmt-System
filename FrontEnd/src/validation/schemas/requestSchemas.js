@@ -44,10 +44,9 @@ export const requestSchemas = {
       errors.Description = ISSUE_MANAGEMENT_MESSAGES.request.descriptionLength(10, 2000);
     }
 
-    // Service or Category requirement
-    if (!serviceCategoryId && !serviceId) {
+    // Service Item (ServiceID) is optional for ad-hoc / typed requests
+    if (!serviceCategoryId && !categoryCode) {
       errors.ServiceCategoryID = ISSUE_MANAGEMENT_MESSAGES.request.categoryRequired;
-      errors.ServiceID = ISSUE_MANAGEMENT_MESSAGES.request.serviceRequired;
     }
 
     // Priority
@@ -295,62 +294,7 @@ export const requestSchemas = {
   },
 
   /**
-   * 8. Known Issue Article Schema
-   * Validates Article Title, Symptoms, Workaround, Solution, and Keywords.
-   */
-  knownIssueForm: (formData) => {
-    const errors = {};
-    const title = inputSanitizer.normalizeText(formData.Title || '');
-    const symptoms = inputSanitizer.normalizeText(formData.Symptoms || formData.Description || '');
-    const workaround = inputSanitizer.normalizeText(formData.Workaround || '');
-    const solution = inputSanitizer.normalizeText(formData.PermanentSolution || formData.ResolutionSteps || '');
-    const categoryCode = inputSanitizer.normalizeText(formData.CategoryCode || '').toUpperCase();
-    const keywords = inputSanitizer.normalizeText(formData.SearchKeywords || formData.Keywords || '');
-
-    if (!title) {
-      errors.Title = ISSUE_MANAGEMENT_MESSAGES.knownIssue.titleRequired;
-    } else if (title.length < 3 || title.length > 250) {
-      errors.Title = ISSUE_MANAGEMENT_MESSAGES.knownIssue.titleLength(3, 250);
-    }
-
-    if (!symptoms) {
-      errors.Symptoms = ISSUE_MANAGEMENT_MESSAGES.knownIssue.symptomsRequired;
-    } else if (symptoms.length < 5 || symptoms.length > 2000) {
-      errors.Symptoms = ISSUE_MANAGEMENT_MESSAGES.knownIssue.symptomsLength(5, 2000);
-    }
-
-    if (workaround && workaround.length > 2000) {
-      errors.Workaround = ISSUE_MANAGEMENT_MESSAGES.knownIssue.workaroundMaxLength(2000);
-    }
-
-    if (solution && solution.length > 2000) {
-      errors.PermanentSolution = ISSUE_MANAGEMENT_MESSAGES.knownIssue.permanentSolutionMaxLength(2000);
-    }
-
-    if (categoryCode && categoryCode.length > 50) {
-      errors.CategoryCode = ISSUE_MANAGEMENT_MESSAGES.knownIssue.categoryCodeMaxLength(50);
-    }
-
-    if (keywords && keywords.length > 500) {
-      errors.SearchKeywords = ISSUE_MANAGEMENT_MESSAGES.knownIssue.searchKeywordsMaxLength(500);
-    }
-
-    return {
-      isValid: Object.keys(errors).length === 0,
-      errors,
-      sanitized: {
-        Title: title,
-        Symptoms: symptoms,
-        Workaround: workaround || null,
-        PermanentSolution: solution || null,
-        CategoryCode: categoryCode || 'GENERAL',
-        SearchKeywords: keywords || null
-      }
-    };
-  },
-
-  /**
-   * 9. Feedback Rating Schema
+   * 8. Feedback Rating Schema
    * Validates satisfaction score (1-5) and feedback commentary.
    */
   feedbackForm: (formData) => {

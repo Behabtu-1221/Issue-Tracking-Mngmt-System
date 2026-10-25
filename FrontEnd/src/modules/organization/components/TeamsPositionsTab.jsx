@@ -15,10 +15,14 @@ import orgApi from '../api/orgApi';
 import identityApi from '../../identity-access/api/identityApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { FormField } from '../../../components/common/FormField';
 import { orgSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n';
 
 export default function TeamsPositionsTab({ onRefreshMetrics }) {
+  const { t } = useTranslation();
   const [subSection, setSubSection] = useState('teams'); // 'teams' | 'positions'
   const [teams, setTeams] = useState([]);
   const [positions, setPositions] = useState([]);
@@ -150,14 +154,14 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
     setIsTeamModalOpen(true);
   };
 
-  const handleOpenTeamEdit = (t) => {
-    setEditingTeam(t);
+  const handleOpenTeamEdit = (team) => {
+    setEditingTeam(team);
     setTeamForm({
-      DepartmentID: t.DepartmentID,
-      TeamCode: t.TeamCode,
-      TeamName: t.TeamName,
-      LeaderUserID: t.LeaderUserID || '',
-      IsActive: t.IsActive !== undefined ? t.IsActive : 1
+      DepartmentID: team.DepartmentID,
+      TeamCode: team.TeamCode,
+      TeamName: team.TeamName,
+      LeaderUserID: team.LeaderUserID || '',
+      IsActive: team.IsActive !== undefined ? team.IsActive : 1
     });
     setErrorMsg('');
     setTeamErrors({});
@@ -311,7 +315,7 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
                 gap: '6px'
               }}
             >
-              <Users size={14} /> Operational Teams
+              <Users size={14} /> {t('organization.operationalTeams', 'Operational Teams')}
             </button>
             <button
               onClick={() => { setSubSection('positions'); setFilterId(''); }}
@@ -329,7 +333,7 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
                 gap: '6px'
               }}
             >
-              <Award size={14} /> Job Positions
+              <Award size={14} /> {t('organization.jobPositions', 'Job Positions')}
             </button>
           </div>
 
@@ -337,7 +341,7 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={t('common.search', 'Search...')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -366,7 +370,7 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
                 minWidth: '180px'
               }}
             >
-              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Departments</option>
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All Departments')}</option>
               {departments.map((d) => (
                 <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                   {d.DepartmentName}
@@ -387,7 +391,7 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
                 minWidth: '180px'
               }}
             >
-              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Departments</option>
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('common.all', 'All Departments')}</option>
               {departments.map((d) => (
                 <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                   {d.DepartmentName}
@@ -413,7 +417,7 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> {subSection === 'teams' ? 'Add Operational Team' : 'Add Job Position'}
+          <Plus size={16} /> {subSection === 'teams' ? t('organization.addTeam', 'Add Operational Team') : t('organization.addPosition', 'Add Job Position')}
         </button>
       </div>
 
@@ -421,64 +425,62 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
       {subSection === 'teams' ? (
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading operational teams...</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.loadingTeams', 'Loading operational teams...')}</div>
           ) : teams.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No teams found matching criteria.</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.noTeamsFound', 'No teams found matching criteria.')}</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '16px 20px' }}>Team Name & Code</th>
-                  <th style={{ padding: '16px 20px' }}>Department</th>
-                  <th style={{ padding: '16px 20px' }}>Team Leader</th>
-                  <th style={{ padding: '16px 20px' }}>Assigned Members</th>
-                  <th style={{ padding: '16px 20px' }}>Status</th>
-                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.teamsTab.thTeamName', 'Team Name & Code')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.teamsTab.thDept', 'Department')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.teamsTab.thLeader', 'Team Leader')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.teamsTab.thMembersCount', 'Assigned Members')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('common.status', 'Status')}</th>
+                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('organization.teamsTab.thActions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
-                {teams.map((t) => (
-                  <tr key={t.TeamID} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                {teams.map((team) => (
+                  <tr key={team.TeamID} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
                     <td style={{ padding: '16px 20px' }}>
-                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{t.TeamName}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.TeamCode}</div>
+                      <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{team.TeamName}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{team.TeamCode}</div>
                     </td>
                     <td style={{ padding: '16px 20px', color: 'var(--text-secondary)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Building2 size={14} color="var(--accent-primary)" />
-                        {t.DepartmentName}
+                        {team.DepartmentName}
                       </div>
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      {t.LeaderFullName ? (
+                      {team.LeaderFullName ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4ade80' }}>
-                          <UserCheck size={14} /> {t.LeaderFullName}
+                          <UserCheck size={14} /> {team.LeaderFullName}
                         </div>
                       ) : (
                         <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Unassigned</span>
                       )}
                     </td>
                     <td style={{ padding: '16px 20px', fontWeight: '600', color: '#60a5fa' }}>
-                      {t.MemberCount} Members
+                      {team.MemberCount} Members
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      {t.IsActive ? <span className="badge badge-success">Active</span> : <span className="badge badge-danger">Inactive</span>}
+                      {team.IsActive ? <span className="badge badge-success">Active</span> : <span className="badge badge-danger">Inactive</span>}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        <button
-                          onClick={() => handleOpenTeamEdit(t)}
-                          style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleTeamDelete(t.TeamID, t.TeamName)}
-                          style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                      <ActionGroup align="right">
+                        <ActionButton
+                          variant="edit"
+                          onClick={() => handleOpenTeamEdit(team)}
+                          title={t('common.edit')}
+                        />
+                        <ActionButton
+                          variant="delete"
+                          onClick={() => handleTeamDelete(team.TeamID, team.TeamName)}
+                          title={t('common.delete')}
+                        />
+                      </ActionGroup>
                     </td>
                   </tr>
                 ))}
@@ -490,18 +492,18 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
         /* Positions Table */
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading positions...</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.loadingPositions', 'Loading positions...')}</div>
           ) : positions.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No positions found.</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.noPositionsFound', 'No positions found.')}</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '16px 20px' }}>Position Title & Code</th>
-                  <th style={{ padding: '16px 20px' }}>Organization Unit</th>
-                  <th style={{ padding: '16px 20px' }}>Assigned Staff</th>
-                  <th style={{ padding: '16px 20px' }}>Status</th>
-                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.teamsTab.positionTitleLabel', 'Position Title & Code')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.units', 'Organization Unit')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignedStaff', 'Assigned Staff')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('common.status', 'Status')}</th>
+                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('organization.teamsTab.thActions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -524,20 +526,18 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
                       {p.IsActive ? <span className="badge badge-success">Active</span> : <span className="badge badge-danger">Inactive</span>}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        <button
+                      <ActionGroup align="right">
+                        <ActionButton
+                          variant="edit"
                           onClick={() => handleOpenPositionEdit(p)}
-                          style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
+                          title={t('common.edit')}
+                        />
+                        <ActionButton
+                          variant="delete"
                           onClick={() => handlePositionDelete(p.PositionID, p.PositionTitle)}
-                          style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                          title={t('common.delete')}
+                        />
+                      </ActionGroup>
                     </td>
                   </tr>
                 ))}
@@ -549,242 +549,215 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
 
       {/* Modal: Create/Edit Team */}
       {isTeamModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <Users color="var(--accent-primary)" />
-              {editingTeam ? 'Edit Operational Team' : 'Add Operational Team'}
-            </h2>
+        <ModalCard
+          isOpen={isTeamModalOpen}
+          onClose={() => setIsTeamModalOpen(false)}
+          title={editingTeam ? 'Edit Operational Team' : 'Add Operational Team'}
+          subtitle="Configure operational squad and leadership assignment"
+          icon={Users}
+          accentStrip="brand"
+          maxWidth="540px"
+          error={errorMsg}
+          onSubmit={handleTeamSubmit}
+          submitText={editingTeam ? 'Update Team' : 'Save Team'}
+          cancelText="Cancel"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <FormField
+              label="Department"
+              required
+              error={teamErrors.DepartmentID}
+              icon={Building2}
+            >
+              <select
+                value={teamForm.DepartmentID}
+                onChange={(e) => {
+                  setTeamForm({ ...teamForm, DepartmentID: e.target.value });
+                  clearTeamError('DepartmentID');
+                }}
+                className={`enterprise-input ${teamErrors.DepartmentID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${teamErrors.DepartmentID ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                  borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Department</option>
+                {departments.map((d) => (
+                  <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {d.DepartmentName} ({d.DepartmentCode})
+                  </option>
+                ))}
+              </select>
+            </FormField>
 
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleTeamSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
               <FormField
-                label="Department"
+                label="Team Code"
                 required
-                error={teamErrors.DepartmentID}
-                icon={Building2}
+                error={teamErrors.TeamCode}
+                icon={Users}
+                hint="Format: TM-01"
               >
-                <select
-                  value={teamForm.DepartmentID}
+                <input
+                  type="text"
+                  placeholder="e.g. TM-OPS"
+                  value={teamForm.TeamCode}
                   onChange={(e) => {
-                    setTeamForm({ ...teamForm, DepartmentID: e.target.value });
-                    clearTeamError('DepartmentID');
+                    setTeamForm({ ...teamForm, TeamCode: e.target.value });
+                    clearTeamError('TeamCode');
                   }}
+                  className={`enterprise-input ${teamErrors.TeamCode ? 'input-error' : ''}`}
                   style={{
                     width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                    border: `1px solid ${teamErrors.DepartmentID ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                    border: `1px solid ${teamErrors.TeamCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
                     borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                  }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Department</option>
-                  {departments.map((d) => (
-                    <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {d.DepartmentName} ({d.DepartmentCode})
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
-                <FormField
-                  label="Team Code"
-                  required
-                  error={teamErrors.TeamCode}
-                  icon={Users}
-                  hint="Format: TM-01"
-                >
-                  <input
-                    type="text"
-                    placeholder="e.g. TM-OPS"
-                    value={teamForm.TeamCode}
-                    onChange={(e) => {
-                      setTeamForm({ ...teamForm, TeamCode: e.target.value });
-                      clearTeamError('TeamCode');
-                    }}
-                    style={{
-                      width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                      border: `1px solid ${teamErrors.TeamCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
-                </FormField>
-
-                <FormField
-                  label="Team Name"
-                  required
-                  error={teamErrors.TeamName}
-                  icon={Users}
-                >
-                  <input
-                    type="text"
-                    placeholder="e.g. Core Operations Squad"
-                    value={teamForm.TeamName}
-                    onChange={(e) => {
-                      setTeamForm({ ...teamForm, TeamName: e.target.value });
-                      clearTeamError('TeamName');
-                    }}
-                    style={{
-                      width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                      border: `1px solid ${teamErrors.TeamName ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
-                </FormField>
-              </div>
-
-              <FormField
-                label="Team Leader (Optional)"
-                error={teamErrors.LeaderUserID}
-                icon={UserCheck}
-              >
-                <select
-                  value={teamForm.LeaderUserID}
-                  onChange={(e) => {
-                    setTeamForm({ ...teamForm, LeaderUserID: e.target.value });
-                    clearTeamError('LeaderUserID');
-                  }}
-                  style={{
-                    width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                    border: '1px solid var(--glass-border)', borderRadius: '8px',
-                    color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                  }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Leader Assigned --</option>
-                  {users.map((u) => (
-                    <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsTeamModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '8px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Save Team
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal: Create/Edit Position */}
-      {isPositionModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <Award color="var(--accent-primary)" />
-              {editingPosition ? 'Edit Job Position' : 'Add Job Position'}
-            </h2>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handlePositionSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
-                <FormField
-                  label="Position Code"
-                  required
-                  error={positionErrors.PositionCode}
-                  icon={Award}
-                  hint="Format: POS-01"
-                >
-                  <input
-                    type="text"
-                    placeholder="e.g. POS-ENG"
-                    value={positionForm.PositionCode}
-                    onChange={(e) => {
-                      setPositionForm({ ...positionForm, PositionCode: e.target.value });
-                      clearPositionError('PositionCode');
-                    }}
-                    style={{
-                      width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                      border: `1px solid ${positionErrors.PositionCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
-                </FormField>
-
-                <FormField
-                  label="Position Title"
-                  required
-                  error={positionErrors.PositionTitle}
-                  icon={Award}
-                >
-                  <input
-                    type="text"
-                    placeholder="e.g. Senior Network Specialist"
-                    value={positionForm.PositionTitle}
-                    onChange={(e) => {
-                      setPositionForm({ ...positionForm, PositionTitle: e.target.value });
-                      clearPositionError('PositionTitle');
-                    }}
-                    style={{
-                      width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                      border: `1px solid ${positionErrors.PositionTitle ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                      borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  />
-                </FormField>
-              </div>
-
-              <FormField
-                label="Description"
-                error={positionErrors.Description}
-                icon={Briefcase}
-              >
-                <textarea
-                  rows="3"
-                  placeholder="Responsibilities & skill requirements (optional)..."
-                  value={positionForm.Description}
-                  onChange={(e) => {
-                    setPositionForm({ ...positionForm, Description: e.target.value });
-                    clearPositionError('Description');
-                  }}
-                  style={{
-                    width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
-                    border: `1px solid ${positionErrors.Description ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
-                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', resize: 'vertical'
                   }}
                 />
               </FormField>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsPositionModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '8px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Save Position
-                </button>
-              </div>
-            </form>
+              <FormField
+                label="Team Name"
+                required
+                error={teamErrors.TeamName}
+                icon={Users}
+              >
+                <input
+                  type="text"
+                  placeholder="e.g. Core Operations Squad"
+                  value={teamForm.TeamName}
+                  onChange={(e) => {
+                    setTeamForm({ ...teamForm, TeamName: e.target.value });
+                    clearTeamError('TeamName');
+                  }}
+                  className={`enterprise-input ${teamErrors.TeamName ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                    border: `1px solid ${teamErrors.TeamName ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                  }}
+                />
+              </FormField>
+            </div>
+
+            <FormField
+              label="Team Leader (Optional)"
+              error={teamErrors.LeaderUserID}
+              icon={UserCheck}
+            >
+              <select
+                value={teamForm.LeaderUserID}
+                onChange={(e) => {
+                  setTeamForm({ ...teamForm, LeaderUserID: e.target.value });
+                  clearTeamError('LeaderUserID');
+                }}
+                className={`enterprise-input ${teamErrors.LeaderUserID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: '8px',
+                  color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Leader Assigned --</option>
+                {users.map((u) => (
+                  <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
+                  </option>
+                ))}
+              </select>
+            </FormField>
           </div>
-        </div>
+        </ModalCard>
+      )}
+
+      {/* Modal: Create/Edit Position */}
+      {isPositionModalOpen && (
+        <ModalCard
+          isOpen={isPositionModalOpen}
+          onClose={() => setIsPositionModalOpen(false)}
+          title={editingPosition ? 'Edit Job Position' : 'Add Job Position'}
+          subtitle="Define organizational job designation and responsibilities"
+          icon={Award}
+          accentStrip="purple"
+          maxWidth="540px"
+          error={errorMsg}
+          onSubmit={handlePositionSubmit}
+          submitText={editingPosition ? 'Update Position' : 'Save Position'}
+          cancelText="Cancel"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
+              <FormField
+                label="Position Code"
+                required
+                error={positionErrors.PositionCode}
+                icon={Award}
+                hint="Format: POS-01"
+              >
+                <input
+                  type="text"
+                  placeholder="e.g. POS-ENG"
+                  value={positionForm.PositionCode}
+                  onChange={(e) => {
+                    setPositionForm({ ...positionForm, PositionCode: e.target.value });
+                    clearPositionError('PositionCode');
+                  }}
+                  className={`enterprise-input ${positionErrors.PositionCode ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                    border: `1px solid ${positionErrors.PositionCode ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                  }}
+                />
+              </FormField>
+
+              <FormField
+                label="Position Title"
+                required
+                error={positionErrors.PositionTitle}
+                icon={Award}
+              >
+                <input
+                  type="text"
+                  placeholder="e.g. Senior Network Specialist"
+                  value={positionForm.PositionTitle}
+                  onChange={(e) => {
+                    setPositionForm({ ...positionForm, PositionTitle: e.target.value });
+                    clearPositionError('PositionTitle');
+                  }}
+                  className={`enterprise-input ${positionErrors.PositionTitle ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                    border: `1px solid ${positionErrors.PositionTitle ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                    borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box'
+                  }}
+                />
+              </FormField>
+            </div>
+
+            <FormField
+              label="Description"
+              error={positionErrors.Description}
+              icon={Briefcase}
+            >
+              <textarea
+                rows="3"
+                placeholder="Responsibilities & skill requirements (optional)..."
+                value={positionForm.Description}
+                onChange={(e) => {
+                  setPositionForm({ ...positionForm, Description: e.target.value });
+                  clearPositionError('Description');
+                }}
+                className={`enterprise-input ${positionErrors.Description ? 'input-error' : ''}`}
+                style={{
+                  width: '100%', padding: '10px 12px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${positionErrors.Description ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
+                  borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', resize: 'vertical'
+                }}
+              />
+            </FormField>
+          </div>
+        </ModalCard>
       )}
       {/* Glass Modals */}
       <ConfirmDialogModal

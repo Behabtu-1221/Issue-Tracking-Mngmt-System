@@ -187,11 +187,6 @@ export const reportingService = {
     });
   },
 
-  // ── Knowledge Base Analytics ──
-  async getKnowledgeAnalytics() {
-    return reportingRepository.getKnowledgeAnalytics();
-  },
-
   // ── Saved Reports CRUD ──
   async getSavedReports(actor) {
     const scope = resolveScope(actor);

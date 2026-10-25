@@ -147,7 +147,41 @@ export const dispatchSchemas = {
   },
 
   /**
-   * 5. Escalate Field Work Schema
+   * 5. Update Field Work Progress Schema
+   * Validates technician milestone, completion percentage, and progress log notes.
+   */
+  updateProgressForm: (formData) => {
+    const errors = {};
+    const rawPct = formData.progressPercentage ?? formData.percentage ?? 0;
+    const progressPercentage = Number(rawPct);
+    const milestone = inputSanitizer.normalizeText(formData.milestone || formData.progressMilestone || 'Field Work Execution');
+    const notes = inputSanitizer.normalizeText(formData.remarks || formData.notes || formData.workNotes || '');
+
+    if (isNaN(progressPercentage) || progressPercentage < 0 || progressPercentage > 100) {
+      errors.progressPercentage = 'Progress must be a valid percentage between 0 and 100%';
+    }
+
+    if (!notes) {
+      errors.remarks = 'Progress remarks / work notes are required to inform requester and approvers';
+    } else if (notes.length < 3 || notes.length > 2000) {
+      errors.remarks = 'Progress remarks must be between 3 and 2000 characters';
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors,
+      sanitized: {
+        progressPercentage,
+        milestone,
+        remarks: notes,
+        estimatedCompletion: formData.estimatedCompletion || null,
+        timeSpentMinutes: formData.timeSpentMinutes ? Number(formData.timeSpentMinutes) : null
+      }
+    };
+  },
+
+  /**
+   * 6. Escalate Field Work Schema
    * Validates escalation reason and technical details.
    */
   escalateWorkForm: (formData) => {

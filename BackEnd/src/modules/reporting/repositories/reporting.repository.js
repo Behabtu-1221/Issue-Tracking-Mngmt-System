@@ -758,54 +758,7 @@ export const reportingRepository = {
   },
 
   // ==========================================================================
-  // 9. KNOWLEDGE BASE ANALYTICS
-  // ==========================================================================
-  async getKnowledgeAnalytics() {
-    const summarySql = `
-      SELECT 
-        COUNT(*) AS TotalArticles,
-        SUM(CASE WHEN ArticleStatusCode = 'PUBLISHED' THEN 1 ELSE 0 END) AS PublishedArticles,
-        SUM(CASE WHEN ArticleStatusCode = 'DRAFT' THEN 1 ELSE 0 END) AS DraftArticles,
-        COALESCE(SUM(ViewsCount), 0) AS TotalViews,
-        COALESCE(SUM(LikesCount), 0) AS TotalLikes
-      FROM KnowledgeArticle
-      WHERE IsDeleted = 0
-    `;
-    const [summary] = await query(summarySql);
-
-    const topArticlesSql = `
-      SELECT 
-        ka.KnowledgeArticleID,
-        ka.Title,
-        ka.ArticleStatusCode,
-        ka.ViewsCount,
-        ka.LikesCount,
-        ka.CreatedDate,
-        kc.CategoryName,
-        CONCAT(u.FirstName, ' ', COALESCE(u.LastName, '')) AS AuthorName
-      FROM KnowledgeArticle ka
-      LEFT JOIN KnowledgeCategory kc ON ka.KnowledgeCategoryID = kc.KnowledgeCategoryID
-      LEFT JOIN \`User\` u ON ka.AuthorUserID = u.UserID
-      WHERE ka.IsDeleted = 0
-      ORDER BY ka.ViewsCount DESC, ka.LikesCount DESC
-      LIMIT 10
-    `;
-    const topArticles = await query(topArticlesSql);
-
-    return {
-      summary: {
-        totalArticles: Number(summary?.TotalArticles) || 0,
-        publishedArticles: Number(summary?.PublishedArticles) || 0,
-        draftArticles: Number(summary?.DraftArticles) || 0,
-        totalViews: Number(summary?.TotalViews) || 0,
-        totalLikes: Number(summary?.TotalLikes) || 0
-      },
-      topArticles
-    };
-  },
-
-  // ==========================================================================
-  // 10. SAVED REPORTS PERSISTENCE
+  // 9. SAVED REPORTS PERSISTENCE
   // ==========================================================================
   async getSavedReports({ tenantId, userId, isGlobal } = {}) {
     let sql = `

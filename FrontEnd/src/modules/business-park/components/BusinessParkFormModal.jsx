@@ -139,6 +139,15 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
     setActiveStep('identity');
   }, [initialData, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   // Real-time Sanitizer & Field Error Validator
@@ -199,20 +208,27 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
   ];
 
   return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '24px'
-    }}>
+    <div
+      style={{
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 'clamp(8px, 2.5vw, 20px)'
+      }}
+      onClick={onClose}
+    >
       <div
+        className="modal-card accent-strip-brand enterprise-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="park-modal-title"
         style={{
           width: '100%',
           maxWidth: '920px',
-          maxHeight: '90vh',
+          maxHeight: '94vh',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: '24px',
+          borderRadius: 'var(--border-radius-lg, 18px)',
           border: '1px solid var(--glass-border-accent)',
           overflow: 'hidden',
           boxShadow: 'var(--shadow-lg)',
@@ -221,6 +237,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
           animation: 'fadeIn 0.25s ease-out',
           position: 'relative'
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Multi-Tone Brand Line Accent */}
         <div style={{
@@ -231,37 +248,42 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
 
         {/* Modal Header */}
         <div style={{
-          padding: '20px 28px',
+          padding: '16px 24px',
           borderBottom: '1px solid var(--glass-border)',
           background: 'var(--bg-tertiary)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,
+          gap: '12px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
             <div style={{
-              width: '42px', height: '42px', borderRadius: '14px',
+              width: '38px', height: '38px', borderRadius: '10px',
               background: 'var(--accent-gradient)',
               color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: 'var(--glow-accent)'
+              boxShadow: 'var(--glow-accent)', flexShrink: 0
             }}>
-              <Building2 size={22} />
+              <Building2 size={20} />
             </div>
-            <div>
-              <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--accent-primary)', letterSpacing: '0.5px' }}>
+            <div style={{ minWidth: 0 }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent-primary)', letterSpacing: '0.5px' }}>
                 {t('businessPark.topologyConfiguration', 'BUSINESS PARK TOPOLOGY CONFIGURATION')}
               </span>
-              <h3 style={{ margin: '2px 0 0', fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+              <h3 id="park-modal-title" style={{ margin: '2px 0 0', fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif", wordBreak: 'break-word' }}>
                 {initialData ? t('businessPark.editCampusTitle', { name: formData.BusinessParkName || 'Business Park' }, `Edit Campus • ${formData.BusinessParkName || 'Business Park'}`) : t('businessPark.registerNewCampusTitle', 'Register New Business Park Campus')}
               </h3>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
+            className="btn-icon touch-target-sm"
             style={{
               background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
-              color: 'var(--text-muted)', cursor: 'pointer', padding: '8px', borderRadius: '50%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
+              color: 'var(--text-muted)', cursor: 'pointer', padding: '8px', borderRadius: '8px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
+              flexShrink: 0
             }}
+            aria-label={t('common.close', 'Close')}
           >
             <X size={18} />
           </button>
@@ -269,8 +291,9 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
 
         {/* Step Navigation Bar */}
         <div style={{
-          display: 'flex', gap: '4px', padding: '8px 16px', background: 'var(--bg-tertiary)',
-          borderBottom: '1px solid var(--glass-border)', overflowX: 'auto', flexShrink: 0
+          display: 'flex', gap: '6px', padding: '8px 16px', background: 'var(--bg-tertiary)',
+          borderBottom: '1px solid var(--glass-border)', overflowX: 'auto', flexShrink: 0,
+          WebkitOverflowScrolling: 'touch'
         }}>
           {steps.map((st) => {
             const IconComp = st.icon;
@@ -281,12 +304,12 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 type="button"
                 onClick={() => setActiveStep(st.id)}
                 style={{
-                  flex: 1, padding: '10px 14px', borderRadius: '12px', border: 'none',
+                  flex: '1 0 auto', padding: '10px 14px', borderRadius: '12px', border: 'none',
                   background: isActive ? 'var(--accent-gradient)' : 'transparent',
                   color: isActive ? '#ffffff' : 'var(--text-muted)',
                   fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap', transition: 'all 0.2s ease', minHeight: '40px',
                   boxShadow: isActive ? 'var(--glow-accent)' : 'none'
                 }}
               >
@@ -298,7 +321,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
 
         {/* Modal Form Body */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
-          <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+          <div style={{ padding: 'clamp(14px, 2.5vw, 24px) clamp(14px, 3vw, 28px)', display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
 
             {formError && (
               <div style={{
@@ -313,7 +336,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
             {/* TAB 1: IDENTITY & LEGAL */}
             {activeStep === 'identity' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', animation: 'fadeIn 0.2s ease-out' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.parkCode', 'Business Park Code')}
@@ -353,7 +376,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.shortNameAlias', 'Short Name / Alias')}
@@ -449,7 +472,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
             {/* TAB 2: CONTACT & DIGITAL CHANNELS */}
             {activeStep === 'contact' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', animation: 'fadeIn 0.2s ease-out' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.officialContactEmail', 'Official Contact Email')}
@@ -485,7 +508,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.landlinePhoneNumber', 'Landline Phone Number')}
@@ -523,7 +546,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
             {/* TAB 3: LOCATION & BOUNDARY */}
             {activeStep === 'location' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', animation: 'fadeIn 0.2s ease-out' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.country', 'Country')}
@@ -574,7 +597,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.subCity', 'SubCity')}
@@ -622,7 +645,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.addressLine1', 'Address Line 1 (Street / Main Gate)')}
@@ -655,7 +678,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.gpsLatitude', 'GPS Latitude')}
@@ -711,7 +734,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
             {/* TAB 4: REGIONAL DEFAULTS & OPERATIONAL */}
             {activeStep === 'regional' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', animation: 'fadeIn 0.2s ease-out' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '6px', textTransform: 'uppercase' }}>
                       {t('businessPark.systemTimeZone', 'System TimeZone')}
@@ -779,16 +802,17 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 800, marginBottom: '10px', textTransform: 'uppercase' }}>
                     {t('businessPark.operationalStatusFlags', 'Campus Operational Status Flags')}
                   </label>
-                  <div style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={() => handleInputChange('IsOperational', formData.IsOperational ? 0 : 1)}
                       style={{
                         padding: '12px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: 800, fontSize: '0.86rem',
-                        display: 'flex', alignItems: 'center', gap: '8px',
+                        display: 'flex', alignItems: 'center', gap: '8px', minHeight: '44px',
                         background: formData.IsOperational ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-tertiary)',
                         border: formData.IsOperational ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid var(--glass-border)',
-                        color: formData.IsOperational ? 'var(--color-success)' : 'var(--text-muted)', transition: 'all 0.2s'
+                        color: formData.IsOperational ? 'var(--color-success)' : 'var(--text-muted)', transition: 'all 0.2s',
+                        flex: '1 1 auto', justifyContent: 'center'
                       }}
                     >
                       {formData.IsOperational ? <CheckCircle2 size={18} /> : null}
@@ -800,10 +824,11 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                       onClick={() => handleInputChange('IsActive', formData.IsActive ? 0 : 1)}
                       style={{
                         padding: '12px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: 800, fontSize: '0.86rem',
-                        display: 'flex', alignItems: 'center', gap: '8px',
+                        display: 'flex', alignItems: 'center', gap: '8px', minHeight: '44px',
                         background: formData.IsActive ? 'rgba(99, 102, 241, 0.15)' : 'var(--bg-tertiary)',
                         border: formData.IsActive ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid var(--glass-border)',
-                        color: formData.IsActive ? 'var(--accent-primary)' : 'var(--text-muted)', transition: 'all 0.2s'
+                        color: formData.IsActive ? 'var(--accent-primary)' : 'var(--text-muted)', transition: 'all 0.2s',
+                        flex: '1 1 auto', justifyContent: 'center'
                       }}
                     >
                       {formData.IsActive ? <CheckCircle2 size={18} /> : null}
@@ -818,7 +843,8 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
           {/* Action Footer */}
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '16px 28px', borderTop: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)', flexShrink: 0
+            padding: 'clamp(12px, 2vw, 16px) clamp(16px, 2.5vw, 28px)', borderTop: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)', flexShrink: 0,
+            flexWrap: 'wrap', gap: '12px'
           }}>
             <div>
               {activeStep !== 'identity' && (
@@ -829,7 +855,7 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                     if (idx > 0) setActiveStep(steps[idx - 1].id);
                   }}
                   style={{
-                    padding: '10px 18px', borderRadius: '12px',
+                    padding: '10px 18px', borderRadius: '12px', minHeight: '42px',
                     border: '1px solid var(--glass-border)', background: 'var(--bg-secondary)',
                     color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: '6px'
@@ -840,15 +866,11 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
               )}
             </div>
 
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', flex: '1 1 auto', justifyContent: 'flex-end' }}>
               <button
                 type="button"
                 onClick={onClose}
-                style={{
-                  padding: '10px 18px', borderRadius: '12px',
-                  border: '1px solid var(--glass-border)', background: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer'
-                }}
+                className="btn btn-secondary"
               >
                 {t('common.cancel', 'Cancel')}
               </button>
@@ -860,12 +882,8 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                     const idx = steps.findIndex(s => s.id === activeStep);
                     if (idx < steps.length - 1) setActiveStep(steps[idx + 1].id);
                   }}
-                  style={{
-                    padding: '10px 20px', borderRadius: '12px', border: 'none',
-                    background: 'var(--accent-gradient)', color: '#ffffff', fontWeight: 800,
-                    fontSize: '0.86rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-                    boxShadow: 'var(--glow-accent)'
-                  }}
+                  className="btn btn-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
                   {t('common.nextStep', 'Next Step')} <ArrowRight size={16} />
                 </button>
@@ -873,12 +891,8 @@ export default function BusinessParkFormModal({ isOpen, onClose, onSuccess, init
                 <button
                   type="submit"
                   disabled={formSubmitting}
-                  style={{
-                    padding: '10px 24px', borderRadius: '12px', border: 'none',
-                    background: 'var(--accent-gradient)', color: '#ffffff', fontWeight: 800,
-                    fontSize: '0.86rem', cursor: formSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                    boxShadow: 'var(--glow-accent)'
-                  }}
+                  className="btn btn-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                 >
                   {formSubmitting ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
                   {formSubmitting ? t('businessPark.savingPark', 'Saving Business Park...') : initialData ? t('businessPark.updateParkBtn', '✓ Update Business Park') : t('businessPark.registerParkBtn', '✓ Register Business Park')}

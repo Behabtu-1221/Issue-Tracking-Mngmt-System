@@ -5,11 +5,12 @@ import {
   RefreshCw, Loader2
 } from 'lucide-react';
 import notificationApi from '../api/notificationApi';
+import { ActionButton } from '../../../components/common/ActionButton';
 
 const glassCard = {
   background: 'var(--glass-bg)',
   border: '1px solid var(--glass-border)',
-  borderRadius: '20px',
+  borderRadius: 'var(--border-radius-lg, 18px)',
   backdropFilter: 'blur(16px)',
   padding: '24px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
@@ -346,21 +347,13 @@ export default function NotifTemplatesTab() {
                   <span>Preview Render</span>
                 </button>
 
-                <button
-                  type="button"
+                <ActionButton
+                  variant="edit"
+                  label="Edit Layout"
                   onClick={() => openEdit(tpl)}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '5px',
-                    padding: '6px 14px', borderRadius: '8px',
-                    background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8',
-                    border: '1px solid rgba(99, 102, 241, 0.3)',
-                    fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <Edit2 size={13} />
-                  <span>Edit Layout</span>
-                </button>
+                  title="Edit Layout"
+                  icon={<Edit2 size={13} />}
+                />
               </div>
             </div>
           ))}
@@ -400,9 +393,11 @@ export default function NotifTemplatesTab() {
               </div>
               <button
                 onClick={() => setPreviewTemplate(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
@@ -493,9 +488,11 @@ export default function NotifTemplatesTab() {
               </div>
               <button
                 onClick={() => setEditingTemplate(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 

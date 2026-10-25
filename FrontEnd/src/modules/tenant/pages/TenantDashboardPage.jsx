@@ -122,18 +122,18 @@ export default function TenantDashboardPage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[var(--text-primary)] m-0 flex items-center gap-2.5">
               {t('nav.tenantOverview')}
             </h1>
-            <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+            <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
               {t('tenant.overviewSubtitle')}
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="flex items-center gap-2.5">
             <span style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -155,9 +155,9 @@ export default function TenantDashboardPage() {
       {/* KPI Cards Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '16px',
-        marginBottom: '28px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+        gap: '14px',
+        marginBottom: '24px'
       }}>
         {kpiCards.map((card) => {
           const Icon = card.icon;
@@ -179,7 +179,7 @@ export default function TenantDashboardPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 600 }}>{card.label}</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', margin: '8px 0 4px', lineHeight: 1.1 }}>
+                  <div style={{ fontSize: '1.65rem', fontWeight: '800', color: 'var(--text-primary)', margin: '6px 0 3px', lineHeight: 1.1 }}>
                     {card.value}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: card.subColor, fontWeight: 500 }}>
@@ -187,21 +187,21 @@ export default function TenantDashboardPage() {
                   </div>
                 </div>
                 <div style={{
-                  padding: '12px',
-                  borderRadius: '14px',
+                  padding: '10px',
+                  borderRadius: '12px',
                   background: card.iconBg,
                   color: card.iconColor,
                   transition: 'transform 0.3s',
                   transform: isHovered ? 'rotate(-8deg) scale(1.1)' : 'rotate(0) scale(1)'
                 }}>
-                  <Icon size={24} />
+                  <Icon size={22} />
                 </div>
               </div>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                marginTop: '14px',
+                marginTop: '12px',
                 fontSize: '0.72rem',
                 fontWeight: 600,
                 color: card.iconColor,
@@ -216,7 +216,7 @@ export default function TenantDashboardPage() {
       </div>
 
       {/* Main Analytics Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-7">
         {/* Lease Portfolio Telemetry */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -320,7 +320,7 @@ export default function TenantDashboardPage() {
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div
               onClick={() => navigate('/tenants/contacts')}
               style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.25s' }}
@@ -351,22 +351,12 @@ export default function TenantDashboardPage() {
       </div>
 
       {/* Shortcuts Bar */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '18px 22px',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: 'var(--border-radius-md)',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
-        <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+      <div className="p-3.5 sm:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[var(--bg-secondary)] border border-[var(--glass-border)] rounded-2xl">
+        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>
           Tenant Management Shortcuts
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div className="flex items-center gap-2 flex-wrap">
           {[
             { label: 'Tenants Directory', icon: Users, route: '/tenants/directory' },
             { label: 'Lease Contracts', icon: FileText, route: '/tenants/leases' },
@@ -379,19 +369,21 @@ export default function TenantDashboardPage() {
               <button
                 key={shortcut.label}
                 onClick={() => navigate(shortcut.route)}
+                className="touch-target-sm shrink-0"
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  fontSize: '0.8rem',
-                  padding: '7px 14px',
+                  fontSize: '0.78rem',
+                  padding: '7px 13px',
                   borderRadius: '8px',
                   border: '1px solid var(--glass-border)',
                   background: 'var(--bg-tertiary)',
                   color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontWeight: 600,
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap'
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-gradient)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}

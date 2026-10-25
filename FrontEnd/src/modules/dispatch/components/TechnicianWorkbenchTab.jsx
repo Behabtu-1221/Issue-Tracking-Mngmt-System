@@ -168,6 +168,44 @@ export default function TechnicianWorkbenchTab() {
     }
   };
 
+  const getActionHeaderInfo = (actionType) => {
+    switch (actionType) {
+      case 'reject':
+        return {
+          icon: XCircle,
+          stripClass: 'accent-strip-danger',
+          gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+          title: t('dispatch.declineServiceAssignment'),
+          subtitle: 'Decline service assignment and return to dispatch queue'
+        };
+      case 'pause':
+        return {
+          icon: Pause,
+          stripClass: 'accent-strip-warning',
+          gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+          title: t('dispatch.pauseFieldWork'),
+          subtitle: 'Temporarily suspend operational progress on this work order'
+        };
+      case 'progress':
+        return {
+          icon: TrendingUp,
+          stripClass: 'accent-strip-brand',
+          gradient: 'var(--accent-gradient)',
+          title: 'Broadcast Field Work Progress Update',
+          subtitle: 'Broadcast real-time execution milestones to requesters & approvers'
+        };
+      case 'complete':
+      default:
+        return {
+          icon: CheckCircle2,
+          stripClass: 'accent-strip-success',
+          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          title: t('dispatch.completeWorkLogResolution'),
+          subtitle: 'Log final resolution details and mark work order as resolved'
+        };
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 'IN_PROGRESS':
@@ -322,52 +360,100 @@ export default function TechnicianWorkbenchTab() {
       )}
 
       {/* Validated Action Modal (Decline, Pause, Complete) */}
-      {activeModal.isOpen && activeModal.assignment && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(15, 23, 42, 0.82)', backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '24px'
-        }}>
-          <div style={{
-            background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
-            borderRadius: '24px', width: '100%', maxWidth: '580px', maxHeight: '90vh',
-            boxShadow: '0 25px 70px rgba(0, 0, 0, 0.5)', display: 'flex', flexDirection: 'column',
-            overflow: 'hidden'
-          }}>
-            {/* Modal Header */}
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '20px 24px', borderBottom: '1px solid var(--glass-border)',
-              background: 'rgba(255, 255, 255, 0.02)'
-            }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    {t('dispatch.workbenchExecution')} • {activeModal.assignment.RequestNumber}
-                  </span>
-                </div>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
-                  {activeModal.actionType === 'reject' && t('dispatch.declineServiceAssignment')}
-                  {activeModal.actionType === 'pause' && t('dispatch.pauseFieldWork')}
-                  {activeModal.actionType === 'complete' && t('dispatch.completeWorkLogResolution')}
-                </h3>
-              </div>
-              <button
-                onClick={closeActionModal}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.06)', border: '1px solid var(--glass-border)',
-                  color: 'var(--text-muted)', cursor: 'pointer', padding: '8px', borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
+      {activeModal.isOpen && activeModal.assignment && (() => {
+        const headerInfo = getActionHeaderInfo(activeModal.actionType);
+        const ActionIcon = headerInfo.icon;
 
-            {/* Modal Form Body */}
-            <form onSubmit={handleModalSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', overflowY: 'auto' }}>
-              {/* Context Summary */}
+        return (
+          <div 
+            onClick={closeActionModal}
+            style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px'
+            }}
+          >
+            <div 
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="workbench-action-title"
+              className={`modal-card ${headerInfo.stripClass} enterprise-card`}
+              style={{
+                background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
+                borderRadius: 'var(--border-radius-lg, 18px)', width: '100%', maxWidth: '580px', maxHeight: '90vh',
+                boxShadow: 'var(--modal-shadow, 0 25px 70px rgba(0, 0, 0, 0.5))', display: 'flex', flexDirection: 'column',
+                overflow: 'hidden', position: 'relative'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid var(--glass-border)',
+                background: 'var(--bg-tertiary)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexShrink: 0
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    background: headerInfo.gradient,
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    flexShrink: 0
+                  }}>
+                    <ActionIcon size={20} />
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {t('dispatch.workbenchExecution')} • {activeModal.assignment.RequestNumber}
+                      </span>
+                    </div>
+                    <h3 id="workbench-action-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      {headerInfo.title}
+                    </h3>
+                  </div>
+                </div>
+                <button
+                  onClick={closeActionModal}
+                  className="btn-icon touch-target-sm"
+                  aria-label="Close dialog"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '6px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Modal Form Body */}
+              <form onSubmit={handleModalSubmit} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+                <div style={{
+                  padding: 'clamp(16px, 3vw, 24px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '18px',
+                  overflowY: 'auto',
+                  flex: 1
+                }}>
+                  {/* Context Summary */}
               <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', fontSize: '0.85rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>{t('dispatch.targetRequest')} </span>
                 <strong style={{ color: 'var(--text-primary)' }}>{activeModal.assignment.RequestTitle}</strong>
@@ -506,45 +592,59 @@ export default function TechnicianWorkbenchTab() {
                   </FormField>
                 </>
               )}
+                </div>
 
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)' }}>
-                <button
-                  type="button"
-                  onClick={closeActionModal}
-                  className="btn btn-secondary"
-                  style={{ padding: '11px 20px', borderRadius: '12px' }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingAction}
-                  style={{
-                    padding: '11px 24px', borderRadius: '12px', border: 'none',
-                    fontWeight: 800, fontSize: '0.88rem', cursor: submittingAction ? 'not-allowed' : 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff',
-                    background: activeModal.actionType === 'reject'
-                      ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
-                      : activeModal.actionType === 'pause'
-                        ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-                        : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {submittingAction ? <RefreshCw size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                  {submittingAction ? t('dispatch.processing') : (
-                    activeModal.actionType === 'reject' ? t('dispatch.confirmDecline') :
-                    activeModal.actionType === 'pause' ? t('dispatch.confirmPause') :
-                    t('dispatch.completeAndResolve')
-                  )}
-                </button>
-              </div>
-            </form>
+                {/* Action Buttons Footer */}
+                <div style={{
+                  padding: '14px 20px',
+                  borderTop: '1px solid var(--glass-border)',
+                  background: 'var(--bg-tertiary)',
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: '12px',
+                  flexShrink: 0
+                }}>
+                  <button
+                    type="button"
+                    onClick={closeActionModal}
+                    className="btn btn-secondary touch-target-sm"
+                    style={{ padding: '9px 18px', borderRadius: 'var(--border-radius-sm)' }}
+                  >
+                    {t('common.cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingAction}
+                    className="touch-target-sm"
+                    style={{
+                      padding: '9px 22px', borderRadius: 'var(--border-radius-sm)', border: 'none',
+                      fontWeight: 700, fontSize: '0.88rem', cursor: submittingAction ? 'not-allowed' : 'pointer',
+                      display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff',
+                      background: activeModal.actionType === 'reject'
+                        ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                        : activeModal.actionType === 'pause'
+                          ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                          : activeModal.actionType === 'progress'
+                            ? 'linear-gradient(135deg, #6366f1 0%, #3b82f6 100%)'
+                            : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      boxShadow: 'var(--glow-accent)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {submittingAction ? <RefreshCw size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                    {submittingAction ? t('dispatch.processing') : (
+                      activeModal.actionType === 'reject' ? t('dispatch.confirmDecline') :
+                      activeModal.actionType === 'pause' ? t('dispatch.confirmPause') :
+                      activeModal.actionType === 'progress' ? 'Broadcast Progress Update' :
+                      t('dispatch.completeAndResolve')
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Glass Alert Modal */}
       <AlertDialogModal

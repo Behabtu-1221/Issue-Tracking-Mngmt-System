@@ -6,7 +6,7 @@
         "migrate": "node src/database/migrator.js migrate",
         "migrate:status": "node src/database/migrator.js status",
         "migrate:check": "node src/database/migrator.js check",
-        "test": "node tests/security-hardening.test.js && node tests/authorization-isolation.test.js && node tests/system-integrity.test.js"
+        "test": "node tests/security-hardening.test.js && node tests/authorization-isolation.test.js && node tests/system-integrity.test.js && node tests/business-park-hierarchy.test.js && node tests/tenant-management.test.js && node tests/approval-to-dispatch-pipeline.test.js"
     },
     "dependencies": {
         "bcryptjs": "^3.0.3",

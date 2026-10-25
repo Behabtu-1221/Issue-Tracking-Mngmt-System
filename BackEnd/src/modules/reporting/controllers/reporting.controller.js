@@ -91,17 +91,7 @@ export const reportingController = {
     }
   },
 
-  // ── 9. Knowledge Base Analytics ──
-  async getKnowledgeAnalytics(req, res, next) {
-    try {
-      const data = await reportingService.getKnowledgeAnalytics();
-      sendSuccess(res, data, 'Knowledge base engagement analytics retrieved successfully');
-    } catch (err) {
-      next(err);
-    }
-  },
-
-  // ── 10. Saved Reports Management ──
+  // ── 9. Saved Reports Management ──
   async getSavedReports(req, res, next) {
     try {
       const data = await reportingService.getSavedReports(req.actor);

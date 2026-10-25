@@ -39,9 +39,6 @@ import budgetCostCenterRoutes from '../src/modules/organization/routes/budget-co
 
 import serviceCategoryRoutes from '../src/modules/service-catalog/routes/service-category.routes.js';
 import serviceRoutes from '../src/modules/service-catalog/routes/service.routes.js';
-import servicePricingRoutes from '../src/modules/service-catalog/routes/service-pricing.routes.js';
-import serviceRequirementRoutes from '../src/modules/service-catalog/routes/service-requirement.routes.js';
-import serviceGovernanceRoutes from '../src/modules/service-catalog/routes/service-governance.routes.js';
 import serviceAnalyticsRoutes from '../src/modules/service-catalog/routes/service-analytics.routes.js';
 import serviceCategoryMappingRoutes from '../src/modules/service-catalog/routes/service-category-mapping.routes.js';
 
@@ -49,7 +46,6 @@ import issueRequestRoutes from '../src/modules/issue-management/routes/issue-req
 import issueCommentRoutes from '../src/modules/issue-management/routes/issue-comment.routes.js';
 import issueInvestigationRoutes from '../src/modules/issue-management/routes/issue-investigation.routes.js';
 import issueResolutionRoutes from '../src/modules/issue-management/routes/issue-resolution.routes.js';
-import knownIssueRoutes from '../src/modules/issue-management/routes/known-issue.routes.js';
 
 import approvalRoutes from '../src/modules/approval/routes/approval.routes.js';
 import approvalDelegationRoutes from '../src/modules/approval/routes/approval-delegation.routes.js';
@@ -89,16 +85,12 @@ const ROUTE_REGISTRY = [
   { basePath: '/api/financials', router: budgetCostCenterRoutes },
   { basePath: '/api/service-categories', router: serviceCategoryRoutes },
   { basePath: '/api/services', router: serviceRoutes },
-  { basePath: '/api/service-pricing', router: servicePricingRoutes },
-  { basePath: '/api/service-requirements', router: serviceRequirementRoutes },
-  { basePath: '/api/service-governance', router: serviceGovernanceRoutes },
   { basePath: '/api/service-analytics', router: serviceAnalyticsRoutes },
   { basePath: '/api/category-mappings', router: serviceCategoryMappingRoutes },
   { basePath: '/api/requests', router: issueRequestRoutes },
   { basePath: '/api/comments', router: issueCommentRoutes },
   { basePath: '/api/investigations', router: issueInvestigationRoutes },
   { basePath: '/api/resolutions', router: issueResolutionRoutes },
-  { basePath: '/api/known-issues', router: knownIssueRoutes },
   { basePath: '/api/approvals', router: approvalRoutes },
   { basePath: '/api/approval-delegations', router: approvalDelegationRoutes },
   { basePath: '/api/approval-rules', router: approvalRuleRoutes },

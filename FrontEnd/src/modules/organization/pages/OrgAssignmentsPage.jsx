@@ -1,15 +1,15 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
 import EmployeeAssignmentsTab from '../components/EmployeeAssignmentsTab';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function OrgAssignmentsPage() {
+  const { t } = useTranslation();
+
   return (
     <div>
-      {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
         <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-          Staff member position placements, primary/secondary department roles, and manager reporting lines
+          {t('organization.assignmentsSubtitle', 'Staff member position placements, primary/secondary department roles, and manager reporting lines')}
         </p>
       </div>
 

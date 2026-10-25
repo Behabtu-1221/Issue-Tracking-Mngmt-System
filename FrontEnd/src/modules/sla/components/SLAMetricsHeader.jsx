@@ -1,7 +1,9 @@
 import React from 'react';
 import { Clock, ShieldCheck, AlertTriangle, AlertCircle, TrendingUp, Layers } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function SLAMetricsHeader({ metrics, activeFilter, onFilterChange }) {
+  const { t } = useTranslation();
   const total = metrics?.totalMonitoredClocks || 0;
   const compliancePercent = metrics?.compliancePercent || 100;
   const responseBreaches = metrics?.responseBreachesCount || 0;
@@ -10,9 +12,9 @@ export default function SLAMetricsHeader({ metrics, activeFilter, onFilterChange
   const cards = [
     {
       id: 'ALL',
-      title: 'Monitored SLA Clocks',
+      title: t('sla.metrics.monitoredClocks', 'Monitored SLA Clocks'),
       value: total,
-      subtext: 'Active service level targets',
+      subtext: t('sla.metrics.monitoredSub', 'Active service level targets'),
       icon: Clock,
       color: '#6366f1',
       bgGlow: 'rgba(99, 102, 241, 0.15)',
@@ -20,9 +22,9 @@ export default function SLAMetricsHeader({ metrics, activeFilter, onFilterChange
     },
     {
       id: 'COMPLIANCE',
-      title: 'SLA Compliance Rate',
+      title: t('sla.metrics.complianceRate', 'SLA Compliance Rate'),
       value: `${compliancePercent}%`,
-      subtext: `${metrics?.compliantClocks || 0} Clocks Within Target`,
+      subtext: t('sla.metrics.complianceSub', '{count} Clocks Within Target').replace('{count}', metrics?.compliantClocks || 0),
       icon: ShieldCheck,
       color: '#10b981',
       bgGlow: 'rgba(16, 185, 129, 0.15)',
@@ -30,9 +32,9 @@ export default function SLAMetricsHeader({ metrics, activeFilter, onFilterChange
     },
     {
       id: 'RESPONSE_BREACH',
-      title: 'Response Breaches',
+      title: t('sla.metrics.responseBreaches', 'Response Breaches'),
       value: responseBreaches,
-      subtext: 'Target initial response exceeded',
+      subtext: t('sla.metrics.responseBreachesSub', 'Target initial response exceeded'),
       icon: AlertTriangle,
       color: '#f59e0b',
       bgGlow: 'rgba(245, 158, 11, 0.15)',
@@ -41,9 +43,9 @@ export default function SLAMetricsHeader({ metrics, activeFilter, onFilterChange
     },
     {
       id: 'RESOLUTION_BREACH',
-      title: 'Resolution Breaches',
+      title: t('sla.metrics.resolutionBreaches', 'Resolution Breaches'),
       value: resolutionBreaches,
-      subtext: 'Target resolution time exceeded',
+      subtext: t('sla.metrics.resolutionBreachesSub', 'Target resolution time exceeded'),
       icon: AlertCircle,
       color: '#ef4444',
       bgGlow: 'rgba(239, 68, 68, 0.15)',

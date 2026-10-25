@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from '../../../i18n';
 import {
   User,
@@ -17,18 +18,41 @@ import {
   Trash2,
   CheckCircle2,
   Camera,
-  Upload
+  Upload,
+  Sliders
 } from 'lucide-react';
 import { useAuth } from '../../authentication/contexts/AuthContext';
 import authApi from '../../authentication/api/authApi';
 import { validatePasswordComplexity } from '../../authentication/utils/passwordValidation';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import NotifPreferencesTab from '../../notification/components/NotifPreferencesTab';
+import { ActionButton } from '../../../components/common/ActionButton';
 
 export default function ProfileManagementPage() {
   const { t } = useTranslation();
   const { user, refreshProfile } = useAuth();
-  const [activeTab, setActiveTab] = useState('personal');
+  const location = useLocation();
+
+  const getInitialTab = () => {
+    const tabParam = new URLSearchParams(location.search).get('tab');
+    if (tabParam === 'notifications' || tabParam === 'preferences') return 'notifications';
+    if (tabParam === 'security') return 'security';
+    return 'personal';
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialTab);
+
+  useEffect(() => {
+    const tabParam = new URLSearchParams(location.search).get('tab');
+    if (tabParam === 'notifications' || tabParam === 'preferences') {
+      setActiveTab('notifications');
+    } else if (tabParam === 'security') {
+      setActiveTab('security');
+    } else if (tabParam === 'personal') {
+      setActiveTab('personal');
+    }
+  }, [location.search]);
   const avatarInputRef = useRef(null);
 
   // Glass Dialog Modals State
@@ -113,18 +137,7 @@ export default function ProfileManagementPage() {
     }
   };
 
-  // Notification Preferences State (Interactive Toggles)
-  const [notifPrefs, setNotifPrefs] = useState({
-    emailTicketUpdates: true,
-    emailSlaWarnings: true,
-    emailWeeklyDigest: false,
-    emailMaintenance: true,
-    smsCriticalSla: true,
-    smsDispatchAlerts: false,
-    inAppSoundAlerts: true,
-    inAppPopups: true,
-    inAppSystemAnnouncements: true
-  });
+
 
   // Password Change State
   const [passwordForm, setPasswordForm] = useState({
@@ -140,9 +153,7 @@ export default function ProfileManagementPage() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState({ type: '', text: '' });
 
-  // Notification Save State
-  const [isSavingPrefs, setIsSavingPrefs] = useState(false);
-  const [notifMsg, setNotifMsg] = useState({ type: '', text: '' });
+
 
   // Active Sessions State
   const [sessions, setSessions] = useState([]);
@@ -204,24 +215,7 @@ export default function ProfileManagementPage() {
     }
   };
 
-  const handleNotifToggle = (key) => {
-    setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }));
-  };
 
-  const handleNotifSubmit = async (e) => {
-    e.preventDefault();
-    setIsSavingPrefs(true);
-    setNotifMsg({ type: '', text: '' });
-
-    try {
-      await authApi.updateNotificationPreferences(notifPrefs);
-      setNotifMsg({ type: 'success', text: t('profile.prefsSaved') });
-    } catch (err) {
-      setNotifMsg({ type: 'error', text: err.response?.data?.message || err.message || 'Failed to save preferences' });
-    } finally {
-      setIsSavingPrefs(false);
-    }
-  };
 
   const handleNewPasswordChange = (val) => {
     setPasswordForm(prev => ({ ...prev, newPassword: val }));
@@ -270,23 +264,23 @@ export default function ProfileManagementPage() {
       <div style={{
         background: 'var(--accent-gradient)',
         borderRadius: 'var(--border-radius-lg)',
-        padding: '32px',
-        marginBottom: '28px',
+        padding: 'clamp(18px, 4vw, 32px)',
+        marginBottom: '24px',
         color: '#ffffff',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '20px',
+        gap: '16px',
         boxShadow: 'var(--shadow-lg)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
           {/* Clickable Avatar with Upload Overlay */}
           <div
             onClick={() => avatarInputRef.current?.click()}
             style={{
-              width: '80px',
-              height: '80px',
+              width: '72px',
+              height: '72px',
               borderRadius: '50%',
               position: 'relative',
               cursor: 'pointer',
@@ -312,7 +306,7 @@ export default function ProfileManagementPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.8rem',
+                fontSize: '1.6rem',
                 fontWeight: 800,
                 letterSpacing: '1px',
                 color: '#ffffff'
@@ -335,9 +329,9 @@ export default function ProfileManagementPage() {
             onMouseLeave={(e) => { if (!isUploadingAvatar) e.currentTarget.style.opacity = '0'; }}
             >
               {isUploadingAvatar ? (
-                <RefreshCw size={22} color="#ffffff" style={{ animation: 'spin 1s linear infinite' }} />
+                <RefreshCw size={20} color="#ffffff" style={{ animation: 'spin 1s linear infinite' }} />
               ) : (
-                <Camera size={22} color="#ffffff" />
+                <Camera size={20} color="#ffffff" />
               )}
             </div>
             <input
@@ -348,11 +342,11 @@ export default function ProfileManagementPage() {
               style={{ display: 'none' }}
             />
           </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800 }}>
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ margin: 0, fontSize: 'clamp(1.2rem, 3.5vw, 1.6rem)', fontWeight: 800, wordBreak: 'break-word' }}>
               {formData.firstName || 'User'} {formData.lastName || 'Profile'}
             </h1>
-            <p style={{ margin: '4px 0 0', opacity: 0.9, fontSize: '0.9rem' }}>
+            <p style={{ margin: '4px 0 0', opacity: 0.9, fontSize: '0.85rem', wordBreak: 'break-all' }}>
               {formData.jobTitle || user?.userTypeCode || 'Employee'} • {formData.email}
             </p>
           </div>
@@ -360,9 +354,9 @@ export default function ProfileManagementPage() {
 
         <div style={{
           background: 'rgba(0, 0, 0, 0.2)',
-          padding: '8px 16px',
+          padding: '6px 14px',
           borderRadius: '20px',
-          fontSize: '0.8rem',
+          fontSize: '0.78rem',
           fontWeight: 600,
           display: 'flex',
           alignItems: 'center',
@@ -375,17 +369,13 @@ export default function ProfileManagementPage() {
       </div>
 
       {/* Profile Navigation Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        borderBottom: '1px solid var(--glass-border)',
-        marginBottom: '28px',
-        overflowX: 'auto',
-        paddingBottom: '4px'
-      }}>
+      <div 
+        className="flex gap-2 border-b border-[var(--glass-border)] mb-6 overflow-x-auto pb-1 max-w-full"
+        style={{ scrollbarWidth: 'none' }}
+      >
         {[
           { id: 'personal', label: t('profile.personalDetailsTab'), icon: User },
-          { id: 'notifications', label: t('profile.notifSettingsTab'), icon: Bell },
+          { id: 'notifications', label: t('nav.notificationPreferences', 'Preferences & Channels'), icon: Sliders },
           { id: 'security', label: t('profile.securityPasswordTab'), icon: Lock }
         ].map(tab => {
           const Icon = tab.icon;
@@ -394,19 +384,21 @@ export default function ProfileManagementPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              className="touch-target-sm shrink-0"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
-                padding: '12px 20px',
+                gap: '8px',
+                padding: '10px 18px',
                 borderRadius: '10px 10px 0 0',
                 background: isActive ? 'var(--bg-secondary)' : 'transparent',
                 border: 'none',
                 borderBottom: isActive ? '3px solid var(--accent-primary)' : '3px solid transparent',
                 color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                 fontWeight: isActive ? 700 : 500,
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
                 transition: 'all 0.2s'
               }}
             >
@@ -423,7 +415,7 @@ export default function ProfileManagementPage() {
           background: 'var(--bg-secondary)',
           border: '1px solid var(--glass-border)',
           borderRadius: 'var(--border-radius-md)',
-          padding: '32px',
+          padding: 'clamp(18px, 4vw, 32px)',
           boxShadow: 'var(--shadow-lg)'
         }}>
           <h2 style={{ fontSize: '1.2rem', marginBottom: '20px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -449,7 +441,7 @@ export default function ProfileManagementPage() {
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '20px', marginBottom: '24px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>{t('profile.firstName')}</label>
               <input
@@ -596,229 +588,11 @@ export default function ProfileManagementPage() {
         </form>
       )}
 
-      {/* TAB 2: Notification Settings & Interactive Toggles */}
+      {/* TAB 2: Notification Preferences & Delivery Channels */}
       {activeTab === 'notifications' && (
-        <form onSubmit={handleNotifSubmit} style={{
-          background: 'var(--bg-secondary)',
-          border: '1px solid var(--glass-border)',
-          borderRadius: 'var(--border-radius-md)',
-          padding: '32px',
-          boxShadow: 'var(--shadow-lg)'
-        }}>
-          <h2 style={{ fontSize: '1.2rem', marginBottom: '8px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Bell size={20} color="var(--accent-primary)" />
-            <span>{t('profile.notifChannelsTitle')}</span>
-          </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '24px' }}>
-            {t('profile.notifChannelsDesc')}
-          </p>
-
-          {notifMsg.text && (
-            <div style={{
-              padding: '12px 16px',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              background: notifMsg.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-              color: notifMsg.type === 'success' ? '#10b981' : '#ef4444',
-              border: `1px solid ${notifMsg.type === 'success' ? '#10b981' : '#ef4444'}`,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              fontSize: '0.88rem'
-            }}>
-              {notifMsg.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-              <span>{notifMsg.text}</span>
-            </div>
-          )}
-
-          {/* Email Notifications Section */}
-          <div style={{ marginBottom: '28px' }}>
-            <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Mail size={16} color="var(--accent-secondary)" />
-              <span>{t('profile.emailNotifs')}</span>
-            </h3>
-
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {[
-                { key: 'emailTicketUpdates', label: t('profile.emailTicketUpdates'), desc: t('profile.emailTicketUpdatesDesc') },
-                { key: 'emailSlaWarnings', label: t('profile.emailSlaWarnings'), desc: t('profile.emailSlaWarningsDesc') },
-                { key: 'emailWeeklyDigest', label: t('profile.emailWeeklyDigest'), desc: t('profile.emailWeeklyDigestDesc') },
-                { key: 'emailMaintenance', label: t('profile.emailMaintenance'), desc: t('profile.emailMaintenanceDesc') }
-              ].map(item => (
-                <div key={item.key} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '14px 18px',
-                  background: 'var(--bg-tertiary)',
-                  borderRadius: '10px',
-                  border: '1px solid var(--glass-border)'
-                }}>
-                  <div>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.88rem' }}>{item.label}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '2px' }}>{item.desc}</div>
-                  </div>
-                  {/* Interactive Toggle Switch */}
-                  <div
-                    onClick={() => handleNotifToggle(item.key)}
-                    style={{
-                      width: '46px',
-                      height: '24px',
-                      borderRadius: '12px',
-                      background: notifPrefs[item.key] ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.1)',
-                      padding: '2px',
-                      cursor: 'pointer',
-                      transition: 'background 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      boxShadow: notifPrefs[item.key] ? 'var(--glow-accent)' : 'none'
-                    }}
-                  >
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      background: '#ffffff',
-                      transform: notifPrefs[item.key] ? 'translateX(22px)' : 'translateX(0)',
-                      transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-                    }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* SMS Notifications Section */}
-          <div style={{ marginBottom: '28px' }}>
-            <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Smartphone size={16} color="#10b981" />
-              <span>{t('profile.smsNotifs')}</span>
-            </h3>
-
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {[
-                { key: 'smsCriticalSla', label: t('profile.smsCriticalSla'), desc: t('profile.smsCriticalSlaDesc') },
-                { key: 'smsDispatchAlerts', label: t('profile.smsDispatchAlerts'), desc: t('profile.smsDispatchAlertsDesc') }
-              ].map(item => (
-                <div key={item.key} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '14px 18px',
-                  background: 'var(--bg-tertiary)',
-                  borderRadius: '10px',
-                  border: '1px solid var(--glass-border)'
-                }}>
-                  <div>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.88rem' }}>{item.label}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '2px' }}>{item.desc}</div>
-                  </div>
-                  <div
-                    onClick={() => handleNotifToggle(item.key)}
-                    style={{
-                      width: '46px',
-                      height: '24px',
-                      borderRadius: '12px',
-                      background: notifPrefs[item.key] ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
-                      padding: '2px',
-                      cursor: 'pointer',
-                      transition: 'background 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      background: '#ffffff',
-                      transform: notifPrefs[item.key] ? 'translateX(22px)' : 'translateX(0)',
-                      transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* In-App Desktop Alerts Section */}
-          <div style={{ marginBottom: '28px' }}>
-            <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Volume2 size={16} color="#f59e0b" />
-              <span>{t('profile.soundAlerts')}</span>
-            </h3>
-
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {[
-                { key: 'inAppSoundAlerts', label: t('profile.soundOnNew'), desc: t('profile.soundOnNewDesc') },
-                { key: 'inAppPopups', label: t('profile.toastBanners'), desc: t('profile.toastBannersDesc') }
-              ].map(item => (
-                <div key={item.key} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '14px 18px',
-                  background: 'var(--bg-tertiary)',
-                  borderRadius: '10px',
-                  border: '1px solid var(--glass-border)'
-                }}>
-                  <div>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.88rem' }}>{item.label}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '2px' }}>{item.desc}</div>
-                  </div>
-                  <div
-                    onClick={() => handleNotifToggle(item.key)}
-                    style={{
-                      width: '46px',
-                      height: '24px',
-                      borderRadius: '12px',
-                      background: notifPrefs[item.key] ? '#f59e0b' : 'rgba(255, 255, 255, 0.1)',
-                      padding: '2px',
-                      cursor: 'pointer',
-                      transition: 'background 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      background: '#ffffff',
-                      transform: notifPrefs[item.key] ? 'translateX(22px)' : 'translateX(0)',
-                      transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button
-              type="submit"
-              disabled={isSavingPrefs}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
-                borderRadius: 'var(--border-radius-sm)',
-                background: 'var(--accent-gradient)',
-                color: '#ffffff',
-                border: 'none',
-                fontWeight: 700,
-                cursor: isSavingPrefs ? 'not-allowed' : 'pointer',
-                boxShadow: 'var(--glow-accent)',
-                opacity: isSavingPrefs ? 0.7 : 1
-              }}
-            >
-              <Save size={16} />
-              <span>{isSavingPrefs ? t('profile.savingPrefs') : t('profile.savePrefs')}</span>
-            </button>
-          </div>
-        </form>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <NotifPreferencesTab />
+        </div>
       )}
 
       {/* TAB 3: Security & Credentials */}
@@ -829,7 +603,7 @@ export default function ProfileManagementPage() {
             background: 'var(--bg-secondary)',
             border: '1px solid var(--glass-border)',
             borderRadius: 'var(--border-radius-md)',
-            padding: '32px',
+            padding: 'clamp(18px, 4vw, 32px)',
             boxShadow: 'var(--shadow-lg)'
           }}>
             <h2 style={{ fontSize: '1.2rem', marginBottom: '8px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -967,10 +741,10 @@ export default function ProfileManagementPage() {
             background: 'var(--bg-secondary)',
             border: '1px solid var(--glass-border)',
             borderRadius: 'var(--border-radius-md)',
-            padding: '32px',
+            padding: 'clamp(18px, 4vw, 32px)',
             boxShadow: 'var(--shadow-lg)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
               <div>
                 <h2 style={{ fontSize: '1.2rem', margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <Laptop size={20} color="var(--accent-secondary)" />
@@ -983,6 +757,7 @@ export default function ProfileManagementPage() {
               <button
                 onClick={loadSessions}
                 disabled={loadingSessions}
+                className="touch-target-sm shrink-0"
                 style={{
                   background: 'var(--bg-tertiary)',
                   border: '1px solid var(--glass-border)',
@@ -1008,46 +783,25 @@ export default function ProfileManagementPage() {
             ) : (
               <div style={{ display: 'grid', gap: '12px' }}>
                 {sessions.map(s => (
-                  <div key={s.UserSessionID} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '14px 18px',
-                    background: 'var(--bg-tertiary)',
-                    borderRadius: '10px',
-                    border: '1px solid var(--glass-border)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      <Laptop size={20} color="var(--accent-primary)" />
-                      <div>
-                        <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.88rem' }}>
+                  <div key={s.UserSessionID} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-3.5 sm:p-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--glass-border)]">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flex: 1, width: '100%' }}>
+                      <Laptop size={20} color="var(--accent-primary)" style={{ flexShrink: 0 }} />
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.88rem', wordBreak: 'break-all' }}>
                           {s.UserAgent || 'Web Browser Session'}
                         </div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', wordBreak: 'break-all' }}>
                           {t('identity.thIpAddress')}: {s.IpAddress || 'Current Client'} • {t('identity.thLoginTimestamp')}: {s.LastSeenDateTime ? new Date(s.LastSeenDateTime).toLocaleString() : t('common.active')}
                         </div>
                       </div>
                     </div>
 
-                    <button
+                    <ActionButton
+                      variant="delete"
+                      label={t('profile.revokeSessionBtn')}
                       onClick={() => handleRevokeSession(s.UserSessionID)}
-                      style={{
-                        background: 'rgba(239, 68, 68, 0.15)',
-                        color: '#ef4444',
-                        border: '1px solid rgba(239, 68, 68, 0.3)',
-                        padding: '6px 12px',
-                        borderRadius: '6px',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <Trash2 size={13} />
-                      <span>{t('profile.revokeSessionBtn')}</span>
-                    </button>
+                      title={t('profile.revokeSessionBtn')}
+                    />
                   </div>
                 ))}
               </div>

@@ -18,10 +18,14 @@ import orgApi from '../api/orgApi';
 import tenantApi from '../../tenant/api/tenantApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { FormField } from '../../../components/common/FormField';
 import { orgSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function FinancialsTab({ onRefreshMetrics }) {
+  const { t } = useTranslation();
   const [subSection, setSubSection] = useState('cost-centers'); // 'cost-centers' | 'budgets'
   const [costCenters, setCostCenters] = useState([]);
   const [budgets, setBudgets] = useState([]);
@@ -191,10 +195,10 @@ export default function FinancialsTab({ onRefreshMetrics }) {
   const handleCCDelete = (id, name) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Cost Center',
-      message: `Are you sure you want to delete cost center "${name}"? Associated budgets may be affected.`,
+      title: t('organization.financialsTab.deleteCCTitle', 'Delete Cost Center'),
+      message: t('organization.financialsTab.deleteCCConfirm', 'Are you sure you want to delete cost center "{name}"? Associated budgets may be affected.').replace('{name}', name),
       type: 'danger',
-      confirmText: 'Delete Cost Center',
+      confirmText: t('organization.financialsTab.deleteCCTitle', 'Delete Cost Center'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -274,10 +278,10 @@ export default function FinancialsTab({ onRefreshMetrics }) {
   const handleBudgetDelete = (id) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Budget Allocation',
-      message: 'Are you sure you want to delete this budget allocation? This action cannot be undone.',
+      title: t('organization.financialsTab.deleteBudgetTitle', 'Delete Budget Allocation'),
+      message: t('organization.financialsTab.deleteBudgetConfirm', 'Are you sure you want to delete this budget allocation? This action cannot be undone.'),
       type: 'danger',
-      confirmText: 'Delete Budget',
+      confirmText: t('organization.financialsTab.deleteBudgetTitle', 'Delete Budget'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -325,7 +329,7 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                 gap: '6px'
               }}
             >
-              <PieChart size={14} /> Cost Centers
+              <PieChart size={14} /> {t('organization.financialsTab.costCentersTabBtn', 'Cost Centers')}
             </button>
             <button
               onClick={() => { setSubSection('budgets'); setSearch(''); }}
@@ -343,7 +347,7 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                 gap: '6px'
               }}
             >
-              <Wallet size={14} /> Department Budgets
+              <Wallet size={14} /> {t('organization.financialsTab.budgetsTabBtn', 'Department Budgets')}
             </button>
           </div>
 
@@ -352,7 +356,7 @@ export default function FinancialsTab({ onRefreshMetrics }) {
               <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input
                 type="text"
-                placeholder="Search cost centers..."
+                placeholder={t('organization.financialsTab.searchPlaceholder', 'Search cost centers...')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{
@@ -380,7 +384,7 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                 minWidth: '200px'
               }}
             >
-              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Departments</option>
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.financialsTab.allDepartments', 'All Departments')}</option>
               {departments.map((d) => (
                 <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                   {d.DepartmentName}
@@ -406,7 +410,7 @@ export default function FinancialsTab({ onRefreshMetrics }) {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> {subSection === 'cost-centers' ? 'Add Cost Center' : 'Add Department Budget'}
+          <Plus size={16} /> {subSection === 'cost-centers' ? t('organization.financialsTab.addCostCenterBtn', 'Add Cost Center') : t('organization.financialsTab.addDepartmentBudgetBtn', 'Add Department Budget')}
         </button>
       </div>
 
@@ -414,19 +418,19 @@ export default function FinancialsTab({ onRefreshMetrics }) {
       {subSection === 'cost-centers' ? (
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading cost centers...</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.financialsTab.loadingCostCenters', 'Loading cost centers...')}</div>
           ) : costCenters.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No cost centers found. Create cost centers to organize financial tracking.</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.financialsTab.emptyCostCenters', 'No cost centers found. Create cost centers to organize financial tracking.')}</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '16px 20px' }}>Cost Center & Code</th>
-                  <th style={{ padding: '16px 20px' }}>Tenant Scope</th>
-                  <th style={{ padding: '16px 20px' }}>Description</th>
-                  <th style={{ padding: '16px 20px' }}>Linked Budgets</th>
-                  <th style={{ padding: '16px 20px' }}>Status</th>
-                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.financialsTab.thCostCenter', 'Cost Center & Code')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.financialsTab.thTenantScope', 'Tenant Scope')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.financialsTab.thDescription', 'Description')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.financialsTab.thLinkedBudgets', 'Linked Budgets')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.financialsTab.thStatus', 'Status')}</th>
+                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('organization.financialsTab.thActions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -450,7 +454,7 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                           {cc.TenantName}
                         </div>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Global</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{t('organization.financialsTab.globalScope', 'Global')}</span>
                       )}
                     </td>
                     <td style={{ padding: '16px 20px', color: 'var(--text-secondary)', fontSize: '0.82rem', maxWidth: '220px' }}>
@@ -460,26 +464,24 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                     </td>
                     <td style={{ padding: '16px 20px' }}>
                       <span style={{ fontWeight: '600', color: '#60a5fa' }}>{cc.BudgetCount || 0}</span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}> budgets</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}> {t('organization.financialsTab.budgetsCount', 'budgets')}</span>
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      {cc.IsActive ? <span className="badge badge-success">Active</span> : <span className="badge badge-danger">Inactive</span>}
+                      {cc.IsActive ? <span className="badge badge-success">{t('organization.financialsTab.activeBadge', 'Active')}</span> : <span className="badge badge-danger">{t('organization.financialsTab.inactiveBadge', 'Inactive')}</span>}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        <button
+                      <ActionGroup align="right">
+                        <ActionButton
+                          variant="edit"
                           onClick={() => handleOpenCCEdit(cc)}
-                          style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
+                          title={t('common.edit')}
+                        />
+                        <ActionButton
+                          variant="delete"
                           onClick={() => handleCCDelete(cc.CostCenterID, cc.CostCenterName)}
-                          style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                          title={t('common.delete')}
+                        />
+                      </ActionGroup>
                     </td>
                   </tr>
                 ))}
@@ -491,9 +493,9 @@ export default function FinancialsTab({ onRefreshMetrics }) {
         /* Department Budgets Grid */
         <div>
           {loading ? (
-            <div className="glass-card" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading department budgets...</div>
+            <div className="glass-card" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.financialsTab.loadingBudgets', 'Loading department budgets...')}</div>
           ) : budgets.length === 0 ? (
-            <div className="glass-card" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No budgets found. Allocate department budgets for fiscal planning.</div>
+            <div className="glass-card" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.financialsTab.emptyBudgets', 'No budgets found. Allocate department budgets for fiscal planning.')}</div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '20px' }}>
               {budgets.map((b) => {
@@ -507,38 +509,38 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                       <div>
                         <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '1rem' }}>{b.DepartmentName}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                          <Calendar size={12} /> FY {b.FiscalYear}
+                          <Calendar size={12} /> {t('organization.financialsTab.fiscalYear', 'FY')} {b.FiscalYear}
                           {b.CostCenterName && (
                             <span style={{ marginLeft: '6px' }}>• {b.CostCenterName}</span>
                           )}
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <button
+                      <ActionGroup align="right">
+                        <ActionButton
+                          variant="edit"
+                          size="sm"
                           onClick={() => handleOpenBudgetEdit(b)}
-                          style={{ padding: '5px 8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={12} />
-                        </button>
-                        <button
+                          title={t('common.edit')}
+                        />
+                        <ActionButton
+                          variant="delete"
+                          size="sm"
                           onClick={() => handleBudgetDelete(b.DepartmentBudgetID)}
-                          style={{ padding: '5px 8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
+                          title={t('common.delete')}
+                        />
+                      </ActionGroup>
                     </div>
 
                     {/* Budget Amounts */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                       <div style={{ background: 'var(--bg-tertiary)', padding: '12px', borderRadius: '8px' }}>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Allocated</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('organization.financialsTab.allocated', 'Allocated')}</div>
                         <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#60a5fa' }}>
                           {b.CurrencyCode} {Number(b.AllocatedAmount || 0).toLocaleString()}
                         </div>
                       </div>
                       <div style={{ background: 'var(--bg-tertiary)', padding: '12px', borderRadius: '8px' }}>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Remaining</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('organization.financialsTab.remaining', 'Remaining')}</div>
                         <div style={{ fontSize: '1.1rem', fontWeight: '700', color: usageColor }}>
                           {b.CurrencyCode} {Number(b.RemainingAmount || 0).toLocaleString()}
                         </div>
@@ -548,8 +550,8 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                     {/* Usage Progress Bar */}
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.78rem' }}>
-                        <span style={{ color: 'var(--text-muted)' }}>Budget Utilization</span>
-                        <span style={{ color: usageColor, fontWeight: '600' }}>{usage}% used</span>
+                        <span style={{ color: 'var(--text-muted)' }}>{t('organization.financialsTab.budgetUtilization', 'Budget Utilization')}</span>
+                        <span style={{ color: usageColor, fontWeight: '600' }}>{t('organization.financialsTab.usedPct', '{usage}% used').replace('{usage}', usage)}</span>
                       </div>
                       <div style={{ width: '100%', height: '6px', borderRadius: '3px', background: 'var(--bg-tertiary)', overflow: 'hidden' }}>
                         <div style={{
@@ -561,8 +563,8 @@ export default function FinancialsTab({ onRefreshMetrics }) {
                         }}></div>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                        <span>Spent: {b.CurrencyCode} {Number(spent).toLocaleString()}</span>
-                        <span>of {b.CurrencyCode} {Number(b.AllocatedAmount || 0).toLocaleString()}</span>
+                        <span>{t('organization.financialsTab.spent', 'Spent')}: {b.CurrencyCode} {Number(spent).toLocaleString()}</span>
+                        <span>{t('organization.financialsTab.of', 'of')} {b.CurrencyCode} {Number(b.AllocatedAmount || 0).toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
@@ -575,374 +577,351 @@ export default function FinancialsTab({ onRefreshMetrics }) {
 
       {/* Modal: Create/Edit Cost Center */}
       {isCCModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <PieChart color="var(--accent-primary)" />
-              {editingCC ? 'Edit Cost Center' : 'Create Cost Center'}
-            </h2>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleCCSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <FormField
-                label="Tenant Scope (Optional)"
-                icon={Building2}
-                error={ccErrors.TenantID}
+        <ModalCard
+          isOpen={isCCModalOpen}
+          onClose={() => setIsCCModalOpen(false)}
+          title={editingCC ? t('organization.financialsTab.editCCTitle', 'Edit Cost Center') : t('organization.financialsTab.createCCTitle', 'Create Cost Center')}
+          subtitle="Configure financial accounting unit and cost allocation boundary"
+          icon={PieChart}
+          accentStrip="brand"
+          maxWidth="540px"
+          error={errorMsg}
+          onSubmit={handleCCSubmit}
+          submitText={editingCC ? t('organization.financialsTab.saveChangesBtn', 'Save Changes') : t('organization.financialsTab.createCCBtn', 'Create Cost Center')}
+          cancelText={t('organization.financialsTab.cancelBtn', 'Cancel')}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <FormField
+              label={t('organization.financialsTab.tenantScopeLabel', 'Tenant Scope (Optional)')}
+              icon={Building2}
+              error={ccErrors.TenantID}
+              id="cc-tenant-id"
+            >
+              <select
                 id="cc-tenant-id"
+                value={ccForm.TenantID}
+                onChange={(e) => {
+                  setCcForm({ ...ccForm, TenantID: e.target.value });
+                  clearCCError('TenantID');
+                }}
+                className={`enterprise-input ${ccErrors.TenantID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: ccErrors.TenantID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)'
+                }}
               >
-                <select
-                  id="cc-tenant-id"
-                  value={ccForm.TenantID}
-                  onChange={(e) => {
-                    setCcForm({ ...ccForm, TenantID: e.target.value });
-                    clearCCError('TenantID');
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'var(--bg-tertiary)',
-                    border: ccErrors.TenantID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Global / System Scope --</option>
-                  {tenants.map((t) => (
-                    <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {t.CompanyName} ({t.TenantCode})
-                    </option>
-                  ))}
-                </select>
-              </FormField>
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.financialsTab.globalScopeOption', '-- Global / System Scope --')}</option>
+                {tenants.map((tenant) => (
+                  <option key={tenant.TenantID} value={tenant.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {tenant.CompanyName} ({tenant.TenantCode})
+                  </option>
+                ))}
+              </select>
+            </FormField>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
-                <FormField
-                  label="Code"
-                  required
-                  icon={Tag}
-                  error={ccErrors.CostCenterCode}
-                  id="cc-code"
-                >
-                  <input
-                    id="cc-code"
-                    type="text"
-                    value={ccForm.CostCenterCode}
-                    onChange={(e) => {
-                      setCcForm({ ...ccForm, CostCenterCode: e.target.value });
-                      clearCCError('CostCenterCode');
-                    }}
-                    placeholder="e.g., CC-IT-01"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: ccErrors.CostCenterCode ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  />
-                </FormField>
-
-                <FormField
-                  label="Cost Center Name"
-                  required
-                  icon={PieChart}
-                  error={ccErrors.CostCenterName}
-                  id="cc-name"
-                >
-                  <input
-                    id="cc-name"
-                    type="text"
-                    value={ccForm.CostCenterName}
-                    onChange={(e) => {
-                      setCcForm({ ...ccForm, CostCenterName: e.target.value });
-                      clearCCError('CostCenterName');
-                    }}
-                    placeholder="e.g., IT Operations"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: ccErrors.CostCenterName ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  />
-                </FormField>
-              </div>
-
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
               <FormField
-                label="Description (Optional)"
-                icon={FileText}
-                error={ccErrors.Description}
-                id="cc-description"
+                label={t('organization.financialsTab.codeLabel', 'Code')}
+                required
+                icon={Tag}
+                error={ccErrors.CostCenterCode}
+                id="cc-code"
               >
-                <textarea
-                  id="cc-description"
-                  rows="3"
-                  value={ccForm.Description}
+                <input
+                  id="cc-code"
+                  type="text"
+                  value={ccForm.CostCenterCode}
                   onChange={(e) => {
-                    setCcForm({ ...ccForm, Description: e.target.value });
-                    clearCCError('Description');
+                    setCcForm({ ...ccForm, CostCenterCode: e.target.value });
+                    clearCCError('CostCenterCode');
                   }}
-                  placeholder="Describe the purpose of this cost center..."
+                  placeholder="e.g., CC-IT-01"
+                  className={`enterprise-input ${ccErrors.CostCenterCode ? 'input-error' : ''}`}
                   style={{
                     width: '100%',
-                    padding: '10px',
+                    padding: '10px 12px',
                     background: 'var(--bg-tertiary)',
-                    border: ccErrors.Description ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px',
+                    border: ccErrors.CostCenterCode ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
                     color: 'var(--text-primary)'
                   }}
                 />
               </FormField>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsCCModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {editingCC ? 'Save Changes' : 'Create Cost Center'}
-                </button>
-              </div>
-            </form>
+              <FormField
+                label={t('organization.financialsTab.costCenterNameLabel', 'Cost Center Name')}
+                required
+                icon={PieChart}
+                error={ccErrors.CostCenterName}
+                id="cc-name"
+              >
+                <input
+                  id="cc-name"
+                  type="text"
+                  value={ccForm.CostCenterName}
+                  onChange={(e) => {
+                    setCcForm({ ...ccForm, CostCenterName: e.target.value });
+                    clearCCError('CostCenterName');
+                  }}
+                  placeholder="e.g., IT Operations"
+                  className={`enterprise-input ${ccErrors.CostCenterName ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: ccErrors.CostCenterName ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </FormField>
+            </div>
+
+            <FormField
+              label={t('organization.financialsTab.descriptionLabel', 'Description (Optional)')}
+              icon={FileText}
+              error={ccErrors.Description}
+              id="cc-description"
+            >
+              <textarea
+                id="cc-description"
+                rows="3"
+                value={ccForm.Description}
+                onChange={(e) => {
+                  setCcForm({ ...ccForm, Description: e.target.value });
+                  clearCCError('Description');
+                }}
+                placeholder={t('organization.financialsTab.descriptionPlaceholder', 'Describe the purpose of this cost center...')}
+                className={`enterprise-input ${ccErrors.Description ? 'input-error' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: ccErrors.Description ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  resize: 'vertical'
+                }}
+              />
+            </FormField>
           </div>
-        </div>
+        </ModalCard>
       )}
 
       {/* Modal: Create/Edit Department Budget */}
       {isBudgetModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '560px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <Wallet color="var(--accent-primary)" />
-              {editingBudget ? 'Edit Department Budget' : 'Allocate Department Budget'}
-            </h2>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleBudgetSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <FormField
-                label="Department"
-                required
-                icon={Building2}
-                error={budgetErrors.DepartmentID}
+        <ModalCard
+          isOpen={isBudgetModalOpen}
+          onClose={() => setIsBudgetModalOpen(false)}
+          title={editingBudget ? t('organization.financialsTab.editBudgetTitle', 'Edit Department Budget') : t('organization.financialsTab.allocateBudgetTitle', 'Allocate Department Budget')}
+          subtitle="Set annual or quarterly financial expenditure ceilings for department operations"
+          icon={Wallet}
+          accentStrip="emerald"
+          maxWidth="560px"
+          error={errorMsg}
+          onSubmit={handleBudgetSubmit}
+          submitText={editingBudget ? t('organization.financialsTab.saveChangesBtn', 'Save Changes') : t('organization.financialsTab.allocateBudgetBtn', 'Allocate Budget')}
+          cancelText={t('organization.financialsTab.cancelBtn', 'Cancel')}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <FormField
+              label={t('organization.financialsTab.departmentLabel', 'Department')}
+              required
+              icon={Building2}
+              error={budgetErrors.DepartmentID}
+              id="budget-department-id"
+            >
+              <select
                 id="budget-department-id"
+                value={budgetForm.DepartmentID}
+                onChange={(e) => {
+                  setBudgetForm({ ...budgetForm, DepartmentID: e.target.value });
+                  clearBudgetError('DepartmentID');
+                }}
+                disabled={!!editingBudget}
+                className={`enterprise-input ${budgetErrors.DepartmentID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: budgetErrors.DepartmentID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  opacity: editingBudget ? 0.6 : 1
+                }}
               >
-                <select
-                  id="budget-department-id"
-                  value={budgetForm.DepartmentID}
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.financialsTab.selectDepartment', 'Select Department')}</option>
+                {departments.map((d) => (
+                  <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {d.DepartmentName} ({d.DepartmentCode})
+                  </option>
+                ))}
+              </select>
+            </FormField>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <FormField
+                label={t('organization.financialsTab.fiscalYearLabel', 'Fiscal Year')}
+                required
+                icon={Calendar}
+                error={budgetErrors.FiscalYear}
+                id="budget-fiscal-year"
+              >
+                <input
+                  id="budget-fiscal-year"
+                  type="number"
+                  min="2000"
+                  max="2100"
+                  value={budgetForm.FiscalYear}
                   onChange={(e) => {
-                    setBudgetForm({ ...budgetForm, DepartmentID: e.target.value });
-                    clearBudgetError('DepartmentID');
+                    setBudgetForm({ ...budgetForm, FiscalYear: Number(e.target.value) });
+                    clearBudgetError('FiscalYear');
                   }}
                   disabled={!!editingBudget}
+                  className={`enterprise-input ${budgetErrors.FiscalYear ? 'input-error' : ''}`}
                   style={{
                     width: '100%',
-                    padding: '10px',
+                    padding: '10px 12px',
                     background: 'var(--bg-tertiary)',
-                    border: budgetErrors.DepartmentID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px',
+                    border: budgetErrors.FiscalYear ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
                     color: 'var(--text-primary)',
                     opacity: editingBudget ? 0.6 : 1
                   }}
+                />
+              </FormField>
+
+              <FormField
+                label={t('organization.financialsTab.costCenterOptional', 'Cost Center (Optional)')}
+                icon={PieChart}
+                error={budgetErrors.CostCenterID}
+                id="budget-cost-center-id"
+              >
+                <select
+                  id="budget-cost-center-id"
+                  value={budgetForm.CostCenterID}
+                  onChange={(e) => {
+                    setBudgetForm({ ...budgetForm, CostCenterID: e.target.value });
+                    clearBudgetError('CostCenterID');
+                  }}
+                  className={`enterprise-input ${budgetErrors.CostCenterID ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: budgetErrors.CostCenterID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
                 >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Department</option>
-                  {departments.map((d) => (
-                    <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {d.DepartmentName} ({d.DepartmentCode})
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.financialsTab.noneOption', '-- None --')}</option>
+                  {costCenters.map((cc) => (
+                    <option key={cc.CostCenterID} value={cc.CostCenterID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {cc.CostCenterName} ({cc.CostCenterCode})
                     </option>
                   ))}
                 </select>
               </FormField>
+            </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <FormField
-                  label="Fiscal Year"
-                  required
-                  icon={Calendar}
-                  error={budgetErrors.FiscalYear}
-                  id="budget-fiscal-year"
-                >
-                  <input
-                    id="budget-fiscal-year"
-                    type="number"
-                    min="2000"
-                    max="2100"
-                    value={budgetForm.FiscalYear}
-                    onChange={(e) => {
-                      setBudgetForm({ ...budgetForm, FiscalYear: Number(e.target.value) });
-                      clearBudgetError('FiscalYear');
-                    }}
-                    disabled={!!editingBudget}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: budgetErrors.FiscalYear ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)',
-                      opacity: editingBudget ? 0.6 : 1
-                    }}
-                  />
-                </FormField>
-
-                <FormField
-                  label="Cost Center (Optional)"
-                  icon={PieChart}
-                  error={budgetErrors.CostCenterID}
-                  id="budget-cost-center-id"
-                >
-                  <select
-                    id="budget-cost-center-id"
-                    value={budgetForm.CostCenterID}
-                    onChange={(e) => {
-                      setBudgetForm({ ...budgetForm, CostCenterID: e.target.value });
-                      clearBudgetError('CostCenterID');
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: budgetErrors.CostCenterID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- None --</option>
-                    {costCenters.map((cc) => (
-                      <option key={cc.CostCenterID} value={cc.CostCenterID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {cc.CostCenterName} ({cc.CostCenterCode})
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 0.6fr', gap: '12px' }}>
-                <FormField
-                  label="Allocated Amount"
-                  required
-                  icon={DollarSign}
-                  error={budgetErrors.AllocatedAmount}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 0.6fr', gap: '12px' }}>
+              <FormField
+                label={t('organization.financialsTab.allocatedAmountLabel', 'Allocated Amount')}
+                required
+                icon={DollarSign}
+                error={budgetErrors.AllocatedAmount}
+                id="budget-allocated-amount"
+              >
+                <input
                   id="budget-allocated-amount"
-                >
-                  <input
-                    id="budget-allocated-amount"
-                    type="number"
-                    min="1"
-                    step="0.01"
-                    value={budgetForm.AllocatedAmount}
-                    onChange={(e) => {
-                      setBudgetForm({ ...budgetForm, AllocatedAmount: e.target.value });
-                      clearBudgetError('AllocatedAmount');
-                      if (budgetErrors.RemainingAmount) clearBudgetError('RemainingAmount');
-                    }}
-                    placeholder="e.g. 50000"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: budgetErrors.AllocatedAmount ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  />
-                </FormField>
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  value={budgetForm.AllocatedAmount}
+                  onChange={(e) => {
+                    setBudgetForm({ ...budgetForm, AllocatedAmount: e.target.value });
+                    clearBudgetError('AllocatedAmount');
+                    if (budgetErrors.RemainingAmount) clearBudgetError('RemainingAmount');
+                  }}
+                  placeholder="e.g. 50000"
+                  className={`enterprise-input ${budgetErrors.AllocatedAmount ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: budgetErrors.AllocatedAmount ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </FormField>
 
-                <FormField
-                  label="Remaining Amount"
-                  icon={Wallet}
-                  error={budgetErrors.RemainingAmount}
+              <FormField
+                label={t('organization.financialsTab.remainingAmountLabel', 'Remaining Amount')}
+                icon={Wallet}
+                error={budgetErrors.RemainingAmount}
+                id="budget-remaining-amount"
+              >
+                <input
                   id="budget-remaining-amount"
-                >
-                  <input
-                    id="budget-remaining-amount"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={budgetForm.RemainingAmount}
-                    onChange={(e) => {
-                      setBudgetForm({ ...budgetForm, RemainingAmount: e.target.value });
-                      clearBudgetError('RemainingAmount');
-                    }}
-                    placeholder="Auto = Allocated"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: budgetErrors.RemainingAmount ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  />
-                </FormField>
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={budgetForm.RemainingAmount}
+                  onChange={(e) => {
+                    setBudgetForm({ ...budgetForm, RemainingAmount: e.target.value });
+                    clearBudgetError('RemainingAmount');
+                  }}
+                  placeholder={t('organization.financialsTab.autoAllocatedPlaceholder', 'Auto = Allocated')}
+                  className={`enterprise-input ${budgetErrors.RemainingAmount ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: budgetErrors.RemainingAmount ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </FormField>
 
-                <FormField
-                  label="Currency"
-                  required
-                  icon={TrendingUp}
-                  error={budgetErrors.CurrencyCode}
+              <FormField
+                label={t('organization.financialsTab.currencyLabel', 'Currency')}
+                required
+                icon={TrendingUp}
+                error={budgetErrors.CurrencyCode}
+                id="budget-currency-code"
+              >
+                <select
                   id="budget-currency-code"
+                  value={budgetForm.CurrencyCode}
+                  onChange={(e) => {
+                    setBudgetForm({ ...budgetForm, CurrencyCode: e.target.value });
+                    clearBudgetError('CurrencyCode');
+                  }}
+                  className={`enterprise-input ${budgetErrors.CurrencyCode ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: budgetErrors.CurrencyCode ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
                 >
-                  <select
-                    id="budget-currency-code"
-                    value={budgetForm.CurrencyCode}
-                    onChange={(e) => {
-                      setBudgetForm({ ...budgetForm, CurrencyCode: e.target.value });
-                      clearBudgetError('CurrencyCode');
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: budgetErrors.CurrencyCode ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    <option value="ETB" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ETB</option>
-                    <option value="USD" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>USD</option>
-                    <option value="EUR" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>EUR</option>
-                    <option value="GBP" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>GBP</option>
-                  </select>
-                </FormField>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsBudgetModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {editingBudget ? 'Save Changes' : 'Allocate Budget'}
-                </button>
-              </div>
-            </form>
+                  <option value="ETB" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ETB</option>
+                  <option value="USD" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>USD</option>
+                  <option value="EUR" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>EUR</option>
+                  <option value="GBP" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>GBP</option>
+                </select>
+              </FormField>
+            </div>
           </div>
-        </div>
+        </ModalCard>
       )}
       {/* Glass Modals */}
       <ConfirmDialogModal

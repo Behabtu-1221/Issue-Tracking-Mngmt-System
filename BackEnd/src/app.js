@@ -36,12 +36,18 @@ app.set('trust proxy', 1);
 
 app.use(helmet());
 
-// Strict CORS: Allow only explicit origins from environment variable
+// Strict CORS: Allow explicit origins from environment variable, or local/RFC1918 private network in development
 const allowedOrigins = env.cors.allowedOrigins;
+const isDev = env.NODE_ENV === 'development';
+const localNetworkPattern = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/;
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    if (isDev && localNetworkPattern.test(origin)) {
       return callback(null, true);
     }
     return callback(new AppError(`Origin "${origin}" is not permitted by CORS policy.`, 403));
@@ -54,6 +60,14 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Ensure req.body is always initialized to an object for mutation requests (POST/PUT/PATCH)
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'PATCH'].includes(req.method) && (req.body === undefined || req.body === null)) {
+    req.body = {};
+  }
+  next();
+});
 
 const morganFormat = env.NODE_ENV === 'development' ? 'dev' : 'combined';
 app.use(morgan(morganFormat, {
@@ -70,6 +84,7 @@ app.use(dataScope);
 app.use(idempotency());
 
 app.use('/health', healthRouter);
+app.use('/api/health', healthRouter);
 
 const modules = [
   configurationModule,

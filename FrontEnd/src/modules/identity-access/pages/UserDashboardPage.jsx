@@ -77,7 +77,7 @@ export default function UserDashboardPage() {
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <h1 style={{ fontSize: 'clamp(1.3rem, 3.5vw, 1.8rem)', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             {t('identity.dashboardTitle')} <span className="glow-text">{t('identity.dashboardHighlight')}</span>
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
@@ -92,7 +92,7 @@ export default function UserDashboardPage() {
       </div>
 
       {/* KPI Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '14px', marginBottom: '24px' }}>
         {kpiCards.map((card) => {
           const Icon = card.icon;
           const isHovered = hoveredCard === card.key;
@@ -102,7 +102,7 @@ export default function UserDashboardPage() {
               onMouseEnter={() => setHoveredCard(card.key)}
               onMouseLeave={() => setHoveredCard(null)}
               style={{
-                padding: '22px', cursor: 'pointer', position: 'relative', overflow: 'hidden',
+                padding: '18px 20px', cursor: 'pointer', position: 'relative', overflow: 'hidden',
                 transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
                 transform: isHovered ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
                 boxShadow: isHovered ? `0 12px 28px -6px ${card.border}33` : 'none',
@@ -112,14 +112,14 @@ export default function UserDashboardPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 600 }}>{card.label}</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, margin: '8px 0 4px', color: card.color }}>{card.value}</div>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 800, margin: '6px 0 2px', color: card.color }}>{card.value}</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{card.sub}</div>
                 </div>
-                <div style={{ padding: '12px', borderRadius: '14px', background: card.bg, color: card.color, transition: 'transform 0.3s', transform: isHovered ? 'rotate(-8deg) scale(1.1)' : 'rotate(0) scale(1)' }}>
-                  <Icon size={24} />
+                <div style={{ padding: '10px', borderRadius: '12px', background: card.bg, color: card.color, transition: 'transform 0.3s', transform: isHovered ? 'rotate(-8deg) scale(1.1)' : 'rotate(0) scale(1)', flexShrink: 0 }}>
+                  <Icon size={22} />
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '14px', fontSize: '0.72rem', fontWeight: 600, color: card.color, opacity: isHovered ? 1 : 0.5, transition: 'opacity 0.3s' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '12px', fontSize: '0.72rem', fontWeight: 600, color: card.color, opacity: isHovered ? 1 : 0.5, transition: 'opacity 0.3s' }}>
                 <ExternalLink size={11} /> {t('identity.openSubmodule')}
               </div>
             </div>
@@ -128,22 +128,22 @@ export default function UserDashboardPage() {
       </div>
 
       {/* Directory Telemetry Panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px', marginBottom: '24px' }}>
         {/* User Directory */}
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(16px, 3vw, 24px)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>{t('identity.panelAccountsDirectory')}</h3>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>{t('identity.panelAccountsDirectory')}</h3>
               <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('identity.panelAccountsDirectoryDesc')}</p>
             </div>
-            <button onClick={() => navigate('/users/directory')} style={{ background: 'rgba(138,75,255,0.1)', border: '1px solid rgba(138,75,255,0.3)', color: 'var(--accent-primary)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px' }}>
+            <button onClick={() => navigate('/users/directory')} className="touch-target-sm" style={{ background: 'rgba(138,75,255,0.1)', border: '1px solid rgba(138,75,255,0.3)', color: 'var(--accent-primary)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px' }}>
               {t('identity.btnViewDirectory')} <ArrowUpRight size={13} />
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div onClick={() => navigate('/users/directory')} style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s' }}>
+            <div onClick={() => navigate('/users/directory')} style={{ padding: '14px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s', flexWrap: 'wrap', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(138,75,255,0.15)', color: 'var(--accent-primary)' }}><Users size={20} /></div>
+                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(138,75,255,0.15)', color: 'var(--accent-primary)', flexShrink: 0 }}><Users size={20} /></div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>{t('identity.panelStaffAccounts')}</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{metrics.totalUsers} {t('identity.panelRegisteredInDirectory')}</div>
@@ -155,23 +155,23 @@ export default function UserDashboardPage() {
         </div>
 
         {/* Roles & Sessions */}
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(16px, 3vw, 24px)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>{t('identity.panelSecurityControls')}</h3>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>{t('identity.panelSecurityControls')}</h3>
               <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('identity.panelSecurityControlsDesc')}</p>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div onClick={() => navigate('/roles/matrix')} style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div onClick={() => navigate('/roles/matrix')} style={{ padding: '14px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
               <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(14,165,233,0.15)', color: '#0ea5e9', width: 'fit-content', marginBottom: '10px' }}><ShieldCheck size={18} /></div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('identity.labelRbacGovernance')}</div>
-              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{t('identity.labelRoleMatrix')}</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, marginTop: '2px' }}>{t('identity.labelRoleMatrix')}</div>
             </div>
-            <div onClick={() => navigate('/users/sessions')} style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
+            <div onClick={() => navigate('/users/sessions')} style={{ padding: '14px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
               <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(245,158,11,0.15)', color: '#facc15', width: 'fit-content', marginBottom: '10px' }}><Monitor size={18} /></div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('identity.labelSecurity')}</div>
-              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{t('identity.labelActiveSessions')}</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, marginTop: '2px' }}>{t('identity.labelActiveSessions')}</div>
             </div>
           </div>
         </div>

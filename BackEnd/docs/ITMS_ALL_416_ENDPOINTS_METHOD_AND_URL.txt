@@ -1,0 +1,686 @@
+========================================================================================================================
+ENTERPRISE ISSUE TRACKING MANAGEMENT SYSTEM (ITMS) — COMPLETE MASTER API INVENTORY (416 ENDPOINTS)
+BASE URL : http://localhost:5000
+FORMAT   : [INDEX] [METHOD] (LEFT)                    | [FULL URL] (RIGHT)
+========================================================================================================================
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 1. SYSTEM HEALTH & DIAGNOSTICS
+# ----------------------------------------------------------------------------------------------------------------------
+001. GET     http://localhost:5000/api/health
+002. GET     http://localhost:5000/api/health/live
+003. GET     http://localhost:5000/api/health/ready
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 2. IDENTITY & ACCESS MANAGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 2.1 AUTHENTICATION & SESSIONS
+# ----------------------------------------------------------------------------------------------------------------------
+004. POST    http://localhost:5000/api/auth/login
+005. POST    http://localhost:5000/api/auth/refresh
+006. GET     http://localhost:5000/api/auth/me
+007. PUT     http://localhost:5000/api/auth/profile
+008. PUT     http://localhost:5000/api/auth/notification-preferences
+009. POST    http://localhost:5000/api/auth/change-password
+010. GET     http://localhost:5000/api/auth/sessions
+011. DELETE  http://localhost:5000/api/auth/sessions/:sessionId
+012. POST    http://localhost:5000/api/auth/forgot-password
+013. POST    http://localhost:5000/api/auth/reset-password
+014. POST    http://localhost:5000/api/auth/logout
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 2.2 USER ACCOUNTS & PROFILES
+# ----------------------------------------------------------------------------------------------------------------------
+015. GET     http://localhost:5000/api/users?limit=10&offset=0
+016. GET     http://localhost:5000/api/users/{{userId}}
+017. POST    http://localhost:5000/api/users
+018. PUT     http://localhost:5000/api/users/{{userId}}
+019. PATCH   http://localhost:5000/api/users/{{userId}}/status
+020. GET     http://localhost:5000/api/users/{{userId}}/sessions
+021. DELETE  http://localhost:5000/api/users/{{userId}}/sessions
+022. GET     http://localhost:5000/api/users/{{userId}}/login-history?limit=10&offset=0
+023. DELETE  http://localhost:5000/api/users/{{userId}}
+024. GET     http://localhost:5000/api/users/:id
+025. PUT     http://localhost:5000/api/users/:id
+026. PATCH   http://localhost:5000/api/users/:id/status
+027. DELETE  http://localhost:5000/api/users/:id
+028. GET     http://localhost:5000/api/users/:id/sessions
+029. DELETE  http://localhost:5000/api/users/:id/sessions
+030. GET     http://localhost:5000/api/users/:id/login-history
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 2.3 ROLES, PERMISSIONS & SECURITY
+# ----------------------------------------------------------------------------------------------------------------------
+031. GET     http://localhost:5000/api/roles/permissions
+032. GET     http://localhost:5000/api/roles/audit-logs
+033. GET     http://localhost:5000/api/roles?limit=20&offset=0
+034. GET     http://localhost:5000/api/roles/{{roleId}}
+035. POST    http://localhost:5000/api/roles
+036. PUT     http://localhost:5000/api/roles/{{roleId}}
+037. PUT     http://localhost:5000/api/roles/{{roleId}}/permissions
+038. POST    http://localhost:5000/api/roles/users/{{userId}}/assign
+039. DELETE  http://localhost:5000/api/roles/users/{{userId}}/roles/{{roleId}}
+040. DELETE  http://localhost:5000/api/roles/{{roleId}}
+041. POST    http://localhost:5000/api/roles/assign
+042. GET     http://localhost:5000/api/roles/:id
+043. PUT     http://localhost:5000/api/roles/:id
+044. DELETE  http://localhost:5000/api/roles/:id
+045. PUT     http://localhost:5000/api/roles/:id/permissions
+046. POST    http://localhost:5000/api/roles/users/:id/assign
+047. DELETE  http://localhost:5000/api/roles/users/:id/roles/:roleId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 3. BUSINESS PARK & FACILITIES
+# ----------------------------------------------------------------------------------------------------------------------
+048. GET     http://localhost:5000/api/parks
+049. GET     http://localhost:5000/api/parks/metrics
+050. GET     http://localhost:5000/api/parks/{{parkId}}
+051. GET     http://localhost:5000/api/buildings
+052. GET     http://localhost:5000/api/buildings/{{buildingId}}
+053. GET     http://localhost:5000/api/buildings/{{buildingId}}/floors
+054. POST    http://localhost:5000/api/buildings
+055. GET     http://localhost:5000/api/floors
+056. GET     http://localhost:5000/api/floors/{{floorId}}/offices
+057. POST    http://localhost:5000/api/floors
+058. GET     http://localhost:5000/api/offices
+059. POST    http://localhost:5000/api/offices
+060. PATCH   http://localhost:5000/api/offices/{{officeId}}/status
+061. GET     http://localhost:5000/api/locations
+062. POST    http://localhost:5000/api/locations
+063. GET     http://localhost:5000/api/facility-zones
+064. GET     http://localhost:5000/api/facility-zones/{{facilityZoneId}}/buildings
+065. GET     http://localhost:5000/api/floor-plans/floor/{{floorId}}
+066. GET     http://localhost:5000/api/parks/:id
+067. POST    http://localhost:5000/api/parks
+068. PUT     http://localhost:5000/api/parks/:id
+069. DELETE  http://localhost:5000/api/parks/:id
+070. GET     http://localhost:5000/api/buildings/:id
+071. GET     http://localhost:5000/api/buildings/:buildingId/floors
+072. PUT     http://localhost:5000/api/buildings/:id
+073. DELETE  http://localhost:5000/api/buildings/:id
+074. GET     http://localhost:5000/api/floors/:id
+075. GET     http://localhost:5000/api/floors/:floorId/offices
+076. PUT     http://localhost:5000/api/floors/:id
+077. DELETE  http://localhost:5000/api/floors/:id
+078. GET     http://localhost:5000/api/offices/:id
+079. PUT     http://localhost:5000/api/offices/:id
+080. PATCH   http://localhost:5000/api/offices/:id/status
+081. DELETE  http://localhost:5000/api/offices/:id
+082. GET     http://localhost:5000/api/locations/:id
+083. PUT     http://localhost:5000/api/locations/:id
+084. DELETE  http://localhost:5000/api/locations/:id
+085. GET     http://localhost:5000/api/facility-zones/:id
+086. GET     http://localhost:5000/api/facility-zones/:zoneId/buildings
+087. POST    http://localhost:5000/api/facility-zones
+088. PUT     http://localhost:5000/api/facility-zones/:id
+089. DELETE  http://localhost:5000/api/facility-zones/:id
+090. GET     http://localhost:5000/api/floor-plans/floor/:floorId
+091. POST    http://localhost:5000/api/floor-plans
+092. PUT     http://localhost:5000/api/floor-plans/:id
+093. DELETE  http://localhost:5000/api/floor-plans/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 4. TENANT MANAGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+094. GET     http://localhost:5000/api/tenants
+095. GET     http://localhost:5000/api/tenants/metrics
+096. GET     http://localhost:5000/api/tenants/{{tenantId}}
+097. POST    http://localhost:5000/api/tenants
+098. PATCH   http://localhost:5000/api/tenants/{{tenantId}}/status
+099. GET     http://localhost:5000/api/sub-tenants
+100. POST    http://localhost:5000/api/sub-tenants
+101. GET     http://localhost:5000/api/tenant-contacts
+102. POST    http://localhost:5000/api/tenant-contacts
+103. GET     http://localhost:5000/api/tenant-addresses
+104. POST    http://localhost:5000/api/tenant-addresses
+105. GET     http://localhost:5000/api/leases
+106. GET     http://localhost:5000/api/leases/expiring-soon
+107. POST    http://localhost:5000/api/leases
+108. GET     http://localhost:5000/api/office-allocations
+109. POST    http://localhost:5000/api/office-allocations
+110. PATCH   http://localhost:5000/api/office-allocations/{{allocationId}}/release
+111. GET     http://localhost:5000/api/tenants/:id
+112. PUT     http://localhost:5000/api/tenants/:id
+113. PATCH   http://localhost:5000/api/tenants/:id/status
+114. DELETE  http://localhost:5000/api/tenants/:id
+115. GET     http://localhost:5000/api/sub-tenants/:id
+116. PUT     http://localhost:5000/api/sub-tenants/:id
+117. DELETE  http://localhost:5000/api/sub-tenants/:id
+118. GET     http://localhost:5000/api/tenant-contacts/:id
+119. PUT     http://localhost:5000/api/tenant-contacts/:id
+120. DELETE  http://localhost:5000/api/tenant-contacts/:id
+121. GET     http://localhost:5000/api/tenant-addresses/:id
+122. PUT     http://localhost:5000/api/tenant-addresses/:id
+123. DELETE  http://localhost:5000/api/tenant-addresses/:id
+124. GET     http://localhost:5000/api/leases/:id
+125. PUT     http://localhost:5000/api/leases/:id
+126. PATCH   http://localhost:5000/api/leases/:id/status
+127. DELETE  http://localhost:5000/api/leases/:id
+128. GET     http://localhost:5000/api/office-allocations/history
+129. GET     http://localhost:5000/api/office-allocations/:id
+130. PATCH   http://localhost:5000/api/office-allocations/:id/release
+131. DELETE  http://localhost:5000/api/office-allocations/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 5. ORGANIZATIONAL STRUCTURE
+# ----------------------------------------------------------------------------------------------------------------------
+132. GET     http://localhost:5000/api/departments
+133. GET     http://localhost:5000/api/departments/{{departmentId}}
+134. POST    http://localhost:5000/api/departments
+135. GET     http://localhost:5000/api/departments/{{departmentId}}/locations
+136. GET     http://localhost:5000/api/teams
+137. GET     http://localhost:5000/api/teams/workload-summary
+138. GET     http://localhost:5000/api/teams/eligible-technicians
+139. POST    http://localhost:5000/api/teams
+140. GET     http://localhost:5000/api/teams/{{teamId}}/members
+141. POST    http://localhost:5000/api/teams/{{teamId}}/members
+142. GET     http://localhost:5000/api/positions
+143. POST    http://localhost:5000/api/positions
+144. GET     http://localhost:5000/api/employee-assignments
+145. POST    http://localhost:5000/api/employee-assignments
+146. GET     http://localhost:5000/api/reporting-hierarchies
+147. POST    http://localhost:5000/api/reporting-hierarchies
+148. GET     http://localhost:5000/api/financials/cost-centers
+149. POST    http://localhost:5000/api/financials/cost-centers
+150. GET     http://localhost:5000/api/financials/budgets
+151. POST    http://localhost:5000/api/financials/budgets
+152. GET     http://localhost:5000/api/departments/:id
+153. PUT     http://localhost:5000/api/departments/:id
+154. DELETE  http://localhost:5000/api/departments/:id
+155. GET     http://localhost:5000/api/departments/:id/locations
+156. POST    http://localhost:5000/api/departments/:id/locations
+157. DELETE  http://localhost:5000/api/departments/locations/:locId
+158. GET     http://localhost:5000/api/teams/:id
+159. PUT     http://localhost:5000/api/teams/:id
+160. DELETE  http://localhost:5000/api/teams/:id
+161. GET     http://localhost:5000/api/teams/:id/members
+162. POST    http://localhost:5000/api/teams/:id/members
+163. DELETE  http://localhost:5000/api/teams/:id/members/:userId
+164. GET     http://localhost:5000/api/positions/:id
+165. PUT     http://localhost:5000/api/positions/:id
+166. DELETE  http://localhost:5000/api/positions/:id
+167. GET     http://localhost:5000/api/employee-assignments/:id
+168. PUT     http://localhost:5000/api/employee-assignments/:id
+169. DELETE  http://localhost:5000/api/employee-assignments/:id
+170. GET     http://localhost:5000/api/reporting-hierarchies/:id
+171. PUT     http://localhost:5000/api/reporting-hierarchies/:id
+172. DELETE  http://localhost:5000/api/reporting-hierarchies/:id
+173. GET     http://localhost:5000/api/financials/cost-centers/:id
+174. PUT     http://localhost:5000/api/financials/cost-centers/:id
+175. DELETE  http://localhost:5000/api/financials/cost-centers/:id
+176. GET     http://localhost:5000/api/financials/budgets/:id
+177. PUT     http://localhost:5000/api/financials/budgets/:id
+178. DELETE  http://localhost:5000/api/financials/budgets/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 6. SERVICE CATALOG & CATEGORIES
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 6.1 SERVICE CATEGORIES
+# ----------------------------------------------------------------------------------------------------------------------
+179. GET     http://localhost:5000/api/service-categories
+180. GET     http://localhost:5000/api/service-categories/:id
+181. POST    http://localhost:5000/api/service-categories
+182. PUT     http://localhost:5000/api/service-categories/:id
+183. DELETE  http://localhost:5000/api/service-categories/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 6.2 SERVICES & ANALYTICS
+# ----------------------------------------------------------------------------------------------------------------------
+184. GET     http://localhost:5000/api/services
+185. GET     http://localhost:5000/api/services/metrics
+186. GET     http://localhost:5000/api/services/:id
+187. POST    http://localhost:5000/api/services
+188. PUT     http://localhost:5000/api/services/:id
+189. DELETE  http://localhost:5000/api/services/:id
+190. GET     http://localhost:5000/api/service-analytics/metrics
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 6.3 CATEGORY DEPARTMENT MAPPINGS
+# ----------------------------------------------------------------------------------------------------------------------
+191. GET     http://localhost:5000/api/category-mappings
+192. GET     http://localhost:5000/api/category-mappings/:id
+193. POST    http://localhost:5000/api/category-mappings
+194. PUT     http://localhost:5000/api/category-mappings/:id
+195. PATCH   http://localhost:5000/api/category-mappings/:id/status
+196. DELETE  http://localhost:5000/api/category-mappings/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 7. ISSUE REQUESTS & LIFECYCLE
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 7.1 ISSUE REQUESTS & LIFECYCLE OPERATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+197. GET     http://localhost:5000/api/issues
+198. GET     http://localhost:5000/api/issues/metrics
+199. GET     http://localhost:5000/api/issues/:id
+200. POST    http://localhost:5000/api/issues
+201. PUT     http://localhost:5000/api/issues/:id
+202. POST    http://localhost:5000/api/issues/:id/assign
+203. POST    http://localhost:5000/api/issues/:id/status
+204. POST    http://localhost:5000/api/issues/:id/cancel
+205. POST    http://localhost:5000/api/issues/:id/reopen
+206. POST    http://localhost:5000/api/issues/:id/feedback
+207. GET     http://localhost:5000/api/issues/:id/feedback
+208. DELETE  http://localhost:5000/api/issues/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 7.2 TECHNICAL INVESTIGATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+209. GET     http://localhost:5000/api/issue-investigations/issue/:issueRequestId
+210. POST    http://localhost:5000/api/issue-investigations
+211. DELETE  http://localhost:5000/api/issue-investigations/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 7.3 ISSUE RESOLUTIONS
+# ----------------------------------------------------------------------------------------------------------------------
+212. GET     http://localhost:5000/api/issue-resolutions/issue/:issueRequestId
+213. POST    http://localhost:5000/api/issue-resolutions
+214. DELETE  http://localhost:5000/api/issue-resolutions/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 7.4 ISSUE COMMENTS
+# ----------------------------------------------------------------------------------------------------------------------
+215. GET     http://localhost:5000/api/issue-comments/issue/:issueRequestId
+216. POST    http://localhost:5000/api/issue-comments
+217. DELETE  http://localhost:5000/api/issue-comments/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 8. APPROVAL WORKFLOWS & GOVERNANCE
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 8.1 APPROVALS LIFECYCLE & DECISIONS
+# ----------------------------------------------------------------------------------------------------------------------
+218. GET     http://localhost:5000/api/approvals
+219. GET     http://localhost:5000/api/approvals/metrics
+220. GET     http://localhost:5000/api/approvals/pending
+221. GET     http://localhost:5000/api/approvals/by-request/:requestId
+222. GET     http://localhost:5000/api/approvals/:id
+223. POST    http://localhost:5000/api/approvals
+224. POST    http://localhost:5000/api/approvals/decision
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 8.2 APPROVAL DELEGATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+225. GET     http://localhost:5000/api/approval-delegations
+226. GET     http://localhost:5000/api/approval-delegations/:id
+227. POST    http://localhost:5000/api/approval-delegations
+228. PUT     http://localhost:5000/api/approval-delegations/:id
+229. DELETE  http://localhost:5000/api/approval-delegations/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 8.3 APPROVAL RULES & THRESHOLDS
+# ----------------------------------------------------------------------------------------------------------------------
+230. GET     http://localhost:5000/api/approval-rules
+231. GET     http://localhost:5000/api/approval-rules/thresholds
+232. GET     http://localhost:5000/api/approval-rules/:id
+233. POST    http://localhost:5000/api/approval-rules/thresholds
+234. POST    http://localhost:5000/api/approval-rules
+235. PUT     http://localhost:5000/api/approval-rules/:id
+236. DELETE  http://localhost:5000/api/approval-rules/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 8.4 APPROVAL GROUPS & MEMBERS
+# ----------------------------------------------------------------------------------------------------------------------
+237. GET     http://localhost:5000/api/approval-groups
+238. GET     http://localhost:5000/api/approval-groups/:id
+239. POST    http://localhost:5000/api/approval-groups
+240. PUT     http://localhost:5000/api/approval-groups/:id
+241. POST    http://localhost:5000/api/approval-groups/:id/members
+242. DELETE  http://localhost:5000/api/approval-groups/:id/members/:userId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 9. TECHNICIAN ASSIGNMENT & DISPATCH
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 9.1 DISPATCH QUEUE & ASSIGNMENT OPERATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+243. GET     http://localhost:5000/api/dispatch/overview
+244. GET     http://localhost:5000/api/dispatch/unassigned
+245. GET     http://localhost:5000/api/dispatch/assignments
+246. GET     http://localhost:5000/api/dispatch/assignments/:id
+247. POST    http://localhost:5000/api/dispatch/assign/manual
+248. POST    http://localhost:5000/api/dispatch/assign/auto
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 9.2 ASSIGNMENT LIFECYCLE
+# ----------------------------------------------------------------------------------------------------------------------
+249. POST    http://localhost:5000/api/dispatch/assignments/:id/accept
+250. POST    http://localhost:5000/api/dispatch/assignments/:id/reject
+251. POST    http://localhost:5000/api/dispatch/assignments/:id/start
+252. POST    http://localhost:5000/api/dispatch/assignments/:id/pause
+253. POST    http://localhost:5000/api/dispatch/assignments/:id/resume
+254. POST    http://localhost:5000/api/dispatch/assignments/:id/progress
+255. POST    http://localhost:5000/api/dispatch/assignments/:id/complete
+256. POST    http://localhost:5000/api/dispatch/assignments/:id/escalate
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 9.3 TECHNICIAN WORKBENCH & TELEMETRY
+# ----------------------------------------------------------------------------------------------------------------------
+257. GET     http://localhost:5000/api/dispatch/my-workbench
+258. GET     http://localhost:5000/api/dispatch/technicians
+259. POST    http://localhost:5000/api/dispatch/technicians/availability
+260. POST    http://localhost:5000/api/dispatch/technicians/location
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 10. SLA POLICIES & ESCALATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 10.1 SLA CLOCKS & STOPWATCHES
+# ----------------------------------------------------------------------------------------------------------------------
+261. GET     http://localhost:5000/api/sla/overview
+262. GET     http://localhost:5000/api/sla/clocks
+263. GET     http://localhost:5000/api/sla/clocks/:id
+264. POST    http://localhost:5000/api/sla/clocks
+265. POST    http://localhost:5000/api/sla/clocks/:id/pause
+266. POST    http://localhost:5000/api/sla/clocks/:id/resume
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 10.2 SLA POLICIES & DEFINITIONS
+# ----------------------------------------------------------------------------------------------------------------------
+267. GET     http://localhost:5000/api/sla/policies
+268. GET     http://localhost:5000/api/sla/policies/:id
+269. POST    http://localhost:5000/api/sla/policies
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 10.3 SLA BREACHES & ACKNOWLEDGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+270. GET     http://localhost:5000/api/sla/breaches
+271. POST    http://localhost:5000/api/sla/breaches/:id/acknowledge
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 11. COMMUNICATION & COLLABORATION
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 11.1 CONVERSATIONS & MESSAGES
+# ----------------------------------------------------------------------------------------------------------------------
+272. GET     http://localhost:5000/api/communication/conversations
+273. GET     http://localhost:5000/api/communication/unread-count
+274. GET     http://localhost:5000/api/communication/search?q=leak
+275. GET     http://localhost:5000/api/communication/conversations/:id
+276. POST    http://localhost:5000/api/communication/conversations
+277. POST    http://localhost:5000/api/communication/conversations/:id/messages
+278. PATCH   http://localhost:5000/api/communication/conversations/:id/read
+279. PATCH   http://localhost:5000/api/communication/conversations/:id/archive
+280. POST    http://localhost:5000/api/communication/conversations/:id/participants
+281. DELETE  http://localhost:5000/api/communication/conversations/:id/participants/:userId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 11.2 INTERNAL NOTES (STAFF ONLY)
+# ----------------------------------------------------------------------------------------------------------------------
+282. GET     http://localhost:5000/api/communication/issues/:id/notes
+283. POST    http://localhost:5000/api/communication/issues/:id/notes
+284. DELETE  http://localhost:5000/api/communication/notes/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 11.3 PUBLIC COMMENTS
+# ----------------------------------------------------------------------------------------------------------------------
+285. GET     http://localhost:5000/api/communication/issues/:id/comments
+286. POST    http://localhost:5000/api/communication/issues/:id/comments
+287. DELETE  http://localhost:5000/api/communication/comments/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 11.4 SYSTEM ANNOUNCEMENTS
+# ----------------------------------------------------------------------------------------------------------------------
+288. GET     http://localhost:5000/api/communication/announcements
+289. POST    http://localhost:5000/api/communication/announcements
+290. DELETE  http://localhost:5000/api/communication/announcements/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 11.5 BROADCAST CHANNELS
+# ----------------------------------------------------------------------------------------------------------------------
+291. GET     http://localhost:5000/api/communication/channels
+292. POST    http://localhost:5000/api/communication/channels
+293. POST    http://localhost:5000/api/communication/channels/:id/broadcast
+294. DELETE  http://localhost:5000/api/communication/channels/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 11.6 ACTIVITY TIMELINE
+# ----------------------------------------------------------------------------------------------------------------------
+295. GET     http://localhost:5000/api/communication/issues/:id/timeline
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 12. NOTIFICATIONS & ALERTS
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 12.1 OVERVIEW & INBOX FEED
+# ----------------------------------------------------------------------------------------------------------------------
+296. GET     http://localhost:5000/api/notifications/overview
+297. GET     http://localhost:5000/api/notifications/unread-count
+298. GET     http://localhost:5000/api/notifications
+299. GET     http://localhost:5000/api/notifications/:id
+300. PATCH   http://localhost:5000/api/notifications/:id/read
+301. PATCH   http://localhost:5000/api/notifications/:id/unread
+302. PATCH   http://localhost:5000/api/notifications/mark-all-read
+303. DELETE  http://localhost:5000/api/notifications/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 12.2 DISPATCH & TRIGGER OPERATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+304. POST    http://localhost:5000/api/notifications/event
+305. POST    http://localhost:5000/api/notifications/dispatch
+306. POST    http://localhost:5000/api/notifications/test-email
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 12.3 NOTIFICATION PREFERENCES
+# ----------------------------------------------------------------------------------------------------------------------
+307. GET     http://localhost:5000/api/notifications/preferences
+308. PUT     http://localhost:5000/api/notifications/preferences
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 12.4 TEMPLATES & DELIVERY AUDITING
+# ----------------------------------------------------------------------------------------------------------------------
+309. GET     http://localhost:5000/api/notifications/templates
+310. POST    http://localhost:5000/api/notifications/templates
+311. PUT     http://localhost:5000/api/notifications/templates/:id
+312. GET     http://localhost:5000/api/notifications/delivery-log
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 12.5 REMINDERS & SCHEDULED FOLLOW-UPS
+# ----------------------------------------------------------------------------------------------------------------------
+313. GET     http://localhost:5000/api/notifications/reminders
+314. POST    http://localhost:5000/api/notifications/reminders
+315. PATCH   http://localhost:5000/api/notifications/reminders/:id/complete
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 13. FILE & DOCUMENT MANAGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 13.1 METRICS & PUBLIC SHARES
+# ----------------------------------------------------------------------------------------------------------------------
+316. GET     http://localhost:5000/api/documents/share/:shareToken
+317. GET     http://localhost:5000/api/documents/metrics
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 13.2 CATEGORIES
+# ----------------------------------------------------------------------------------------------------------------------
+318. GET     http://localhost:5000/api/documents/categories
+319. POST    http://localhost:5000/api/documents/categories
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 13.3 DOCUMENTS CRUD & QUERY
+# ----------------------------------------------------------------------------------------------------------------------
+320. GET     http://localhost:5000/api/documents
+321. GET     http://localhost:5000/api/documents/:id
+322. PATCH   http://localhost:5000/api/documents/:id
+323. DELETE  http://localhost:5000/api/documents/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 13.4 FILE UPLOADS
+# ----------------------------------------------------------------------------------------------------------------------
+324. POST    http://localhost:5000/api/documents/upload
+325. POST    http://localhost:5000/api/documents/upload-multiple
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 13.5 FILE RETRIEVAL & SHARING
+# ----------------------------------------------------------------------------------------------------------------------
+326. GET     http://localhost:5000/api/documents/:id/download
+327. GET     http://localhost:5000/api/documents/:id/preview
+328. POST    http://localhost:5000/api/documents/:id/versions
+329. POST    http://localhost:5000/api/documents/:id/share
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 13.6 LIFECYCLE & TRASH MANAGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+330. POST    http://localhost:5000/api/documents/:id/restore
+331. DELETE  http://localhost:5000/api/documents/:id/permanent
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 14. REPORTING & ANALYTICS
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 14.1 OPERATIONAL & EXECUTIVE DASHBOARDS
+# ----------------------------------------------------------------------------------------------------------------------
+332. GET     http://localhost:5000/api/reports/dashboard/executive
+333. GET     http://localhost:5000/api/reports/requests
+334. GET     http://localhost:5000/api/reports/assignments
+335. GET     http://localhost:5000/api/reports/sla
+336. GET     http://localhost:5000/api/reports/tenants
+337. GET     http://localhost:5000/api/reports/departments
+338. GET     http://localhost:5000/api/reports/approvals
+339. GET     http://localhost:5000/api/reports/audit
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 14.2 EXPORT OPERATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+340. GET     http://localhost:5000/api/reports/export/:reportType?format=csv
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 14.3 SAVED CUSTOM REPORTS
+# ----------------------------------------------------------------------------------------------------------------------
+341. GET     http://localhost:5000/api/reports/saved
+342. POST    http://localhost:5000/api/reports/saved
+343. PUT     http://localhost:5000/api/reports/saved/:id
+344. DELETE  http://localhost:5000/api/reports/saved/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 14.4 SCHEDULES & AUTOMATION
+# ----------------------------------------------------------------------------------------------------------------------
+345. GET     http://localhost:5000/api/reports/schedules
+346. POST    http://localhost:5000/api/reports/schedules
+347. PUT     http://localhost:5000/api/reports/schedules/:id
+348. DELETE  http://localhost:5000/api/reports/schedules/:id
+349. POST    http://localhost:5000/api/reports/schedules/:id/trigger
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 14.5 EXECUTIONS HISTORY
+# ----------------------------------------------------------------------------------------------------------------------
+350. GET     http://localhost:5000/api/reports/executions
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15. CONFIGURATION MANAGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.1 SYSTEM BOOTSTRAP
+# ----------------------------------------------------------------------------------------------------------------------
+351. GET     http://localhost:5000/api/configuration/bootstrap
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.2 SYSTEM SETTINGS
+# ----------------------------------------------------------------------------------------------------------------------
+352. GET     http://localhost:5000/api/configuration/system-settings
+353. GET     http://localhost:5000/api/configuration/system-settings/key/:key
+354. GET     http://localhost:5000/api/configuration/system-settings/:id
+355. POST    http://localhost:5000/api/configuration/system-settings
+356. PUT     http://localhost:5000/api/configuration/system-settings/:id
+357. DELETE  http://localhost:5000/api/configuration/system-settings/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.3 FEATURE FLAGS
+# ----------------------------------------------------------------------------------------------------------------------
+358. GET     http://localhost:5000/api/configuration/feature-flags
+359. GET     http://localhost:5000/api/configuration/feature-flags/code/:code
+360. GET     http://localhost:5000/api/configuration/feature-flags/code/:code/enabled
+361. GET     http://localhost:5000/api/configuration/feature-flags/:id
+362. POST    http://localhost:5000/api/configuration/feature-flags
+363. PUT     http://localhost:5000/api/configuration/feature-flags/:id
+364. PATCH   http://localhost:5000/api/configuration/feature-flags/:id/toggle
+365. DELETE  http://localhost:5000/api/configuration/feature-flags/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.4 BUSINESS RULES
+# ----------------------------------------------------------------------------------------------------------------------
+366. GET     http://localhost:5000/api/configuration/business-rules
+367. GET     http://localhost:5000/api/configuration/business-rules/code/:code
+368. GET     http://localhost:5000/api/configuration/business-rules/:id
+369. POST    http://localhost:5000/api/configuration/business-rules
+370. PUT     http://localhost:5000/api/configuration/business-rules/:id
+371. DELETE  http://localhost:5000/api/configuration/business-rules/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.5 NUMBER SEQUENCES
+# ----------------------------------------------------------------------------------------------------------------------
+372. GET     http://localhost:5000/api/configuration/number-sequences
+373. GET     http://localhost:5000/api/configuration/number-sequences/code/:code
+374. POST    http://localhost:5000/api/configuration/number-sequences/code/:code/next
+375. GET     http://localhost:5000/api/configuration/number-sequences/:id
+376. POST    http://localhost:5000/api/configuration/number-sequences
+377. PUT     http://localhost:5000/api/configuration/number-sequences/:id
+378. DELETE  http://localhost:5000/api/configuration/number-sequences/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.6 DYNAMIC LOOKUPS
+# ----------------------------------------------------------------------------------------------------------------------
+379. GET     http://localhost:5000/api/configuration/lookups/:entityKey
+380. GET     http://localhost:5000/api/configuration/lookups/:entityKey/code/:code
+381. GET     http://localhost:5000/api/configuration/lookups/:entityKey/:id
+382. POST    http://localhost:5000/api/configuration/lookups/:entityKey
+383. PUT     http://localhost:5000/api/configuration/lookups/:entityKey/:id
+384. DELETE  http://localhost:5000/api/configuration/lookups/:entityKey/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.7 LOOKUP TYPES & VALUES
+# ----------------------------------------------------------------------------------------------------------------------
+385. GET     http://localhost:5000/api/configuration/lookup-types
+386. GET     http://localhost:5000/api/configuration/lookup-types/code/:code
+387. GET     http://localhost:5000/api/configuration/lookup-types/:id
+388. POST    http://localhost:5000/api/configuration/lookup-types
+389. PUT     http://localhost:5000/api/configuration/lookup-types/:id
+390. DELETE  http://localhost:5000/api/configuration/lookup-types/:id
+391. GET     http://localhost:5000/api/configuration/lookup-types/:id/values
+392. POST    http://localhost:5000/api/configuration/lookup-types/:id/values
+393. PUT     http://localhost:5000/api/configuration/lookup-types/:lookupTypeId/values/:valueId
+394. DELETE  http://localhost:5000/api/configuration/lookup-types/:lookupTypeId/values/:valueId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.8 WORKING CALENDARS, HOURS & HOLIDAYS
+# ----------------------------------------------------------------------------------------------------------------------
+395. GET     http://localhost:5000/api/configuration/calendars
+396. GET     http://localhost:5000/api/configuration/calendars/:id
+397. POST    http://localhost:5000/api/configuration/calendars
+398. PUT     http://localhost:5000/api/configuration/calendars/:id
+399. DELETE  http://localhost:5000/api/configuration/calendars/:id
+400. GET     http://localhost:5000/api/configuration/calendars/:id/working-hours
+401. POST    http://localhost:5000/api/configuration/calendars/:id/working-hours
+402. PUT     http://localhost:5000/api/configuration/calendars/:calendarId/working-hours/:workingHourId
+403. DELETE  http://localhost:5000/api/configuration/calendars/:calendarId/working-hours/:workingHourId
+404. GET     http://localhost:5000/api/configuration/calendars/:id/holidays
+405. POST    http://localhost:5000/api/configuration/calendars/:id/holidays
+406. PUT     http://localhost:5000/api/configuration/calendars/:calendarId/holidays/:holidayId
+407. DELETE  http://localhost:5000/api/configuration/calendars/:calendarId/holidays/:holidayId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 15.9 LOCALIZATIONS & MULTILINGUAL RESOURCES
+# ----------------------------------------------------------------------------------------------------------------------
+408. GET     http://localhost:5000/api/configuration/localizations
+409. GET     http://localhost:5000/api/configuration/localizations/:id
+410. POST    http://localhost:5000/api/configuration/localizations
+411. PUT     http://localhost:5000/api/configuration/localizations/:id
+412. DELETE  http://localhost:5000/api/configuration/localizations/:id
+413. GET     http://localhost:5000/api/configuration/localizations/:id/resources
+414. POST    http://localhost:5000/api/configuration/localizations/:id/resources
+415. PUT     http://localhost:5000/api/configuration/localizations/:localizationId/resources/:resourceId
+416. DELETE  http://localhost:5000/api/configuration/localizations/:localizationId/resources/:resourceId

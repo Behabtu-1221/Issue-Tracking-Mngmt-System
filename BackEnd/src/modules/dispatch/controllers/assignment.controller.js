@@ -108,7 +108,27 @@ export const assignmentController = {
   async pauseWork(req, res, next) {
     try {
       const actorUserId = req.actor?.userId || req.user?.id || 1;
-      const data = await assignmentService.pauseWork(req.params.id, req.body.pauseReason, actorUserId);
+      const data = await assignmentService.pauseWork(req.params.id, req.body.pauseReason || req.body, actorUserId);
+      return sendSuccess(res, data);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async resumeWork(req, res, next) {
+    try {
+      const actorUserId = req.actor?.userId || req.user?.id || 1;
+      const data = await assignmentService.resumeWork(req.params.id, req.body, actorUserId);
+      return sendSuccess(res, data);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async updateProgress(req, res, next) {
+    try {
+      const actorUserId = req.actor?.userId || req.user?.id || 1;
+      const data = await assignmentService.updateProgress(req.params.id, req.body, actorUserId);
       return sendSuccess(res, data);
     } catch (err) {
       next(err);

@@ -1,8 +1,31 @@
 import axios from 'axios';
 import { STORAGE_KEYS } from '../modules/authentication/constants/authConstants';
 
+/**
+ * Resolves the API Base URL dynamically:
+ * 1. Explicit environment variable: import.meta.env.VITE_API_URL
+ * 2. In browser environments: resolves to current window.location.hostname on port 5000
+ * 3. Fallback: http://localhost:5000/api
+ */
+export const getApiBaseUrl = () => {
+  if (import.meta.env?.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+    return `http://${window.location.hostname}:5000/api`;
+  }
+  return 'http://localhost:5000/api';
+};
+
+/**
+ * Returns the Server Root URL (without /api suffix) for preview streams and static media.
+ */
+export const getServerBaseUrl = () => {
+  return getApiBaseUrl().replace(/\/api\/?$/, '');
+};
+
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json'
   }
@@ -70,7 +93,7 @@ api.interceptors.response.use(
       }
 
       try {
-        const res = await axios.post('http://localhost:5000/api/auth/refresh', { refreshToken });
+        const res = await axios.post(`${getApiBaseUrl()}/auth/refresh`, { refreshToken });
         const newAccessToken = res.data?.data?.accessToken;
 
         if (newAccessToken) {

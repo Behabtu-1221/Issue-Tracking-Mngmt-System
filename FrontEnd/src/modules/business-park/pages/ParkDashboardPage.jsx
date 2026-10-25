@@ -135,12 +135,12 @@ export default function ParkDashboardPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h1 style={{ fontSize: 'clamp(1.3rem, 3.5vw, 1.8rem)', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span className="glow-text">{t('businessPark.parkDashboardTitle')}</span>
             </h1>
-            <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+            <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
               {t('businessPark.parkDashboardSubtitle')}
             </p>
           </div>
@@ -167,7 +167,7 @@ export default function ParkDashboardPage() {
       {/* KPI Cards Grid — Each card navigates on click */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
         gap: '16px',
         marginBottom: '28px'
       }}>
@@ -183,6 +183,7 @@ export default function ParkDashboardPage() {
               onMouseLeave={() => setHoveredCard(null)}
               style={{
                 ...interactiveCard(),
+                padding: 'clamp(16px, 2.5vw, 24px)',
                 transform: isHovered ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
                 boxShadow: isHovered ? `0 12px 28px -6px ${card.borderAccent}33` : 'none',
                 borderTop: isHovered ? `2px solid ${card.borderAccent}` : '2px solid transparent'
@@ -229,12 +230,12 @@ export default function ParkDashboardPage() {
       </div>
 
       {/* Main Analytics Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', marginBottom: '28px' }}>
         {/* Space Utilization & Occupancy Breakdown */}
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(16px, 2.5vw, 24px)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 {t('businessPark.officesSubtitle')}
               </h3>
               <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -253,7 +254,8 @@ export default function ParkDashboardPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '6px 12px',
+                padding: '8px 12px',
+                minHeight: '38px',
                 borderRadius: '8px',
                 transition: 'all 0.2s'
               }}
@@ -264,7 +266,7 @@ export default function ParkDashboardPage() {
 
           {/* Progress Bar Visual */}
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 600 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 600, flexWrap: 'wrap', gap: '4px' }}>
               <span>{t('businessPark.capacity')} ({totalOffices} {t('businessPark.officeUnits')})</span>
               <span style={{ color: 'var(--accent-primary)' }}>{occupancyRate}% {t('businessPark.occupied')}</span>
             </div>
@@ -275,7 +277,7 @@ export default function ParkDashboardPage() {
           </div>
 
           {/* Legend Badges */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px' }}>
             <div
               onClick={() => navigate('/parks/offices')}
               style={{ padding: '14px 16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.2s' }}
@@ -305,10 +307,10 @@ export default function ParkDashboardPage() {
         </div>
 
         {/* Building & Tower Infrastructure Status */}
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(16px, 2.5vw, 24px)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 {t('businessPark.buildingsSubtitle')}
               </h3>
               <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -327,7 +329,8 @@ export default function ParkDashboardPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '6px 12px',
+                padding: '8px 12px',
+                minHeight: '38px',
                 borderRadius: '8px',
                 transition: 'all 0.2s'
               }}
@@ -339,20 +342,20 @@ export default function ParkDashboardPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div
               onClick={() => navigate('/parks/buildings')}
-              style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.25s' }}
+              style={{ padding: 'clamp(12px, 2vw, 16px)', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.25s', flexWrap: 'wrap', gap: '10px' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(4px)'; e.currentTarget.style.borderColor = 'var(--accent-primary)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateX(0)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flex: 1 }}>
+                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.15)', color: 'var(--accent-primary)', flexShrink: 0 }}>
                   <Building size={20} />
                 </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Block A — Innovation Hub</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.92rem', wordBreak: 'break-word' }}>Block A — Innovation Hub</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>4 {t('businessPark.totalLevelsCount')} • 12,000 m² {t('businessPark.totalArea')}</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                 <span style={{
                   padding: '4px 10px',
                   borderRadius: '6px',
@@ -367,20 +370,20 @@ export default function ParkDashboardPage() {
 
             <div
               onClick={() => navigate('/parks/buildings')}
-              style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.25s' }}
+              style={{ padding: 'clamp(12px, 2vw, 16px)', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.25s', flexWrap: 'wrap', gap: '10px' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(4px)'; e.currentTarget.style.borderColor = 'var(--color-info)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateX(0)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--color-info)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flex: 1 }}>
+                <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--color-info)', flexShrink: 0 }}>
                   <Building size={20} />
                 </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Block B — Tech Innovation Center</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.92rem', wordBreak: 'break-word' }}>Block B — Tech Innovation Center</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>4 {t('businessPark.totalLevelsCount')} • 20,000 m² {t('businessPark.totalArea')}</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                 <span style={{
                   padding: '4px 10px',
                   borderRadius: '6px',
@@ -397,10 +400,10 @@ export default function ParkDashboardPage() {
       </div>
 
       {/* Facility & Security Zones Summary */}
-      <div className="glass-panel" style={{ padding: '24px', marginBottom: '28px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <div className="glass-panel" style={{ padding: 'clamp(16px, 2.5vw, 24px)', marginBottom: '28px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {t('businessPark.facilityZones')}
             </h3>
             <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -419,7 +422,8 @@ export default function ParkDashboardPage() {
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              padding: '6px 12px',
+              padding: '8px 12px',
+              minHeight: '38px',
               borderRadius: '8px',
               transition: 'all 0.2s'
             }}
@@ -428,7 +432,7 @@ export default function ParkDashboardPage() {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '14px' }}>
           {facilityCards.map((fc) => {
             const FcIcon = fc.icon;
             return (
@@ -436,7 +440,7 @@ export default function ParkDashboardPage() {
                 key={fc.key}
                 onClick={() => navigate('/parks/zones')}
                 style={{
-                  padding: '18px',
+                  padding: '16px',
                   borderRadius: '14px',
                   background: 'var(--bg-tertiary)',
                   border: '1px solid var(--glass-border)',
@@ -449,7 +453,7 @@ export default function ParkDashboardPage() {
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = fc.iconColor; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
               >
-                <div style={{ padding: '10px', borderRadius: '12px', background: fc.iconBg, color: fc.iconColor }}>
+                <div style={{ padding: '10px', borderRadius: '12px', background: fc.iconBg, color: fc.iconColor, flexShrink: 0 }}>
                   <FcIcon size={20} />
                 </div>
                 <div>
@@ -467,7 +471,7 @@ export default function ParkDashboardPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '18px 22px',
+        padding: 'clamp(14px, 2vw, 18px) clamp(14px, 2vw, 22px)',
         background: 'var(--bg-secondary)',
         border: '1px solid var(--glass-border)',
         borderRadius: 'var(--border-radius-md)',
@@ -478,7 +482,7 @@ export default function ParkDashboardPage() {
           {t('businessPark.quickTopologyActions')}
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', width: '100%', maxWidth: '100%' }}>
           {[
             { label: t('businessPark.buildingsBlocks'), icon: Building, route: '/parks/buildings' },
             { label: t('businessPark.floorsLevels'), icon: Layers, route: '/parks/floors' },
@@ -496,14 +500,17 @@ export default function ParkDashboardPage() {
                   alignItems: 'center',
                   gap: '6px',
                   fontSize: '0.8rem',
-                  padding: '7px 14px',
+                  padding: '8px 14px',
+                  minHeight: '40px',
                   borderRadius: '8px',
                   border: '1px solid var(--glass-border)',
                   background: 'var(--bg-tertiary)',
                   color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontWeight: 600,
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  flex: '1 1 auto',
+                  justifyContent: 'center'
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-gradient)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}

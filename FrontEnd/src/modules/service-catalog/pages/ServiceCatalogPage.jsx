@@ -3,21 +3,23 @@ import {
   BookOpen,
   FolderKanban,
   Layers,
-  DollarSign,
-  FileText,
-  ShieldCheck,
   RefreshCw,
-  Tag
+  Tag,
+  DollarSign
 } from 'lucide-react';
 import serviceCatalogApi from '../api/serviceCatalogApi';
+import { useTranslation } from '../../../i18n/LanguageContext';
+import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import ServiceCategoriesTab from '../components/ServiceCategoriesTab';
 import ServicesTab from '../components/ServicesTab';
-import ServicePricingTab from '../components/ServicePricingTab';
-import ServiceRequirementsTab from '../components/ServiceRequirementsTab';
-import ServiceGovernanceTab from '../components/ServiceGovernanceTab';
 import ServiceCategoryMappingTab from '../components/ServiceCategoryMappingTab';
 
 export default function ServiceCatalogPage() {
+  const { t } = useTranslation();
+  const { user, isParkAdmin, isCompanyAdmin, hasPermission } = usePermissionContext();
+  const roleCode = (user?.userTypeCode || user?.UserTypeCode || (user?.roles && user?.roles[0]?.RoleCode) || '').toUpperCase();
+  const isEmployee = roleCode === 'EMPLOYEE' || (!isParkAdmin && !isCompanyAdmin && !hasPermission('Service.Create'));
+
   const [activeTab, setActiveTab] = useState('services');
   const [metrics, setMetrics] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -74,10 +76,10 @@ export default function ServiceCatalogPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            Service Catalog & <span className="glow-text">Fulfillment Hub</span>
+            {t('catalog.hubTitle', 'Service Catalog & Fulfillment Hub')}
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginTop: '4px' }}>
-            Manage core service offerings, request categories, pricing models, form requirements, and governance rules.
+            {t('catalog.hubSubtitle', 'Manage core service offerings, request categories, pricing models, form requirements, and governance rules.')}
           </p>
         </div>
 
@@ -97,7 +99,7 @@ export default function ServiceCatalogPage() {
           }}
         >
           <RefreshCw size={16} />
-          Refresh Hub
+          {t('catalog.refreshBtn', 'Refresh Hub')}
         </button>
       </div>
 
@@ -112,7 +114,9 @@ export default function ServiceCatalogPage() {
             <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-primary)' }}>
               {loadingMetrics ? '...' : (m.totalCategories || 0)}
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Service Categories</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {t('catalog.metrics.serviceCategories', 'Service Categories')}
+            </div>
           </div>
         </div>
 
@@ -125,7 +129,9 @@ export default function ServiceCatalogPage() {
             <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-primary)' }}>
               {loadingMetrics ? '...' : (m.totalServices || 0)}
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total Services Offered</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {t('catalog.metrics.totalServicesOffered', 'Total Services Offered')}
+            </div>
           </div>
         </div>
 
@@ -138,7 +144,9 @@ export default function ServiceCatalogPage() {
             <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-primary)' }}>
               {loadingMetrics ? '...' : (m.activeServices || 0)}
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Active Published Services</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {t('catalog.metrics.activePublishedServices', 'Active Published Services')}
+            </div>
           </div>
         </div>
 
@@ -151,7 +159,9 @@ export default function ServiceCatalogPage() {
             <div style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-primary)' }}>
               {loadingMetrics ? '...' : (m.billableServices || 0)}
             </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Billable Service Offerings</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {t('catalog.metrics.billableServiceOfferings', 'Billable Service Offerings')}
+            </div>
           </div>
         </div>
       </div>
@@ -159,12 +169,11 @@ export default function ServiceCatalogPage() {
       {/* Navigation Tabs */}
       <div style={{ borderBottom: '1px solid var(--glass-border)', display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
         {[
-          { id: 'services', label: 'Services Offered', icon: Layers },
-          { id: 'categories', label: 'Service Categories', icon: FolderKanban },
-          { id: 'category-mappings', label: 'Category Routing Mappings', icon: Tag },
-          { id: 'pricing', label: 'Pricing & Billing', icon: DollarSign },
-          { id: 'requirements', label: 'Form & File Requirements', icon: FileText },
-          { id: 'governance', label: 'Governance & SLA', icon: ShieldCheck }
+          { id: 'services', label: t('catalog.tabs.services', 'Services Offered'), icon: Layers },
+          { id: 'categories', label: t('catalog.tabs.categories', 'Service Categories'), icon: FolderKanban },
+          ...(!isEmployee ? [
+            { id: 'category-mappings', label: t('catalog.tabs.categoryMappings', 'Category Routing Mappings'), icon: Tag }
+          ] : [])
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -206,15 +215,6 @@ export default function ServiceCatalogPage() {
         )}
         {activeTab === 'category-mappings' && (
           <ServiceCategoryMappingTab />
-        )}
-        {activeTab === 'pricing' && (
-          <ServicePricingTab services={services} onPricingUpdated={handleRefreshAll} />
-        )}
-        {activeTab === 'requirements' && (
-          <ServiceRequirementsTab services={services} />
-        )}
-        {activeTab === 'governance' && (
-          <ServiceGovernanceTab services={services} />
         )}
       </div>
     </div>

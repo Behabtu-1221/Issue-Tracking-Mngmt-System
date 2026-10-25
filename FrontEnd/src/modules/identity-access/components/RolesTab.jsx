@@ -8,6 +8,7 @@ import {
 import identityApi from '../api/identityApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { FormField } from '../../../components/common/FormField';
 import { rolePermissionSchemas } from '../../../validation';
 import { PERMISSION_MODULE_TREE, DEFAULT_ROLE_PRESETS, DATA_SCOPES } from '../../role-permission-management/constants/permissionConstants';
@@ -422,34 +423,26 @@ export default function RolesTab() {
                   </button>
 
                   {!role.IsSystemRole && (
-                    <>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="edit"
                         onClick={() => {
                           setSelectedRole(role);
                           setFormData({ roleName: role.RoleName, roleCode: role.RoleCode, description: role.Description || '', isSystemRole: false });
                           setRoleErrors({});
                           setShowCreateModal(true);
                         }}
-                        style={{
-                          padding: '8px 12px', borderRadius: 'var(--border-radius-sm)',
-                          background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
-                          color: 'var(--text-primary)', cursor: 'pointer'
-                        }}
-                      >
-                        <Edit size={14} />
-                      </button>
+                        title={t('common.edit')}
+                        icon={<Edit size={14} />}
+                      />
 
-                      <button
+                      <ActionButton
+                        variant="delete"
                         onClick={() => { setSelectedRole(role); setShowDeleteModal(true); }}
-                        style={{
-                          padding: '8px 12px', borderRadius: 'var(--border-radius-sm)',
-                          background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)',
-                          color: 'var(--color-danger)', cursor: 'pointer'
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </>
+                        title={t('common.delete')}
+                        icon={<Trash2 size={14} />}
+                      />
+                    </ActionGroup>
                   )}
                 </div>
               </div>

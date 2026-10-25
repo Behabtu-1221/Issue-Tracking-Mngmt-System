@@ -3,9 +3,11 @@ import { Inbox, Send, RefreshCw, Sparkles } from 'lucide-react';
 import NotifInboxTab from '../components/NotifInboxTab';
 import SendNotificationModal from '../components/SendNotificationModal';
 import { useAuth } from '../../authentication/contexts/AuthContext';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function NotifInboxPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const userRole = (user?.role || user?.RoleName || '').toUpperCase();
   const isStaff = ['SUPER_ADMIN', 'PARK_ADMIN', 'DEPARTMENT_MANAGER', 'TECHNICIAN', 'STAFF', 'ADMIN'].some(r => userRole.includes(r)) || !userRole;
 
@@ -22,10 +24,10 @@ export default function NotifInboxPage() {
             color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px'
           }}>
             <Inbox size={28} color="#6366f1" />
-            User Inbox & Notification Alerts
+            {t('notifications.inboxTab.title', 'User Inbox & Notification Alerts')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Personal alert feed, ticket progress notifications, work orders & action requests
+            {t('notifications.inboxTab.subtitle', 'Personal alert feed, ticket progress notifications, work orders & action requests')}
           </p>
         </div>
 
@@ -50,7 +52,7 @@ export default function NotifInboxPage() {
               }}
             >
               <Send size={15} />
-              <span>Dispatch / Test Alert</span>
+              <span>{t('notifications.sendNotifBtn', 'Dispatch / Test Alert')}</span>
             </button>
           )}
 
@@ -75,7 +77,7 @@ export default function NotifInboxPage() {
             onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
           >
             <RefreshCw size={14} />
-            <span>Refresh</span>
+            <span>{t('common.refresh', 'Refresh')}</span>
           </button>
         </div>
       </div>

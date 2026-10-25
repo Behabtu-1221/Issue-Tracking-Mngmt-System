@@ -7,8 +7,10 @@ import ApprovalDelegationsTab from '../components/ApprovalDelegationsTab';
 import ApprovalRulesGroupsTab from '../components/ApprovalRulesGroupsTab';
 import CreateWorkflowModal from '../components/CreateWorkflowModal';
 import { Layers, Plus, UserCheck, ShieldCheck, CheckSquare, RefreshCw } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 
 export default function ApprovalManagementPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('workflows'); // 'workflows' | 'delegations' | 'rules'
   const [metrics, setMetrics] = useState(null);
   const [approvals, setApprovals] = useState([]);
@@ -91,10 +93,10 @@ export default function ApprovalManagementPage() {
             </div>
             <div>
               <h1 style={{ fontSize: '1.75rem', fontWeight: '800', margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-                Approval Management System
+                {t('approval.title', 'Approval Management System')}
               </h1>
               <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                Multi-level governance, decision recording, delegation & audit trails
+                {t('approval.subtitle', 'Multi-level governance, decision recording, delegation & audit trails')}
               </div>
             </div>
           </div>
@@ -106,14 +108,14 @@ export default function ApprovalManagementPage() {
             className="btn btn-secondary"
             style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            <RefreshCw size={16} /> Refresh
+            <RefreshCw size={16} /> {t('approval.refreshBtn', 'Refresh')}
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn btn-primary"
             style={{ padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            <Plus size={18} /> Initiate Workflow
+            <Plus size={18} /> {t('approval.workflowModal.createTitle', 'Initiate Workflow')}
           </button>
         </div>
       </div>

@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Layers, Search, Filter, BookOpen, Clock, ArrowRight, ShieldCheck,
   Building, DollarSign, FileText, CheckCircle2, Plus, Sparkles, RefreshCw
 } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import serviceCatalogApi from '../api/serviceCatalogApi';
 import ServicesTab from '../components/ServicesTab';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 
 export default function ServiceDirectoryPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get('category');
   const { user, isParkAdmin, isCompanyAdmin, hasPermission } = usePermissionContext();
 
-  const isEmployeeRole = (user?.userTypeCode === 'EMPLOYEE') || (!isParkAdmin && !isCompanyAdmin && !hasPermission('Department.Read') && !hasPermission('Building.Read') && !hasPermission('Request.Assign') && !hasPermission('Request.Approve'));
+  const roleCode = (user?.userTypeCode || user?.UserTypeCode || (user?.roles && user?.roles[0]?.RoleCode) || '').toUpperCase();
+  const isEmployeeRole = roleCode === 'EMPLOYEE' || (!isParkAdmin && !isCompanyAdmin && !hasPermission('Service.Create'));
 
   const [categories, setCategories] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'ALL');
 
   useEffect(() => {
     fetchCatalog();
@@ -64,9 +69,11 @@ export default function ServiceDirectoryPage() {
     return (
       <div>
         <div style={{ marginBottom: '24px' }}>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>Service Directory & Offerings</h1>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>
+            {t('catalog.title', 'Service Directory & Offerings')}
+          </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Registered service definitions, SLA tiers, fulfillment workflows, and publication status
+            {t('catalog.directorySubtitle', 'Registered service definitions, SLA tiers, fulfillment workflows, and publication status')}
           </p>
         </div>
         <ServicesTab categories={categories} />
@@ -92,14 +99,14 @@ export default function ServiceDirectoryPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <span style={{ padding: '3px 10px', borderRadius: '12px', background: 'rgba(37,99,235,0.2)', color: '#60a5fa', fontSize: '0.75rem', fontWeight: 700 }}>
-              Business Park Service Catalog
+              {t('catalog.serviceOffering', 'Business Park Service Catalog')}
             </span>
           </div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
-            Browse Available <span className="glow-text">Services</span>
+            {t('catalog.browseServices', 'Browse Available Services')}
           </h1>
           <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Explore tenant facilities, IT infrastructure, maintenance, and administrative service offerings.
+            {t('catalog.browseServicesSubtitle', 'Explore tenant facilities, IT infrastructure, maintenance, and administrative service offerings.')}
           </p>
         </div>
 
@@ -120,7 +127,7 @@ export default function ServiceDirectoryPage() {
             boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)'
           }}
         >
-          <Plus size={18} /> General Request
+          <Plus size={18} /> {t('catalog.generalRequest', 'General Request')}
         </button>
       </div>
 
@@ -143,7 +150,7 @@ export default function ServiceDirectoryPage() {
               transition: 'all 0.2s'
             }}
           >
-            All Services ({services.length})
+            {t('catalog.allServices', 'All Services')} ({services.length})
           </button>
 
           {categories.map(c => (
@@ -173,7 +180,7 @@ export default function ServiceDirectoryPage() {
             <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search catalog services..."
+              placeholder={t('catalog.searchCatalog', 'Search catalog services...')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
@@ -198,7 +205,7 @@ export default function ServiceDirectoryPage() {
               color: 'var(--text-secondary)',
               cursor: 'pointer'
             }}
-            title="Refresh Catalog"
+            title={t('catalog.refreshBtn', 'Refresh Catalog')}
           >
             <RefreshCw size={16} />
           </button>
@@ -209,14 +216,16 @@ export default function ServiceDirectoryPage() {
       {/* Services Grid Cards */}
       {loading ? (
         <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
-          Loading service catalog offerings...
+          {t('catalog.loadingCatalog', 'Loading service catalog offerings...')}
         </div>
       ) : filteredServices.length === 0 ? (
         <div className="glass-panel" style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
           <Layers size={40} style={{ color: 'var(--accent-primary)', marginBottom: '12px' }} />
-          <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>No services found</h4>
+          <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            {t('catalog.noServicesFound', 'No services found')}
+          </h4>
           <p style={{ margin: 0, fontSize: '0.85rem' }}>
-            No catalog service matching your selected category or search keyword.
+            {t('catalog.noServicesMatching', 'No catalog service matching your selected category or search keyword.')}
           </p>
         </div>
       ) : (
@@ -256,7 +265,7 @@ export default function ServiceDirectoryPage() {
                     color: '#60a5fa',
                     border: '1px solid rgba(37,99,235,0.25)'
                   }}>
-                    {svc.CategoryName || 'General Service'}
+                    {svc.CategoryName || t('catalog.directory.generalService', 'General Service')}
                   </span>
                   <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'var(--text-muted)' }}>
                     {svc.ServiceCode}
@@ -268,17 +277,17 @@ export default function ServiceDirectoryPage() {
                 </h3>
 
                 <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {svc.Description || 'Standard tenant service offering across campus facilities.'}
+                  {svc.Description || t('catalog.directory.defaultDesc', 'Standard tenant service offering across campus facilities.')}
                 </p>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderTop: '1px solid var(--glass-border)', paddingTop: '14px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem' }}>
                   <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Clock size={14} color="#facc15" /> SLA Target:
+                    <Clock size={14} color="#facc15" /> {t('catalog.directory.slaTarget', 'SLA Target:')}
                   </span>
                   <span style={{ fontWeight: 700, color: '#facc15' }}>
-                    {svc.SLATargetHours || 24} hours
+                    {t('catalog.directory.slaHours', `${svc.SLATargetHours || 24} hours`, { hours: svc.SLATargetHours || 24 })}
                   </span>
                 </div>
 
@@ -302,7 +311,7 @@ export default function ServiceDirectoryPage() {
                     transition: 'opacity 0.2s'
                   }}
                 >
-                  Request This Service <ArrowRight size={15} />
+                  {t('catalog.requestThisService', 'Request This Service')} <ArrowRight size={15} />
                 </button>
               </div>
             </div>

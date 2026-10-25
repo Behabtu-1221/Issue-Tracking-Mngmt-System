@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Hash, Plus, Edit3, Trash2, Zap, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 
 export default function NumberSequencesTab() {
   const { t } = useTranslation();
@@ -124,20 +127,7 @@ export default function NumberSequencesTab() {
 
         <button
           onClick={() => handleOpenModal()}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 18px',
-            borderRadius: 'var(--border-radius-sm)',
-            background: 'var(--accent-gradient)',
-            color: 'white',
-            border: 'none',
-            fontWeight: '600',
-            fontSize: '0.88rem',
-            cursor: 'pointer',
-            boxShadow: 'var(--glow-accent)'
-          }}
+          className="btn btn-primary"
         >
           <Plus size={16} /> {t('config.newSequenceBtn')}
         </button>
@@ -194,61 +184,25 @@ export default function NumberSequencesTab() {
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="indigo"
+                        icon={<Zap size={14} />}
+                        label={t('config.generateNextBtn')}
                         onClick={() => handleGenerateNext(item.NumberSequenceID)}
-                        style={{
-                          background: 'var(--accent-gradient-cyan)',
-                          border: 'none',
-                          borderRadius: '6px',
-                          padding: '6px 12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          cursor: 'pointer',
-                          color: 'white',
-                          fontSize: '0.8rem',
-                          fontWeight: '600'
-                        }}
                         title={t('config.generateNextBtn')}
-                      >
-                        <Zap size={14} /> {t('config.generateNextBtn')}
-                      </button>
-                      <button
+                      />
+                      <ActionButton
+                        variant="edit"
                         onClick={() => handleOpenModal(item)}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid var(--glass-border)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--text-secondary)'
-                        }}
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                      <button
+                        title={t('common.edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDelete(item.NumberSequenceID)}
-                        style={{
-                          background: 'rgba(239, 68, 68, 0.1)',
-                          border: '1px solid rgba(239, 68, 68, 0.2)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--color-danger)'
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                        title={t('common.delete')}
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -257,109 +211,86 @@ export default function NumberSequencesTab() {
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? t('config.editSequenceTitle') : t('config.createSequenceTitle')}
-            </h3>
+      <ModalCard
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingItem ? t('config.editSequenceTitle') : t('config.createSequenceTitle')}
+        subtitle={t('config.sequencesSectionDesc')}
+        icon={Hash}
+        accentStrip="brand"
+        maxWidth="540px"
+        onSubmit={handleSubmit}
+        submitting={submitting}
+        submitText={submitting ? t('common.save') : editingItem ? t('config.updateSequenceBtn') : t('config.createSequenceBtn')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <FormField label={t('config.sequenceCodeLabel')} required icon={Hash}>
+          <input
+            type="text"
+            className="form-control"
+            required
+            disabled={!!editingItem}
+            placeholder="e.g. SEQ_INCIDENT_NUMBER"
+            value={formData.sequenceCode}
+            onChange={(e) => setFormData({ ...formData, sequenceCode: e.target.value.toUpperCase() })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
 
-            {error && (
-              <div style={{ padding: '10px 14px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={16} /> {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.sequenceCodeLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  disabled={!!editingItem}
-                  placeholder="e.g. SEQ_INCIDENT_NUMBER"
-                  value={formData.sequenceCode}
-                  onChange={(e) => setFormData({ ...formData, sequenceCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.prefixLabel')}</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. INC-"
-                    value={formData.prefix}
-                    onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.suffixLabel')}</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. -2026"
-                    value={formData.suffix}
-                    onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.nextNumberLabel')}</label>
-                  <input
-                    type="number"
-                    required
-                    value={formData.nextNumber}
-                    onChange={(e) => setFormData({ ...formData, nextNumber: parseInt(e.target.value, 10) || 1 })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.incrementLabel')}</label>
-                  <input
-                    type="number"
-                    required
-                    value={formData.incrementValue}
-                    onChange={(e) => setFormData({ ...formData, incrementValue: parseInt(e.target.value, 10) || 1 })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.widthLabel')}</label>
-                  <input
-                    type="number"
-                    required
-                    value={formData.numberWidth}
-                    onChange={(e) => setFormData({ ...formData, numberWidth: parseInt(e.target.value, 10) || 6 })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {submitting ? t('common.save') : editingItem ? t('config.updateSequenceBtn') : t('config.createSequenceBtn')}
-                </button>
-              </div>
-            </form>
-          </div>
+        <div className="form-grid-2">
+          <FormField label={t('config.prefixLabel')} hint="Prepended text prefix">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="e.g. INC-"
+              value={formData.prefix}
+              onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </FormField>
+          <FormField label={t('config.suffixLabel')} hint="Appended text suffix">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="e.g. -2026"
+              value={formData.suffix}
+              onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </FormField>
         </div>
-      )}
+
+        <div className="form-grid-3">
+          <FormField label={t('config.nextNumberLabel')} required>
+            <input
+              type="number"
+              className="form-control"
+              required
+              value={formData.nextNumber}
+              onChange={(e) => setFormData({ ...formData, nextNumber: parseInt(e.target.value, 10) || 1 })}
+            />
+          </FormField>
+          <FormField label={t('config.incrementLabel')} required>
+            <input
+              type="number"
+              className="form-control"
+              required
+              value={formData.incrementValue}
+              onChange={(e) => setFormData({ ...formData, incrementValue: parseInt(e.target.value, 10) || 1 })}
+            />
+          </FormField>
+          <FormField label={t('config.widthLabel')} required hint="Padding digits">
+            <input
+              type="number"
+              className="form-control"
+              required
+              value={formData.numberWidth}
+              onChange={(e) => setFormData({ ...formData, numberWidth: parseInt(e.target.value, 10) || 6 })}
+            />
+          </FormField>
+        </div>
+      </ModalCard>
     </div>
   );
 }

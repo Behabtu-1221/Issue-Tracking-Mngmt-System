@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import slaApi from '../api/slaApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton } from '../../../components/common/ActionButton';
 import { slaSchemas } from '../../../validation';
 import {
   ShieldCheck,
@@ -65,6 +66,15 @@ export default function SLAPoliciesTab() {
   useEffect(() => {
     fetchPolicies();
   }, []);
+
+  useEffect(() => {
+    if (!showModal) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showModal]);
 
   const fetchPolicies = async () => {
     try {
@@ -325,28 +335,42 @@ export default function SLAPoliciesTab() {
 
       {/* Professional Responsive SLA Policy Creation Modal */}
       {showModal && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 9999, padding: '20px'
-        }}>
-          <div style={{
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--glass-border-accent)',
-            borderRadius: '24px',
-            width: '100%',
-            maxWidth: '680px',
-            maxHeight: '90vh',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-            animation: 'fadeIn 0.25s ease-out'
-          }}>
+        <div 
+          onClick={() => {
+            setShowModal(false);
+            setFieldErrors({});
+          }}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 9999, padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sla-modal-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--glass-border-accent)',
+              borderRadius: 'var(--border-radius-lg, 18px)',
+              width: '100%',
+              maxWidth: '680px',
+              maxHeight: '90vh',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              boxShadow: 'var(--modal-shadow, 0 20px 60px rgba(0, 0, 0, 0.5))',
+              animation: 'fadeIn 0.25s ease-out',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div style={{
-              padding: '20px 24px',
+              padding: '16px 20px',
               borderBottom: '1px solid var(--glass-border)',
               background: 'var(--bg-tertiary)',
               display: 'flex',
@@ -356,19 +380,21 @@ export default function SLAPoliciesTab() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
-                  padding: '10px',
-                  borderRadius: '12px',
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
                   background: 'var(--accent-gradient)',
                   color: '#ffffff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: 'var(--glow-accent)'
+                  boxShadow: 'var(--glow-accent)',
+                  flexShrink: 0
                 }}>
-                  <ShieldCheck size={22} />
+                  <ShieldCheck size={20} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  <h3 id="sla-modal-title" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     Create Enterprise SLA Policy
                   </h3>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -378,20 +404,25 @@ export default function SLAPoliciesTab() {
               </div>
 
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setFieldErrors({});
+                }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
                 style={{
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-muted)',
                   cursor: 'pointer',
                   padding: '6px',
-                  borderRadius: '50%',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
@@ -583,18 +614,12 @@ export default function SLAPoliciesTab() {
                               )}
                             </div>
 
-                            <button
-                              type="button"
+                            <ActionButton
+                              variant="delete"
+                              size="sm"
                               onClick={() => handleRemoveStage(idx)}
                               title="Remove Priority Tier"
-                              style={{
-                                background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)',
-                                color: '#f87171', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem'
-                              }}
-                            >
-                              <Trash2 size={13} />
-                            </button>
+                            />
                           </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>

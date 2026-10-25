@@ -12,6 +12,7 @@ export const notificationApi = {
   getInbox: (params) => api.get('/notifications/inbox', { params }),
   getUnreadCount: () => api.get('/notifications/unread-count'),
   markAsRead: (id) => api.patch(`/notifications/${id}/read`),
+  markAsUnread: (id) => api.patch(`/notifications/${id}/unread`),
   markAllRead: (data) => api.patch('/notifications/read-all', data),
 
   // Event Triggers & Dispatch

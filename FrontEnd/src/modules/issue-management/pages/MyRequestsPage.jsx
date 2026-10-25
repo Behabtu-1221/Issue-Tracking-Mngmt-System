@@ -19,9 +19,10 @@ export default function MyRequestsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const urlParamStatus = new URLSearchParams(location.search).get('status');
+  const [statusFilter, setStatusFilter] = useState(urlParamStatus || 'ALL');
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [viewMode, setViewMode] = useState('table');
+  const [viewMode, setViewMode] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 'cards' : 'table'));
 
   const currentUserId = user?.UserID || user?.userId;
 
@@ -79,31 +80,36 @@ export default function MyRequestsPage() {
     const status = (statusStr || '').toUpperCase();
     switch (status) {
       case 'NEW':
-        return { label: t('issues.statusNew', 'New Request'), bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' };
+        return { label: t('issues.statusNew', 'New Request'), className: 'status-badge status-new' };
       case 'APPROVED':
-        return { label: t('issues.statusApproved', 'Approved'), bg: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: 'rgba(56, 189, 248, 0.3)' };
+        return { label: t('issues.statusApproved', 'Approved'), className: 'status-badge status-assigned' };
       case 'ASSIGNED':
-        return { label: t('issues.statusAssigned', 'Assigned'), bg: 'rgba(192, 132, 252, 0.15)', color: '#c084fc', border: 'rgba(192, 132, 252, 0.3)' };
+        return { label: t('issues.statusAssigned', 'Assigned'), className: 'status-badge status-assigned' };
       case 'IN_PROGRESS':
-        return { label: t('issues.statusInProgress', 'In Progress'), bg: 'rgba(250, 204, 21, 0.15)', color: '#facc15', border: 'rgba(250, 204, 21, 0.3)' };
+        return { label: t('issues.statusInProgress', 'In Progress'), className: 'status-badge status-in-progress' };
       case 'PENDING':
-        return { label: t('issues.statusPending', 'Action Needed'), bg: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: 'rgba(251, 146, 60, 0.3)' };
+        return { label: t('issues.statusPending', 'Action Needed'), className: 'status-badge status-pending' };
       case 'RESOLVED':
-        return { label: t('issues.statusResolved', 'Resolved'), bg: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', border: 'rgba(74, 222, 128, 0.3)' };
+        return { label: t('issues.statusResolved', 'Resolved'), className: 'status-badge status-resolved' };
       case 'CLOSED':
-        return { label: t('issues.statusClosed', 'Closed'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: t('issues.statusClosed', 'Closed'), className: 'status-badge status-closed' };
       default:
-        return { label: statusStr || t('issues.statusSubmitted', 'Submitted'), bg: 'rgba(148, 163, 184, 0.15)', color: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
+        return { label: statusStr || t('issues.statusSubmitted', 'Submitted'), className: 'status-badge status-closed' };
     }
   };
 
   const getPriorityBadge = (priorityStr) => {
     const p = (priorityStr || '').toUpperCase();
     switch (p) {
-      case 'URGENT': return { label: t('issues.priorityUrgent', 'Urgent'), color: '#f87171' };
-      case 'HIGH': return { label: t('issues.priorityHigh', 'High'), color: '#facc15' };
-      case 'LOW': return { label: t('issues.priorityLow', 'Low'), color: '#94a3b8' };
-      default: return { label: t('issues.priorityMedium', 'Medium'), color: '#60a5fa' };
+      case 'CRITICAL':
+      case 'URGENT':
+        return { label: t('issues.priorityUrgent', 'Urgent'), className: 'priority-chip priority-critical' };
+      case 'HIGH':
+        return { label: t('issues.priorityHigh', 'High'), className: 'priority-chip priority-high' };
+      case 'LOW':
+        return { label: t('issues.priorityLow', 'Low'), className: 'priority-chip priority-low' };
+      default:
+        return { label: t('issues.priorityMedium', 'Medium'), className: 'priority-chip priority-medium' };
     }
   };
 
@@ -141,9 +147,9 @@ export default function MyRequestsPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 sm:gap-4">
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
             <LifeBuoy size={26} style={{ color: 'var(--accent-primary)' }} /> {t('issues.myRequests', 'My Service Requests')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
@@ -151,29 +157,13 @@ export default function MyRequestsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => navigate('/issues/create')}
-          style={{
-            padding: '10px 20px',
-            borderRadius: '10px',
-            background: 'var(--accent-gradient)',
-            color: '#ffffff',
-            border: 'none',
-            fontWeight: 700,
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)'
-          }}
-        >
+        <button onClick={() => navigate('/issues/create')} className="btn btn-primary w-full sm:w-auto touch-target-sm justify-center" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Plus size={18} /> {t('issues.createIssue', 'Create Request')}
         </button>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="glass-panel" style={{ padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+      <div className="enterprise-card" style={{ padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
         
         {/* Status Chips */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -191,10 +181,10 @@ export default function MyRequestsPage() {
                 borderRadius: '16px',
                 fontSize: '0.8rem',
                 fontWeight: 600,
-                border: 'none',
                 cursor: 'pointer',
-                background: statusFilter === tab.id ? 'var(--accent-gradient)' : 'var(--bg-tertiary)',
-                color: statusFilter === tab.id ? '#ffffff' : 'var(--text-secondary)',
+                background: statusFilter === tab.id ? 'var(--color-primary)' : 'var(--color-elevated)',
+                color: statusFilter === tab.id ? '#ffffff' : 'var(--color-text-secondary)',
+                border: '1px solid ' + (statusFilter === tab.id ? 'var(--color-primary)' : 'var(--color-border)'),
                 transition: 'all 0.2s'
               }}
             >
@@ -204,31 +194,23 @@ export default function MyRequestsPage() {
         </div>
 
         {/* Search Input, View Mode & Refresh */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <div className="w-full sm:w-auto flex items-center gap-2.5 flex-wrap">
+          <div className="relative flex-1 sm:flex-initial">
+            <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', zIndex: 1, pointerEvents: 'none' }} />
             <input
               type="text"
               placeholder={t('issues.searchMyRequests', 'Search by request code or title...')}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              style={{
-                padding: '8px 14px 8px 36px',
-                borderRadius: '8px',
-                border: '1px solid var(--glass-border)',
-                background: 'var(--bg-tertiary)',
-                color: 'var(--text-primary)',
-                fontSize: '0.85rem',
-                width: '230px'
-              }}
+              className="search-input enterprise-input w-full sm:w-[250px]"
             />
           </div>
 
           {/* View Mode Toggle */}
           <div style={{
             display: 'flex',
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--glass-border)',
+            background: 'var(--color-elevated)',
+            border: '1px solid var(--color-border)',
             borderRadius: '8px',
             padding: '3px',
             gap: '2px'
@@ -240,7 +222,7 @@ export default function MyRequestsPage() {
                 padding: '5px 10px',
                 borderRadius: '6px',
                 border: 'none',
-                background: viewMode === 'table' ? 'var(--accent-gradient)' : 'transparent',
+                background: viewMode === 'table' ? 'var(--color-primary)' : 'transparent',
                 color: viewMode === 'table' ? '#fff' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 display: 'flex',
@@ -260,7 +242,7 @@ export default function MyRequestsPage() {
                 padding: '5px 10px',
                 borderRadius: '6px',
                 border: 'none',
-                background: viewMode === 'cards' ? 'var(--accent-gradient)' : 'transparent',
+                background: viewMode === 'cards' ? 'var(--color-primary)' : 'transparent',
                 color: viewMode === 'cards' ? '#fff' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 display: 'flex',
@@ -275,18 +257,7 @@ export default function MyRequestsPage() {
             </button>
           </div>
 
-          <button
-            onClick={fetchMyRequests}
-            style={{
-              padding: '8px',
-              borderRadius: '8px',
-              border: '1px solid var(--glass-border)',
-              background: 'var(--bg-tertiary)',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer'
-            }}
-            title={t('common.refresh', 'Refresh list')}
-          >
+          <button onClick={fetchMyRequests} className="btn-icon" style={{ padding: '8px', borderRadius: '8px' }} title={t('common.refresh', 'Refresh list')}>
             <RefreshCw size={16} />
           </button>
         </div>
@@ -295,17 +266,17 @@ export default function MyRequestsPage() {
 
       {/* Requests Container */}
       {viewMode === 'table' ? (
-        <div className="glass-panel" style={{ borderRadius: 'var(--border-radius-md)', padding: 0, overflow: 'hidden' }}>
+        <div className="enterprise-card" style={{ padding: 0, overflow: 'hidden' }}>
           {/* Table Subheader Bar with Live Count & Horizontal Scroll Cue */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '12px 20px',
-            borderBottom: '1px solid var(--glass-border)',
-            background: 'rgba(255, 255, 255, 0.02)',
+            borderBottom: '1px solid var(--color-border)',
+            background: 'var(--color-surface)',
             fontSize: '0.82rem',
-            color: 'var(--text-muted)'
+            color: 'var(--color-text-secondary)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{t('issues.myRequests', 'My Requests')}</span>
@@ -341,7 +312,7 @@ export default function MyRequestsPage() {
           <div className="table-scroll-container" tabIndex={0} role="region" aria-label="My Requests Table">
             <table className="custom-table" style={{ width: '100%', minWidth: '1200px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)' }}>
+                <tr style={{ backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)' }}>
                   <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '220px' }}>{t('issues.requestNumberAndTitle', 'Request # & Title')}</th>
                   <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '180px' }}>{t('issues.serviceAndCategory', 'Service & Category')}</th>
                   <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', fontWeight: '600', minWidth: '120px' }}>{t('issues.priority', 'Priority')}</th>
@@ -354,11 +325,35 @@ export default function MyRequestsPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan="8" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      {t('common.loadingRequests', 'Loading your service requests...')}
-                    </td>
-                  </tr>
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={idx} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div className="skeleton-box" style={{ width: '80px', height: '16px', marginBottom: '6px' }} />
+                        <div className="skeleton-line" style={{ width: '180px', height: '14px' }} />
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div className="skeleton-line" style={{ width: '120px', height: '14px' }} />
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div className="skeleton-box" style={{ width: '70px', height: '22px', borderRadius: '12px' }} />
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div className="skeleton-box" style={{ width: '90px', height: '22px', borderRadius: '12px' }} />
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div className="skeleton-line" style={{ width: '110px', height: '14px' }} />
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div className="skeleton-line" style={{ width: '80px', height: '14px' }} />
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div className="skeleton-line" style={{ width: '60px', height: '14px' }} />
+                      </td>
+                      <td style={{ padding: '14px 18px', textAlign: 'right' }}>
+                        <div className="skeleton-box" style={{ width: '100px', height: '30px', borderRadius: '6px', marginLeft: 'auto' }} />
+                      </td>
+                    </tr>
+                  ))
                 ) : filteredRequests.length === 0 ? (
                   <tr>
                     <td colSpan="8" style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -404,23 +399,34 @@ export default function MyRequestsPage() {
                         </td>
 
                         <td style={{ padding: '14px 18px' }}>
-                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: priorityBadge.color }}>
+                          <span className={priorityBadge.className}>
                             {priorityBadge.label}
                           </span>
                         </td>
 
                         <td style={{ padding: '14px 18px' }}>
-                          <span style={{
-                            padding: '3px 10px',
-                            borderRadius: '12px',
-                            fontSize: '0.73rem',
-                            fontWeight: 700,
-                            background: statusBadge.bg,
-                            color: statusBadge.color,
-                            border: `1px solid ${statusBadge.border}`
-                          }}>
-                            {statusBadge.label}
-                          </span>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <span className={statusBadge.className}>
+                              {statusBadge.label}
+                            </span>
+                            {(() => {
+                              let custom = {};
+                              try {
+                                custom = req.CustomFieldsDataJson ? (typeof req.CustomFieldsDataJson === 'string' ? JSON.parse(req.CustomFieldsDataJson) : req.CustomFieldsDataJson) : {};
+                              } catch (e) {}
+                              if (custom.progressPercentage !== undefined && ['IN_PROGRESS', 'PENDING'].includes(req.StatusCode)) {
+                                return (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--accent-primary)', fontWeight: 800 }}>
+                                    <div style={{ width: '40px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                                      <div style={{ width: `${custom.progressPercentage}%`, height: '100%', background: 'var(--accent-primary)' }} />
+                                    </div>
+                                    <span>{custom.progressPercentage}%</span>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
                         </td>
 
                         <td style={{ padding: '14px 18px' }}>
@@ -446,19 +452,8 @@ export default function MyRequestsPage() {
                         <td style={{ padding: '14px 18px', textAlign: 'right' }}>
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedRequest(req); }}
-                            style={{
-                              padding: '7px 12px',
-                              borderRadius: '8px',
-                              background: 'rgba(37,99,235,0.12)',
-                              border: '1px solid rgba(37,99,235,0.3)',
-                              color: '#60a5fa',
-                              fontSize: '0.8rem',
-                              fontWeight: 600,
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px'
-                            }}
+                            className="btn btn-secondary btn-sm"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                           >
                             <Eye size={14} /> {t('issues.detailsAndChat', 'Details & Chat')}
                           </button>
@@ -473,34 +468,34 @@ export default function MyRequestsPage() {
         </div>
       ) : (
         /* Cards View */
-        <div className="glass-panel" style={{ padding: '24px' }}>
+        <div className="enterprise-card" style={{ padding: '24px' }}>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              {t('common.loadingRequests', 'Loading your service requests...')}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[1, 2, 3, 4].map(idx => (
+                <div key={idx} className="enterprise-card" style={{ padding: '18px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '70%' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <div className="skeleton-box" style={{ width: '80px', height: '18px', borderRadius: '4px' }} />
+                      <div className="skeleton-box" style={{ width: '90px', height: '18px', borderRadius: '12px' }} />
+                    </div>
+                    <div className="skeleton-line" style={{ width: '60%', height: '16px' }} />
+                    <div className="skeleton-line" style={{ width: '40%', height: '12px' }} />
+                  </div>
+                  <div className="skeleton-box" style={{ width: '120px', height: '32px', borderRadius: '8px' }} />
+                </div>
+              ))}
             </div>
           ) : filteredRequests.length === 0 ? (
-            <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              <CheckCircle2 size={40} style={{ color: '#4ade80', marginBottom: '12px' }} />
-              <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('issues.noRequestsFound', 'No requests found')}</h4>
-              <p style={{ margin: 0, fontSize: '0.85rem' }}>
+            <div className="empty-state-box" style={{ padding: '48px 24px' }}>
+              <CheckCircle2 size={42} style={{ color: 'var(--color-success)', marginBottom: '12px' }} />
+              <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-main)' }}>{t('issues.noRequestsFound', 'No requests found')}</h4>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-secondary)', maxWidth: '380px' }}>
                 {statusFilter !== 'ALL' ? t('issues.noMatchingFilter', 'No issues match the selected filter.') : t('issues.noSubmittedRequests', 'You have not submitted any service requests yet.')}
               </p>
               <button
                 onClick={() => navigate('/issues/create')}
-                style={{
-                  marginTop: '16px',
-                  padding: '8px 18px',
-                  borderRadius: '8px',
-                  background: 'var(--accent-gradient)',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
+                className="btn btn-primary"
+                style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 <Plus size={16} /> {t('issues.submitServiceRequest', 'Submit Service Request')}
               </button>
@@ -515,26 +510,7 @@ export default function MyRequestsPage() {
                   <div
                     key={req.IssueRequestID || req.id}
                     onClick={() => setSelectedRequest(req)}
-                    style={{
-                      padding: '18px 20px',
-                      borderRadius: '12px',
-                      background: 'var(--bg-tertiary)',
-                      border: '1px solid var(--glass-border)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '16px'
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                      e.currentTarget.style.transform = 'translateX(4px)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = 'var(--glass-border)';
-                      e.currentTarget.style.transform = 'translateX(0)';
-                    }}
+                    className="enterprise-interactive-card"
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -542,19 +518,11 @@ export default function MyRequestsPage() {
                           {req.IssueRequestCode || `#${req.IssueRequestID}`}
                         </span>
 
-                        <span style={{
-                          padding: '3px 10px',
-                          borderRadius: '12px',
-                          fontSize: '0.73rem',
-                          fontWeight: 700,
-                          background: statusBadge.bg,
-                          color: statusBadge.color,
-                          border: `1px solid ${statusBadge.border}`
-                        }}>
+                        <span className={statusBadge.className}>
                           {statusBadge.label}
                         </span>
 
-                        <span style={{ fontSize: '0.73rem', fontWeight: 700, color: priorityBadge.color }}>
+                        <span className={priorityBadge.className}>
                           {t('issues.priority', 'Priority')}: {priorityBadge.label}
                         </span>
 
@@ -577,19 +545,7 @@ export default function MyRequestsPage() {
                     </div>
 
                     <div>
-                      <button style={{
-                        padding: '8px 14px',
-                        borderRadius: '8px',
-                        background: 'rgba(37,99,235,0.12)',
-                        border: '1px solid rgba(37,99,235,0.3)',
-                        color: '#60a5fa',
-                        fontSize: '0.82rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}>
+                      <button className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         {t('issues.viewDetailsAndChat', 'View Details & Chat')} <ChevronRight size={15} />
                       </button>
                     </div>

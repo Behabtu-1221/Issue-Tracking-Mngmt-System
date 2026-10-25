@@ -18,10 +18,14 @@ import orgApi from '../api/orgApi';
 import identityApi from '../../identity-access/api/identityApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { FormField } from '../../../components/common/FormField';
 import { orgSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
+  const { t } = useTranslation();
   const [subSection, setSubSection] = useState('assignments'); // 'assignments' | 'hierarchies'
   const [assignments, setAssignments] = useState([]);
   const [hierarchies, setHierarchies] = useState([]);
@@ -211,10 +215,10 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
   const handleAssignDelete = (id) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Remove Assignment',
-      message: 'Are you sure you want to remove this employee assignment? This action cannot be undone.',
+      title: t('organization.assignmentsTab.removeAssignmentTitle', 'Remove Assignment'),
+      message: t('organization.assignmentsTab.removeAssignmentConfirm', 'Are you sure you want to remove this employee assignment? This action cannot be undone.'),
       type: 'danger',
-      confirmText: 'Remove Assignment',
+      confirmText: t('organization.assignmentsTab.removeAssignmentTitle', 'Remove Assignment'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -287,10 +291,10 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
   const handleHierarchyDelete = (id) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Remove Reporting Link',
-      message: 'Are you sure you want to remove this reporting hierarchy link? This will affect organizational structure visibility.',
+      title: t('organization.assignmentsTab.removeLinkTitle', 'Remove Reporting Link'),
+      message: t('organization.assignmentsTab.removeLinkConfirm', 'Are you sure you want to remove this reporting hierarchy link? This will affect organizational structure visibility.'),
       type: 'danger',
-      confirmText: 'Remove Link',
+      confirmText: t('organization.assignmentsTab.removeLinkTitle', 'Remove Link'),
       onConfirm: async () => {
         try {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -309,10 +313,10 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
     : teams;
 
   const reportingTypes = [
-    { value: 'DIRECT', label: 'Direct Report' },
-    { value: 'DOTTED', label: 'Dotted Line' },
-    { value: 'MATRIX', label: 'Matrix' },
-    { value: 'FUNCTIONAL', label: 'Functional' }
+    { value: 'DIRECT', label: t('organization.assignmentsTab.directReport', 'Direct Report') },
+    { value: 'DOTTED', label: t('organization.assignmentsTab.dottedLine', 'Dotted Line') },
+    { value: 'MATRIX', label: t('organization.assignmentsTab.matrix', 'Matrix') },
+    { value: 'FUNCTIONAL', label: t('organization.assignmentsTab.functional', 'Functional') }
   ];
 
   return (
@@ -337,7 +341,7 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
                 gap: '6px'
               }}
             >
-              <UserPlus size={14} /> Employee Assignments
+              <UserPlus size={14} /> {t('organization.assignmentsTab.assignmentsTabBtn', 'Employee Assignments')}
             </button>
             <button
               onClick={() => setSubSection('hierarchies')}
@@ -355,7 +359,7 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
                 gap: '6px'
               }}
             >
-              <GitFork size={14} /> Reporting Hierarchies
+              <GitFork size={14} /> {t('organization.assignmentsTab.hierarchiesTabBtn', 'Reporting Hierarchies')}
             </button>
           </div>
 
@@ -373,7 +377,7 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
                 minWidth: '200px'
               }}
             >
-              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>All Departments</option>
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.assignmentsTab.allDepartments', 'All Departments')}</option>
               {departments.map((d) => (
                 <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                   {d.DepartmentName}
@@ -399,7 +403,7 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
             boxShadow: 'var(--glow-accent)'
           }}
         >
-          <Plus size={16} /> {subSection === 'assignments' ? 'Assign Employee' : 'Add Reporting Link'}
+          <Plus size={16} /> {subSection === 'assignments' ? t('organization.assignmentsTab.assignStaffBtn', 'Assign Employee') : t('organization.assignmentsTab.addReportingLinkBtn', 'Add Reporting Link')}
         </button>
       </div>
 
@@ -407,20 +411,20 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
       {subSection === 'assignments' ? (
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading employee assignments...</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.assignmentsTab.loadingAssignments', 'Loading employee assignments...')}</div>
           ) : assignments.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No assignments found. Assign employees to departments to get started.</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.assignmentsTab.emptyAssignments', 'No assignments found. Assign employees to departments to get started.')}</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '16px 20px' }}>Employee</th>
-                  <th style={{ padding: '16px 20px' }}>Department</th>
-                  <th style={{ padding: '16px 20px' }}>Team</th>
-                  <th style={{ padding: '16px 20px' }}>Position</th>
-                  <th style={{ padding: '16px 20px' }}>Joined</th>
-                  <th style={{ padding: '16px 20px' }}>Primary</th>
-                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thEmployee', 'Employee')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thDepartment', 'Department')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thTeam', 'Team')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thPosition', 'Position')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thEffectiveDate', 'Joined')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thPrimary', 'Primary')}</th>
+                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('organization.assignmentsTab.thActions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -468,27 +472,25 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
                           background: 'rgba(250, 204, 21, 0.15)', border: '1px solid rgba(250, 204, 21, 0.3)',
                           color: '#fbbf24', fontSize: '0.75rem', fontWeight: '600'
                         }}>
-                          <Star size={10} /> Primary
+                          <Star size={10} /> {t('organization.assignmentsTab.primaryBadge', 'Primary')}
                         </span>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Secondary</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{t('organization.assignmentsTab.secondaryBadge', 'Secondary')}</span>
                       )}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        <button
+                      <ActionGroup align="right">
+                        <ActionButton
+                          variant="edit"
                           onClick={() => handleOpenAssignEdit(a)}
-                          style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
+                          title={t('common.edit')}
+                        />
+                        <ActionButton
+                          variant="delete"
                           onClick={() => handleAssignDelete(a.EmployeeAssignmentID)}
-                          style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                          title={t('common.delete')}
+                        />
+                      </ActionGroup>
                     </td>
                   </tr>
                 ))}
@@ -500,19 +502,19 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
         /* Reporting Hierarchies Table */
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading reporting hierarchies...</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.assignmentsTab.loadingHierarchies', 'Loading reporting hierarchies...')}</div>
           ) : hierarchies.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>No reporting links defined. Create reporting hierarchies to define management chains.</div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('organization.assignmentsTab.emptyHierarchies', 'No reporting links defined. Create reporting hierarchies to define management chains.')}</div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
               <thead>
                 <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '16px 20px' }}>Employee</th>
-                  <th style={{ padding: '16px 20px' }}>Reporting Relationship</th>
-                  <th style={{ padding: '16px 20px' }}>Supervisor</th>
-                  <th style={{ padding: '16px 20px' }}>Type</th>
-                  <th style={{ padding: '16px 20px' }}>Status</th>
-                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thEmployee', 'Employee')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thReportingRel', 'Reporting Relationship')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thSupervisor', 'Supervisor')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thType', 'Type')}</th>
+                  <th style={{ padding: '16px 20px' }}>{t('organization.assignmentsTab.thStatus', 'Status')}</th>
+                  <th style={{ padding: '16px 20px', textAlign: 'right' }}>{t('organization.assignmentsTab.thActions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -525,7 +527,7 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
                         <ArrowRight size={16} color="#818cf8" />
-                        <span style={{ fontSize: '0.78rem' }}>reports to</span>
+                        <span style={{ fontSize: '0.78rem' }}>{t('organization.assignmentsTab.reportsTo', 'reports to')}</span>
                         <ArrowRight size={16} color="#818cf8" />
                       </div>
                     </td>
@@ -553,23 +555,21 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
                       </span>
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      {h.IsActive ? <span className="badge badge-success">Active</span> : <span className="badge badge-danger">Inactive</span>}
+                      {h.IsActive ? <span className="badge badge-success">{t('organization.assignmentsTab.activeBadge', 'Active')}</span> : <span className="badge badge-danger">{t('organization.assignmentsTab.inactiveBadge', 'Inactive')}</span>}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        <button
+                      <ActionGroup align="right">
+                        <ActionButton
+                          variant="edit"
                           onClick={() => handleOpenHierarchyEdit(h)}
-                          style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
+                          title={t('common.edit')}
+                        />
+                        <ActionButton
+                          variant="delete"
                           onClick={() => handleHierarchyDelete(h.ReportingHierarchyID)}
-                          style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                          title={t('common.delete')}
+                        />
+                      </ActionGroup>
                     </td>
                   </tr>
                 ))}
@@ -581,349 +581,323 @@ export default function EmployeeAssignmentsTab({ onRefreshMetrics }) {
 
       {/* Modal: Create/Edit Employee Assignment */}
       {isAssignModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '560px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <UserPlus color="var(--accent-primary)" />
-              {editingAssignment ? 'Edit Employee Assignment' : 'Assign Employee to Department'}
-            </h2>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleAssignSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {!editingAssignment && (
-                <FormField
-                  label="Employee"
-                  required
-                  icon={UserPlus}
-                  error={assignErrors.UserID}
-                  id="assign-user-id"
-                >
-                  <select
-                    id="assign-user-id"
-                    value={assignForm.UserID}
-                    onChange={(e) => {
-                      setAssignForm({ ...assignForm, UserID: e.target.value });
-                      clearAssignError('UserID');
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: assignErrors.UserID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Employee</option>
-                    {users.map((u) => (
-                      <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-              )}
-
+        <ModalCard
+          isOpen={isAssignModalOpen}
+          onClose={() => setIsAssignModalOpen(false)}
+          title={editingAssignment ? t('organization.assignmentsTab.editModalTitle', 'Edit Employee Assignment') : t('organization.assignmentsTab.createAssignmentTitle', 'Assign Employee to Department')}
+          subtitle="Assign personnel to departmental unit, operational team, and job role"
+          icon={UserPlus}
+          accentStrip="brand"
+          maxWidth="560px"
+          error={errorMsg}
+          onSubmit={handleAssignSubmit}
+          submitText={editingAssignment ? t('organization.assignmentsTab.saveChangesBtn', 'Save Changes') : t('organization.assignmentsTab.assignStaffBtn', 'Assign Employee')}
+          cancelText={t('organization.assignmentsTab.cancelBtn', 'Cancel')}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {!editingAssignment && (
               <FormField
-                label="Department"
+                label={t('organization.assignmentsTab.selectUserLabel', 'Employee')}
                 required
-                icon={Building2}
-                error={assignErrors.DepartmentID}
-                id="assign-department-id"
+                icon={UserPlus}
+                error={assignErrors.UserID}
+                id="assign-user-id"
               >
                 <select
-                  id="assign-department-id"
-                  value={assignForm.DepartmentID}
+                  id="assign-user-id"
+                  value={assignForm.UserID}
                   onChange={(e) => {
-                    setAssignForm({ ...assignForm, DepartmentID: e.target.value, TeamID: '' });
-                    clearAssignError('DepartmentID');
+                    setAssignForm({ ...assignForm, UserID: e.target.value });
+                    clearAssignError('UserID');
                   }}
+                  className={`enterprise-input ${assignErrors.UserID ? 'input-error' : ''}`}
                   style={{
                     width: '100%',
-                    padding: '10px',
+                    padding: '10px 12px',
                     background: 'var(--bg-tertiary)',
-                    border: assignErrors.DepartmentID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px',
+                    border: assignErrors.UserID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
                     color: 'var(--text-primary)'
                   }}
                 >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Department</option>
-                  {departments.map((d) => (
-                    <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {d.DepartmentName} ({d.DepartmentCode})
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.assignmentsTab.selectEmployee', 'Select Employee')}</option>
+                  {users.map((u) => (
+                    <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+            )}
+
+            <FormField
+              label={t('organization.assignmentsTab.selectDeptLabel', 'Department')}
+              required
+              icon={Building2}
+              error={assignErrors.DepartmentID}
+              id="assign-department-id"
+            >
+              <select
+                id="assign-department-id"
+                value={assignForm.DepartmentID}
+                onChange={(e) => {
+                  setAssignForm({ ...assignForm, DepartmentID: e.target.value, TeamID: '' });
+                  clearAssignError('DepartmentID');
+                }}
+                className={`enterprise-input ${assignErrors.DepartmentID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: assignErrors.DepartmentID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.assignmentsTab.selectDepartment', 'Select Department')}</option>
+                {departments.map((d) => (
+                  <option key={d.DepartmentID} value={d.DepartmentID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {d.DepartmentName} ({d.DepartmentCode})
+                  </option>
+                ))}
+              </select>
+            </FormField>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <FormField
+                label={t('organization.assignmentsTab.teamOptional', 'Team (Optional)')}
+                icon={Users}
+                error={assignErrors.TeamID}
+                id="assign-team-id"
+              >
+                <select
+                  id="assign-team-id"
+                  value={assignForm.TeamID}
+                  onChange={(e) => {
+                    setAssignForm({ ...assignForm, TeamID: e.target.value });
+                    clearAssignError('TeamID');
+                  }}
+                  className={`enterprise-input ${assignErrors.TeamID ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: assignErrors.TeamID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
+                >
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.assignmentsTab.noTeam', '-- No Team --')}</option>
+                  {filteredTeams.map((team) => (
+                    <option key={team.TeamID} value={team.TeamID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {team.TeamName} ({team.TeamCode})
                     </option>
                   ))}
                 </select>
               </FormField>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <FormField
-                  label="Team (Optional)"
-                  icon={Users}
-                  error={assignErrors.TeamID}
-                  id="assign-team-id"
-                >
-                  <select
-                    id="assign-team-id"
-                    value={assignForm.TeamID}
-                    onChange={(e) => {
-                      setAssignForm({ ...assignForm, TeamID: e.target.value });
-                      clearAssignError('TeamID');
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: assignErrors.TeamID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Team --</option>
-                    {filteredTeams.map((t) => (
-                      <option key={t.TeamID} value={t.TeamID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {t.TeamName} ({t.TeamCode})
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-
-                <FormField
-                  label="Position (Optional)"
-                  icon={Award}
-                  error={assignErrors.PositionID}
+              <FormField
+                label={t('organization.assignmentsTab.positionOptional', 'Position (Optional)')}
+                icon={Award}
+                error={assignErrors.PositionID}
+                id="assign-position-id"
+              >
+                <select
                   id="assign-position-id"
+                  value={assignForm.PositionID}
+                  onChange={(e) => {
+                    setAssignForm({ ...assignForm, PositionID: e.target.value });
+                    clearAssignError('PositionID');
+                  }}
+                  className={`enterprise-input ${assignErrors.PositionID ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: assignErrors.PositionID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
                 >
-                  <select
-                    id="assign-position-id"
-                    value={assignForm.PositionID}
-                    onChange={(e) => {
-                      setAssignForm({ ...assignForm, PositionID: e.target.value });
-                      clearAssignError('PositionID');
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: assignErrors.PositionID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Position --</option>
-                    {positions.map((p) => (
-                      <option key={p.PositionID} value={p.PositionID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {p.PositionTitle} ({p.PositionCode})
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-              </div>
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.assignmentsTab.noPosition', '-- No Position --')}</option>
+                  {positions.map((p) => (
+                    <option key={p.PositionID} value={p.PositionID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {p.PositionTitle} ({p.PositionCode})
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+            </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <FormField
-                  label="Joined Date"
-                  required
-                  icon={Calendar}
-                  error={assignErrors.JoinedDate}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <FormField
+                label={t('organization.assignmentsTab.joinedDate', 'Joined Date')}
+                required
+                icon={Calendar}
+                error={assignErrors.JoinedDate}
+                id="assign-joined-date"
+              >
+                <input
                   id="assign-joined-date"
-                >
-                  <input
-                    id="assign-joined-date"
-                    type="date"
-                    value={assignForm.JoinedDate}
-                    onChange={(e) => {
-                      setAssignForm({ ...assignForm, JoinedDate: e.target.value });
-                      clearAssignError('JoinedDate');
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      background: 'var(--bg-tertiary)',
-                      border: assignErrors.JoinedDate ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px',
-                      color: 'var(--text-primary)'
-                    }}
-                  />
-                </FormField>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Primary Assignment?</label>
-                  <div style={{ display: 'flex', gap: '12px', paddingTop: '10px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
-                      <input type="radio" name="isPrimary" checked={assignForm.IsPrimary === 1} onChange={() => setAssignForm({ ...assignForm, IsPrimary: 1 })} />
-                      Yes (Primary)
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
-                      <input type="radio" name="isPrimary" checked={assignForm.IsPrimary === 0} onChange={() => setAssignForm({ ...assignForm, IsPrimary: 0 })} />
-                      No
-                    </label>
-                  </div>
+                  type="date"
+                  value={assignForm.JoinedDate}
+                  onChange={(e) => {
+                    setAssignForm({ ...assignForm, JoinedDate: e.target.value });
+                    clearAssignError('JoinedDate');
+                  }}
+                  className={`enterprise-input ${assignErrors.JoinedDate ? 'input-error' : ''}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: assignErrors.JoinedDate ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+              </FormField>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('organization.assignmentsTab.primaryAssignmentLabel', 'Primary Assignment?')}</label>
+                <div style={{ display: 'flex', gap: '12px', paddingTop: '10px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                    <input type="radio" name="isPrimary" checked={assignForm.IsPrimary === 1} onChange={() => setAssignForm({ ...assignForm, IsPrimary: 1 })} />
+                    {t('organization.assignmentsTab.yesPrimary', 'Yes (Primary)')}
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                    <input type="radio" name="isPrimary" checked={assignForm.IsPrimary === 0} onChange={() => setAssignForm({ ...assignForm, IsPrimary: 0 })} />
+                    {t('organization.assignmentsTab.noSecondary', 'No')}
+                  </label>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsAssignModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {editingAssignment ? 'Save Changes' : 'Assign Employee'}
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
-        </div>
+        </ModalCard>
       )}
 
       {/* Modal: Create/Edit Reporting Hierarchy */}
       {isHierarchyModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '520px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <GitFork color="var(--accent-primary)" />
-              {editingHierarchy ? 'Edit Reporting Link' : 'Create Reporting Link'}
-            </h2>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleHierarchySubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <FormField
-                label="Employee (Reports To)"
-                required
-                icon={UserPlus}
-                error={hierarchyErrors.EmployeeUserID}
+        <ModalCard
+          isOpen={isHierarchyModalOpen}
+          onClose={() => setIsHierarchyModalOpen(false)}
+          title={editingHierarchy ? t('organization.assignmentsTab.editHierarchyTitle', 'Edit Reporting Link') : t('organization.assignmentsTab.createHierarchyTitle', 'Create Reporting Link')}
+          subtitle="Configure managerial supervisory chain and reporting relationship"
+          icon={GitFork}
+          accentStrip="purple"
+          maxWidth="540px"
+          error={errorMsg}
+          onSubmit={handleHierarchySubmit}
+          submitText={editingHierarchy ? t('organization.assignmentsTab.saveChangesBtn', 'Save Changes') : t('organization.assignmentsTab.createLinkBtn', 'Create Link')}
+          cancelText={t('organization.assignmentsTab.cancelBtn', 'Cancel')}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <FormField
+              label={t('organization.assignmentsTab.employeeReportsToLabel', 'Employee (Reports To)')}
+              required
+              icon={UserPlus}
+              error={hierarchyErrors.EmployeeUserID}
+              id="hierarchy-employee-user-id"
+            >
+              <select
                 id="hierarchy-employee-user-id"
+                value={hierarchyForm.EmployeeUserID}
+                onChange={(e) => {
+                  setHierarchyForm({ ...hierarchyForm, EmployeeUserID: e.target.value });
+                  clearHierarchyError('EmployeeUserID');
+                  if (hierarchyErrors.SupervisorUserID) clearHierarchyError('SupervisorUserID');
+                }}
+                disabled={!!editingHierarchy}
+                className={`enterprise-input ${hierarchyErrors.EmployeeUserID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: hierarchyErrors.EmployeeUserID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  opacity: editingHierarchy ? 0.6 : 1
+                }}
               >
-                <select
-                  id="hierarchy-employee-user-id"
-                  value={hierarchyForm.EmployeeUserID}
-                  onChange={(e) => {
-                    setHierarchyForm({ ...hierarchyForm, EmployeeUserID: e.target.value });
-                    clearHierarchyError('EmployeeUserID');
-                    if (hierarchyErrors.SupervisorUserID) clearHierarchyError('SupervisorUserID');
-                  }}
-                  disabled={!!editingHierarchy}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'var(--bg-tertiary)',
-                    border: hierarchyErrors.EmployeeUserID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px',
-                    color: 'var(--text-primary)',
-                    opacity: editingHierarchy ? 0.6 : 1
-                  }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Employee</option>
-                  {users.map((u) => (
-                    <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
-                    </option>
-                  ))}
-                </select>
-              </FormField>
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.assignmentsTab.selectEmployee', 'Select Employee')}</option>
+                {users.map((u) => (
+                  <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
+                  </option>
+                ))}
+              </select>
+            </FormField>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                <div style={{ flex: 1, borderBottom: '1px dashed var(--glass-border)' }}></div>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><ArrowRight size={14} color="#818cf8" /> reports to <ArrowRight size={14} color="#818cf8" /></span>
-                <div style={{ flex: 1, borderBottom: '1px dashed var(--glass-border)' }}></div>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+              <div style={{ flex: 1, borderBottom: '1px dashed var(--glass-border)' }}></div>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><ArrowRight size={14} color="#818cf8" /> {t('organization.assignmentsTab.reportsTo', 'reports to')} <ArrowRight size={14} color="#818cf8" /></span>
+              <div style={{ flex: 1, borderBottom: '1px dashed var(--glass-border)' }}></div>
+            </div>
 
-              <FormField
-                label="Supervisor"
-                required
-                icon={UserCheck}
-                error={hierarchyErrors.SupervisorUserID}
+            <FormField
+              label={t('organization.assignmentsTab.supervisorLabel', 'Supervisor')}
+              required
+              icon={UserCheck}
+              error={hierarchyErrors.SupervisorUserID}
+              id="hierarchy-supervisor-user-id"
+            >
+              <select
                 id="hierarchy-supervisor-user-id"
+                value={hierarchyForm.SupervisorUserID}
+                onChange={(e) => {
+                  setHierarchyForm({ ...hierarchyForm, SupervisorUserID: e.target.value });
+                  clearHierarchyError('SupervisorUserID');
+                }}
+                disabled={!!editingHierarchy}
+                className={`enterprise-input ${hierarchyErrors.SupervisorUserID ? 'input-error' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: hierarchyErrors.SupervisorUserID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  opacity: editingHierarchy ? 0.6 : 1
+                }}
               >
-                <select
-                  id="hierarchy-supervisor-user-id"
-                  value={hierarchyForm.SupervisorUserID}
-                  onChange={(e) => {
-                    setHierarchyForm({ ...hierarchyForm, SupervisorUserID: e.target.value });
-                    clearHierarchyError('SupervisorUserID');
-                  }}
-                  disabled={!!editingHierarchy}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'var(--bg-tertiary)',
-                    border: hierarchyErrors.SupervisorUserID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px',
-                    color: 'var(--text-primary)',
-                    opacity: editingHierarchy ? 0.6 : 1
-                  }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Supervisor</option>
-                  {users.map((u) => (
-                    <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
-                    </option>
-                  ))}
-                </select>
-              </FormField>
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('organization.assignmentsTab.selectSupervisor', 'Select Supervisor')}</option>
+                {users.map((u) => (
+                  <option key={u.UserID} value={u.UserID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {u.FirstName ? `${u.FirstName} ${u.LastName}` : u.Username} ({u.Email})
+                  </option>
+                ))}
+              </select>
+            </FormField>
 
-              <FormField
-                label="Reporting Type"
-                required
-                icon={GitFork}
-                error={hierarchyErrors.ReportingTypeCode}
+            <FormField
+              label={t('organization.assignmentsTab.reportingTypeLabel', 'Reporting Type')}
+              required
+              icon={GitFork}
+              error={hierarchyErrors.ReportingTypeCode}
+              id="hierarchy-reporting-type"
+            >
+              <select
                 id="hierarchy-reporting-type"
+                value={hierarchyForm.ReportingTypeCode}
+                onChange={(e) => {
+                  setHierarchyForm({ ...hierarchyForm, ReportingTypeCode: e.target.value });
+                  clearHierarchyError('ReportingTypeCode');
+                }}
+                className={`enterprise-input ${hierarchyErrors.ReportingTypeCode ? 'input-error' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: hierarchyErrors.ReportingTypeCode ? '1px solid #ef4444' : '1px solid var(--glass-border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)'
+                }}
               >
-                <select
-                  id="hierarchy-reporting-type"
-                  value={hierarchyForm.ReportingTypeCode}
-                  onChange={(e) => {
-                    setHierarchyForm({ ...hierarchyForm, ReportingTypeCode: e.target.value });
-                    clearHierarchyError('ReportingTypeCode');
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'var(--bg-tertiary)',
-                    border: hierarchyErrors.ReportingTypeCode ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px',
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  {reportingTypes.map((rt) => (
-                    <option key={rt.value} value={rt.value} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{rt.label}</option>
-                  ))}
-                </select>
-              </FormField>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsHierarchyModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {editingHierarchy ? 'Save Changes' : 'Create Link'}
-                </button>
-              </div>
-            </form>
+                {reportingTypes.map((rt) => (
+                  <option key={rt.value} value={rt.value} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{rt.label}</option>
+                ))}
+              </select>
+            </FormField>
           </div>
-        </div>
+        </ModalCard>
       )}
       {/* Glass Modals */}
       <ConfirmDialogModal

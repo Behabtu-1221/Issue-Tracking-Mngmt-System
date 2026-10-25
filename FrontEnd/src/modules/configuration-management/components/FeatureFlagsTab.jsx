@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Flag, Plus, Edit3, Trash2, ToggleLeft, ToggleRight, RefreshCw, AlertCircle } from 'lucide-react';
 import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 
 export default function FeatureFlagsTab() {
   const { t } = useTranslation();
@@ -112,20 +115,7 @@ export default function FeatureFlagsTab() {
 
         <button
           onClick={() => handleOpenModal()}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 18px',
-            borderRadius: 'var(--border-radius-sm)',
-            background: 'var(--accent-gradient)',
-            color: 'white',
-            border: 'none',
-            fontWeight: '600',
-            fontSize: '0.88rem',
-            cursor: 'pointer',
-            boxShadow: 'var(--glow-accent)'
-          }}
+          className="btn btn-primary"
         >
           <Plus size={16} /> {t('config.newFlagBtn')}
         </button>
@@ -184,42 +174,18 @@ export default function FeatureFlagsTab() {
                     </button>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="edit"
                         onClick={() => handleOpenModal(item)}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid var(--glass-border)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--text-secondary)'
-                        }}
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                      <button
+                        title={t('common.edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDelete(item.FeatureFlagID)}
-                        style={{
-                          background: 'rgba(239, 68, 68, 0.1)',
-                          border: '1px solid rgba(239, 68, 68, 0.2)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--color-danger)'
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                        title={t('common.delete')}
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -228,76 +194,54 @@ export default function FeatureFlagsTab() {
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '500px', padding: '28px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? t('config.editFlagTitle') : t('config.createFlagTitle')}
-            </h3>
+      <ModalCard
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingItem ? t('config.editFlagTitle') : t('config.createFlagTitle')}
+        subtitle={t('config.flagsSectionDesc')}
+        icon={Flag}
+        accentStrip="brand"
+        maxWidth="520px"
+        onSubmit={handleSubmit}
+        submitting={submitting}
+        submitText={submitting ? t('common.save') : editingItem ? t('config.updateFlagBtn') : t('config.createFlagBtn')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <FormField label={t('config.flagCodeLabel')} required icon={Flag}>
+          <input
+            type="text"
+            className="form-control"
+            required
+            disabled={!!editingItem}
+            placeholder="e.g. ENABLE_NEW_APPROVAL_WORKFLOW"
+            value={formData.flagCode}
+            onChange={(e) => setFormData({ ...formData, flagCode: e.target.value.toUpperCase() })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
 
-            {error && (
-              <div style={{ padding: '10px 14px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={16} /> {error}
-              </div>
-            )}
+        <FormField label={t('config.featureNameLabel')} required>
+          <input
+            type="text"
+            className="form-control"
+            required
+            placeholder="e.g. New Approval Workflow Engine"
+            value={formData.flagName}
+            onChange={(e) => setFormData({ ...formData, flagName: e.target.value })}
+          />
+        </FormField>
 
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.flagCodeLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  disabled={!!editingItem}
-                  placeholder="e.g. ENABLE_NEW_APPROVAL_WORKFLOW"
-                  value={formData.flagCode}
-                  onChange={(e) => setFormData({ ...formData, flagCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.featureNameLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. New Approval Workflow Engine"
-                  value={formData.flagName}
-                  onChange={(e) => setFormData({ ...formData, flagName: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.descriptionLabel')}</label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder={t('config.flagDescPlaceholder')}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {submitting ? t('common.save') : editingItem ? t('config.updateFlagBtn') : t('config.createFlagBtn')}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+        <FormField label={t('config.descriptionLabel')} hint={t('config.flagDescPlaceholder')}>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder={t('config.flagDescPlaceholder')}
+          />
+        </FormField>
+      </ModalCard>
     </div>
   );
 }

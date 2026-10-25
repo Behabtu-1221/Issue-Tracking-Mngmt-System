@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Clock, RefreshCw } from 'lucide-react';
 import NotifRemindersTab from '../components/NotifRemindersTab';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function NotifRemindersPage() {
+  const { t } = useTranslation();
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (
@@ -15,10 +17,10 @@ export default function NotifRemindersPage() {
             color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px'
           }}>
             <Clock size={28} color="#f59e0b" />
-            Scheduled Task & SLA Reminders
+            {t('notifications.remindersTab.title', 'Scheduled Task & SLA Reminders')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Automated calendar reminders, follow-up deadlines & SLA escalation alerts
+            {t('notifications.remindersTab.subtitle', 'Automated calendar reminders, follow-up deadlines & SLA escalation alerts')}
           </p>
         </div>
 
@@ -43,7 +45,7 @@ export default function NotifRemindersPage() {
           onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
         >
           <RefreshCw size={14} />
-          <span>Refresh</span>
+          <span>{t('common.refresh', 'Refresh')}</span>
         </button>
       </div>
 

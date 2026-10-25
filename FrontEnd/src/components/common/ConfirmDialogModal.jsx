@@ -108,11 +108,12 @@ export default function ConfirmDialogModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="modal-card no-accent-strip"
         style={{
           width: '100%',
           maxWidth: '480px',
           background: 'var(--color-elevated, #20262D)',
-          borderRadius: '24px',
+          borderRadius: 'var(--border-radius-lg, 18px)',
           border: '1px solid var(--color-border, #303841)',
           boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45)',
           overflow: 'hidden',
@@ -218,17 +219,8 @@ export default function ConfirmDialogModal({
           </div>
 
           {/* International Standard Pill Buttons */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              gap: '12px',
-              paddingTop: '16px',
-              borderTop: '1px solid var(--glass-border, rgba(255, 255, 255, 0.08))'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--text-muted)', marginRight: 'auto' }}>
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t border-[var(--glass-border,rgba(255,255,255,0.08))]">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[var(--text-muted)] mr-auto">
               <Info size={14} />
               <span>Press <b>Esc</b> to cancel</span>
             </div>
@@ -237,6 +229,7 @@ export default function ConfirmDialogModal({
               type="button"
               onClick={onClose}
               disabled={loading}
+              className="touch-target-sm justify-center w-full sm:w-auto"
               style={{
                 padding: '10px 22px',
                 borderRadius: '9999px',
@@ -246,7 +239,9 @@ export default function ConfirmDialogModal({
                 fontWeight: 600,
                 cursor: 'pointer',
                 fontSize: '0.88rem',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center'
               }}
             >
               {cancelText}
@@ -256,6 +251,7 @@ export default function ConfirmDialogModal({
               type="button"
               onClick={onConfirm}
               disabled={loading}
+              className="touch-target-sm justify-center w-full sm:w-auto"
               style={{
                 padding: '10px 24px',
                 borderRadius: '9999px',
@@ -267,7 +263,9 @@ export default function ConfirmDialogModal({
                 fontSize: '0.88rem',
                 boxShadow: style.btnShadow,
                 opacity: loading ? 0.7 : 1,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center'
               }}
             >
               {loading ? 'Processing...' : confirmText}

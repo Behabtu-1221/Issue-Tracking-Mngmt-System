@@ -11,6 +11,7 @@ import { usePermissionContext } from '../../role-permission-management/contexts/
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { FormField } from '../../../components/common/FormField';
+import { ActionButton } from '../../../components/common/ActionButton';
 
 export default function AnnouncementsTab() {
   const { user, isParkAdmin, isCompanyAdmin, hasPermission } = usePermissionContext();
@@ -81,6 +82,19 @@ export default function AnnouncementsTab() {
     loadAnnouncements();
     loadTenants();
   }, [canPublish]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (selectedAnnouncement) setSelectedAnnouncement(null);
+        if (showModal) setShowModal(false);
+      }
+    };
+    if (selectedAnnouncement || showModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedAnnouncement, showModal]);
 
   const handleCreate = async (e) => {
     e?.preventDefault();
@@ -417,18 +431,11 @@ export default function AnnouncementsTab() {
                     </div>
 
                     {canPublish && (
-                      <button
+                      <ActionButton
+                        variant="delete"
                         onClick={(e) => handleDelete(a.AnnouncementID, a.Title, e)}
                         title="Delete Announcement"
-                        style={{
-                          padding: '6px', borderRadius: '6px',
-                          border: '1px solid rgba(239, 68, 68, 0.25)',
-                          background: 'rgba(239, 68, 68, 0.1)', color: '#f87171',
-                          cursor: 'pointer', display: 'flex', alignItems: 'center'
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      />
                     )}
                   </div>
 
@@ -481,17 +488,27 @@ export default function AnnouncementsTab() {
 
       {/* ── Modal 1: Read Full Announcement Modal ── */}
       {selectedAnnouncement && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 9999,
-          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
-        }}>
-          <div style={{
-            width: '100%', maxWidth: '640px', background: 'var(--bg-secondary)',
-            borderRadius: '20px', border: '1px solid var(--glass-border-accent)',
-            padding: '28px', boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-            maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column'
-          }}>
+        <div 
+          onClick={() => setSelectedAnnouncement(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="announcement-detail-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              width: '100%', maxWidth: '640px', background: 'var(--bg-secondary)',
+              borderRadius: 'var(--border-radius-lg, 18px)', border: '1px solid var(--glass-border-accent)',
+              padding: '28px', boxShadow: 'var(--modal-shadow, 0 25px 60px rgba(0,0,0,0.5))',
+              maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{
@@ -556,17 +573,27 @@ export default function AnnouncementsTab() {
 
       {/* ── Modal 2: Publish Broadcast Announcement Modal (Admin/Manager) ── */}
       {showModal && canPublish && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 9999,
-          background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
-        }}>
-          <div style={{
-            width: '100%', maxWidth: '580px', background: 'var(--bg-secondary)',
-            borderRadius: '20px', border: '1px solid var(--glass-border-accent)',
-            padding: '28px', boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-            maxHeight: '90vh', overflowY: 'auto'
-          }}>
+        <div 
+          onClick={() => setShowModal(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="announcement-publish-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              width: '100%', maxWidth: '580px', background: 'var(--bg-secondary)',
+              borderRadius: 'var(--border-radius-lg, 18px)', border: '1px solid var(--glass-border-accent)',
+              padding: '28px', boxShadow: 'var(--modal-shadow, 0 25px 60px rgba(0,0,0,0.5))',
+              maxHeight: '90vh', overflowY: 'auto', position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>

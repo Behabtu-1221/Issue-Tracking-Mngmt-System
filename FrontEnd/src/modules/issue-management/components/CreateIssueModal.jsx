@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   X, Plus, AlertTriangle, Paperclip, FileText, Trash2,
-  Shield, Clock, Sparkles, Layers, User, Tag
+  Shield, Clock, Sparkles, Layers, User, Tag, Upload, AlertCircle
 } from 'lucide-react';
 import issueManagementApi from '../api/issueManagementApi';
 import fileDocumentApi from '../../file-document/api/fileDocumentApi';
@@ -14,10 +14,12 @@ import { useTranslation } from '../../../i18n';
 export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propServices = [] }) => {
   const { t, isRTL } = useTranslation();
   const { user } = usePermissionContext();
+  const [categoriesList, setCategoriesList] = useState([]);
   const [servicesList, setServicesList] = useState([]);
   const [selectedServiceMeta, setSelectedServiceMeta] = useState(null);
 
   const [form, setForm] = useState({
+    ServiceCategoryID: '',
     ServiceID: '',
     Title: '',
     Description: '',
@@ -34,6 +36,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
   });
 
   const [attachedFiles, setAttachedFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [serverError, setServerError] = useState(null);
@@ -41,15 +44,22 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
 
   useEffect(() => {
     if (isOpen) {
-      if (propServices && propServices.length > 0) {
-        setServicesList(propServices);
-      } else {
-        serviceCatalogApi.getServices()
-          .then(res => setServicesList(res.data?.data?.services || res.data?.data || []))
-          .catch(() => {});
-      }
+      Promise.all([
+        serviceCatalogApi.getCategories().catch(() => ({ data: { data: [] } })),
+        propServices && propServices.length > 0
+          ? Promise.resolve({ data: { data: { services: propServices } } })
+          : serviceCatalogApi.getServices().catch(() => ({ data: { data: { services: [] } } }))
+      ]).then(([catRes, svcRes]) => {
+        const cats = catRes.data?.data?.categories || catRes.data?.data || [];
+        const svcs = svcRes.data?.data?.services || svcRes.data?.data || [];
+        setCategoriesList(Array.isArray(cats) ? cats : []);
+        setServicesList(Array.isArray(svcs) ? svcs : []);
+      }).catch(err => {
+        console.warn('Failed to load metadata in CreateIssueModal:', err);
+      });
 
       setForm({
+        ServiceCategoryID: '',
         ServiceID: '',
         Title: '',
         Description: '',
@@ -71,6 +81,15 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
     }
   }, [isOpen, propServices, user]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleFieldChange = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
     if (fieldErrors[field]) {
@@ -81,19 +100,40 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
     }
   };
 
+  const handleCategorySelect = (categoryId) => {
+    const found = categoriesList.find(c => String(c.ServiceCategoryID) === String(categoryId));
+    setForm(prev => ({
+      ...prev,
+      ServiceCategoryID: categoryId,
+      CategoryCode: found ? found.CategoryCode : '',
+      ServiceID: ''
+    }));
+    setSelectedServiceMeta(null);
+    if (fieldErrors.ServiceCategoryID) {
+      setFieldErrors(prev => ({ ...prev, ServiceCategoryID: null }));
+    }
+    if (fieldErrors.ServiceID) {
+      setFieldErrors(prev => ({ ...prev, ServiceID: null }));
+    }
+  };
+
   const handleServiceSelect = (serviceId) => {
-    const sId = Number(serviceId);
     handleFieldChange('ServiceID', serviceId);
+    if (!serviceId) {
+      setSelectedServiceMeta(null);
+      return;
+    }
+    const sId = Number(serviceId);
     const found = servicesList.find(s => Number(s.ServiceID) === sId);
     if (found) {
       setSelectedServiceMeta(found);
-      if (found.EstimatedCost) {
-        setForm(prev => ({
-          ...prev,
-          EstimatedCost: found.EstimatedCost,
-          CategoryCode: found.CategoryCode || prev.CategoryCode
-        }));
-      }
+      setForm(prev => ({
+        ...prev,
+        ServiceID: serviceId,
+        ServiceCategoryID: found.ServiceCategoryID ? String(found.ServiceCategoryID) : prev.ServiceCategoryID,
+        CategoryCode: found.CategoryCode || prev.CategoryCode,
+        EstimatedCost: found.EstimatedCost ? Number(found.EstimatedCost) : prev.EstimatedCost
+      }));
     } else {
       setSelectedServiceMeta(null);
     }
@@ -104,6 +144,31 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
     setAttachedFiles((prev) => [...prev, ...files]);
     if (fieldErrors.Attachments) {
       setFieldErrors(prev => ({ ...prev, Attachments: null }));
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      setAttachedFiles((prev) => [...prev, ...files]);
+      if (fieldErrors.Attachments) {
+        setFieldErrors(prev => ({ ...prev, Attachments: null }));
+      }
     }
   };
 
@@ -119,6 +184,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
       {
         Title: form.Title,
         Description: form.Description,
+        ServiceCategoryID: form.ServiceCategoryID,
         ServiceID: form.ServiceID,
         PriorityCode: form.PriorityCode,
         RequestTypeCode: form.RequestTypeCode,
@@ -146,14 +212,15 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
         Title: validation.sanitized.Title,
         Description: validation.sanitized.Description,
         PriorityCode: validation.sanitized.PriorityCode,
-        RequestTypeCode: validation.sanitized.RequestTypeCode
+        RequestTypeCode: validation.sanitized.RequestTypeCode,
+        ServiceCategoryID: form.ServiceCategoryID ? Number(form.ServiceCategoryID) : null,
+        ServiceID: form.ServiceID ? Number(form.ServiceID) : null,
+        RequesterUserID: Number(form.RequesterUserID || user?.UserID || 1),
+        CategoryCode: form.CategoryCode || 'GENERAL',
+        IsMajorIncident: form.IsMajorIncident ? 1 : 0
       };
       if (!payload.BuildingID) delete payload.BuildingID;
       if (!payload.OfficeSpaceID) delete payload.OfficeSpaceID;
-      if (!payload.CategoryCode) delete payload.CategoryCode;
-      payload.ServiceID = Number(payload.ServiceID);
-      payload.RequesterUserID = Number(payload.RequesterUserID);
-      payload.IsMajorIncident = payload.IsMajorIncident ? 1 : 0;
 
       // 1. Submit Issue Request to Backend
       const res = await issueManagementApi.createIssue(payload);
@@ -192,59 +259,82 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
 
   const baseInputStyle = (hasError) => ({
     width: '100%',
-    padding: '10px 14px',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    border: hasError ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
-    borderRadius: '8px',
-    color: 'var(--text-primary)',
-    fontSize: '0.9rem',
-    outline: 'none',
     boxSizing: 'border-box'
   });
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 1000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
-      backdropFilter: 'blur(6px)'
-    }}>
-      <div className="glass-panel" style={{
-        width: '100%', maxWidth: '720px', maxHeight: '90vh', overflow: 'auto',
-        borderRadius: 'var(--border-radius-lg)', padding: '0'
-      }}>
-        {/* Header */}
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
+        backdropFilter: 'blur(12px)',
+        padding: 'clamp(8px, 2.5vw, 20px)'
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="modal-card accent-strip-brand enterprise-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-issue-title"
+        style={{
+          width: '100%', maxWidth: '750px', maxHeight: '92vh',
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          borderRadius: 'var(--border-radius-lg, 18px)', padding: '0',
+          background: 'var(--color-surface, var(--bg-secondary))',
+          boxShadow: 'var(--shadow-lg)'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header (Pinned) */}
         <div style={{
-          padding: '20px 28px',
-          borderBottom: '1px solid var(--glass-border)',
+          padding: '16px 24px',
+          borderBottom: '1px solid var(--color-border-subtle, var(--glass-border))',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'linear-gradient(135deg, rgba(47, 129, 247, 0.08), rgba(56, 163, 255, 0.04))'
+          background: 'var(--bg-tertiary)', flexShrink: 0
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--color-primary-subtle)' }}>
-              <Plus size={20} style={{ color: 'var(--color-primary)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '38px', height: '38px', borderRadius: '10px',
+              background: 'var(--accent-gradient)', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', color: '#ffffff',
+              boxShadow: 'var(--glow-accent)', flexShrink: 0
+            }}>
+              <Plus size={20} />
             </div>
             <div>
-              <h2 style={{ fontWeight: '700', fontSize: '1.2rem', letterSpacing: '-0.3px' }}>{t('issues.submitServiceRequest', 'Submit New Issue Request')}</h2>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('issues.descPlaceholder', 'Fill in details and attach supporting documents/photos')}</p>
+              <div style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--accent-primary)' }}>
+                Service Management Gateway
+              </div>
+              <h2 id="create-issue-title" style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.3px', margin: '2px 0 0', color: 'var(--text-primary)' }}>
+                {t('issues.submitServiceRequest', 'Submit New Issue Request')}
+              </h2>
             </div>
           </div>
-          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', border: '1px solid var(--glass-border)', backgroundColor: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-icon touch-target-sm"
+            style={{ borderRadius: '8px' }}
+            aria-label={t('common.close', 'Close')}
+          >
             <X size={18} />
           </button>
         </div>
 
-        {/* Body */}
-        <form onSubmit={handleSubmit} style={{ padding: '28px' }}>
-          {serverError && (
-            <div style={{ marginBottom: '18px', padding: '12px 16px', borderRadius: '8px', backgroundColor: 'var(--color-error-bg)', border: '1px solid var(--color-error-border)', color: 'var(--color-error)', fontSize: '0.85rem' }}>
-              {serverError}
-            </div>
-          )}
+        {/* Body (Scrollable Form) */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(16px, 3vw, 24px)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {serverError && (
+              <div style={{ padding: '12px 16px', borderRadius: '8px', backgroundColor: 'var(--color-error-bg)', border: '1px solid var(--color-error-border)', color: 'var(--color-error)', fontSize: '0.85rem' }}>
+                {serverError}
+              </div>
+            )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5">
             {/* Title */}
-            <div style={{ gridColumn: '1 / -1' }}>
+            <div className="sm:col-span-2">
               <FormField
                 label={t('issues.requestTitle', 'Issue Title')}
                 id="Title"
@@ -259,13 +349,13 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   value={form.Title}
                   onChange={(e) => handleFieldChange('Title', e.target.value)}
                   placeholder={t('issues.titlePlaceholder', 'e.g. AC unit in meeting room 302 not cooling properly')}
-                  style={baseInputStyle(Boolean(fieldErrors.Title))}
+                  className={`enterprise-input ${fieldErrors.Title ? 'input-error' : ''}`}
                 />
               </FormField>
             </div>
 
             {/* Description */}
-            <div style={{ gridColumn: '1 / -1' }}>
+            <div className="sm:col-span-2">
               <FormField
                 label={t('issues.descriptionDetails', 'Detailed Description')}
                 id="Description"
@@ -280,41 +370,35 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   value={form.Description}
                   onChange={(e) => handleFieldChange('Description', e.target.value)}
                   placeholder={t('issues.descPlaceholder', 'Provide a comprehensive description of the problem...')}
-                  style={{ ...baseInputStyle(Boolean(fieldErrors.Description)), resize: 'vertical' }}
+                  className={`enterprise-input ${fieldErrors.Description ? 'input-error' : ''}`}
+                  style={{ resize: 'vertical' }}
                 />
               </FormField>
             </div>
 
-            {/* Service Selection */}
+            {/* Service Category / Domain */}
             <div>
               <FormField
-                label={t('issues.serviceItem', 'Service Catalog Item')}
-                id="ServiceID"
-                required
+                label={t('issues.category', 'Service Category / Domain')}
+                id="ServiceCategoryID"
                 icon={Layers}
-                error={fieldErrors.ServiceID}
-                helpText="Select corresponding service offering."
+                error={fieldErrors.ServiceCategoryID}
+                helpText={t('issues.selectDomainHelp', 'Select operational domain or general area')}
               >
                 <select
-                  id="ServiceID"
-                  value={form.ServiceID}
-                  onChange={(e) => handleServiceSelect(e.target.value)}
-                  style={baseInputStyle(Boolean(fieldErrors.ServiceID))}
+                  id="ServiceCategoryID"
+                  value={form.ServiceCategoryID}
+                  onChange={(e) => handleCategorySelect(e.target.value)}
+                  className={`enterprise-input ${fieldErrors.ServiceCategoryID ? 'input-error' : ''}`}
                 >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- {t('issues.chooseService', 'Select Service from Catalog')} --</option>
-                  {servicesList.map((svc) => (
-                    <option key={svc.ServiceID} value={svc.ServiceID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      {svc.ServiceName} ({svc.ServiceCode || `ID #${svc.ServiceID}`})
+                  <option value="">-- {t('issues.allCategories', 'General / All Categories')} --</option>
+                  {categoriesList.map((c) => (
+                    <option key={c.ServiceCategoryID} value={c.ServiceCategoryID}>
+                      {c.CategoryName} ({c.CategoryCode})
                     </option>
                   ))}
                 </select>
               </FormField>
-              {selectedServiceMeta && (
-                <div style={{ marginTop: '8px', padding: '8px 12px', borderRadius: '6px', background: 'rgba(79, 70, 229, 0.1)', border: '1px solid rgba(79, 70, 229, 0.2)', fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                  <span><strong>Cost:</strong> {selectedServiceMeta.EstimatedCost ? `${selectedServiceMeta.EstimatedCost} ${selectedServiceMeta.CurrencyCode || 'ETB'}` : 'Standard'}</span>
-                  <span><Shield size={12} style={{ verticalAlign: 'middle', marginRight: '4px', color: '#6366f1' }} /><strong>Governance:</strong> Auto-Routed</span>
-                </div>
-              )}
             </div>
 
             {/* Request Type */}
@@ -329,37 +413,122 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   id="RequestTypeCode"
                   value={form.RequestTypeCode}
                   onChange={(e) => handleFieldChange('RequestTypeCode', e.target.value)}
-                  style={baseInputStyle(Boolean(fieldErrors.RequestTypeCode))}
+                  className={`enterprise-input ${fieldErrors.RequestTypeCode ? 'input-error' : ''}`}
                 >
-                  <option value="INCIDENT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.incident', 'Incident')}</option>
-                  <option value="MAINTENANCE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.maintenance', 'Maintenance')}</option>
-                  <option value="COMPLAINT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.complaint', 'Complaint')}</option>
-                  <option value="DISRUPTION" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.disruption', 'Disruption')}</option>
-                  <option value="SERVICE_REQUEST" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.serviceRequest', 'Service Request')}</option>
+                  <option value="INCIDENT">{t('issues.incident', 'Incident')}</option>
+                  <option value="MAINTENANCE">{t('issues.maintenance', 'Maintenance')}</option>
+                  <option value="COMPLAINT">{t('issues.complaint', 'Complaint')}</option>
+                  <option value="DISRUPTION">{t('issues.disruption', 'Disruption')}</option>
+                  <option value="SERVICE_REQUEST">{t('issues.serviceRequest', 'Service Request')}</option>
                 </select>
               </FormField>
             </div>
 
-            {/* Priority */}
-            <div>
+            {/* Specific Service Selection (Optional) */}
+            <div className="sm:col-span-2">
               <FormField
-                label={t('issues.urgencyPriority', 'Urgency & Priority')}
+                label={t('issues.serviceItemOptional', 'Specific Service Item (Optional)')}
+                id="ServiceID"
+                icon={FileText}
+                error={fieldErrors.ServiceID}
+                helpText={t('issues.serviceItemHint', 'Optional. Only select if raising a request for a specific catalog offering; leave blank for direct typed requests.')}
+              >
+                <select
+                  id="ServiceID"
+                  value={form.ServiceID}
+                  onChange={(e) => handleServiceSelect(e.target.value)}
+                  className={`enterprise-input ${fieldErrors.ServiceID ? 'input-error' : ''}`}
+                >
+                  <option value="">-- {t('issues.chooseServiceOptional', 'None / Free-form Request (No Specific Service Item)')} --</option>
+                  {servicesList
+                    .filter((s) => !form.ServiceCategoryID || String(s.ServiceCategoryID) === String(form.ServiceCategoryID))
+                    .map((svc) => (
+                      <option key={svc.ServiceID} value={svc.ServiceID}>
+                        {svc.ServiceName} ({svc.ServiceCode || `ID #${svc.ServiceID}`})
+                      </option>
+                    ))}
+                </select>
+              </FormField>
+              {selectedServiceMeta && (
+                <div style={{ marginTop: '8px', padding: '8px 12px', borderRadius: '6px', background: 'rgba(79, 70, 229, 0.1)', border: '1px solid rgba(79, 70, 229, 0.2)', fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <span><strong>Cost:</strong> {selectedServiceMeta.EstimatedCost ? `${selectedServiceMeta.EstimatedCost} ${selectedServiceMeta.CurrencyCode || 'ETB'}` : 'Standard'}</span>
+                  <span><Shield size={12} style={{ verticalAlign: 'middle', marginRight: '4px', color: '#6366f1' }} /><strong>Governance:</strong> Auto-Routed</span>
+                </div>
+              )}
+            </div>
+
+            {/* Priority Selection (Full Width 4-Tile Grid) */}
+            <div className="sm:col-span-2">
+              <FormField
+                label={t('issues.urgencyPriority', 'Urgency & SLA Priority Level')}
                 id="PriorityCode"
                 required
                 icon={Clock}
                 error={fieldErrors.PriorityCode}
               >
-                <select
-                  id="PriorityCode"
-                  value={form.PriorityCode}
-                  onChange={(e) => handleFieldChange('PriorityCode', e.target.value)}
-                  style={baseInputStyle(Boolean(fieldErrors.PriorityCode))}
-                >
-                  <option value="LOW" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityLow', 'Low')} — Routine</option>
-                  <option value="MEDIUM" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityMedium', 'Medium')} — Standard</option>
-                  <option value="HIGH" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityHigh', 'High')} — Important</option>
-                  <option value="CRITICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t('issues.priorityCritical', 'Critical')} — Emergency</option>
-                </select>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: '10px' }}>
+                  {[
+                    { code: 'LOW', label: t('issues.priorityLow', 'Low'), desc: 'Routine · 48h SLA', color: '#94a3b8', icon: Clock, badge: 'Standard' },
+                    { code: 'MEDIUM', label: t('issues.priorityMedium', 'Medium'), desc: 'Normal · 24h SLA', color: '#38bdf8', icon: Sparkles, badge: 'Normal' },
+                    { code: 'HIGH', label: t('issues.priorityHigh', 'High'), desc: 'Urgent · 8h SLA', color: '#facc15', icon: AlertCircle, badge: 'Important' },
+                    { code: 'CRITICAL', label: t('issues.priorityCritical', 'Critical'), desc: 'Emergency · 2h SLA', color: '#f87171', icon: AlertTriangle, badge: 'Emergency' }
+                  ].map(p => {
+                    const isSel = form.PriorityCode === p.code;
+                    const IconComponent = p.icon;
+                    return (
+                      <div
+                        key={p.code}
+                        onClick={() => handleFieldChange('PriorityCode', p.code)}
+                        className={`form-selection-tile ${isSel ? 'selected' : ''}`}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleFieldChange('PriorityCode', p.code)}
+                        style={{
+                          position: 'relative',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          minHeight: '85px',
+                          padding: '10px 12px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <div style={{
+                            width: '26px',
+                            height: '26px',
+                            borderRadius: '6px',
+                            background: isSel ? `${p.color}25` : 'rgba(255,255,255,0.05)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: p.color
+                          }}>
+                            <IconComponent size={15} />
+                          </div>
+                          <span style={{
+                            fontSize: '0.65rem',
+                            fontWeight: 800,
+                            padding: '2px 6px',
+                            borderRadius: '10px',
+                            background: isSel ? `${p.color}25` : 'var(--color-elevated)',
+                            color: isSel ? p.color : 'var(--color-text-secondary)',
+                            border: `1px solid ${isSel ? p.color : 'var(--color-border)'}`
+                          }}>
+                            {p.badge}
+                          </span>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: isSel ? p.color : 'var(--color-text-main)' }}>
+                            {p.label}
+                          </div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                            {p.desc}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </FormField>
             </div>
 
@@ -378,7 +547,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   value={form.CategoryCode}
                   onChange={(e) => handleFieldChange('CategoryCode', e.target.value.toUpperCase())}
                   placeholder="e.g. FACILITIES, IT, SECURITY"
-                  style={baseInputStyle(Boolean(fieldErrors.CategoryCode))}
+                  className={`enterprise-input ${fieldErrors.CategoryCode ? 'input-error' : ''}`}
                 />
               </FormField>
             </div>
@@ -398,7 +567,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                   min="1"
                   value={form.RequesterUserID}
                   onChange={(e) => handleFieldChange('RequesterUserID', e.target.value)}
-                  style={baseInputStyle(Boolean(fieldErrors.RequesterUserID))}
+                  className={`enterprise-input ${fieldErrors.RequesterUserID ? 'input-error' : ''}`}
                 />
               </FormField>
             </div>
@@ -418,7 +587,7 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
             </div>
 
             {/* ── File & Document Attachment Section ── */}
-            <div style={{ gridColumn: '1 / -1', borderTop: '1px dashed var(--glass-border)', paddingTop: '16px', marginTop: '6px' }}>
+            <div className="sm:col-span-2" style={{ borderTop: '1px dashed var(--color-border)', paddingTop: '16px', marginTop: '6px' }}>
               <FormField
                 label={t('issues.attachFiles', 'Attach Supporting Files & Documents')}
                 id="attachments"
@@ -427,13 +596,14 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                 helpText="Upload relevant error logs, photos, or diagnostic files (up to 5 files, 10MB each)."
               >
                 <div
+                  className={`enterprise-dropzone ${isDragging ? 'dragover' : ''}`}
                   onClick={() => fileInputRef.current?.click()}
-                  style={{
-                    border: fieldErrors.Attachments ? '2px dashed var(--color-danger, #ef4444)' : '2px dashed var(--glass-border)',
-                    borderRadius: '12px', padding: '20px',
-                    textAlign: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.02)',
-                    transition: 'all 0.2s'
-                  }}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && fileInputRef.current?.click()}
                 >
                   <input
                     type="file"
@@ -442,25 +612,76 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
                     onChange={handleFileChange}
                     style={{ display: 'none' }}
                   />
-                  <Paperclip size={24} color="var(--accent-primary)" style={{ marginBottom: '6px' }} />
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>{t('issues.dragDropBrowse', 'Click to browse or attach files/photos')}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  <div className="dropzone-icon" style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    background: 'rgba(37, 99, 235, 0.1)',
+                    color: 'var(--color-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 8px'
+                  }}>
+                    <Upload size={18} />
+                  </div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                    {t('issues.dragDropBrowse', 'Click to browse or drop files here')}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                     {t('issues.fileSupportHint', 'Images, PDFs, Word, Excel, CSV (Saved directly to Document Repository)')}
                   </div>
                 </div>
               </FormField>
 
               {attachedFiles.length > 0 && (
-                <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '8px' }}>
                   {attachedFiles.map((file, idx) => (
-                    <div key={idx} style={{ padding: '8px 12px', borderRadius: '8px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <FileText size={16} color="#818cf8" />
-                        <span style={{ fontWeight: 600 }}>{file.name}</span>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>({(file.size / 1024).toFixed(1)} KB)</span>
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        background: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: '0.82rem',
+                        gap: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.03)'
+                      }}
+                      className="hover:border-blue-400"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                        <FileText size={15} color="var(--color-primary)" style={{ flexShrink: 0 }} />
+                        <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={file.name}>
+                          {file.name}
+                        </span>
+                        <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.72rem', flexShrink: 0 }}>
+                          ({(file.size / 1024).toFixed(1)} KB)
+                        </span>
                       </div>
-                      <button type="button" onClick={() => handleRemoveFile(idx)} style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', padding: '2px' }}>
-                        <Trash2 size={14} />
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); handleRemoveFile(idx); }}
+                        style={{
+                          background: 'rgba(239, 68, 68, 0.1)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          color: '#f87171',
+                          width: '22px',
+                          height: '22px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          flexShrink: 0
+                        }}
+                        title="Remove file"
+                        className="hover:bg-red-500 hover:text-white"
+                      >
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   ))}
@@ -468,13 +689,34 @@ export const CreateIssueModal = ({ isOpen, onClose, onCreated, services: propSer
               )}
             </div>
           </div>
+        </div>
 
-          {/* Footer */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--glass-border)' }}>
-            <button type="button" onClick={onClose} style={{ padding: '10px 24px', borderRadius: '8px', border: '1px solid var(--glass-border)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: '600' }}>
+        {/* Footer (Pinned) */}
+        <div style={{
+            padding: '16px 24px',
+            borderTop: '1px solid var(--color-border-subtle, var(--glass-border))',
+            background: 'var(--bg-tertiary)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            gap: '12px',
+            flexShrink: 0
+          }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary touch-target-sm"
+              disabled={submitting}
+            >
               {t('common.cancel', 'Cancel')}
             </button>
-            <button type="submit" className="btn-primary" disabled={submitting} style={{ padding: '10px 28px' }}>
+            <button
+              type="submit"
+              className="btn btn-primary touch-target-sm"
+              disabled={submitting}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+              <Plus size={16} />
               {submitting ? t('issues.submitting', 'Submitting & Uploading Files...') : t('issues.submitServiceRequest', 'Submit Issue Request')}
             </button>
           </div>

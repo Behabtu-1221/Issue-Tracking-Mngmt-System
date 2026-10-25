@@ -9,7 +9,7 @@ import notificationApi from '../api/notificationApi';
 const glassCard = {
   background: 'var(--glass-bg)',
   border: '1px solid var(--glass-border)',
-  borderRadius: '20px',
+  borderRadius: 'var(--border-radius-lg, 18px)',
   backdropFilter: 'blur(16px)',
   padding: '24px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
@@ -460,9 +460,11 @@ export default function NotifDeliveryLogTab() {
               </div>
               <button
                 onClick={() => setSelectedLog(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 

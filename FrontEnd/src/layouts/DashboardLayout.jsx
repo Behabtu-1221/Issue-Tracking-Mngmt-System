@@ -69,7 +69,9 @@ import { usePermissionContext } from '../modules/role-permission-management/cont
 import { useAuth } from '../modules/authentication/contexts/AuthContext';
 import { notificationApi } from '../modules/notification/api/notificationApi';
 import NotificationDetailModal from '../modules/notification/components/NotificationDetailModal';
+import { playSoundChime } from '../modules/notification/components/NotifPreferencesTab';
 import { useTranslation, LanguageSelector } from '../i18n';
+import NeuronLogo from '../components/common/NeuronLogo';
 
 export default function DashboardLayout({ children, activeMenu = 'parks', onNavigate }) {
   const { t, isRTL } = useTranslation();
@@ -79,6 +81,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
   const currentSearch = location.search;
   const { user, logout } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -95,19 +98,42 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     setTheme(nextTheme);
     localStorage.setItem('theme', nextTheme);
     document.documentElement.setAttribute('data-theme', nextTheme);
+    document.documentElement.classList.toggle('dark', nextTheme === 'dark');
   };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
+  // Auto-close mobile drawer on location change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Global Escape key listener for accessible dismissal (WCAG 2.1.1 Keyboard)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (mobileMenuOpen) setMobileMenuOpen(false);
+        if (showNotifications) setShowNotifications(false);
+        if (showProfileMenu) setShowProfileMenu(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen, showNotifications, showProfileMenu]);
+
   const handleNav = (target) => {
+    setMobileMenuOpen(false);
     if (onNavigate) {
       onNavigate(target.startsWith('/') ? target.slice(1) : target);
     } else {
       navigate(target.startsWith('/') ? target : `/${target}`);
     }
   };
+
+  const prevUnreadCountRef = useRef(null);
 
   const fetchNotifications = async () => {
     try {
@@ -117,8 +143,22 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       ]);
       const rawList = inboxRes.data?.data || inboxRes.data?.notifications || (Array.isArray(inboxRes.data) ? inboxRes.data : []);
       setNotifications(Array.isArray(rawList) ? rawList : []);
-      const unread = countRes.data?.data?.unreadCount ?? countRes.data?.unreadCount ?? 0;
-      setUnreadCount(Number(unread));
+      const unread = Number(countRes.data?.data?.unreadCount ?? countRes.data?.unreadCount ?? 0);
+
+      // Play audio ringtone chime if new notification arrives and user has sound enabled
+      if (prevUnreadCountRef.current !== null && unread > prevUnreadCountRef.current) {
+        try {
+          const stored = localStorage.getItem('itms_notification_preferences');
+          const prefs = stored ? JSON.parse(stored) : { soundAlerts: true, soundProfile: 'aurora', soundVolume: 0.8 };
+          if (prefs.soundAlerts !== false && !prefs.quietHours) {
+            playSoundChime(prefs.soundProfile || 'aurora', prefs.soundVolume ?? 0.8);
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+      prevUnreadCountRef.current = unread;
+      setUnreadCount(unread);
     } catch (err) {
       console.warn('Failed to fetch real-time notifications:', err);
     }
@@ -152,6 +192,16 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     }
   };
 
+  const handleMarkSingleUnread = async (userNotificationId) => {
+    try {
+      await notificationApi.markAsUnread(userNotificationId);
+      setNotifications(prev => prev.map(n => n.UserNotificationID === userNotificationId ? { ...n, IsRead: 0 } : n));
+      setUnreadCount(prev => prev + 1);
+    } catch (err) {
+      console.warn('Failed to mark notification unread:', err);
+    }
+  };
+
   const handleNotificationClick = (n) => {
     if (!n.IsRead) {
       handleMarkSingleRead(n.UserNotificationID);
@@ -170,12 +220,14 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     const role = (user?.roleCode || user?.RoleCode || user?.userTypeCode || '').toUpperCase();
     const param = resourceId ? `?id=${resourceId}` : '';
 
-    if (type.startsWith('APPROVAL') || table === 'Approval') {
+    if (type.startsWith('APPROVAL') || type === 'HIGHER_APPROVAL_REQUIRED' || table === 'Approval') {
       handleNav(`approvals/queue${param}`);
-    } else if (type === 'ISSUE_ASSIGNED' && (role === 'TECHNICIAN' || user?.isTechnician)) {
-      handleNav(resourceId ? `technician/request/${resourceId}` : 'technician/assigned');
-    } else if (type === 'APPROVAL_COMPLETED' && (role === 'DISPATCHER' || role === 'DEPARTMENT_MANAGER')) {
+    } else if (type === 'ISSUE_APPROVED_FOR_DISPATCH' || (type === 'APPROVAL_COMPLETED' && (role.includes('DISPATCH') || role.includes('MANAGER')))) {
       handleNav(`dispatch/queue${param}`);
+    } else if ((type === 'ISSUE_ASSIGNED' || type === 'ASSIGNMENT_REASSIGNED') && (role === 'TECHNICIAN' || user?.isTechnician)) {
+      handleNav(resourceId ? `technician/request/${resourceId}` : 'technician/assigned');
+    } else if (type === 'ISSUE_RESOLVED' && (role === 'EMPLOYEE' || role === 'TENANT_REPRESENTATIVE')) {
+      handleNav(`issues/my-requests${param}`);
     } else if (table === 'SLAClock' || type.startsWith('SLA')) {
       handleNav('sla/clocks');
     } else if (role === 'EMPLOYEE' || role === 'TENANT_REPRESENTATIVE') {
@@ -200,6 +252,9 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
   const getNotifIcon = (typeCode = '') => {
     if (typeCode.startsWith('APPROVAL_REQUIRED') || typeCode === 'HIGHER_APPROVAL_REQUIRED') {
       return <Clock size={16} color="#f59e0b" />;
+    }
+    if (typeCode === 'ISSUE_APPROVED_FOR_DISPATCH') {
+      return <Wrench size={16} color="#0ea5e9" />;
     }
     if (typeCode === 'APPROVAL_COMPLETED' || typeCode === 'ISSUE_RESOLVED' || typeCode === 'DEPARTMENT_APPROVED') {
       return <CheckCircle2 size={16} color="#10b981" />;
@@ -258,7 +313,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
   );
 
   const isEmployeeRole = !isTechnicianRole && !isManagerRole && !isTenantRepRole && (
-    (activeRoleCode === 'EMPLOYEE') ||
+    (activeRoleCode?.toUpperCase() === 'EMPLOYEE') ||
     (!isParkAdmin && !hasPermission('Department.Read') && !hasPermission('Building.Read') && !hasPermission('Issue.Assign') && !hasPermission('Issue.Approve'))
   );
 
@@ -293,7 +348,6 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     icon: Bell,
     children: [
       { id: 'notifications/inbox', tabId: 'inbox', label: 'Inbox & Alerts', icon: Inbox },
-      { id: 'notifications/preferences', tabId: 'preferences', label: 'Delivery Preferences', icon: Sliders },
       { id: 'notifications/reminders', tabId: 'reminders', label: 'Automated Reminders', icon: Clock }
     ]
   };
@@ -305,7 +359,6 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     children: [
       { id: 'notifications/dashboard', tabId: 'dashboard', label: 'Alerts Overview', icon: BarChart2 },
       { id: 'notifications/inbox', tabId: 'inbox', label: 'User Inbox & Feeds', icon: Inbox },
-      { id: 'notifications/preferences', tabId: 'preferences', label: 'Delivery Preferences', icon: Sliders },
       { id: 'notifications/reminders', tabId: 'reminders', label: 'Automated Reminders', icon: Clock },
       { id: 'notifications/templates', tabId: 'templates', label: 'Notification Layouts', icon: BookOpen, permission: 'Notification.Manage' },
       { id: 'notifications/log', tabId: 'log', label: 'Delivery Audit Log', icon: History, permission: 'Notification.Manage' }
@@ -326,7 +379,6 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       ]
     },
     staffCommunicationMenuItem,
-    { id: 'issues/known', label: 'Knowledge Base', icon: BookOpen },
     userNotificationMenuItem,
     { id: 'profile', label: 'Profile', icon: UserCircle }
   ];
@@ -340,10 +392,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       { id: 'services/dashboard', tabId: 'dashboard', label: 'Catalog Overview', icon: BarChart2, permission: 'Service.Read' },
       { id: 'services/directory', tabId: 'directory', label: 'Service Directory', icon: Layers, permission: 'Service.Read' },
       { id: 'services/categories', tabId: 'categories', label: 'Service Categories', icon: FolderKanban, permission: 'Service.Read' },
-      { id: 'services/category-mappings', tabId: 'category-mappings', label: 'Category Mappings', icon: Tag, permission: 'Service.Read' },
-      { id: 'services/pricing', tabId: 'pricing', label: 'Pricing & Billing', icon: DollarSign, permission: 'Service.Read' },
-      { id: 'services/requirements', tabId: 'requirements', label: 'Form & Requirements', icon: FileText, permission: 'Service.Read' },
-      { id: 'services/governance', tabId: 'governance', label: 'Governance & SLA', icon: ShieldCheck, permission: 'Service.Read' }
+      { id: 'services/category-mappings', tabId: 'category-mappings', label: 'Category Mappings', icon: Tag, permission: 'Service.Update' }
     ]
   };
 
@@ -353,28 +402,62 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     icon: BookOpen,
     permission: 'Service.Read',
     children: [
-      { id: 'services/dashboard', tabId: 'dashboard', label: 'Catalog Overview', icon: BarChart2, permission: 'Service.Read' },
       { id: 'services/directory', tabId: 'directory', label: 'Service Directory', icon: Layers, permission: 'Service.Read' }
     ]
   };
 
   const employeeMenuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    employeeServiceCatalogItem,
     {
-      id: 'issues',
-      label: 'My Requests',
-      icon: LifeBuoy,
-      children: [
-        { id: 'issues/create', tabId: 'create', label: 'Create Request', icon: Plus },
-        { id: 'issues/my-requests', tabId: 'my-requests', label: 'My Requests', icon: ListChecks },
-        { id: 'issues/history', tabId: 'history', label: 'Request History', icon: History }
-      ]
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard
     },
-    standardCommunicationMenuItem,
-    { id: 'issues/known', label: 'Knowledge Base', icon: BookOpen },
-    userNotificationMenuItem,
-    { id: 'profile', label: 'Profile', icon: UserCircle }
+    {
+      id: 'services/directory',
+      label: 'Service Directory',
+      icon: Layers,
+      permission: 'Request.Read'
+    },
+    {
+      id: 'issues/create',
+      label: 'Create Request',
+      icon: Plus,
+      permission: 'Request.Create'
+    },
+    {
+      id: 'issues/my-requests',
+      label: 'My Requests',
+      icon: ListChecks,
+      permission: 'Request.Read'
+    },
+    {
+      id: 'issues/history',
+      label: 'Request History',
+      icon: History,
+      permission: 'Request.Read'
+    },
+    {
+      id: 'communication/discussions',
+      label: 'Request Discussions',
+      icon: MessageSquare,
+      permission: 'Communication.Read'
+    },
+    {
+      id: 'communication/announcements',
+      label: 'Announcements',
+      icon: Megaphone,
+      permission: 'Communication.Read'
+    },
+    {
+      id: 'notifications/inbox',
+      label: 'Inbox & Alerts',
+      icon: Inbox
+    },
+    {
+      id: 'notifications/reminders',
+      label: 'Automated Reminders',
+      icon: Clock
+    }
   ];
 
   const managerMenuItems = [
@@ -414,7 +497,6 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
         { id: 'organization/assignments', tabId: 'users', label: 'Department Users', icon: Users }
       ]
     },
-    { id: 'issues/known', label: 'Knowledge Base', icon: BookOpen },
     { id: 'sla/dashboard', label: 'Operational Reports', icon: BarChart2 },
     userNotificationMenuItem,
     { id: 'profile', label: 'Profile', icon: UserCircle }
@@ -430,8 +512,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
         { id: 'issues/create', tabId: 'create', label: 'Create Request', icon: Plus },
         { id: 'issues/tracker', tabId: 'tracker', label: 'Company Requests Tracker', icon: ListChecks },
         { id: 'issues/my-requests', tabId: 'my-requests', label: 'My Requests', icon: CheckSquare },
-        { id: 'issues/history', tabId: 'history', label: 'Request History', icon: History },
-        { id: 'issues/known', tabId: 'known', label: 'Knowledge Base & FAQs', icon: BookOpen }
+        { id: 'issues/history', tabId: 'history', label: 'Request History', icon: History }
       ]
     },
     {
@@ -503,8 +584,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       children: [
         { id: 'issues/dashboard', tabId: 'dashboard', label: 'Issue Overview ', icon: BarChart2, permission: 'Report.View' },
         { id: 'issues/tracker', tabId: 'tracker', label: 'Issue Requests Tracker', icon: ListChecks, permission: 'Issue.Read.Own' },
-        { id: 'issues/status-flow', tabId: 'status-flow', label: 'Status Lifecycle', icon: RefreshCw, permission: 'Issue.Read.Company' },
-        { id: 'issues/known', tabId: 'known', label: 'Known Issues & KB', icon: BookOpen, permission: 'Knowledge.Read' }
+        { id: 'issues/status-flow', tabId: 'status-flow', label: 'Status Lifecycle', icon: RefreshCw, permission: 'Issue.Read.Company' }
       ]
     },
     {
@@ -682,9 +762,6 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       'services/directory': 'nav.serviceDirectory',
       'services/categories': 'nav.serviceCategories',
       'services/category-mappings': 'nav.serviceCategoryMapping',
-      'services/pricing': 'nav.pricingBilling',
-      'services/requirements': 'nav.serviceRequirements',
-      'services/governance': 'nav.serviceGovernance',
       'issues': 'nav.issues',
       'issues/dashboard': 'nav.issuesOverview',
       'issues/tracker': 'nav.issuesTracker',
@@ -692,7 +769,6 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       'issues/my-requests': 'nav.myRequests',
       'issues/history': 'nav.requestHistory',
       'issues/status-flow': 'nav.statusFlow',
-      'issues/known': 'nav.knownIssues',
       'approvals': 'nav.approvals',
       'approvals/dashboard': 'nav.approvalOverview',
       'approvals/queue': 'nav.approvalQueue',
@@ -787,9 +863,6 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       'Pending': 'issues.statusPending',
       'Resolved': 'issues.statusResolved',
       'Resolved (Work History)': 'nav.workHistory',
-      'Knowledge Base': 'nav.knownIssues',
-      'Knowledge Base & FAQs': 'nav.knownIssuesFaq',
-      'Known Issues & KB': 'nav.knownIssues',
       'My Requests': 'nav.myRequests',
       'Create Request': 'nav.createRequest',
       'Request History': 'nav.requestHistory',
@@ -855,10 +928,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       'Catalog Overview': 'nav.servicesOverview',
       'Service Directory': 'nav.serviceDirectory',
       'Service Categories': 'nav.serviceCategories',
-      'Category Mappings': 'nav.serviceCategoryMapping',
-      'Pricing & Billing': 'nav.pricingBilling',
-      'Form & Requirements': 'nav.serviceRequirements',
-      'Governance & SLA': 'nav.serviceGovernance'
+      'Category Mappings': 'nav.serviceCategoryMapping'
     };
 
     const directKey = keyMap[rawId] || keyMap[cleanId] || labelMap[item.label?.trim()];
@@ -919,19 +989,39 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', background: 'var(--bg-primary)' }}>
+      {/* Mobile Backdrop Overlay */}
+      {mobileMenuOpen && (
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          className="mobile-backdrop"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            zIndex: 49
+          }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar */}
-      <aside style={{
-        width: sidebarCollapsed ? '72px' : '260px',
-        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        background: 'var(--sidebar-bg)',
-        borderRight: '1px solid var(--sidebar-border)',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        flexShrink: 0,
-        overflow: 'hidden',
-        zIndex: 10
-      }}>
+      <aside
+        className={`app-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}
+        style={{
+          width: sidebarCollapsed ? '72px' : '260px',
+          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          background: 'var(--sidebar-bg)',
+          borderRight: '1px solid var(--sidebar-border)',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          flexShrink: 0,
+          overflow: 'hidden',
+          zIndex: 50
+        }}
+      >
         {/* Brand Logo & Menu Toggle */}
         <div style={{
           height: '70px',
@@ -944,74 +1034,57 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
         }}>
           {!sidebarCollapsed ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '12px',
-                  background: 'var(--accent-gradient)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 14px rgba(47, 129, 247, 0.35)',
-                  flexShrink: 0
-                }}>
-                  <img
-                    src="/logoitms.png"
-                    alt="ITMS Logo"
-                    style={{ width: '26px', height: '26px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-                  />
-                </div>
-                <span style={{
-                  fontFamily: 'Outfit, sans-serif',
-                  fontWeight: '800',
-                  fontSize: '1.2rem',
-                  letterSpacing: '-0.01em',
-                  color: 'var(--text-primary)'
-                }}>
-                  ITMS
-                </span>
-              </div>
+              <NeuronLogo size={40} iconSize={26} showText={true} />
 
-              <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                title={t('nav.toggleSidebar', 'Toggle Sidebar Menu')}
-                style={{
-                  background: 'var(--bg-tertiary)',
-                  border: '1px solid var(--sidebar-border)',
-                  color: 'var(--text-primary)',
-                  borderRadius: '8px',
-                  padding: '7px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <Menu size={18} />
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-drawer-close-btn touch-target"
+                  title={t('common.close', 'Close Menu')}
+                  aria-label={t('common.close', 'Close Menu')}
+                  style={{
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--sidebar-border)',
+                    color: 'var(--text-primary)',
+                    borderRadius: '8px',
+                    padding: '8px',
+                    cursor: 'pointer',
+                    display: 'none',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <X size={20} />
+                </button>
+                <button
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  className="desktop-sidebar-toggle-btn"
+                  title={t('nav.toggleSidebar', 'Toggle Sidebar Menu')}
+                  style={{
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--sidebar-border)',
+                    color: 'var(--text-primary)',
+                    borderRadius: '8px',
+                    padding: '7px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Menu size={18} />
+                </button>
+              </div>
             </>
           ) : (
-            <button
+            <div
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               title={t('nav.expandSidebar', 'Expand Sidebar Menu')}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                background: 'var(--accent-gradient)',
-                border: 'none',
-                color: '#ffffff',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(47, 129, 247, 0.35)'
-              }}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <Menu size={20} />
-            </button>
+              <NeuronLogo size={40} iconSize={26} showText={false} collapsed={true} />
+            </div>
           )}
         </div>
 
@@ -1044,13 +1117,53 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
             };
 
             const isChildActive = hasChildren && item.children.some(child => checkChildActive(child));
-            const isParentActive = activeMenu === item.id || currentPath.endsWith(`/${item.id}`) || isChildActive;
+            
+            const checkDirectActive = () => {
+              if (activeMenu === item.id) return true;
+              if (item.id === 'dashboard' && (currentPath === '/' || currentPath === '' || currentPath === '/dashboard')) return true;
+              if (item.id.includes('?')) {
+                const [iPath, iQuery] = item.id.split('?');
+                const pathMatches = currentPath.endsWith('/' + iPath) || currentPath === '/' + iPath;
+                const queryMatches = currentSearch.includes(iQuery);
+                return pathMatches && queryMatches;
+              }
+              const cleanId = item.id.startsWith('/') ? item.id : '/' + item.id;
+              return currentPath === cleanId || currentPath.endsWith(cleanId);
+            };
+
+            const isParentActive = checkDirectActive() || isChildActive;
 
             const isSearching = searchQuery.trim().length > 0;
             const isExpanded = isSearching ? true : !!expandedItems[item.id];
 
             return (
-              <div key={item.id} style={{ marginBottom: '6px' }}>
+              <div key={item.id} style={{ marginBottom: '4px' }}>
+                {/* Section Header for direct flat navigation items */}
+                {item.sectionHeader && (
+                  !sidebarCollapsed ? (
+                    <div style={{
+                      fontSize: '0.67rem',
+                      fontWeight: '800',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-muted, #94a3b8)',
+                      padding: '12px 12px 6px 12px',
+                      userSelect: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span>{item.sectionHeader}</span>
+                    </div>
+                  ) : (
+                    <div style={{
+                      height: '1px',
+                      background: 'var(--sidebar-border, rgba(255, 255, 255, 0.08))',
+                      margin: '8px 10px'
+                    }} />
+                  )
+                )}
+
                 {/* Parent Item Button */}
                 <button
                   onClick={(e) => {
@@ -1066,14 +1179,14 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   className={`sidebar-parent-btn ${isParentActive ? 'active' : ''} ${isParentActive && !isChildActive ? 'active-solid' : isChildActive ? 'active-tint' : ''}`}
                   style={{
                     justifyContent: sidebarCollapsed ? 'center' : 'space-between',
-                    fontWeight: '800'
+                    fontWeight: isParentActive ? '800' : '700'
                   }}
                   title={sidebarCollapsed ? getLocalizedLabel(item) : undefined}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Icon size={18} color={isParentActive ? '#ffffff' : 'var(--color-primary)'} />
                     {!sidebarCollapsed && (
-                      <span style={{ fontWeight: '800', color: isParentActive && !isChildActive ? '#ffffff' : 'var(--text-primary)', fontSize: '0.9rem' }}>
+                      <span style={{ fontWeight: isParentActive && !isChildActive ? '800' : '700', color: isParentActive && !isChildActive ? '#ffffff' : 'var(--text-primary)', fontSize: '0.88rem' }}>
                         {getLocalizedLabel(item)}
                       </span>
                     )}
@@ -1143,26 +1256,34 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
       {/* Main Content Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100%', overflow: 'hidden' }}>
         {/* Top Navbar */}
-        <header style={{
-          height: '70px',
-          borderBottom: '1px solid var(--glass-border)',
-          background: theme === 'dark' ? 'rgba(23, 27, 33, 0.88)' : 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(12px)',
+        <header className="top-navbar px-3 sm:px-6" style={{
+          height: '64px',
+          borderBottom: '1px solid var(--color-border)',
+          background: theme === 'dark' ? 'rgba(21, 26, 34, 0.88)' : 'rgba(255, 255, 255, 0.88)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 32px',
           position: 'sticky',
           top: 0,
-          zIndex: 20
+          zIndex: 30,
+          boxShadow: theme === 'dark' ? '0 4px 20px -2px rgba(0, 0, 0, 0.4)' : '0 2px 12px -2px rgba(15, 23, 42, 0.05)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <Search size={16} style={{ position: 'absolute', left: '14px', color: 'var(--text-muted)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
+            {/* Mobile Navigation Toggle Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="mobile-nav-toggle navbar-icon-btn"
+              title={t('nav.toggleSidebar', 'Toggle Navigation Menu')}
+              aria-label={t('nav.toggleSidebar', 'Toggle Navigation Menu')}
+            >
+              <Menu size={18} />
+            </button>
+
+            {/* Global Search Input */}
+            <div className="navbar-search-wrapper">
+              <Search size={15} style={{ position: 'absolute', left: '12px', color: 'var(--color-text-muted)', pointerEvents: 'none', transition: 'color 0.2s' }} />
               <input
                 type="text"
                 placeholder={t('common.searchPlaceholder', 'Global search across platform...')}
@@ -1173,18 +1294,11 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                     setSearchQuery('');
                   }
                 }}
-                style={{
-                  padding: searchQuery ? '8px 36px 8px 40px' : '8px 16px 8px 40px',
-                  borderRadius: 'var(--border-radius-sm)',
-                  background: 'var(--bg-tertiary)',
-                  border: '1px solid var(--glass-border)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.85rem',
-                  width: '280px',
-                  outline: 'none',
-                  transition: 'all 0.2s ease'
-                }}
+                className="header-search-input navbar-search-input"
               />
+              {!searchQuery && (
+                <kbd className="search-shortcut-badge" title="Press / to search">/</kbd>
+              )}
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
@@ -1192,21 +1306,22 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   style={{
                     position: 'absolute',
                     right: '10px',
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    background: 'var(--color-surface)',
                     border: 'none',
-                    color: 'var(--text-secondary)',
+                    color: 'var(--color-text-secondary)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '3px',
+                    width: '20px',
+                    height: '20px',
                     borderRadius: '50%',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.15s ease'
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-text)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.transform = 'scale(1.0)'; }}
                 >
-                  <X size={14} />
+                  <X size={12} />
                 </button>
               )}
             </div>
@@ -1219,24 +1334,15 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
             {/* Theme Toggle Button (Dark / Bright) */}
             <button
               onClick={toggleTheme}
-              title={theme === 'dark' ? t('theme.switchToLight', 'Switch to Bright/Light Theme') : t('theme.switchToDark', 'Switch to Dark Theme')}
-              style={{
-                padding: '10px',
-                borderRadius: '50%',
-                background: 'var(--bg-tertiary)',
-                border: '1px solid var(--sidebar-border)',
-                color: theme === 'dark' ? 'var(--color-warning)' : 'var(--color-primary)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: theme === 'dark' ? '0 0 12px rgba(242, 176, 30, 0.25)' : '0 0 12px rgba(47, 129, 247, 0.25)'
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1.0)'; }}
+              title={theme === 'dark' ? t('theme.switchToLight', 'Dark Theme Active • Click to switch to Light Theme') : t('theme.switchToDark', 'Light Theme Active • Click to switch to Dark Theme')}
+              aria-label={theme === 'dark' ? t('theme.switchToLight', 'Dark Theme Active • Click to switch to Light Theme') : t('theme.switchToDark', 'Light Theme Active • Click to switch to Dark Theme')}
+              className={`navbar-icon-btn navbar-theme-btn ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}
             >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === 'dark' ? (
+                <Moon size={18} color="var(--color-primary, #60a5fa)" />
+              ) : (
+                <Sun size={18} color="#f59e0b" />
+              )}
             </button>
 
             {/* Notification Button & Drawer */}
@@ -1244,41 +1350,13 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 title={t('notifications.title', 'Notifications')}
-                style={{
-                  padding: '10px',
-                  borderRadius: '50%',
-                  background: 'var(--bg-tertiary)',
-                  border: '1px solid var(--glass-border)',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.3s'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1.0)'; }}
+                aria-label={t('notifications.title', 'Notifications')}
+                className={`navbar-icon-btn navbar-notif-btn ${showNotifications ? 'notif-open' : ''}`}
               >
                 <Bell size={18} />
                 {unreadCount > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    top: '-2px',
-                    right: '-2px',
-                    background: 'var(--color-error)',
-                    color: '#fff',
-                    fontSize: '10px',
-                    fontWeight: '800',
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 0 8px rgba(229, 72, 77, 0.5)'
-                  }}>
-                    {unreadCount}
+                  <span className="navbar-notif-badge">
+                    {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
               </button>
@@ -1289,7 +1367,8 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                   position: 'absolute',
                   top: '50px',
                   right: 0,
-                  width: '380px',
+                  width: 'min(380px, calc(100vw - 20px))',
+                  maxHeight: 'calc(100vh - 70px)',
                   background: 'var(--color-elevated)',
                   border: '1px solid var(--color-border)',
                   borderRadius: '16px',
@@ -1388,76 +1467,92 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         <div>{notifFilter === 'unread' ? t('notifications.noUnread', 'No unread notifications') : t('notifications.noNotifications', 'No notifications yet')}</div>
                       </div>
                     ) : notifications
-                        .filter(n => notifFilter === 'all' || !n.IsRead)
-                        .map((n) => {
-                          const isUnread = !n.IsRead;
-                          return (
-                            <div
-                              key={n.UserNotificationID}
-                              onClick={() => handleNotificationClick(n)}
-                              style={{
-                                padding: '12px 14px',
-                                borderRadius: '10px',
-                                marginBottom: '4px',
-                                background: isUnread ? 'var(--bg-tertiary)' : 'transparent',
-                                borderLeft: isUnread ? '3px solid var(--accent-primary)' : '3px solid transparent',
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                justifyContent: 'space-between',
-                                gap: '10px',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s'
-                              }}
-                              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
-                              onMouseLeave={(e) => { if (!isUnread) e.currentTarget.style.background = 'transparent'; }}
-                            >
-                              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flex: 1 }}>
-                                <div style={{ marginTop: '2px' }}>
-                                  {getNotifIcon(n.TypeCode)}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginBottom: '2px' }}>
+                      .filter(n => notifFilter === 'all' || !n.IsRead)
+                      .map((n) => {
+                        const isUnread = !n.IsRead;
+                        return (
+                          <div
+                            key={n.UserNotificationID}
+                            onClick={() => handleNotificationClick(n)}
+                            style={{
+                              padding: '12px 14px',
+                              borderRadius: '10px',
+                              marginBottom: '4px',
+                              background: isUnread ? 'var(--bg-tertiary)' : 'transparent',
+                              borderLeft: isUnread ? '3px solid var(--accent-primary)' : '3px solid transparent',
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              justifyContent: 'space-between',
+                              gap: '10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
+                            onMouseLeave={(e) => { if (!isUnread) e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flex: 1 }}>
+                              <div style={{ marginTop: '2px' }}>
+                                {getNotifIcon(n.TypeCode)}
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginBottom: '2px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <span style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: isUnread ? 700 : 500 }}>
                                       {n.Title}
                                     </span>
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '10px', whiteSpace: 'nowrap' }}>
-                                      {formatRelativeTime(n.CreatedDate || n.NotificationDate)}
-                                    </span>
+                                    {n.PriorityCode && (
+                                      <span style={{
+                                        fontSize: '9px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px', textTransform: 'uppercase',
+                                        background: n.PriorityCode === 'CRITICAL' ? 'rgba(239, 68, 68, 0.18)' : n.PriorityCode === 'HIGH' ? 'rgba(245, 158, 11, 0.18)' : 'rgba(59, 130, 246, 0.18)',
+                                        color: n.PriorityCode === 'CRITICAL' ? '#ef4444' : n.PriorityCode === 'HIGH' ? '#f59e0b' : '#3b82f6'
+                                      }}>
+                                        {n.PriorityCode}
+                                      </span>
+                                    )}
                                   </div>
-                                  <p style={{ margin: '2px 0 4px', color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
-                                    {n.MessageText}
-                                  </p>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <span style={{ fontSize: '11px', color: 'var(--accent-primary)', fontWeight: 600 }}>
-                                      {t('notifications.viewDetails', 'View Details →')}
+                                  <span style={{ color: 'var(--text-muted)', fontSize: '10px', whiteSpace: 'nowrap' }}>
+                                    {formatRelativeTime(n.CreatedDate || n.NotificationDate)}
+                                  </span>
+                                </div>
+                                <p style={{ margin: '2px 0 4px', color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4 }}>
+                                  {n.MessageText}
+                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginTop: '4px' }}>
+                                  {n.RequestNumber && (
+                                    <span style={{ fontSize: '10px', color: 'var(--accent-primary)', fontWeight: 700 }}>
+                                      #{n.RequestNumber}
                                     </span>
-                                  </div>
+                                  )}
+                                  <span style={{ fontSize: '11px', color: 'var(--accent-primary)', fontWeight: 600 }}>
+                                    {t('notifications.viewDetails', 'View Details →')}
+                                  </span>
                                 </div>
                               </div>
-
-                              {isUnread && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleMarkSingleRead(n.UserNotificationID);
-                                  }}
-                                  title={t('notifications.markAllRead', 'Mark as read')}
-                                  style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: 'var(--text-muted)',
-                                    cursor: 'pointer',
-                                    padding: '4px',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                  }}
-                                >
-                                  <Check size={14} color="var(--accent-primary)" />
-                                </button>
-                              )}
                             </div>
-                          );
-                        })}
+
+                            {isUnread && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMarkSingleRead(n.UserNotificationID);
+                                }}
+                                title={t('notifications.markAllRead', 'Mark as read')}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: 'var(--text-muted)',
+                                  cursor: 'pointer',
+                                  padding: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center'
+                                }}
+                              >
+                                <Check size={14} color="var(--accent-primary)" />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
                   </div>
 
                   {/* Popover Footer Navigation */}
@@ -1488,116 +1583,113 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
               )}
             </div>
 
-            {/* User Profile Avatar & Dropdown Menu */}
+            {/* User Profile Avatar Circle & Dropdown Menu */}
             <div ref={profileRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                title={t('auth.profileSettings', 'Account & Profile Settings')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: 'var(--bg-tertiary)',
-                  border: '1px solid var(--glass-border)',
-                  padding: '4px 12px 4px 6px',
-                  borderRadius: '24px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
+                title={`${user?.firstName || user?.FirstName || 'User'} ${user?.lastName || user?.LastName || ''}`}
+                aria-label={t('auth.profileSettings', 'Account & Profile Settings')}
+                aria-expanded={showProfileMenu}
+                className={`navbar-profile-trigger ${showProfileMenu ? 'profile-open' : ''}`}
               >
-                {(user?.avatarUrl || user?.AvatarUrl) ? (
-                  <img
-                    src={user.avatarUrl || user.AvatarUrl}
-                    alt="Avatar"
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      objectFit: 'cover',
-                      boxShadow: '0 0 8px rgba(138, 75, 255, 0.4)'
-                    }}
-                  />
-                ) : (
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    background: 'var(--accent-gradient)',
-                    color: '#ffffff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    boxShadow: '0 0 8px rgba(47, 129, 247, 0.35)'
-                  }}>
-                    {user ? `${(user.firstName || user.FirstName || 'U').charAt(0)}${(user.lastName || user.LastName || '').charAt(0)}`.toUpperCase() : 'U'}
-                  </div>
-                )}
-                <div style={{ textAlign: 'left', display: 'none', mdDisplay: 'block' }}>
-                  <div style={{ color: 'var(--text-primary)', fontSize: '0.82rem', fontWeight: 700, lineHeight: 1.2 }}>
-                    {user?.firstName || user?.FirstName || 'User'}
-                  </div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                    {user?.userTypeCode || 'Member'}
-                  </div>
+                <div className="navbar-avatar-circle">
+                  {(user?.avatarUrl || user?.AvatarUrl) ? (
+                    <img
+                      src={user.avatarUrl || user.AvatarUrl}
+                      alt="Avatar"
+                      className="navbar-avatar-img"
+                    />
+                  ) : (
+                    <div className="navbar-avatar-fallback">
+                      {user ? `${(user.firstName || user.FirstName || 'U').charAt(0)}${(user.lastName || user.LastName || '').charAt(0)}`.toUpperCase() : 'U'}
+                    </div>
+                  )}
                 </div>
-                <ChevronRight size={14} color="var(--text-muted)" style={{ transform: showProfileMenu ? 'rotate(90deg)' : 'rotate(0)', transition: 'transform 0.2s' }} />
+                <span className="navbar-presence-dot" title="Active" />
               </button>
 
               {/* Profile Dropdown Drawer */}
               {showProfileMenu && (
                 <div style={{
                   position: 'absolute',
-                  top: '50px',
+                  top: '52px',
                   right: 0,
-                  width: '260px',
+                  width: 'min(290px, calc(100vw - 20px))',
                   background: 'var(--color-elevated)',
                   border: '1px solid var(--color-border)',
                   borderRadius: '16px',
-                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.35)',
+                  boxShadow: '0 20px 48px -4px rgba(0, 0, 0, 0.45)',
                   backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
                   zIndex: 100,
                   overflow: 'hidden',
-                  animation: 'fadeInUp 0.25s ease-out',
+                  animation: 'fadeInUp 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
                   padding: '8px'
                 }}>
                   <div style={{
-                    padding: '12px 14px',
+                    padding: '14px 14px',
                     borderBottom: '1px solid var(--color-border)',
-                    marginBottom: '6px'
+                    marginBottom: '6px',
+                    background: 'var(--color-surface)',
+                    borderRadius: '12px 12px 0 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
                   }}>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.9rem' }}>
-                      {user?.firstName || user?.FirstName || 'User'} {user?.lastName || user?.LastName || ''}
+                    <div style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      border: '2px solid var(--color-primary)',
+                      boxShadow: '0 0 10px rgba(37, 99, 235, 0.25)'
+                    }}>
+                      {(user?.avatarUrl || user?.AvatarUrl) ? (
+                        <img src={user.avatarUrl || user.AvatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                          color: '#ffffff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 800,
+                          fontSize: '0.95rem'
+                        }}>
+                          {user ? `${(user.firstName || user.FirstName || 'U').charAt(0)}${(user.lastName || user.LastName || '').charAt(0)}`.toUpperCase() : 'U'}
+                        </div>
+                      )}
                     </div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '2px', wordBreak: 'break-all' }}>
-                      {user?.email || user?.Email || 'user@system.com'}
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: '0.92rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {user?.firstName || user?.FirstName || user?.Username || 'User'} {user?.lastName || user?.LastName || ''}
+                      </div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.74rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {user?.email || user?.Email || 'user@system.com'}
+                      </div>
+                      <div style={{ marginTop: '5px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, padding: '2px 7px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.12)', color: 'var(--color-primary)' }}>
+                          {user?.userTypeCode || 'Employee'}
+                        </span>
+                        {user?.TenantName && (
+                          <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '2px 7px', borderRadius: '4px', background: 'var(--color-elevated)', color: 'var(--text-secondary)' }}>
+                            🏢 {user.TenantName}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gap: '2px' }}>
+                  <div style={{ display: 'grid', gap: '3px' }}>
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
                         if (onNavigate) onNavigate('profile');
                       }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        width: '100%',
-                        padding: '10px 12px',
-                        borderRadius: '8px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textAlign: 'left'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                      className="profile-menu-item"
                     >
                       <User size={16} color="var(--color-primary)" />
                       <span>{t('profile.myProfile', 'My Profile & Settings')}</span>
@@ -1606,52 +1698,20 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
-                        if (onNavigate) onNavigate('profile');
+                        if (onNavigate) onNavigate('profile?tab=notifications');
                       }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        width: '100%',
-                        padding: '10px 12px',
-                        borderRadius: '8px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textAlign: isRTL ? 'right' : 'left'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                      className="profile-menu-item"
                     >
-                      <Bell size={16} color="var(--color-info)" />
+                      <Sliders size={16} color="var(--color-info)" />
                       <span>{t('nav.notificationPreferences', 'Notification Preferences')}</span>
                     </button>
 
                     <button
                       onClick={() => {
                         setShowProfileMenu(false);
-                        if (onNavigate) onNavigate('profile');
+                        if (onNavigate) onNavigate('profile?tab=security');
                       }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        width: '100%',
-                        padding: '10px 12px',
-                        borderRadius: '8px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textAlign: isRTL ? 'right' : 'left'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-surface)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                      className="profile-menu-item"
                     >
                       <Lock size={16} color="var(--color-success)" />
                       <span>{t('auth.profileSettings', 'Password & Security')}</span>
@@ -1664,23 +1724,9 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
                         setShowProfileMenu(false);
                         logout();
                       }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        width: '100%',
-                        padding: '10px 12px',
-                        borderRadius: '8px',
-                        background: 'var(--color-error-bg)',
-                        border: 'none',
-                        color: 'var(--color-error)',
-                        fontSize: '0.85rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        textAlign: isRTL ? 'right' : 'left'
-                      }}
+                      className="profile-menu-item-danger"
                     >
-                      <LogOut size={16} color="var(--color-error)" />
+                      <LogOut size={16} color="#ef4444" />
                       <span>{t('auth.signOut', 'Sign Out')}</span>
                     </button>
                   </div>
@@ -1691,10 +1737,115 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
         </header>
 
         {/* Content Body */}
-        <main style={{ flex: 1, minHeight: 0, padding: '32px', overflowY: 'auto' }}>
+        <main className="app-main-content">
           {children}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar (WCAG 2.2 AA compliant thumb navigation for mobile viewports) */}
+      <nav className="mobile-bottom-nav" aria-label="Mobile Navigation">
+        {/* 1. Dashboard */}
+        <button
+          type="button"
+          onClick={() => handleNav('dashboard')}
+          className={`mobile-bottom-nav-btn ${currentPath === '/' || currentPath === '/dashboard' ? 'active' : ''}`}
+          aria-label={t('nav.dashboard', 'Dashboard')}
+        >
+          <LayoutDashboard size={20} />
+          <span>{t('nav.dashboard', 'Dashboard')}</span>
+        </button>
+
+        {/* 2. Tasks / Requests / Queue (Role Adaptive) */}
+        <button
+          type="button"
+          onClick={() => {
+            const role = (user?.userTypeCode || '').toUpperCase();
+            if (role === 'TECHNICIAN') handleNav('technician/assigned');
+            else if (role === 'DEPARTMENT_MANAGER') handleNav('approval/queue');
+            else handleNav('issues/my-requests');
+          }}
+          className={`mobile-bottom-nav-btn ${
+            currentPath.includes('my-requests') || currentPath.includes('technician') || currentPath.includes('approval')
+              ? 'active'
+              : ''
+          }`}
+          aria-label={
+            (user?.userTypeCode || '').toUpperCase() === 'TECHNICIAN'
+              ? 'Workbench'
+              : (user?.userTypeCode || '').toUpperCase() === 'DEPARTMENT_MANAGER'
+              ? 'Approvals'
+              : t('issues.myRequests', 'Requests')
+          }
+        >
+          {(user?.userTypeCode || '').toUpperCase() === 'TECHNICIAN' ? (
+            <Wrench size={20} />
+          ) : (user?.userTypeCode || '').toUpperCase() === 'DEPARTMENT_MANAGER' ? (
+            <ShieldCheck size={20} />
+          ) : (
+            <LifeBuoy size={20} />
+          )}
+          <span>
+            {(user?.userTypeCode || '').toUpperCase() === 'TECHNICIAN'
+              ? 'Workbench'
+              : (user?.userTypeCode || '').toUpperCase() === 'DEPARTMENT_MANAGER'
+              ? 'Approvals'
+              : 'Requests'}
+          </span>
+        </button>
+
+        {/* 3. Primary Quick Action (Submit New Request) */}
+        <button
+          type="button"
+          onClick={() => handleNav('issues/create')}
+          className="mobile-bottom-nav-btn"
+          aria-label={t('issues.submitNew', 'New Request')}
+          style={{ transform: 'translateY(-6px)' }}
+        >
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, #7c3aed 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#ffffff',
+            boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)'
+          }}>
+            <Plus size={22} />
+          </div>
+          <span style={{ fontSize: '0.62rem', fontWeight: 800, marginTop: '2px' }}>New</span>
+        </button>
+
+        {/* 4. Notifications with Badge */}
+        <button
+          type="button"
+          onClick={() => handleNav('notifications/inbox')}
+          className={`mobile-bottom-nav-btn ${currentPath.includes('notifications') ? 'active' : ''}`}
+          aria-label={t('notifications.title', 'Notifications')}
+        >
+          <div style={{ position: 'relative' }}>
+            <Bell size={20} />
+            {unreadCount > 0 && (
+              <span className="mobile-bottom-nav-badge">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </div>
+          <span>{t('notifications.title', 'Alerts')}</span>
+        </button>
+
+        {/* 5. Menu Drawer Trigger */}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className={`mobile-bottom-nav-btn ${mobileMenuOpen ? 'active' : ''}`}
+          aria-label={t('nav.menu', 'Menu')}
+        >
+          <Menu size={20} />
+          <span>{t('nav.menu', 'Menu')}</span>
+        </button>
+      </nav>
 
       {/* Notification Detail Modal */}
       <NotificationDetailModal
@@ -1702,6 +1853,7 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
         notification={selectedNotifDetail}
         onClose={() => setSelectedNotifDetail(null)}
         onMarkRead={handleMarkSingleRead}
+        onMarkUnread={handleMarkSingleUnread}
         onNavigateToResource={handleNavigateToResource}
       />
 
@@ -1709,6 +1861,329 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Modern Enterprise Navbar Styling ─── */
+        .top-navbar {
+          transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .navbar-search-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .navbar-search-input {
+          height: 38px;
+          padding: 7px 34px 7px 36px !important;
+          border-radius: 20px !important;
+          background: var(--color-elevated) !important;
+          border: 1.5px solid var(--color-border) !important;
+          color: var(--color-text) !important;
+          font-size: 0.83rem !important;
+          width: 240px !important;
+          outline: none !important;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .navbar-search-input:hover {
+          border-color: rgba(37, 99, 235, 0.45) !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-search-input:focus {
+          width: 290px !important;
+          border-color: var(--color-primary) !important;
+          box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.2), 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+          background: var(--color-surface) !important;
+        }
+
+        .search-shortcut-badge {
+          position: absolute;
+          right: 12px;
+          font-size: 11px;
+          padding: 1px 6px;
+          border-radius: 4px;
+          background: var(--color-surface);
+          border: 1px solid var(--color-border);
+          color: var(--color-text-muted);
+          font-family: monospace;
+          pointer-events: none;
+          line-height: 1.2;
+        }
+
+        .navbar-icon-btn {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--bg-tertiary);
+          border: 1px solid var(--color-border);
+          color: var(--color-text-secondary);
+          cursor: pointer;
+          position: relative;
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          outline: none;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-icon-btn:hover {
+          transform: translateY(-1.5px) scale(1.05);
+          color: var(--color-text);
+          border-color: var(--color-primary);
+          box-shadow: 0 4px 14px rgba(37, 99, 235, 0.22), 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-icon-btn:active {
+          transform: scale(0.96);
+        }
+
+        .navbar-theme-btn.theme-dark:hover {
+          border-color: #60a5fa;
+          color: #60a5fa;
+          box-shadow: 0 0 16px rgba(96, 165, 250, 0.4);
+        }
+
+        .navbar-theme-btn.theme-light:hover {
+          border-color: #f59e0b;
+          color: #f59e0b;
+          box-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+        }
+
+        .navbar-theme-btn svg {
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .navbar-theme-btn:hover svg {
+          transform: rotate(20deg) scale(1.1);
+        }
+
+        .navbar-notif-btn.notif-open {
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+        }
+
+        .navbar-notif-badge {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          background: #ef4444;
+          color: #ffffff;
+          font-size: 10px;
+          font-weight: 800;
+          min-width: 18px;
+          height: 18px;
+          padding: 0 4px;
+          border-radius: 9px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+          animation: pulsePing 2s infinite ease-in-out;
+        }
+
+        @keyframes pulsePing {
+          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+          50% { transform: scale(1.08); box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
+          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* ─── Circular Profile Trigger ─── */
+        .navbar-profile-trigger {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          padding: 0;
+          position: relative;
+          background: transparent;
+          border: 2px solid var(--color-border);
+          cursor: pointer;
+          outline: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-profile-trigger:hover,
+        .navbar-profile-trigger.profile-open {
+          transform: translateY(-1.5px) scale(1.06);
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.28), 0 6px 16px rgba(0, 0, 0, 0.18);
+        }
+
+        .navbar-profile-trigger:active {
+          transform: scale(0.96);
+        }
+
+        .navbar-avatar-circle {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .navbar-avatar-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+
+        .navbar-avatar-fallback {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 0.85rem;
+          letter-spacing: 0.02em;
+        }
+
+        .navbar-presence-dot {
+          position: absolute;
+          bottom: -1px;
+          right: -1px;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #10b981;
+          border: 2px solid var(--color-elevated);
+          box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+        }
+
+        .profile-menu-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 10px 12px;
+          border-radius: 8px;
+          background: transparent;
+          border: none;
+          color: var(--text-primary);
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.18s ease;
+          text-align: left;
+        }
+
+        .profile-menu-item:hover {
+          background: rgba(37, 99, 235, 0.08);
+          color: var(--color-primary);
+          transform: translateX(3px);
+        }
+
+        .profile-menu-item-danger {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 10px 12px;
+          border-radius: 8px;
+          background: var(--color-error-bg);
+          border: none;
+          color: var(--color-error);
+          font-size: 0.85rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.18s ease;
+          text-align: left;
+        }
+
+        .profile-menu-item-danger:hover {
+          background: rgba(239, 68, 68, 0.15);
+          transform: translateX(3px);
+        }
+
+        .app-main-content {
+          flex: 1;
+          min-height: 0;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          padding: 16px 14px calc(var(--mobile-bottom-nav-height, 64px) + var(--safe-area-bottom, 0px) + 20px) 14px;
+        }
+
+        @media (min-width: 640px) {
+          .app-main-content {
+            padding: 22px 20px calc(var(--mobile-bottom-nav-height, 64px) + var(--safe-area-bottom, 0px) + 20px) 20px;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .app-main-content {
+            padding: 24px 28px;
+          }
+          .mobile-bottom-nav {
+            display: none !important;
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .app-main-content {
+            padding: 32px 36px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .top-navbar {
+            height: 58px !important;
+          }
+          .header-search-input {
+            width: 120px !important;
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .app-sidebar {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            height: 100vh !important;
+            z-index: 100 !important;
+            transform: translateX(-100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+          }
+          .app-sidebar.mobile-open {
+            transform: translateX(0) !important;
+          }
+          .mobile-nav-toggle {
+            display: inline-flex !important;
+          }
+          .mobile-drawer-close-btn {
+            display: inline-flex !important;
+          }
+          .desktop-sidebar-toggle-btn {
+            display: none !important;
+          }
+          .header-search-input {
+            width: 140px !important;
+          }
+        }
+
+        @media (min-width: 1025px) {
+          .mobile-nav-toggle {
+            display: none !important;
+          }
+          .mobile-drawer-close-btn {
+            display: none !important;
+          }
+          .desktop-sidebar-toggle-btn {
+            display: inline-flex !important;
+          }
         }
       `}</style>
     </div>

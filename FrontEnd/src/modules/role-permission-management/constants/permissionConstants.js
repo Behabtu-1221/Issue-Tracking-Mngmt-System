@@ -92,10 +92,6 @@ export const PERMISSIONS = {
   ISSUE_CLOSE: 'Issue.Close',
   ISSUE_REOPEN: 'Issue.Reopen',
 
-  // Knowledge Base
-  KNOWLEDGE_READ: 'Knowledge.Read',
-  KNOWLEDGE_PUBLISH: 'Knowledge.Publish',
-
   // Notification Management
   NOTIFICATION_MANAGE: 'Notification.Manage',
   NOTIFICATION_READ_OWN: 'Notification.Read.Own',
@@ -320,21 +316,6 @@ export const PERMISSION_MODULE_TREE = [
     ]
   },
   {
-    moduleCode: 'MOD_KB',
-    moduleName: 'Knowledge Base',
-    moduleScope: 'BOTH',
-    groups: [
-      {
-        groupCode: 'KB_ARTICLES',
-        groupName: 'Knowledge Base Articles',
-        permissions: [
-          { code: 'Knowledge.Read', name: 'View Solution Articles', description: 'Read solution KB articles and FAQs', scope: 'ALL' },
-          { code: 'Knowledge.Publish', name: 'Publish KB Article', description: 'Author and publish knowledge base solutions', scope: 'COMPANY' }
-        ]
-      }
-    ]
-  },
-  {
     moduleCode: 'MOD_NOTIF',
     moduleName: 'Notification Management',
     moduleScope: 'BOTH',
@@ -412,7 +393,6 @@ export const DEFAULT_ROLE_PRESETS = {
       'Role.Read', 'Role.Create', 'Role.Update', 'Role.Delete', 'Role.Permission.Assign', 'Role.Assign',
       'Issue.Create', 'Issue.Read.Own', 'Issue.Read.Department', 'Issue.Read.Company', 'Issue.Read.All', 'Issue.Approve', 'Issue.Assign', 'Issue.Dispatch', 'Issue.Close',
       'Service.Read', 'Service.Create', 'Service.Update', 'Service.Delete',
-      'Knowledge.Read', 'Knowledge.Publish',
       'Report.View', 'Report.Export',
       'Audit.Read', 'Audit.Export',
       'Notification.Manage', 'Communication.Read', 'Document.Read'
@@ -427,7 +407,6 @@ export const DEFAULT_ROLE_PRESETS = {
       'User.Read.Own', 'User.Read.Company',
       'Issue.Create', 'Issue.Read.Own', 'Issue.Read.Company', 'Issue.Update.OwnDraft', 'Issue.Cancel.Own', 'Issue.Comment',
       'Service.Read',
-      'Knowledge.Read',
       'Report.View',
       'Notification.Manage',
       'Communication.Read'
@@ -444,7 +423,6 @@ export const DEFAULT_ROLE_PRESETS = {
       'Issue.Create', 'Issue.Read.Own', 'Issue.Read.Company', 'Issue.Update.OwnDraft', 'Issue.Cancel.Own', 'Issue.Comment',
       'Issue.Close',
       'Service.Read',
-      'Knowledge.Read',
       'Report.View', 'Report.Export',
       'Audit.Read',
       'Notification.Manage',
@@ -463,7 +441,6 @@ export const DEFAULT_ROLE_PRESETS = {
       'Issue.Assign', 'Issue.Dispatch',
       'Issue.Close',
       'Service.Read',
-      'Knowledge.Read',
       'Report.View',
       'Communication.Read'
     ]
@@ -480,7 +457,6 @@ export const DEFAULT_ROLE_PRESETS = {
       'Issue.Attachment.Upload.Assigned', 'Issue.RequestInformation.Assigned',
       'Issue.Escalate.Assigned', 'Issue.Resolve',
       'Service.Read',
-      'Knowledge.Read',
       'Notification.Read.Own',
       'Communication.Read'
     ]
@@ -493,7 +469,6 @@ export const DEFAULT_ROLE_PRESETS = {
       'User.Read.Own',
       'Issue.Create', 'Issue.Read.Own', 'Issue.Update.OwnDraft', 'Issue.Cancel.Own', 'Issue.Comment',
       'Service.Read',
-      'Knowledge.Read',
       'Communication.Read'
     ]
   }

@@ -21,6 +21,7 @@ import {
   Edit2,
   Trash2,
   ShieldAlert,
+  Tag,
   X
 } from 'lucide-react';
 import tenantApi from '../api/tenantApi';
@@ -28,6 +29,9 @@ import parkApi from '../../business-park/api/parkApi';
 import TenantDetailModal from './TenantDetailModal';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 import { tenantSchemas } from '../../../validation';
 import { useTranslation } from '../../../i18n';
 
@@ -278,9 +282,9 @@ export default function TenantsTab({ onRefreshMetrics }) {
   return (
     <div>
       {/* Action Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '300px' }}>
-          <div style={{ position: 'relative', flex: 1 }}>
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 min-w-0">
+          <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
@@ -301,6 +305,7 @@ export default function TenantsTab({ onRefreshMetrics }) {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full sm:w-auto"
             style={{
               padding: '10px 14px',
               background: 'var(--bg-secondary)',
@@ -334,17 +339,15 @@ export default function TenantsTab({ onRefreshMetrics }) {
 
         <button
           onClick={handleOpenCreate}
+          className="touch-target-sm w-full sm:w-auto flex items-center justify-center gap-2"
           style={{
             padding: '10px 18px',
             background: 'var(--accent-gradient)',
             border: 'none',
             borderRadius: 'var(--border-radius-sm)',
             color: '#ffffff',
-            fontWeight: '600',
+            fontWeight: '700',
             cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
             boxShadow: 'var(--glow-accent)'
           }}
         >
@@ -398,13 +401,13 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   <td style={{ padding: '16px 20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {getStatusBadge(tn.Status)}
-                      <button
-                        onClick={() => { setStatusModalTenant(tn); setNewStatus(''); setErrorMsg(''); }}
+                      <ActionButton
+                        variant="warning"
+                        size="sm"
                         title="Change Status Lifecycle"
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}
-                      >
-                        <Edit2 size={13} />
-                      </button>
+                        onClick={() => { setStatusModalTenant(tn); setNewStatus(''); setErrorMsg(''); }}
+                        icon={<Edit2 size={12} />}
+                      />
                     </div>
                   </td>
                   <td style={{ padding: '16px 20px' }}>
@@ -418,26 +421,24 @@ export default function TenantsTab({ onRefreshMetrics }) {
                     </div>
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="neutral"
+                        label={t('common.viewDetails')}
                         onClick={() => setSelectedTenant(tn)}
-                        style={{ padding: '6px 12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
-                      >
-                        {t('common.viewDetails')}
-                      </button>
-                      <button
+                        title={t('common.viewDetails')}
+                      />
+                      <ActionButton
+                        variant="edit"
                         onClick={() => handleOpenEdit(tn)}
-                        style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-muted)', cursor: 'pointer' }}
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
+                        title={t('common.edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDelete(tn.TenantID, tn.CompanyName)}
-                        style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                        title={t('common.delete')}
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -448,49 +449,55 @@ export default function TenantsTab({ onRefreshMetrics }) {
       </div>
 
       {/* Modal: Create/Edit Tenant */}
-      {isCreateModalOpen && createPortal(
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ width: '100%', maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto', padding: '28px', background: 'var(--bg-secondary)', borderRadius: '24px', border: '1px solid var(--glass-border-accent)', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-                <Users color="var(--accent-primary)" />
-                {editingTenant ? 'Edit Tenant Profile' : 'Onboard New Tenant'}
-              </h2>
-              <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                <X size={20} />
-              </button>
+      <ModalCard
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title={editingTenant ? t('tenant.editTenantProfile', 'Edit Tenant Profile') : t('tenant.onboardTenant', 'Onboard New Tenant')}
+        subtitle={t('tenant.onboardSubtitle', 'Enter enterprise tenant registration details, tax identifiers, and initial account status')}
+        category={t('tenant.moduleName', 'Tenant Management')}
+        icon={Building2}
+        accentStrip="brand"
+        maxWidth="680px"
+        onSubmit={handleSubmit}
+        submitText={editingTenant ? t('common.saveChanges', 'Save Changes') : t('tenant.onboardTenant', 'Onboard New Tenant')}
+        cancelText={t('common.cancel', 'Cancel')}
+        error={errorMsg || (Object.keys(fieldErrors).length > 0 ? Object.values(fieldErrors)[0] : null)}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Section 1: Legal Entity & Organization */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-primary, #2563eb)' }}>
+              1. Corporate & Legal Identity
             </div>
 
-            {(errorMsg || Object.keys(fieldErrors).length > 0) && (
-              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg || Object.values(fieldErrors)[0]}
-              </div>
-            )}
+            <FormField
+              label={t('tenant.companyName', 'Company Name')}
+              required
+              error={fieldErrors.CompanyName}
+              icon={Building2}
+            >
+              <input
+                type="text"
+                placeholder="e.g. Acme Innovations PLC"
+                value={formData.CompanyName}
+                onChange={(e) => handleFieldChange('CompanyName', e.target.value)}
+                onBlur={() => handleBlur('CompanyName')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${fieldErrors.CompanyName ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
 
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div style={{ gridColumn: 'span 2' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Company Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Acme Innovations PLC"
-                  value={formData.CompanyName}
-                  onChange={(e) => handleFieldChange('CompanyName', e.target.value)}
-                  onBlur={() => handleBlur('CompanyName')}
-                  style={{
-                    width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.CompanyName ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
-                  }}
-                />
-                {fieldErrors.CompanyName && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.CompanyName}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Tenant Code *</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <FormField
+                label={t('tenant.tenantCode', 'Tenant Code')}
+                required
+                error={fieldErrors.TenantCode}
+                icon={Tag}
+                hint="Format: TNT-01"
+              >
                 <input
                   type="text"
                   placeholder="e.g. TNT-01"
@@ -499,40 +506,36 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('TenantCode')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.TenantCode ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontFamily: 'monospace'
+                    border: `1px solid ${fieldErrors.TenantCode ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.TenantCode && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.TenantCode}
-                  </span>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Business Park</label>
+              <FormField
+                label={t('tenant.businessPark', 'Business Park / Campus')}
+                icon={Building2}
+                hint="Single campus system — auto-assigned"
+              >
                 <div style={{
-                  width: '100%', padding: '10px 14px', borderRadius: '8px',
-                  background: 'rgba(99, 102, 241, 0.08)',
-                  border: '1px solid rgba(99, 102, 241, 0.25)',
+                  width: '100%', padding: '10px 14px', borderRadius: 'var(--border-radius-sm)',
+                  background: 'rgba(37, 99, 235, 0.08)',
+                  border: '1px solid rgba(37, 99, 235, 0.25)',
                   color: 'var(--text-primary)', fontSize: '0.88rem',
                   fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px'
                 }}>
-                  🏢 {parks.length > 0 ? `${parks[0].BusinessParkName} (${parks[0].BusinessParkCode || ''})` : 'Ethiopian IT Park'}
+                  <Building2 size={15} style={{ color: 'var(--color-primary, #2563eb)' }} />
+                  <span>{parks.length > 0 ? `${parks[0].BusinessParkName} (${parks[0].BusinessParkCode || ''})` : 'Ethiopian IT Park'}</span>
                 </div>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px', display: 'block' }}>
-                  Single campus system — auto-assigned
-                </span>
-                {fieldErrors.BusinessParkID && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.BusinessParkID}
-                  </span>
-                )}
-              </div>
+              </FormField>
+            </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Registration Number</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <FormField
+                label={t('tenant.regNumber', 'Registration Number')}
+                error={fieldErrors.RegistrationNumber}
+                icon={Briefcase}
+              >
                 <input
                   type="text"
                   placeholder="e.g. REG-2024-001"
@@ -541,19 +544,17 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('RegistrationNumber')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.RegistrationNumber ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.RegistrationNumber ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.RegistrationNumber && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.RegistrationNumber}
-                  </span>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Tax ID (TIN)</label>
+              <FormField
+                label={t('tenant.tin', 'Tax Identification (TIN)')}
+                error={fieldErrors.TaxIdentificationNo}
+                icon={FileText}
+              >
                 <input
                   type="text"
                   placeholder="e.g. TIN-992381"
@@ -562,19 +563,26 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('TaxIdentificationNo')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.TaxIdentificationNo ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.TaxIdentificationNo ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.TaxIdentificationNo && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.TaxIdentificationNo}
-                  </span>
-                )}
-              </div>
+              </FormField>
+            </div>
+          </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Website</label>
+          {/* Section 2: Online Presence & Account Status */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid var(--color-border-subtle, var(--glass-border))', paddingTop: '16px' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-primary, #2563eb)' }}>
+              2. Web Presence & Operational Status
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <FormField
+                label={t('tenant.website', 'Corporate Website')}
+                error={fieldErrors.Website}
+                icon={Globe}
+              >
                 <input
                   type="text"
                   placeholder="https://company.com"
@@ -583,124 +591,100 @@ export default function TenantsTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('Website')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.Website ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.Website ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.Website && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.Website}
-                  </span>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Account Status</label>
+              <FormField
+                label={t('tenant.accountStatus', 'Initial Account Status')}
+                icon={ShieldAlert}
+              >
                 <select
                   value={formData.Status}
                   onChange={(e) => handleFieldChange('Status', e.target.value)}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
                     border: '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 >
-                  <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ACTIVE (Ready for Leases & Spaces)</option>
-                  <option value="ONBOARDING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ONBOARDING (Under Setup)</option>
+                  <option value="ACTIVE">ACTIVE (Ready for Leases & Spaces)</option>
+                  <option value="ONBOARDING">ONBOARDING (Under Setup)</option>
                 </select>
-              </div>
-
-              <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)' }}
-                >
-                  {editingTenant ? t('common.saveChanges') : t('tenant.onboardTenant')}
-                </button>
-              </div>
-            </form>
+              </FormField>
+            </div>
           </div>
-        </div>,
-        document.body
-      )}
+        </div>
+      </ModalCard>
 
       {/* Modal: Status Lifecycle Transition */}
-      {statusModalTenant && createPortal(
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ width: '100%', maxWidth: '480px', padding: '28px', background: 'var(--bg-secondary)', borderRadius: '24px', border: '1px solid var(--glass-border-accent)', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-                <ShieldAlert color="var(--accent-primary)" />
-                Tenant Lifecycle Transition
-              </h2>
-              <button onClick={() => setStatusModalTenant(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                <X size={20} />
-              </button>
+      <ModalCard
+        isOpen={Boolean(statusModalTenant)}
+        onClose={() => setStatusModalTenant(null)}
+        title={t('tenant.statusTransition', 'Tenant Lifecycle Transition')}
+        subtitle={statusModalTenant ? `Update operational lifecycle for ${statusModalTenant.CompanyName}` : ''}
+        category={t('tenant.statusGovernance', 'Status Governance')}
+        icon={ShieldAlert}
+        accentStrip="amber"
+        maxWidth="480px"
+        onSubmit={handleStatusChange}
+        submitText={t('common.confirm', 'Confirm Transition')}
+        cancelText={t('common.cancel', 'Cancel')}
+        error={errorMsg}
+      >
+        {statusModalTenant && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div
+              style={{
+                padding: '12px 14px',
+                borderRadius: '10px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--glass-border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Current Status:</span>
+              <span className="badge badge-info">{statusModalTenant.Status}</span>
             </div>
 
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              Current Status of <strong style={{ color: 'var(--text-primary)' }}>{statusModalTenant.CompanyName}</strong> is{' '}
-              <span className="badge">{statusModalTenant.Status}</span>
-            </p>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleStatusChange}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '8px' }}>Select Target Status:</label>
+            <FormField
+              label="Select Target Status:"
+              required
+              icon={ShieldAlert}
+            >
               <select
                 required
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
-                style={{ width: '100%', padding: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', marginBottom: '20px' }}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)',
+                  color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
               >
-                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Choose New Status --</option>
-                {statusModalTenant.Status === 'ONBOARDING' && <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ACTIVE (Onboarding Complete)</option>}
+                <option value="">-- Choose New Status --</option>
+                {statusModalTenant.Status === 'ONBOARDING' && <option value="ACTIVE">ACTIVE (Onboarding Complete)</option>}
                 {statusModalTenant.Status === 'ACTIVE' && (
                   <>
-                    <option value="SUSPENDED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>SUSPENDED (Temporary Hold)</option>
-                    <option value="TERMINATED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>TERMINATED (Offboard Tenant)</option>
+                    <option value="SUSPENDED">SUSPENDED (Temporary Hold)</option>
+                    <option value="TERMINATED">TERMINATED (Offboard Tenant)</option>
                   </>
                 )}
                 {statusModalTenant.Status === 'SUSPENDED' && (
                   <>
-                    <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ACTIVE (Re-activate Tenant)</option>
-                    <option value="TERMINATED" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>TERMINATED (Offboard Tenant)</option>
+                    <option value="ACTIVE">ACTIVE (Re-activate Tenant)</option>
+                    <option value="TERMINATED">TERMINATED (Offboard Tenant)</option>
                   </>
                 )}
               </select>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setStatusModalTenant(null)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={!newStatus}
-                  style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)', opacity: !newStatus ? 0.5 : 1 }}
-                >
-                  {t('common.confirm')}
-                </button>
-              </div>
-            </form>
+            </FormField>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </ModalCard>
 
       {/* Professional Tenant Full Details Modal */}
       {selectedTenant && (

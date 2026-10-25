@@ -7,6 +7,7 @@ import communicationApi from '../api/communicationApi';
 import issueManagementApi from '../../issue-management/api/issueManagementApi';
 import { useAuth } from '../../../modules/authentication/contexts/AuthContext';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
+import { ActionButton } from '../../../components/common/ActionButton';
 
 const glassCard = {
   background: 'var(--glass-bg)',
@@ -345,19 +346,12 @@ export default function RequestCommentsTab({ initialRequestId }) {
                         <Clock size={11} /> {formatDate(c.CreatedDate)}
                       </span>
                       {isStaff && (
-                        <button
+                        <ActionButton
+                          variant="delete"
+                          size="sm"
                           onClick={() => promptDelete(c.IssueRequestCommentID)}
-                          style={{
-                            background: 'transparent', border: 'none', cursor: 'pointer',
-                            color: 'var(--text-muted)', padding: '4px', borderRadius: '6px',
-                            display: 'flex', alignItems: 'center', transition: 'all 0.2s'
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.color = '#ef4444'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
                           title="Delete comment"
-                        >
-                          <Trash2 size={13} />
-                        </button>
+                        />
                       )}
                     </div>
                   </div>

@@ -20,6 +20,8 @@ import tenantApi from '../api/tenantApi';
 import parkApi from '../../business-park/api/parkApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 import { tenantSchemas } from '../../../validation';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { useTranslation } from '../../../i18n';
@@ -534,37 +536,27 @@ export default function AllocationsTab({ onRefreshMetrics }) {
       )}
 
       {/* Allocate Modal (Office / Floor / Building) */}
-      {isAllocateModalOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-        }} onClick={() => setIsAllocateModalOpen(false)}>
-          <div style={{
-            ...glassCard, background: 'var(--bg-secondary)', width: '560px', maxWidth: '90vw',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-            animation: 'fadeInUp 0.3s ease-out'
-          }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '18px', fontWeight: 700 }}>
-                🏬 Allocate Real Estate Space
-              </h3>
-              <button onClick={() => setIsAllocateModalOpen(false)} style={{
-                background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer'
-              }}><X size={20} /></button>
-            </div>
-
-            {(errorMsg || Object.keys(fieldErrors).length > 0) && (
-              <div style={{
-                padding: '10px 14px', borderRadius: '10px', marginBottom: '14px', fontSize: '12.5px',
-                background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444'
-              }}>
-                {errorMsg || Object.values(fieldErrors)[0]}
-              </div>
-            )}
-
-            {/* Scope Switcher */}
-            <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', background: 'var(--bg-tertiary)', padding: '4px', borderRadius: '10px' }}>
+      <ModalCard
+        isOpen={isAllocateModalOpen}
+        onClose={() => setIsAllocateModalOpen(false)}
+        title="Allocate Real Estate Space"
+        subtitle="Assign office units, floors, or entire building capacity to tenant companies"
+        category="Premises Allocation"
+        icon={Building2}
+        accentStrip="amber"
+        maxWidth="620px"
+        onSubmit={handleAllocateSubmit}
+        submitText={`${t('tenant.allocateSpace')} ${previewStats.count > 0 ? `(${previewStats.count} Units)` : ''}`}
+        cancelText={t('common.cancel')}
+        error={errorMsg || (Object.keys(fieldErrors).length > 0 ? Object.values(fieldErrors)[0] : '')}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Scope Switcher */}
+          <div>
+            <label style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '8px' }}>
+              Allocation Scope
+            </label>
+            <div style={{ display: 'flex', gap: '6px', background: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--glass-border)' }}>
               <button
                 type="button"
                 onClick={() => {
@@ -578,9 +570,10 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                   });
                 }}
                 style={{
-                  flex: 1, padding: '8px 4px', borderRadius: '8px', border: 'none',
+                  flex: 1, padding: '9px 6px', borderRadius: '8px', border: 'none',
                   background: scope === 'OFFICE' ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'transparent',
-                  color: scope === 'OFFICE' ? '#fff' : 'var(--text-muted)', fontWeight: 700, fontSize: '12px', cursor: 'pointer'
+                  color: scope === 'OFFICE' ? '#fff' : 'var(--text-muted)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                  boxShadow: scope === 'OFFICE' ? '0 2px 8px rgba(245, 158, 11, 0.35)' : 'none'
                 }}
               >
                 🚪 Single Office Unit
@@ -598,9 +591,10 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                   });
                 }}
                 style={{
-                  flex: 1, padding: '8px 4px', borderRadius: '8px', border: 'none',
+                  flex: 1, padding: '9px 6px', borderRadius: '8px', border: 'none',
                   background: scope === 'FLOOR' ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'transparent',
-                  color: scope === 'FLOOR' ? '#fff' : 'var(--text-muted)', fontWeight: 700, fontSize: '12px', cursor: 'pointer'
+                  color: scope === 'FLOOR' ? '#fff' : 'var(--text-muted)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                  boxShadow: scope === 'FLOOR' ? '0 2px 8px rgba(245, 158, 11, 0.35)' : 'none'
                 }}
               >
                 🏬 Entire Floor Level
@@ -618,332 +612,260 @@ export default function AllocationsTab({ onRefreshMetrics }) {
                   });
                 }}
                 style={{
-                  flex: 1, padding: '8px 4px', borderRadius: '8px', border: 'none',
+                  flex: 1, padding: '9px 6px', borderRadius: '8px', border: 'none',
                   background: scope === 'BUILDING' ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'transparent',
-                  color: scope === 'BUILDING' ? '#fff' : 'var(--text-muted)', fontWeight: 700, fontSize: '12px', cursor: 'pointer'
+                  color: scope === 'BUILDING' ? '#fff' : 'var(--text-muted)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                  boxShadow: scope === 'BUILDING' ? '0 2px 8px rgba(245, 158, 11, 0.35)' : 'none'
                 }}
               >
                 🏙️ Entire Building
               </button>
             </div>
+          </div>
 
-            <form onSubmit={handleAllocateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {/* Tenant Selection */}
-              <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Target Tenant Company *</label>
+          {/* Tenant Selection */}
+          <FormField label="Target Tenant Company *" error={fieldErrors.TenantID} icon={Building2}>
+            <select
+              value={formData.TenantID}
+              onChange={(e) => handleTenantSelect(e.target.value)}
+              onBlur={() => handleBlur('TenantID')}
+              style={{
+                width: '100%', background: 'var(--bg-tertiary)',
+                border: `1px solid ${fieldErrors.TenantID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                borderRadius: 'var(--border-radius-sm)', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem'
+              }}
+            >
+              <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Choose Tenant Company --</option>
+              {(Array.isArray(tenants) ? tenants : []).map(t => (
+                <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                  {t.CompanyName} ({t.TenantCode})
+                </option>
+              ))}
+            </select>
+          </FormField>
+
+          {/* Dynamic Scope Inputs */}
+          {scope === 'OFFICE' && (
+            <FormField label="Select Vacant Office Unit *" error={fieldErrors.OfficeSpaceID} icon={Building}>
+              <select
+                value={formData.OfficeSpaceID}
+                onChange={(e) => handleFieldChange('OfficeSpaceID', e.target.value)}
+                onBlur={() => handleBlur('OfficeSpaceID')}
+                style={{
+                  width: '100%', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${fieldErrors.OfficeSpaceID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Choose Vacant Office Unit --</option>
+                {offices.filter(o => o.AvailabilityStatus === 'VACANT').map(o => (
+                  <option key={o.OfficeSpaceID} value={o.OfficeSpaceID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {o.OfficeName} ({o.OfficeNumber}) &bull; {o.SquareMeters} m² &bull; {o.BuildingName || 'Building'} - {o.FloorName || 'Floor'}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          )}
+
+          {scope === 'FLOOR' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+              <FormField label="Building Block *" error={fieldErrors.BuildingID} icon={Building2}>
                 <select
-                  value={formData.TenantID}
-                  onChange={(e) => handleTenantSelect(e.target.value)}
-                  onBlur={() => handleBlur('TenantID')}
+                  value={selectedBuildingID}
+                  onChange={(e) => handleBuildingSelect(e.target.value)}
+                  onBlur={() => handleBlur('BuildingID')}
                   style={{
                     width: '100%', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.TenantID ? '1px solid #ef4444' : '1px solid rgba(245, 158, 11, 0.3)',
-                    borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
+                    border: `1px solid ${fieldErrors.BuildingID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Choose Tenant Company --</option>
-                  {(Array.isArray(tenants) ? tenants : []).map(t => (
-                    <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{t.CompanyName} ({t.TenantCode})</option>
-                  ))}
-                </select>
-                {fieldErrors.TenantID && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.TenantID}
-                  </span>
-                )}
-              </div>
-
-              {/* Dynamic Scope Inputs */}
-              {scope === 'OFFICE' && (
-                <div>
-                  <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Select Vacant Office Unit *</label>
-                  <select
-                    value={formData.OfficeSpaceID}
-                    onChange={(e) => handleFieldChange('OfficeSpaceID', e.target.value)}
-                    onBlur={() => handleBlur('OfficeSpaceID')}
-                    style={{
-                      width: '100%', background: 'var(--bg-tertiary)',
-                      border: fieldErrors.OfficeSpaceID ? '1px solid #ef4444' : '1px solid rgba(245, 158, 11, 0.3)',
-                      borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Choose Vacant Office Unit --</option>
-                    {offices.filter(o => o.AvailabilityStatus === 'VACANT').map(o => (
-                      <option key={o.OfficeSpaceID} value={o.OfficeSpaceID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {o.OfficeName} ({o.OfficeNumber}) &bull; {o.SquareMeters} m² &bull; {o.BuildingName || 'Building'} - {o.FloorName || 'Floor'}
-                      </option>
-                    ))}
-                  </select>
-                  {fieldErrors.OfficeSpaceID && (
-                    <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                      ⚠️ {fieldErrors.OfficeSpaceID}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {scope === 'FLOOR' && (
-                <>
-                  <div>
-                    <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Building Block *</label>
-                    <select
-                      value={selectedBuildingID}
-                      onChange={(e) => handleBuildingSelect(e.target.value)}
-                      onBlur={() => handleBlur('BuildingID')}
-                      style={{
-                        width: '100%', background: 'var(--bg-tertiary)',
-                        border: fieldErrors.BuildingID ? '1px solid #ef4444' : '1px solid rgba(245, 158, 11, 0.3)',
-                        borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
-                      }}
-                    >
-                      <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Select Building Block --</option>
-                      {buildings.map(b => (
-                        <option key={b.BuildingID} value={b.BuildingID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{b.BuildingName} ({b.BuildingCode || b.BuildingID})</option>
-                      ))}
-                    </select>
-                    {fieldErrors.BuildingID && (
-                      <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                        ⚠️ {fieldErrors.BuildingID}
-                      </span>
-                    )}
-                  </div>
-
-                  <div>
-                    <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Floor Level *</label>
-                    <select
-                      value={selectedFloorID}
-                      onChange={(e) => {
-                        setSelectedFloorID(e.target.value);
-                        if (fieldErrors.FloorID) {
-                          setFieldErrors(prev => {
-                            const next = { ...prev };
-                            delete next.FloorID;
-                            return next;
-                          });
-                        }
-                      }}
-                      onBlur={() => handleBlur('FloorID')}
-                      style={{
-                        width: '100%', background: 'var(--bg-tertiary)',
-                        border: fieldErrors.FloorID ? '1px solid #ef4444' : '1px solid rgba(245, 158, 11, 0.3)',
-                        borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
-                      }}
-                    >
-                      <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Select Floor Level --</option>
-                      {floors.map(f => (
-                        <option key={f.FloorID} value={f.FloorID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{f.FloorName} (Level {f.FloorNumber})</option>
-                      ))}
-                    </select>
-                    {fieldErrors.FloorID && (
-                      <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                        ⚠️ {fieldErrors.FloorID}
-                      </span>
-                    )}
-                  </div>
-                </>
-              )}
-
-              {scope === 'BUILDING' && (
-                <div>
-                  <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Entire Building Block *</label>
-                  <select
-                    value={selectedBuildingID}
-                    onChange={(e) => {
-                      setSelectedBuildingID(e.target.value);
-                      if (fieldErrors.BuildingID) {
-                        setFieldErrors(prev => {
-                          const next = { ...prev };
-                          delete next.BuildingID;
-                          return next;
-                        });
-                      }
-                    }}
-                    style={{
-                      width: '100%', background: 'var(--bg-tertiary)',
-                      border: fieldErrors.BuildingID ? '1px solid #ef4444' : '1px solid rgba(245, 158, 11, 0.3)',
-                      borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Select Building Block --</option>
-                    {buildings.map(b => (
-                      <option key={b.BuildingID} value={b.BuildingID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{b.BuildingName} ({b.BuildingCode || b.BuildingID})</option>
-                    ))}
-                  </select>
-                  {fieldErrors.BuildingID && (
-                    <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                      ⚠️ {fieldErrors.BuildingID}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {/* Scope Summary Preview Box */}
-              <div style={{
-                background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.25)',
-                borderRadius: '10px', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-              }}>
-                <div>
-                  <span style={{ color: '#f59e0b', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' }}>Scope Capacity Summary</span>
-                  <div style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 700, marginTop: '2px' }}>
-                    {previewStats.count} Vacant Office Space Units
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Aggregated Area</span>
-                  <div style={{ color: '#10b981', fontSize: '15px', fontWeight: 800 }}>
-                    {previewStats.area} m² Total
-                  </div>
-                </div>
-              </div>
-
-              {/* Linked Lease Agreement */}
-              <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Link Active Lease Contract (Optional)</label>
-                <select
-                  value={formData.LeaseAgreementID}
-                  onChange={(e) => handleFieldChange('LeaseAgreementID', e.target.value)}
-                  style={{
-                    width: '100%', background: 'var(--bg-tertiary)',
-                    border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '10px',
-                    padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
-                  }}
-                >
-                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Lease Contract Link --</option>
-                  {leases.map(l => (
-                    <option key={l.LeaseAgreementID} value={l.LeaseAgreementID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                      Contract #{l.AgreementNumber} (ETB {Number(l.MonthlyRentAmount).toLocaleString()}/mo)
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Select Building Block --</option>
+                  {buildings.map(b => (
+                    <option key={b.BuildingID} value={b.BuildingID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {b.BuildingName} ({b.BuildingCode || b.BuildingID})
                     </option>
                   ))}
                 </select>
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Allocation Date *</label>
-                <input
-                  type="date"
-                  value={formData.AllocatedDate}
-                  onChange={(e) => handleFieldChange('AllocatedDate', e.target.value)}
-                  onBlur={() => handleBlur('AllocatedDate')}
+              <FormField label="Floor Level *" error={fieldErrors.FloorID} icon={Layers}>
+                <select
+                  value={selectedFloorID}
+                  onChange={(e) => {
+                    setSelectedFloorID(e.target.value);
+                    if (fieldErrors.FloorID) {
+                      setFieldErrors(prev => {
+                        const next = { ...prev };
+                        delete next.FloorID;
+                        return next;
+                      });
+                    }
+                  }}
+                  onBlur={() => handleBlur('FloorID')}
                   style={{
                     width: '100%', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.AllocatedDate ? '1px solid #ef4444' : '1px solid rgba(245, 158, 11, 0.3)',
-                    borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', boxSizing: 'border-box'
+                    border: `1px solid ${fieldErrors.FloorID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
-                />
-                {fieldErrors.AllocatedDate && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.AllocatedDate}
-                  </span>
-                )}
-              </div>
+                >
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Select Floor Level --</option>
+                  {floors.map(f => (
+                    <option key={f.FloorID} value={f.FloorID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {f.FloorName} (Level {f.FloorNumber})
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+            </div>
+          )}
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsAllocateModalOpen(false)}
-                  style={{
-                    background: 'rgba(100, 116, 139, 0.2)', border: '1px solid rgba(148, 163, 184, 0.15)',
-                    borderRadius: '10px', padding: '10px 20px', color: 'var(--text-muted)', fontWeight: 600,
-                    fontSize: '13px', cursor: 'pointer'
-                  }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                    border: 'none', borderRadius: '10px', padding: '10px 24px',
-                    color: '#fff', fontWeight: 700, fontSize: '13px', cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                  }}
-                >
-                  {t('tenant.allocateSpace')} {previewStats.count > 0 ? `(${previewStats.count} Units)` : ''}
-                </button>
+          {scope === 'BUILDING' && (
+            <FormField label="Entire Building Block *" error={fieldErrors.BuildingID} icon={Building2}>
+              <select
+                value={selectedBuildingID}
+                onChange={(e) => {
+                  setSelectedBuildingID(e.target.value);
+                  if (fieldErrors.BuildingID) {
+                    setFieldErrors(prev => {
+                      const next = { ...prev };
+                      delete next.BuildingID;
+                      return next;
+                    });
+                  }
+                }}
+                style={{
+                  width: '100%', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${fieldErrors.BuildingID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Select Building Block --</option>
+                {buildings.map(b => (
+                  <option key={b.BuildingID} value={b.BuildingID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {b.BuildingName} ({b.BuildingCode || b.BuildingID})
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          )}
+
+          {/* Scope Summary Preview Box */}
+          <div style={{
+            background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)',
+            borderRadius: 'var(--border-radius-sm)', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+          }}>
+            <div>
+              <span style={{ color: '#f59e0b', fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Capacity Summary</span>
+              <div style={{ color: 'var(--text-primary)', fontSize: '0.92rem', fontWeight: 800, marginTop: '2px' }}>
+                {previewStats.count} Vacant Units
               </div>
-            </form>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>Aggregated Area</span>
+              <div style={{ color: '#10b981', fontSize: '0.95rem', fontWeight: 800 }}>
+                {previewStats.area} m² Total
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+            <FormField label="Link Active Lease (Optional)" icon={FileText}>
+              <select
+                value={formData.LeaseAgreementID}
+                onChange={(e) => handleFieldChange('LeaseAgreementID', e.target.value)}
+                style={{
+                  width: '100%', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)',
+                  padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- No Lease Link --</option>
+                {leases.map(l => (
+                  <option key={l.LeaseAgreementID} value={l.LeaseAgreementID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    Contract #{l.AgreementNumber} (ETB {Number(l.MonthlyRentAmount).toLocaleString()}/mo)
+                  </option>
+                ))}
+              </select>
+            </FormField>
+
+            <FormField label="Allocation Date *" error={fieldErrors.AllocatedDate} icon={Clock}>
+              <input
+                type="date"
+                value={formData.AllocatedDate}
+                onChange={(e) => handleFieldChange('AllocatedDate', e.target.value)}
+                onBlur={() => handleBlur('AllocatedDate')}
+                style={{
+                  width: '100%', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${fieldErrors.AllocatedDate ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
           </div>
         </div>
-      )}
+      </ModalCard>
 
       {/* Release Modal */}
-      {releaseModalAlloc && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-        }} onClick={() => setReleaseModalAlloc(null)}>
-          <div style={{
-            ...glassCard, background: 'var(--bg-secondary)', width: '460px', maxWidth: '90vw',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-            animation: 'fadeInUp 0.3s ease-out'
-          }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '18px', fontWeight: 700 }}>
-                🔄 Release Space Allocation
-              </h3>
-              <button onClick={() => setReleaseModalAlloc(null)} style={{
-                background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer'
-              }}><X size={20} /></button>
+      <ModalCard
+        isOpen={Boolean(releaseModalAlloc)}
+        onClose={() => setReleaseModalAlloc(null)}
+        title="Release Space Allocation"
+        subtitle={releaseModalAlloc ? `Release ${releaseModalAlloc.OfficeName} from ${releaseModalAlloc.TenantCompanyName}` : ''}
+        category="Premises De-allocation"
+        icon={RotateCcw}
+        accentStrip="rose"
+        maxWidth="480px"
+        onSubmit={handleReleaseSubmit}
+        submitText={t('common.confirm', 'Confirm Release')}
+        cancelText={t('common.cancel', 'Cancel')}
+        submitDisabled={!releaseRemarks.trim()}
+        error={releaseErrors.Remarks || ''}
+      >
+        {releaseModalAlloc && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div
+              style={{
+                padding: '12px 14px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.85rem'
+              }}
+            >
+              <div>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'block' }}>Target Office Unit</span>
+                <strong style={{ color: 'var(--text-primary)', fontSize: '0.92rem' }}>{releaseModalAlloc.OfficeName}</strong>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'block' }}>Tenant</span>
+                <strong style={{ color: 'var(--text-primary)', fontSize: '0.92rem' }}>{releaseModalAlloc.TenantCompanyName}</strong>
+              </div>
             </div>
 
-            <p style={{ color: 'var(--text-secondary)', fontSize: '13.5px', marginBottom: '16px' }}>
-              Release <strong style={{ color: 'var(--text-primary)' }}>{releaseModalAlloc.OfficeName}</strong> from <strong style={{ color: 'var(--text-primary)' }}>{releaseModalAlloc.TenantCompanyName}</strong>?
-            </p>
-
-            <form onSubmit={handleReleaseSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Release Reason / Remarks *</label>
-                <textarea
-                  value={releaseRemarks}
-                  onChange={(e) => {
-                    setReleaseRemarks(e.target.value);
-                    if (releaseErrors.Remarks) setReleaseErrors({});
-                  }}
-                  placeholder="e.g. Lease expired, tenant relocated to new floor..."
-                  rows={3}
-                  style={{
-                    width: '100%', background: 'var(--bg-tertiary)',
-                    border: releaseErrors.Remarks ? '1px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '10px',
-                    padding: '10px 14px', color: 'var(--text-primary)', fontSize: '13.5px', outline: 'none',
-                    resize: 'vertical', boxSizing: 'border-box'
-                  }}
-                />
-                {releaseErrors.Remarks && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {releaseErrors.Remarks}
-                  </span>
-                )}
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => setReleaseModalAlloc(null)}
-                  style={{
-                    background: 'rgba(100, 116, 139, 0.2)', border: '1px solid rgba(148, 163, 184, 0.15)',
-                    borderRadius: '10px', padding: '10px 20px', color: 'var(--text-muted)', fontWeight: 600,
-                    fontSize: '13px', cursor: 'pointer'
-                  }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                    border: 'none', borderRadius: '10px', padding: '10px 22px',
-                    color: '#fff', fontWeight: 700, fontSize: '13px', cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-                  }}
-                >
-                  {t('common.confirm')}
-                </button>
-              </div>
-            </form>
+            <FormField label="Release Reason / Remarks *" error={releaseErrors.Remarks} icon={FileText}>
+              <textarea
+                value={releaseRemarks}
+                onChange={(e) => {
+                  setReleaseRemarks(e.target.value);
+                  if (releaseErrors.Remarks) setReleaseErrors({});
+                }}
+                placeholder="e.g. Lease expired, tenant relocated to new floor..."
+                rows={3}
+                style={{
+                  width: '100%', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${releaseErrors.Remarks ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', padding: '10px 14px', color: 'var(--text-primary)',
+                  fontSize: '0.88rem', resize: 'vertical'
+                }}
+              />
+            </FormField>
           </div>
-        </div>
-      )}
+        )}
+      </ModalCard>
 
       <style>{`
         @keyframes fadeInUp {

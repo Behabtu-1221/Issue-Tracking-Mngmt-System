@@ -11,17 +11,11 @@ export const serviceRepository = {
         sc.CategoryName,
         sc.CategoryCode,
         st.ServiceTypeName,
-        sl.ServiceLevelName,
-        sp.PricingModel,
-        sp.UnitPrice,
-        sp.BillingType,
-        (SELECT COUNT(*) FROM ServiceRequirement sr WHERE sr.ServiceID = s.ServiceID AND sr.IsDeleted = 0) AS RequirementCount,
-        (SELECT COUNT(*) FROM ServiceAttachmentRequirement sar WHERE sar.ServiceID = s.ServiceID AND sar.IsDeleted = 0) AS AttachmentRequirementCount
+        sl.ServiceLevelName
       FROM Service s
       JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
       LEFT JOIN ServiceType st ON s.ServiceTypeID = st.ServiceTypeID
       LEFT JOIN ServiceLevel sl ON s.ServiceLevelID = sl.ServiceLevelID
-      LEFT JOIN ServicePricing sp ON s.ServiceID = sp.ServiceID AND sp.IsDeleted = 0
       WHERE s.IsDeleted = 0 AND sc.IsDeleted = 0
     `;
     const params = [];
@@ -80,11 +74,6 @@ export const serviceRepository = {
         sc.CategoryCode,
         st.ServiceTypeName,
         sl.ServiceLevelName,
-        sp.ServicePricingID,
-        sp.PricingModel,
-        sp.UnitPrice,
-        sp.BillingType,
-        sp.CurrencyCode AS PricingCurrencyCode,
         sa.ServiceAvailabilityID,
         sa.BusinessCalendarID,
         bc.CalendarName
@@ -92,7 +81,6 @@ export const serviceRepository = {
       JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
       LEFT JOIN ServiceType st ON s.ServiceTypeID = st.ServiceTypeID
       LEFT JOIN ServiceLevel sl ON s.ServiceLevelID = sl.ServiceLevelID
-      LEFT JOIN ServicePricing sp ON s.ServiceID = sp.ServiceID AND sp.IsDeleted = 0
       LEFT JOIN ServiceAvailability sa ON s.ServiceID = sa.ServiceID AND sa.IsDeleted = 0
       LEFT JOIN BusinessCalendar bc ON sa.BusinessCalendarID = bc.BusinessCalendarID
       WHERE s.ServiceID = ? AND s.IsDeleted = 0
@@ -212,19 +200,10 @@ export const serviceRepository = {
       WHERE s.IsDeleted = 0 AND s.IsActive = 1 AND sc.IsDeleted = 0 ${tenantFilter}
     `, params);
 
-    const billableSvcs = await query(`
-      SELECT COUNT(*) as total
-      FROM ServicePricing sp
-      JOIN Service s ON sp.ServiceID = s.ServiceID
-      JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
-      WHERE sp.IsDeleted = 0 AND sp.BillingType = 'BILLABLE' AND s.IsDeleted = 0 ${tenantFilter}
-    `, params);
-
     return {
       totalCategories: totalCats[0]?.total || 0,
       totalServices: totalSvcs[0]?.total || 0,
-      activeServices: activeSvcs[0]?.total || 0,
-      billableServices: billableSvcs[0]?.total || 0
+      activeServices: activeSvcs[0]?.total || 0
     };
   }
 };

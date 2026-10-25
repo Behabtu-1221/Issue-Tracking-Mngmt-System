@@ -148,8 +148,7 @@ export default function IssueDashboardPage() {
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           {[
             { label: t('dashboard.serviceRequestsTracker', 'Issue Requests Tracker'), icon: ListChecks, route: '/issues/tracker' },
-            { label: t('dashboard.serviceRequestsTrackerDesc', 'Status Lifecycle Flow'), icon: RefreshCw, route: '/issues/status-flow' },
-            { label: t('dashboard.knowledgeBase', 'Known Issues & KB'), icon: BookOpen, route: '/issues/known' }
+            { label: t('dashboard.serviceRequestsTrackerDesc', 'Status Lifecycle Flow'), icon: RefreshCw, route: '/issues/status-flow' }
           ].map((s) => {
             const ShortIcon = s.icon;
             return (

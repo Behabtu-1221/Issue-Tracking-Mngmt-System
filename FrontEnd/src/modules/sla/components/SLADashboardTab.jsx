@@ -5,8 +5,10 @@ import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { FormField } from '../../../components/common/FormField';
 import { slaSchemas } from '../../../validation';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function SLADashboardTab() {
+  const { t } = useTranslation();
   const [clocks, setClocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -138,7 +140,7 @@ export default function SLADashboardTab() {
       const overSecs = Math.abs(diffSecs);
       const m = Math.floor(overSecs / 60);
       const s = overSecs % 60;
-      return `OVERDUE (-${m}m ${s}s)`;
+      return `${t('sla.breached', 'OVERDUE')} (-${m}m ${s}s)`;
     }
 
     const hours = Math.floor(diffSecs / 3600);
@@ -151,20 +153,20 @@ export default function SLADashboardTab() {
     if (c.IsResolutionBreached || c.IsResponseBreached) {
       return (
         <span style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-          <AlertTriangle size={13} /> SLA Breached
+          <AlertTriangle size={13} /> {t('sla.breached', 'SLA Breached')}
         </span>
       );
     }
     if (c.ClockStatus === 'PAUSED') {
       return (
         <span style={{ background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.4)', color: '#f59e0b', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-          <Pause size={13} /> Timer Paused
+          <Pause size={13} /> {t('sla.paused', 'Timer Paused')}
         </span>
       );
     }
     return (
       <span style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#10b981', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-        <Clock size={13} /> Timer Running
+        <Clock size={13} /> {t('sla.running', 'Timer Running')}
       </span>
     );
   };
@@ -184,7 +186,7 @@ export default function SLADashboardTab() {
           <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search SLA clocks by title, request number..."
+            placeholder={t('sla.searchClocks', 'Search SLA clocks by title, request number...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -197,7 +199,11 @@ export default function SLADashboardTab() {
         </div>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--bg-tertiary)', padding: '4px', borderRadius: '14px', border: '1px solid var(--glass-border)' }}>
-          {['ALL', 'RUNNING', 'PAUSED'].map((st) => (
+          {[
+            { key: 'ALL', label: t('sla.allClocks', 'All Clocks') },
+            { key: 'RUNNING', label: t('sla.running', 'Running') },
+            { key: 'PAUSED', label: t('sla.paused', 'Paused') }
+          ].map(({ key: st, label }) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
@@ -208,7 +214,7 @@ export default function SLADashboardTab() {
                 fontWeight: '700', fontSize: '0.78rem', cursor: 'pointer'
               }}
             >
-              {st === 'ALL' ? 'All Clocks' : st}
+              {label}
             </button>
           ))}
         </div>
@@ -216,24 +222,24 @@ export default function SLADashboardTab() {
 
       {/* Clocks Table */}
       {loading ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading active SLA clocks...</div>
+        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>{t('sla.loadingClocks', 'Loading active SLA clocks...')}</div>
       ) : (!clocks || clocks.length === 0) ? (
         <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
           <Clock size={42} style={{ opacity: 0.4, marginBottom: '12px', color: 'var(--accent-primary)' }} />
-          <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>No SLA Clocks Monitored</div>
-          <div style={{ fontSize: '0.82rem' }}>SLA timers start automatically when service requests are submitted.</div>
+          <div style={{ fontWeight: '700', fontSize: '1rem', color: 'var(--text-primary)' }}>{t('sla.noClocksMonitored', 'No SLA Clocks Monitored')}</div>
+          <div style={{ fontSize: '0.82rem' }}>{t('sla.clocksStartAuto', 'SLA timers start automatically when service requests are submitted.')}</div>
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px', textAlign: 'left', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ color: 'var(--text-muted)', fontSize: '0.78rem', letterSpacing: '0.5px' }}>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>SERVICE REQUEST</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>PRIORITY</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>RESPONSE DEADLINE</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>RESOLUTION COUNTDOWN</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700' }}>STATUS</th>
-                <th style={{ padding: '12px 18px', fontWeight: '700', textAlign: 'right' }}>TIMER CONTROL</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('sla.serviceRequest', 'SERVICE REQUEST')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('sla.priority', 'PRIORITY')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('sla.responseDeadline', 'RESPONSE DEADLINE')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('sla.resolutionCountdown', 'RESOLUTION COUNTDOWN')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700' }}>{t('issues.status', 'STATUS')}</th>
+                <th style={{ padding: '12px 18px', fontWeight: '700', textAlign: 'right' }}>{t('sla.timerControl', 'TIMER CONTROL')}</th>
               </tr>
             </thead>
             <tbody>
@@ -321,38 +327,51 @@ export default function SLADashboardTab() {
 
       {/* Validated Pause SLA Clock Modal */}
       {pauseModal.isOpen && pauseModal.clock && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(15, 23, 42, 0.82)', backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '24px'
-        }}>
-          <div style={{
-            background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
-            borderRadius: '24px', width: '100%', maxWidth: '540px',
-            boxShadow: '0 25px 70px rgba(0, 0, 0, 0.5)', display: 'flex', flexDirection: 'column',
-            overflow: 'hidden'
-          }}>
+        <div
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 'clamp(8px, 2.5vw, 20px)'
+          }}
+          onClick={closePauseModal}
+        >
+          <div
+            className="modal-card accent-strip-amber enterprise-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pause-sla-title"
+            style={{
+              background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)',
+              borderRadius: 'var(--border-radius-lg, 18px)', width: '100%', maxWidth: '540px',
+              boxShadow: 'var(--shadow-lg)', display: 'flex', flexDirection: 'column',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '20px 24px', borderBottom: '1px solid var(--glass-border)',
-              background: 'rgba(255, 255, 255, 0.02)'
+              padding: '16px 24px', borderBottom: '1px solid var(--glass-border)',
+              background: 'var(--bg-tertiary)'
             }}>
               <div>
                 <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   SLA CLOCK CONTROLS • {pauseModal.clock.RequestNumber || `#${pauseModal.clock.SLAClockID}`}
                 </span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+                <h3 id="pause-sla-title" style={{ margin: '4px 0 0', fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
                   Pause SLA Countdown Timer
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={closePauseModal}
+                className="btn-icon touch-target-sm"
                 style={{
                   background: 'rgba(255, 255, 255, 0.06)', border: '1px solid var(--glass-border)',
-                  color: 'var(--text-muted)', cursor: 'pointer', padding: '8px', borderRadius: '50%',
+                  color: 'var(--text-muted)', cursor: 'pointer', padding: '8px', borderRadius: '8px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}
+                aria-label="Close"
               >
                 <X size={18} />
               </button>

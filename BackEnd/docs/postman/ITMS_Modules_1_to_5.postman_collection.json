@@ -1,0 +1,6162 @@
+{
+  "info": {
+    "name": "Enterprise ITMS — Modules 1 to 5 Postman Inventory (Core Foundation)",
+    "description": "Covers Modules 1 to 5: Health & Diagnostics, Identity & Access (Auth, Users, Roles), Business Park & Infrastructure, Tenant Management, and Organization Structure & Staff.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "devResetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "entityId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "parkId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "buildingId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "floorId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "officeId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "locationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "facilityZoneId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "floorPlanId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "tenantId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "subTenantId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "contactId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "addressId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "leaseId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "allocationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "departmentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "teamId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "positionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "assignmentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "hierarchyId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "costCenterId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "budgetId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "serviceId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "mappingId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "issueRequestId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "commentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "investigationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "resolutionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "approvalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "delegationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "approvalRuleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "approvalGroupId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "dispatchId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "slaPolicyId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "conversationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "channelId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "announcementId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "templateId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reminderId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reportId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "settingId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "flagId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "sequenceId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "lookupTypeId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "lookupValueId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "calendarId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "workingHourId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "holidayId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "localizationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "resourceId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. System Health & Diagnostics",
+      "item": [
+        {
+          "name": "Comprehensive Health Status",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "description": "Public health probe checking DB connection, migrations status, and uptime."
+          }
+        },
+        {
+          "name": "Liveness Probe (/live)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health/live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health",
+                "live"
+              ]
+            },
+            "description": "Kubernetes/Docker liveness probe verifying event loop responsiveness."
+          }
+        },
+        {
+          "name": "Readiness Probe (/ready)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health",
+                "ready"
+              ]
+            },
+            "description": "Readiness probe verifying MySQL connectivity and schema at migration head."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Identity & Access Management",
+      "item": [
+        {
+          "name": "2.1 Authentication & Sessions",
+          "item": [
+            {
+              "name": "Login (Super Admin)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.data && res.data.accessToken) {",
+                      "    pm.collectionVariables.set(\"token\", res.data.accessToken);",
+                      "    pm.collectionVariables.set(\"refreshToken\", res.data.refreshToken);",
+                      "    console.log(\"✓ Captured JWT Access Token and Refresh Token!\");",
+                      "}",
+                      "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Contains JWT accessToken\", () => pm.expect(res.data.accessToken).to.be.a(\"string\"));"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"superadmin\",\n  \"password\": \"Admin@123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Authenticates with username/password and automatically sets {{token}} for all subsequent requests."
+              }
+            },
+            {
+              "name": "Refresh Access Token",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Current Actor Profile (/me)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "me"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Current User Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"System\",\n  \"lastName\": \"Super Admin\",\n  \"phoneNumber\": \"+251911000000\",\n  \"preferredLanguage\": \"en\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "profile"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Notification Preferences",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"emailNotifications\": true,\n  \"inAppNotifications\": true,\n  \"digestFrequency\": \"DAILY\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/notification-preferences",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "notification-preferences"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Change Password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\": \"Admin@123\",\n  \"newPassword\": \"NewAdmin@123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/change-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "change-password"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List Active User Sessions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "sessions"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Revoke Specific Session",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/sessions/:sessionId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "sessions",
+                    ":sessionId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "sessionId",
+                      "value": "1"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Forgot Password Request",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"superadmin@businesspark.local\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Reset Password With Token",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"32_CHARACTER_CRYPTOGRAPHIC_RESET_TOKEN\",\n  \"newPassword\": \"SecureReset@2026!\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/reset-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "reset-password"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Logout Session",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.2 User Accounts & Profiles",
+          "item": [
+            {
+              "name": "List Users (Paginated & Filterable)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users?limit=10&offset=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "tenantId",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "userTypeCode",
+                      "value": "EMPLOYEE",
+                      "disabled": true
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get User By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Abebe\",\n  \"lastName\": \"Kebede\",\n  \"email\": \"abebe.kebede@testcorp.com\",\n  \"userTypeCode\": \"STAFF\",\n  \"tenantId\": 1,\n  \"jobTitle\": \"Facilities Coordinator\",\n  \"phoneNumber\": \"+251911223344\",\n  \"preferredLanguage\": \"en\",\n  \"accountStatusCode\": \"ACTIVE\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update User Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Abebe\",\n  \"lastName\": \"Kebede Modified\",\n  \"jobTitle\": \"Senior Facilities Coordinator\",\n  \"phoneNumber\": \"+251911998877\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update User Account Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{userId}}",
+                    "status"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get User Sessions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}/sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{userId}}",
+                    "sessions"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Terminate All User Sessions",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}/sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{userId}}",
+                    "sessions"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get User Login History",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}/login-history?limit=10&offset=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{userId}}",
+                    "login-history"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Soft Delete User",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "{{userId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get User by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/users/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update User Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/users/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"FirstName\": \"Super\",\n  \"LastName\": \"Administrator\",\n  \"Email\": \"admin@enterprise.com\",\n  \"Phone\": \"+251911000000\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Patch User Status (Activate/Deactivate)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/:id/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ":id",
+                    "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PATCH http://localhost:5000/api/users/:id/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isActive\": true\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete User Account",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/users/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Active Sessions for User",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/:id/sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ":id",
+                    "sessions"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/users/:id/sessions"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Revoke All Sessions for User",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/:id/sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ":id",
+                    "sessions"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/users/:id/sessions"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get User Login History & Audit",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/:id/login-history",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    ":id",
+                    "login-history"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/users/:id/login-history"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2.3 Roles, Permissions & Security",
+          "item": [
+            {
+              "name": "Get All System Permissions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/permissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "permissions"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get RBAC Audit Logs",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/audit-logs",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "audit-logs"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List Roles",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles?limit=20&offset=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Role By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "{{roleId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Role",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleCode\": \"FACILITY_INSPECTOR\",\n  \"roleName\": \"Facility Inspector\",\n  \"description\": \"Conducts periodic physical facility safety audits\",\n  \"permissionIds\": [\n    1,\n    2,\n    3\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Role",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleName\": \"Senior Facility Inspector\",\n  \"description\": \"Updated inspection scope authority\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "{{roleId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Role Permissions (Sync)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"permissionIds\": [\n    1,\n    2,\n    3,\n    4\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/{{roleId}}/permissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "{{roleId}}",
+                    "permissions"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Assign Roles to User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleIds\": [\n    2\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/users/{{userId}}/assign",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "users",
+                    "{{userId}}",
+                    "assign"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Remove Role from User",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/users/{{userId}}/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "users",
+                    "{{userId}}",
+                    "roles",
+                    "{{roleId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Role",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/{{roleId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "{{roleId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Assign Role to User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/assign",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "assign"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/roles/assign",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": 1,\n  \"roleId\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Role by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/roles/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Role Definition",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/roles/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleName\": \"PARK_OPERATIONS_MANAGER\",\n  \"description\": \"Operations and facilities lead manager\",\n  \"roleLevel\": 50\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Role",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/roles/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Role Permissions Matrix",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/:id/permissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    ":id",
+                    "permissions"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/roles/:id/permissions",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"permissionIds\": [\n    1,\n    2,\n    3,\n    4,\n    5,\n    10,\n    15\n  ]\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Assign User to Role",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/users/:id/assign",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "users",
+                    ":id",
+                    "assign"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/roles/users/:id/assign",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleId\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Remove Role from User",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/roles/users/:id/roles/:roleId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "users",
+                    ":id",
+                    "roles",
+                    ":roleId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    },
+                    {
+                      "key": "roleId",
+                      "value": "1",
+                      "description": "URL path parameter :roleId"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/roles/users/:id/roles/:roleId"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Business Park & Facilities",
+      "item": [
+        {
+          "name": "List Business Parks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/parks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Park Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/parks/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parks",
+                "metrics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Park By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/parks/{{parkId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parks",
+                "{{parkId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Buildings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Building By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings/{{buildingId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings",
+                "{{buildingId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Floors in Building",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings/{{buildingId}}/floors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings",
+                "{{buildingId}}",
+                "floors"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Building",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"BusinessParkID\": 1,\n  \"FacilityZoneID\": 1,\n  \"BuildingCode\": \"BLD-TEST-01\",\n  \"BuildingName\": \"Innovation Hub North\",\n  \"TotalFloors\": 5,\n  \"TotalAreaSquareMeter\": 12500.5,\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Floors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floors"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Offices on Floor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floors/{{floorId}}/offices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floors",
+                "{{floorId}}",
+                "offices"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Floor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"BuildingID\": 1,\n  \"FloorNumber\": 3,\n  \"FloorCode\": \"FL-03\",\n  \"FloorName\": \"Third Floor Tech Wing\",\n  \"TotalOfficeSpaces\": 12,\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/floors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floors"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Offices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Office",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FloorID\": 1,\n  \"OfficeTypeID\": 1,\n  \"OfficeNumber\": \"OFF-305\",\n  \"OfficeName\": \"Executive Suite 305\",\n  \"SquareMeters\": 85.5,\n  \"MaxOccupancy\": 10,\n  \"MonthlyRentAmount\": 45000,\n  \"AvailabilityStatus\": \"VACANT\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/offices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Office Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"OCCUPIED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/{{officeId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                "{{officeId}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Locations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/locations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "locations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Location",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"BusinessParkID\": 1,\n  \"LocationCode\": \"LOC-PARK-01\",\n  \"LocationName\": \"Main Campus East Courtyard\",\n  \"LocationType\": \"CAMPUS\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/locations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "locations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Facility Zones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/facility-zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facility-zones"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Buildings in Zone",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/facility-zones/{{facilityZoneId}}/buildings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facility-zones",
+                "{{facilityZoneId}}",
+                "buildings"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Floor Plan By Floor ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floor-plans/floor/{{floorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floor-plans",
+                "floor",
+                "{{floorId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Business Park by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/parks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/parks/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Business Park",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/parks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parks"
+              ]
+            },
+            "description": "POST http://localhost:5000/api/parks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ParkCode\": \"BP_ADDIS_TECH\",\n  \"ParkName\": \"Addis Technology Park\",\n  \"Description\": \"Flagship innovation and software park\",\n  \"TotalLandAreaSqMeters\": 500000,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Business Park",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/parks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/parks/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ParkName\": \"Addis Technology & Innovation Park\",\n  \"TotalLandAreaSqMeters\": 550000,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Business Park",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/parks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/parks/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Building by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/buildings/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Floors in Building",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings/:buildingId/floors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings",
+                ":buildingId",
+                "floors"
+              ],
+              "variable": [
+                {
+                  "key": "buildingId",
+                  "value": "{{buildingId}}",
+                  "description": "URL path parameter :buildingId"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/buildings/:buildingId/floors"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Building",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/buildings/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"BuildingName\": \"Building A (Technology Tower)\",\n  \"TotalFloors\": 12,\n  \"TotalAreaSqMeters\": 18000,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Building",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/buildings/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buildings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/buildings/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Floor by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floors/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floors",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/floors/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Offices on Floor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floors/:floorId/offices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floors",
+                ":floorId",
+                "offices"
+              ],
+              "variable": [
+                {
+                  "key": "floorId",
+                  "value": "{{floorId}}",
+                  "description": "URL path parameter :floorId"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/floors/:floorId/offices"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Floor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/floors/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floors",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/floors/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FloorName\": \"2nd Floor - Innovation Hub\",\n  \"FloorAreaSqMeters\": 1500,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Floor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floors/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floors",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/floors/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Office by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/offices/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Office Suite",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/offices/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"OfficeName\": \"Suite 201-B\",\n  \"AreaSqMeters\": 145,\n  \"MaxOccupancy\": 18,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Office Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/:id/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                ":id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PATCH http://localhost:5000/api/offices/:id/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"OCCUPIED\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Office",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/offices/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Location by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/locations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "locations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/locations/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Campus Location",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/locations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "locations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/locations/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"LocationName\": \"East Gate Security & Visitor Plaza\",\n  \"LocationType\": \"SECURITY\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Campus Location",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/locations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "locations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/locations/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Facility Zone by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/facility-zones/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facility-zones",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/facility-zones/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Buildings in Facility Zone",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/facility-zones/:zoneId/buildings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facility-zones",
+                ":zoneId",
+                "buildings"
+              ],
+              "variable": [
+                {
+                  "key": "zoneId",
+                  "value": "1",
+                  "description": "URL path parameter :zoneId"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/facility-zones/:zoneId/buildings"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Facility Zone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/facility-zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facility-zones"
+              ]
+            },
+            "description": "POST http://localhost:5000/api/facility-zones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ParkID\": 1,\n  \"ZoneCode\": \"ZONE_NORTH\",\n  \"ZoneName\": \"North Technology Quad\",\n  \"ZoneType\": \"COMMERCIAL\",\n  \"Description\": \"Commercial tech cluster\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Facility Zone",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/facility-zones/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facility-zones",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/facility-zones/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ZoneName\": \"North Technology Innovation Quad\",\n  \"Description\": \"Updated commercial cluster zone\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Facility Zone",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/facility-zones/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "facility-zones",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/facility-zones/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Floor Plan Blueprint by Floor ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floor-plans/floor/:floorId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floor-plans",
+                "floor",
+                ":floorId"
+              ],
+              "variable": [
+                {
+                  "key": "floorId",
+                  "value": "{{floorId}}",
+                  "description": "URL path parameter :floorId"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/floor-plans/floor/:floorId"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Floor Plan Blueprint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/floor-plans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floor-plans"
+              ]
+            },
+            "description": "POST http://localhost:5000/api/floor-plans",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"FloorID\": 1,\n  \"PlanName\": \"Building A Floor 2 CAD Layout\",\n  \"FileUrl\": \"/uploads/floorplans/bldg_a_fl_2.pdf\",\n  \"ScaleRatio\": \"1:100\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Floor Plan Blueprint",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/floor-plans/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floor-plans",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/floor-plans/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"PlanName\": \"Building A Floor 2 CAD Layout v2\",\n  \"ScaleRatio\": \"1:100\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Floor Plan Blueprint",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/floor-plans/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "floor-plans",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/floor-plans/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Tenant Management",
+      "item": [
+        {
+          "name": "List Tenants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tenant Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "metrics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tenant By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/{{tenantId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "{{tenantId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Tenant Organization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"BusinessParkID\": 1,\n  \"TenantTypeID\": 1,\n  \"TenantCode\": \"TNT-SOLUTIONS-01\",\n  \"CompanyName\": \"Apex Tech Solutions PLC\",\n  \"RegistrationNumber\": \"REG-ETH-2026-99\",\n  \"TaxIdentificationNo\": \"TIN-0099887766\",\n  \"Status\": \"ACTIVE\",\n  \"Website\": \"https://apexsolutions.et\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Tenant Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/{{tenantId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                "{{tenantId}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Sub-Tenants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sub-tenants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sub-tenants"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Sub-Tenant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ParentTenantID\": 1,\n  \"CompanyName\": \"Apex Cloud Services (Subsidiary)\",\n  \"RelationshipType\": \"SUBSIDIARY\",\n  \"Status\": \"ACTIVE\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/sub-tenants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sub-tenants"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Tenant Contacts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-contacts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-contacts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Tenant Contact",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenantID\": 1,\n  \"ContactType\": \"EMAIL\",\n  \"Label\": \"Primary Operational Support\",\n  \"ContactValue\": \"ops@apexsolutions.et\",\n  \"IsPrimary\": 1,\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-contacts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-contacts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Tenant Addresses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-addresses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-addresses"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Tenant Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenantID\": 1,\n  \"AddressType\": \"LEGAL\",\n  \"Country\": \"Ethiopia\",\n  \"City\": \"Addis Ababa\",\n  \"AddressLine1\": \"Bole Subcity, IT Park Road\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-addresses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-addresses"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Leases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leases",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leases"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Leases Expiring Soon",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leases/expiring-soon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leases",
+                "expiring-soon"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Lease Agreement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenantID\": 1,\n  \"AgreementNumber\": \"LSE-2026-APEX-01\",\n  \"StartDate\": \"2026-01-01\",\n  \"EndDate\": \"2027-12-31\",\n  \"ExecutionDate\": \"2025-12-15\",\n  \"MonthlyRentAmount\": 50000,\n  \"SecurityDepositAmount\": 150000,\n  \"CurrencyCode\": \"ETB\",\n  \"GracePeriodDays\": 5,\n  \"Status\": \"ACTIVE\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leases",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leases"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Office Allocations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/office-allocations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "office-allocations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Allocate Office Space",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenantID\": 1,\n  \"AllocationScope\": \"OFFICE\",\n  \"OfficeSpaceID\": 1,\n  \"AllocatedDate\": \"2026-01-01\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/office-allocations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "office-allocations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Release Office Allocation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Remarks\": \"Office vacated following scheduled tenancy expansion\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/office-allocations/{{allocationId}}/release",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "office-allocations",
+                "{{allocationId}}",
+                "release"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tenant by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/tenants/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Corporate Tenant",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/tenants/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenantName\": \"Acme International Corporation\",\n  \"Industry\": \"Information Technology\",\n  \"RegistrationNumber\": \"REG-2026-9999\",\n  \"ContactEmail\": \"info@acme.com\",\n  \"ContactPhone\": \"+251911002233\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patch Tenant Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/:id/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                ":id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PATCH http://localhost:5000/api/tenants/:id/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Corporate Tenant",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenants/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenants",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/tenants/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Sub-Tenant by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sub-tenants/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sub-tenants",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/sub-tenants/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Sub-Tenant",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/sub-tenants/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sub-tenants",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/sub-tenants/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"SubTenantName\": \"Acme Cloud Labs Branch\",\n  \"BusinessType\": \"R&D\",\n  \"ContactPerson\": \"Jane Doe\",\n  \"ContactEmail\": \"jane.doe@acme.com\",\n  \"ContactPhone\": \"+251911445566\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Sub-Tenant",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/sub-tenants/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "sub-tenants",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/sub-tenants/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Tenant Contact by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-contacts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-contacts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/tenant-contacts/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Tenant Contact",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-contacts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-contacts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/tenant-contacts/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ContactName\": \"Jane Smith\",\n  \"JobTitle\": \"Senior Operations Director\",\n  \"Email\": \"jane.smith@acme.com\",\n  \"Phone\": \"+251911223344\",\n  \"IsPrimary\": 1,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Tenant Contact",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-contacts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-contacts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/tenant-contacts/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Tenant Address by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-addresses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-addresses",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/tenant-addresses/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Tenant Address",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-addresses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-addresses",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/tenant-addresses/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AddressLine1\": \"Bole Sub-City, Road 4, Suite 300\",\n  \"City\": \"Addis Ababa\",\n  \"PostalCode\": \"1000\",\n  \"Country\": \"Ethiopia\",\n  \"IsPrimary\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Tenant Address",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tenant-addresses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tenant-addresses",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/tenant-addresses/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Lease by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leases/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leases",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/leases/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Lease Agreement",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/leases/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leases",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/leases/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"LeaseAgreementNumber\": \"LSE-2026-001-A\",\n  \"MonthlyRent\": 8500,\n  \"SecurityDeposit\": 25500,\n  \"CurrencyCode\": \"ETB\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patch Lease Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/leases/:id/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leases",
+                ":id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PATCH http://localhost:5000/api/leases/:id/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Lease Agreement",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leases/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leases",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/leases/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Office Allocation History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/office-allocations/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "office-allocations",
+                "history"
+              ]
+            },
+            "description": "GET http://localhost:5000/api/office-allocations/history"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Office Allocation by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/office-allocations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "office-allocations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/office-allocations/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Release Office Allocation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/office-allocations/:id/release",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "office-allocations",
+                ":id",
+                "release"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PATCH http://localhost:5000/api/office-allocations/:id/release",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"releaseDate\": \"2026-10-31\",\n  \"notes\": \"Lease expired; office vacated\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Office Allocation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/office-allocations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "office-allocations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/office-allocations/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Organizational Structure",
+      "item": [
+        {
+          "name": "List Departments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Department By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/{{departmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                "{{departmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"DepartmentCode\": \"DEPT-ENG\",\n  \"DepartmentName\": \"Network & Telecommunications Engineering\",\n  \"ManagerUserID\": 1,\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/departments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Department Locations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/{{departmentId}}/locations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                "{{departmentId}}",
+                "locations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Teams",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Team Workload Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/workload-summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                "workload-summary"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Eligible Technicians",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/eligible-technicians",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                "eligible-technicians"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Team",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"DepartmentID\": 1,\n  \"TeamCode\": \"TEAM-FIBER\",\n  \"TeamName\": \"Fiber Optics Rapid Response\",\n  \"LeaderUserID\": 5,\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Team Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                "{{teamId}}",
+                "members"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Team Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"UserID\": 5,\n  \"MemberRoleCode\": \"PRIMARY_TECHNICIAN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                "{{teamId}}",
+                "members"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Positions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/positions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "positions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Position",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"PositionCode\": \"POS-NET-ENG\",\n  \"PositionTitle\": \"Lead Fiber Network Engineer\",\n  \"Description\": \"Responsible for core campus backbone uptime\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/positions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "positions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Employee Assignments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employee-assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Employee Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"UserID\": 5,\n  \"DepartmentID\": 1,\n  \"PositionID\": 1,\n  \"IsPrimary\": 1,\n  \"JoinedDate\": \"2026-01-15\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employee-assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Reporting Hierarchies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reporting-hierarchies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reporting-hierarchies"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Reporting Hierarchy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"EmployeeUserID\": 5,\n  \"SupervisorUserID\": 1,\n  \"ReportingTypeCode\": \"DIRECT\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reporting-hierarchies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reporting-hierarchies"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Cost Centers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/cost-centers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "cost-centers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Cost Center",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CostCenterCode\": \"CC-FAC-01\",\n  \"CostCenterName\": \"Facility Maintenance OPEX\",\n  \"Description\": \"General campus maintenance cost center\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/cost-centers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "cost-centers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Department Budgets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "budgets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Department Budget",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"DepartmentID\": 1,\n  \"CostCenterID\": 1,\n  \"FiscalYear\": 2026,\n  \"AllocatedAmount\": 500000,\n  \"CurrencyCode\": \"ETB\",\n  \"IsActive\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/budgets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "budgets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Department by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/departments/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/departments/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"DepartmentName\": \"Facilities & Infrastructure Engineering\",\n  \"Description\": \"Updated facilities operations and mechanical maintenance\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Department",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/departments/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Locations for Department",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/:id/locations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                ":id",
+                "locations"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/departments/:id/locations"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Assign Location to Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/:id/locations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                ":id",
+                "locations"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "POST http://localhost:5000/api/departments/:id/locations",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"LocationID\": 1,\n  \"IsPrimary\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove Department Location Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/locations/:locId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "departments",
+                "locations",
+                ":locId"
+              ],
+              "variable": [
+                {
+                  "key": "locId",
+                  "value": "1",
+                  "description": "URL path parameter :locId"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/departments/locations/:locId"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Team by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/teams/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Team",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/teams/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TeamName\": \"Plumbing & Environmental Response Team\",\n  \"TeamLeadUserID\": 1,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Team",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/teams/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Team Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/:id/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                ":id",
+                "members"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/teams/:id/members"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Member to Team",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/:id/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                ":id",
+                "members"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "POST http://localhost:5000/api/teams/:id/members",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"UserID\": 1,\n  \"RoleInTeam\": \"SPECIALIST\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove Member from Team",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/:id/members/:userId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teams",
+                ":id",
+                "members",
+                ":userId"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "URL path parameter :userId"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/teams/:id/members/:userId"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Position by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/positions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "positions",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/positions/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Position",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/positions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "positions",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/positions/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"PositionTitle\": \"Lead Electrical & Systems Engineer\",\n  \"JobGrade\": \"GRADE-10\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Position",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/positions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "positions",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/positions/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Employee Assignment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-assignments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employee-assignments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/employee-assignments/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Employee Assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-assignments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employee-assignments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/employee-assignments/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AssignmentType\": \"PRIMARY\",\n  \"EndDate\": \"2027-12-31\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Employee Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-assignments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "employee-assignments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/employee-assignments/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Reporting Hierarchy by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reporting-hierarchies/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reporting-hierarchies",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/reporting-hierarchies/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Reporting Hierarchy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reporting-hierarchies/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reporting-hierarchies",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/reporting-hierarchies/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"HierarchyType\": \"FUNCTIONAL_MANAGER\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Reporting Hierarchy",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reporting-hierarchies/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reporting-hierarchies",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/reporting-hierarchies/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Cost Center by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/cost-centers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "cost-centers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/financials/cost-centers/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Cost Center",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/cost-centers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "cost-centers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/financials/cost-centers/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CostCenterName\": \"Campus Infrastructure & Clean Room Plant\",\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Cost Center",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/cost-centers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "cost-centers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/financials/cost-centers/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Department Budget by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/budgets/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "budgets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "GET http://localhost:5000/api/financials/budgets/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Department Budget Allocation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/budgets/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "budgets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "PUT http://localhost:5000/api/financials/budgets/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AllocatedAmount\": 600000,\n  \"IsActive\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Department Budget",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financials/budgets/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "financials",
+                "budgets",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{entityId}}",
+                  "description": "URL path parameter :id"
+                }
+              ]
+            },
+            "description": "DELETE http://localhost:5000/api/financials/budgets/:id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 2xx or expected\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

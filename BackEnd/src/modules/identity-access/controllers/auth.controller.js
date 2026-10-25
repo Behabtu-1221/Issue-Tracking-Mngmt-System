@@ -4,12 +4,14 @@ import authService from '../services/auth.service.js';
 
 const authController = {
   login: asyncHandler(async (req, res) => {
-    const result = await authService.login(req.body, req);
+    const body = req.body || {};
+    const result = await authService.login(body, req);
     sendSuccess(res, result);
   }),
 
   refresh: asyncHandler(async (req, res) => {
-    const result = await authService.refresh(req.body.refreshToken);
+    const body = req.body || {};
+    const result = await authService.refresh(body.refreshToken);
     sendSuccess(res, result);
   }),
 
@@ -19,48 +21,53 @@ const authController = {
   }),
 
   me: asyncHandler(async (req, res) => {
-    const profile = await authService.getCurrentUser(req.actor.userId);
+    const profile = await authService.getCurrentUser(req.actor?.userId);
     sendSuccess(res, profile);
   }),
 
   changePassword: asyncHandler(async (req, res) => {
+    const body = req.body || {};
     const result = await authService.changePassword(
-      req.actor.userAccountId,
-      req.actor.userId,
-      req.body.currentPassword,
-      req.body.newPassword
+      req.actor?.userAccountId,
+      req.actor?.userId,
+      body.currentPassword,
+      body.newPassword
     );
     sendSuccess(res, result);
   }),
 
   sessions: asyncHandler(async (req, res) => {
-    const sessions = await authService.listSessions(req.actor.userAccountId);
+    const sessions = await authService.listSessions(req.actor?.userAccountId);
     sendSuccess(res, sessions);
   }),
 
   revokeSession: asyncHandler(async (req, res) => {
-    const result = await authService.revokeSession(req.params.sessionId, req.actor.userId);
+    const result = await authService.revokeSession(req.params?.sessionId, req.actor?.userId);
     sendSuccess(res, result);
   }),
 
   forgotPassword: asyncHandler(async (req, res) => {
-    const identifier = req.body.username || req.body.email;
+    const body = req.body || {};
+    const identifier = body.username || body.email;
     const result = await authService.forgotPassword(identifier);
     sendSuccess(res, result);
   }),
 
   resetPassword: asyncHandler(async (req, res) => {
-    const result = await authService.resetPassword(req.body.token, req.body.newPassword);
+    const body = req.body || {};
+    const result = await authService.resetPassword(body.token, body.newPassword);
     sendSuccess(res, result);
   }),
 
   updateProfile: asyncHandler(async (req, res) => {
-    const updatedProfile = await authService.updateProfile(req.actor.userId, req.body);
+    const body = req.body || {};
+    const updatedProfile = await authService.updateProfile(req.actor?.userId, body);
     sendSuccess(res, updatedProfile);
   }),
 
   updateNotificationPreferences: asyncHandler(async (req, res) => {
-    const result = await authService.updateNotificationPreferences(req.actor.userId, req.body);
+    const body = req.body || {};
+    const result = await authService.updateNotificationPreferences(req.actor?.userId, body);
     sendSuccess(res, result);
   })
 };

@@ -1,6 +1,5 @@
 import issueRequestRepository from '../repositories/issue-request.repository.js';
 import issueHistoryRepository from '../repositories/issue-history.repository.js';
-import serviceGovernanceRepository from '../../service-catalog/repositories/service-governance.repository.js';
 import serviceCategoryMappingRepository from '../../service-catalog/repositories/service-category-mapping.repository.js';
 import { slaClockService } from '../../sla/services/sla-clock.service.js';
 import { approvalService } from '../../approval/services/approval.service.js';
@@ -45,15 +44,17 @@ export const issueRequestService = {
     let categoryCode = data.CategoryCode || null;
     let estimatedCost = data.EstimatedCost !== undefined ? data.EstimatedCost : null;
 
-    // 1. Resolve Service details (ServiceCategoryID, CategoryCode, EstimatedCost) if ServiceID provided
-    if (data.ServiceID) {
+    let serviceId = data.ServiceID ? Number(data.ServiceID) : null;
+
+    // 1. Resolve Service details (ServiceCategoryID, CategoryCode, EstimatedCost)
+    if (serviceId) {
       try {
         const [svc] = await query(
           `SELECT s.ServiceID, s.ServiceCategoryID, s.EstimatedCost, sc.CategoryCode, sc.CategoryName
            FROM Service s
            LEFT JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
            WHERE s.ServiceID = ? AND s.IsDeleted = 0`,
-          [data.ServiceID]
+          [serviceId]
         );
         if (svc) {
           if (!categoryCode && svc.CategoryCode) {
@@ -66,9 +67,43 @@ export const issueRequestService = {
       } catch (svcErr) {
         console.warn('Service lookup notice:', svcErr.message);
       }
+    } else if (data.ServiceCategoryID) {
+      try {
+        const [sc] = await query(
+          `SELECT ServiceCategoryID, CategoryCode, CategoryName
+           FROM ServiceCategory
+           WHERE ServiceCategoryID = ? AND IsDeleted = 0`,
+          [data.ServiceCategoryID]
+        );
+        if (sc && sc.CategoryCode) {
+          categoryCode = sc.CategoryCode;
+        }
+        const [svcCat] = await query(
+          `SELECT ServiceID FROM Service WHERE ServiceCategoryID = ? AND IsDeleted = 0 LIMIT 1`,
+          [data.ServiceCategoryID]
+        );
+        if (svcCat) serviceId = svcCat.ServiceID;
+      } catch (scErr) {
+        console.warn('Service category lookup notice:', scErr.message);
+      }
     }
 
-    // 2. Department Resolution: Check servicedepartment mapping table
+    if (!serviceId) {
+      try {
+        const [defaultSvc] = await query(
+          `SELECT ServiceID FROM Service WHERE IsDeleted = 0 ORDER BY ServiceID ASC LIMIT 1`
+        );
+        serviceId = defaultSvc ? defaultSvc.ServiceID : 1;
+      } catch (svcErr) {
+        serviceId = 1;
+      }
+    }
+
+    if (!categoryCode) {
+      categoryCode = data.CategoryCode || 'GENERAL';
+    }
+
+    // 2. Department Resolution
     if (!assignedDeptId && data.ServiceID) {
       try {
         const [sd] = await query(
@@ -86,6 +121,27 @@ export const issueRequestService = {
         }
       } catch (deptErr) {
         console.warn('Service department lookup notice:', deptErr.message);
+      }
+    }
+
+    // If still no department, try matching by CategoryCode
+    if (!assignedDeptId && categoryCode && categoryCode !== 'GENERAL') {
+      try {
+        const catKey = categoryCode.split('-')[0].trim();
+        const [deptMatch] = await query(
+          `SELECT DepartmentID, DepartmentName 
+           FROM Department 
+           WHERE (DepartmentCode = ? OR DepartmentName LIKE ? OR DepartmentCode LIKE ?) 
+             AND IsActive = 1 AND IsDeleted = 0 
+           LIMIT 1`,
+          [categoryCode, `%${catKey}%`, `%${catKey}%`]
+        );
+        if (deptMatch && deptMatch.DepartmentID) {
+          assignedDeptId = deptMatch.DepartmentID;
+          resolvedDeptName = deptMatch.DepartmentName;
+        }
+      } catch (catDeptErr) {
+        console.warn('Category department lookup notice:', catDeptErr.message);
       }
     }
 
@@ -111,10 +167,6 @@ export const issueRequestService = {
       } catch (dErr) {
         console.warn('Dept name lookup notice:', dErr.message);
       }
-    }
-
-    if (!categoryCode) {
-      categoryCode = 'FACILITIES';
     }
 
     // Calculate SLA target deadlines in UTC using BusinessCalendar
@@ -148,6 +200,7 @@ export const issueRequestService = {
     return await unitOfWork.execute(async (tx) => {
       const newIssue = await issueRequestRepository.create({
         ...data,
+        ServiceID: serviceId,
         CategoryCode: categoryCode,
         AssignedDepartmentID: assignedDeptId,
         StatusCode: initialStatus,

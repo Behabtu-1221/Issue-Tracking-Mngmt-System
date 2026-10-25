@@ -1,0 +1,113 @@
+========================================================================================================================
+ENTERPRISE ISSUE TRACKING MANAGEMENT SYSTEM (ITMS) — 80 VERIFIED API ENDPOINTS
+BASE URL : http://localhost:5000
+FORMAT   : [METHOD] (LEFT)                    | [FULL URL] (RIGHT)
+========================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 1: SYSTEM HEALTH & DIAGNOSTICS (3 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+01. GET      http://localhost:5000/api/health
+02. GET      http://localhost:5000/api/health/live
+03. GET      http://localhost:5000/api/health/ready
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 2: IDENTITY & ACCESS MANAGEMENT — AUTHENTICATION & SESSIONS (11 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+04. POST     http://localhost:5000/api/auth/login
+05. POST     http://localhost:5000/api/auth/refresh
+06. POST     http://localhost:5000/api/auth/forgot-password
+07. POST     http://localhost:5000/api/auth/reset-password
+08. POST     http://localhost:5000/api/auth/logout
+09. GET      http://localhost:5000/api/auth/me
+10. PUT      http://localhost:5000/api/auth/profile
+11. PUT      http://localhost:5000/api/auth/notification-preferences
+12. POST     http://localhost:5000/api/auth/change-password
+13. GET      http://localhost:5000/api/auth/sessions
+14. DELETE   http://localhost:5000/api/auth/sessions/:sessionId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 2: IDENTITY & ACCESS MANAGEMENT — USER ACCOUNTS & PROFILES (9 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+15. GET      http://localhost:5000/api/users
+16. POST     http://localhost:5000/api/users
+17. GET      http://localhost:5000/api/users/:id
+18. PUT      http://localhost:5000/api/users/:id
+19. PATCH    http://localhost:5000/api/users/:id/status
+20. DELETE   http://localhost:5000/api/users/:id
+21. GET      http://localhost:5000/api/users/:id/sessions
+22. DELETE   http://localhost:5000/api/users/:id/sessions
+23. GET      http://localhost:5000/api/users/:id/login-history
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 2: IDENTITY & ACCESS MANAGEMENT — ROLES, PERMISSIONS & RBAC (11 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+24. GET      http://localhost:5000/api/roles/permissions
+25. GET      http://localhost:5000/api/roles/audit-logs
+26. GET      http://localhost:5000/api/roles
+27. POST     http://localhost:5000/api/roles
+28. POST     http://localhost:5000/api/roles/assign
+29. GET      http://localhost:5000/api/roles/:id
+30. PUT      http://localhost:5000/api/roles/:id
+31. DELETE   http://localhost:5000/api/roles/:id
+32. PUT      http://localhost:5000/api/roles/:id/permissions
+33. POST     http://localhost:5000/api/roles/users/:id/assign
+34. DELETE   http://localhost:5000/api/roles/users/:id/roles/:roleId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 3: BUSINESS PARK & CAMPUS FACILITY MANAGEMENT (21 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+35. GET      http://localhost:5000/api/parks
+36. GET      http://localhost:5000/api/parks/metrics
+37. GET      http://localhost:5000/api/parks/:id
+38. POST     http://localhost:5000/api/parks
+39. PUT      http://localhost:5000/api/parks/:id
+40. DELETE   http://localhost:5000/api/parks/:id
+41. GET      http://localhost:5000/api/buildings
+42. GET      http://localhost:5000/api/buildings/:id
+43. GET      http://localhost:5000/api/buildings/:buildingId/floors
+44. POST     http://localhost:5000/api/buildings
+45. PUT      http://localhost:5000/api/buildings/:id
+46. DELETE   http://localhost:5000/api/buildings/:id
+47. GET      http://localhost:5000/api/floors
+48. GET      http://localhost:5000/api/floors/:id
+49. GET      http://localhost:5000/api/floors/:floorId/offices
+50. POST     http://localhost:5000/api/floors
+51. PUT      http://localhost:5000/api/floors/:id
+52. DELETE   http://localhost:5000/api/floors/:id
+53. GET      http://localhost:5000/api/offices
+54. GET      http://localhost:5000/api/offices/:id
+55. POST     http://localhost:5000/api/offices
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT ORGANIZATIONS & SPACE ALLOCATIONS (17 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+56. PATCH    http://localhost:5000/api/offices/:id/status
+57. DELETE   http://localhost:5000/api/offices/:id
+58. GET      http://localhost:5000/api/locations
+59. GET      http://localhost:5000/api/facility-zones
+60. GET      http://localhost:5000/api/floor-plans/floor/:floorId
+61. GET      http://localhost:5000/api/tenants
+62. GET      http://localhost:5000/api/tenants/metrics
+63. GET      http://localhost:5000/api/tenants/:id
+64. POST     http://localhost:5000/api/tenants
+65. PATCH    http://localhost:5000/api/tenants/:id/status
+66. GET      http://localhost:5000/api/sub-tenants
+67. POST     http://localhost:5000/api/sub-tenants
+68. GET      http://localhost:5000/api/tenant-contacts
+69. POST     http://localhost:5000/api/tenant-contacts
+70. GET      http://localhost:5000/api/tenant-addresses
+71. POST     http://localhost:5000/api/tenant-addresses
+72. GET      http://localhost:5000/api/leases
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE & STAFF MANAGEMENT (8 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+73. GET      http://localhost:5000/api/leases/expiring-soon
+74. POST     http://localhost:5000/api/leases
+75. GET      http://localhost:5000/api/office-allocations
+76. POST     http://localhost:5000/api/office-allocations
+77. PATCH    http://localhost:5000/api/office-allocations/:id/release
+78. GET      http://localhost:5000/api/departments
+79. POST     http://localhost:5000/api/departments
+80. GET      http://localhost:5000/api/teams

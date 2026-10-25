@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import fileDocumentService from '../services/file-document.service.js';
 import { sendSuccess } from '../../../shared/utils/apiResponse.js';
 
@@ -117,14 +119,47 @@ export const fileDocumentController = {
   async previewFile(req, res, next) {
     try {
       const actorId = req.actor?.userId || 1;
-      const { stream, fileName, mimeType, fileSize } = await fileDocumentService.getPreviewStream(
+      const { stream, fileName, mimeType, fileSize, filePath } = await fileDocumentService.getPreviewStream(
         req.params.id,
         actorId,
         req.actor
       );
 
-      res.setHeader('Content-Type', mimeType);
+      let effectiveMime = mimeType;
+      if (!effectiveMime || effectiveMime === 'application/octet-stream') {
+        const ext = path.extname(fileName || '').toLowerCase();
+        if (ext === '.webm') effectiveMime = 'audio/webm';
+        else if (ext === '.mp3') effectiveMime = 'audio/mpeg';
+        else if (ext === '.wav') effectiveMime = 'audio/wav';
+        else if (ext === '.ogg') effectiveMime = 'audio/ogg';
+        else if (ext === '.m4a') effectiveMime = 'audio/mp4';
+        else if (ext === '.aac') effectiveMime = 'audio/aac';
+        else if (ext === '.png') effectiveMime = 'image/png';
+        else if (ext === '.jpg' || ext === '.jpeg') effectiveMime = 'image/jpeg';
+        else if (ext === '.pdf') effectiveMime = 'application/pdf';
+      }
+
+      const range = req.headers.range;
+      if (range && fileSize && filePath && fs.existsSync(filePath)) {
+        const parts = range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        const chunkSize = (end - start) + 1;
+
+        res.status(206);
+        res.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+        res.setHeader('Accept-Ranges', 'bytes');
+        res.setHeader('Content-Length', chunkSize);
+        res.setHeader('Content-Type', effectiveMime || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName)}"`);
+
+        const partialStream = fs.createReadStream(filePath, { start, end });
+        return partialStream.pipe(res);
+      }
+
+      res.setHeader('Content-Type', effectiveMime || 'application/octet-stream');
       res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileName)}"`);
+      res.setHeader('Accept-Ranges', 'bytes');
       if (fileSize) res.setHeader('Content-Length', fileSize);
 
       stream.pipe(res);

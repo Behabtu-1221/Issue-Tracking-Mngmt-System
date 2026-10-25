@@ -66,10 +66,10 @@ export default function BusinessParkNavHeader({ activeTabId }) {
         marginBottom: '24px'
       }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <h1 style={{ fontSize: 'clamp(1.25rem, 3.5vw, 1.8rem)', fontWeight: 800, margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span className="glow-text">{activeItem.label}</span>
           </h1>
-          <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             {activeItem.description}
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function BusinessParkNavHeader({ activeTabId }) {
       {/* Live Sub-Module Specific Metric Summary Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
         gap: '16px',
         marginBottom: '24px'
       }}>

@@ -32,18 +32,25 @@ async function runTenantTests() {
   let testContact = null;
   let testAddress = null;
   let testSubTenant = null;
+  let createdTestPark = false;
 
   try {
     // 0. Setup Park Hierarchy for space allocation testing
-    const parkCode = `BP-TN-${timestamp}`;
-    testPark = await parkService.createPark({
-      BusinessParkCode: parkCode,
-      BusinessParkName: `Tenant Test Park ${timestamp}`,
-      City: 'Addis Ababa',
-      Country: 'Ethiopia',
-      TotalAreaSquareMeter: 20000,
-      IsActive: 1
-    }, testUserId);
+    const existingParks = await parkService.getParks({ limit: 1 });
+    if (existingParks.parks && existingParks.parks.length > 0) {
+      testPark = existingParks.parks[0];
+    } else {
+      const parkCode = `BP-TN-${timestamp}`;
+      testPark = await parkService.createPark({
+        BusinessParkCode: parkCode,
+        BusinessParkName: `Tenant Test Park ${timestamp}`,
+        City: 'Addis Ababa',
+        Country: 'Ethiopia',
+        TotalAreaSquareMeter: 20000,
+        IsActive: 1
+      }, testUserId);
+      createdTestPark = true;
+    }
 
     testZone = await facilityZoneService.createFacilityZone({
       BusinessParkID: testPark.BusinessParkID,
@@ -366,7 +373,7 @@ async function runTenantTests() {
       if (testZone?.FacilityZoneID) {
         await query('DELETE FROM FacilityZone WHERE FacilityZoneID = ?', [testZone.FacilityZoneID]);
       }
-      if (testPark?.BusinessParkID) {
+      if (createdTestPark && testPark?.BusinessParkID) {
         await query('DELETE FROM BusinessPark WHERE BusinessParkID = ?', [testPark.BusinessParkID]);
       }
       console.log('Cleanup complete.');

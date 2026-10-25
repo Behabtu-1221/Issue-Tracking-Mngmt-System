@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getApiBaseUrl } from '../../../api/client';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: getApiBaseUrl(),
   withCredentials: true
 });
 
@@ -23,7 +24,6 @@ export const reportingApi = {
   getDepartmentPerformance: (params) => api.get('/reports/departments', { params }),
   getApprovalAnalytics: (params) => api.get('/reports/approvals', { params }),
   getAuditAnalytics: (params) => api.get('/reports/audit', { params }),
-  getKnowledgeAnalytics: () => api.get('/reports/knowledge'),
 
   // ── Saved Reports CRUD ──
   getSavedReports: () => api.get('/reports/saved'),

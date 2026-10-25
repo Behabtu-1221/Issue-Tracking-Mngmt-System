@@ -34,6 +34,19 @@ export default function ApprovalRulesGroupsTab() {
     else fetchGroups();
   }, [subSection]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showRuleModal) handleCloseRuleModal();
+        else if (showGroupModal) handleCloseGroupModal();
+      }
+    };
+    if (showRuleModal || showGroupModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showRuleModal, showGroupModal]);
+
   const clearRuleError = (field) => {
     if (ruleErrors[field]) {
       setRuleErrors(prev => {
@@ -243,32 +256,64 @@ export default function ApprovalRulesGroupsTab() {
 
       {/* Rule Modal */}
       {showRuleModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{
-            background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
-            borderRadius: '24px', width: '100%', maxWidth: '520px', maxHeight: '90vh',
-            display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)'
-          }}>
+        <div 
+          onClick={handleCloseRuleModal}
+          style={{ 
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' 
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rule-modal-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
+              borderRadius: 'var(--border-radius-lg, 18px)', width: '100%', maxWidth: '520px', maxHeight: '90vh',
+              display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: 'var(--modal-shadow, 0 20px 60px rgba(0, 0, 0, 0.4))',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div style={{
-              padding: '20px 24px', borderBottom: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)',
+              padding: '16px 20px', borderBottom: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(138, 75, 255, 0.15)', color: 'var(--accent-primary)' }}>
-                  <ShieldCheck size={18} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  width: '38px', height: '38px', borderRadius: '10px', 
+                  background: 'var(--accent-gradient)', color: '#ffffff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: 'var(--glow-accent)', flexShrink: 0
+                }}>
+                  <ShieldCheck size={20} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-primary)' }}>Create Governance Rule</h3>
-                  <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>Define monetary threshold triggers for multi-level sign-off</p>
+                  <h3 id="rule-modal-title" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    Create Governance Rule
+                  </h3>
+                  <div style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Define monetary threshold triggers for multi-level sign-off
+                  </div>
                 </div>
               </div>
-              <button onClick={handleCloseRuleModal} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px' }}><X size={18} /></button>
+              <button 
+                onClick={handleCloseRuleModal} 
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <X size={18} />
+              </button>
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleCreateRule} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', overflowY: 'auto', flex: 1 }}>
-              <FormField label="Rule Name" required error={ruleErrors.RuleName} icon={Tag}>
+            <form onSubmit={handleCreateRule} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+              <div style={{ padding: 'clamp(16px, 3vw, 24px)', display: 'flex', flexDirection: 'column', gap: '18px', overflowY: 'auto', flex: 1 }}>
+                <FormField label="Rule Name" required error={ruleErrors.RuleName} icon={Tag}>
                 <input
                   type="text"
                   value={ruleForm.RuleName}
@@ -382,10 +427,33 @@ export default function ApprovalRulesGroupsTab() {
                   </select>
                 </FormField>
               </div>
+              </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)', flexShrink: 0 }}>
-                <button type="button" onClick={handleCloseRuleModal} style={{ padding: '10px 18px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--glass-border)', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 22px', borderRadius: 'var(--border-radius-sm)', border: 'none', background: 'var(--accent-gradient)', color: '#ffffff', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer', boxShadow: 'var(--glow-accent)' }}>Create Governance Rule</button>
+              {/* Modal Footer */}
+              <div style={{ 
+                padding: '14px 20px', 
+                borderTop: '1px solid var(--glass-border)', 
+                background: 'var(--bg-tertiary)', 
+                display: 'flex', 
+                gap: '12px', 
+                justifyContent: 'flex-end', 
+                flexShrink: 0 
+              }}>
+                <button 
+                  type="button" 
+                  onClick={handleCloseRuleModal} 
+                  className="btn btn-secondary"
+                  style={{ padding: '9px 18px', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  style={{ padding: '9px 22px', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  Create Governance Rule
+                </button>
               </div>
             </form>
           </div>
@@ -394,32 +462,64 @@ export default function ApprovalRulesGroupsTab() {
 
       {/* Group Modal */}
       {showGroupModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{
-            background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
-            borderRadius: '24px', width: '100%', maxWidth: '500px', maxHeight: '90vh',
-            display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)'
-          }}>
+        <div 
+          onClick={handleCloseGroupModal}
+          style={{ 
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+            background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' 
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="group-modal-title"
+            className="modal-card accent-strip-brand enterprise-card"
+            style={{
+              background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
+              borderRadius: 'var(--border-radius-lg, 18px)', width: '100%', maxWidth: '500px', maxHeight: '90vh',
+              display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: 'var(--modal-shadow, 0 20px 60px rgba(0, 0, 0, 0.4))',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
             <div style={{
-              padding: '20px 24px', borderBottom: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)',
+              padding: '16px 20px', borderBottom: '1px solid var(--glass-border)', background: 'var(--bg-tertiary)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(138, 75, 255, 0.15)', color: 'var(--accent-primary)' }}>
-                  <Users size={18} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  width: '38px', height: '38px', borderRadius: '10px', 
+                  background: 'var(--accent-gradient)', color: '#ffffff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: 'var(--glow-accent)', flexShrink: 0
+                }}>
+                  <Users size={20} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-primary)' }}>Create Approver Group</h3>
-                  <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>Form an approver committee or multi-user signing group</p>
+                  <h3 id="group-modal-title" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    Create Approver Group
+                  </h3>
+                  <div style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Form an approver committee or multi-user signing group
+                  </div>
                 </div>
               </div>
-              <button onClick={handleCloseGroupModal} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px' }}><X size={18} /></button>
+              <button 
+                onClick={handleCloseGroupModal} 
+                className="btn-icon touch-target-sm"
+                aria-label="Close dialog"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <X size={18} />
+              </button>
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleCreateGroup} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', overflowY: 'auto', flex: 1 }}>
-              <FormField label="Group Name" required error={groupErrors.GroupName} icon={Users}>
+            <form onSubmit={handleCreateGroup} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, margin: 0 }}>
+              <div style={{ padding: 'clamp(16px, 3vw, 24px)', display: 'flex', flexDirection: 'column', gap: '18px', overflowY: 'auto', flex: 1 }}>
+                <FormField label="Group Name" required error={groupErrors.GroupName} icon={Users}>
                 <input
                   type="text"
                   value={groupForm.GroupName}
@@ -465,10 +565,33 @@ export default function ApprovalRulesGroupsTab() {
                   }}
                 />
               </FormField>
+              </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)', flexShrink: 0 }}>
-                <button type="button" onClick={handleCloseGroupModal} style={{ padding: '10px 18px', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--glass-border)', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 22px', borderRadius: 'var(--border-radius-sm)', border: 'none', background: 'var(--accent-gradient)', color: '#ffffff', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer', boxShadow: 'var(--glow-accent)' }}>Create Group</button>
+              {/* Modal Footer */}
+              <div style={{ 
+                padding: '14px 20px', 
+                borderTop: '1px solid var(--glass-border)', 
+                background: 'var(--bg-tertiary)', 
+                display: 'flex', 
+                gap: '12px', 
+                justifyContent: 'flex-end', 
+                flexShrink: 0 
+              }}>
+                <button 
+                  type="button" 
+                  onClick={handleCloseGroupModal} 
+                  className="btn btn-secondary"
+                  style={{ padding: '9px 18px', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  style={{ padding: '9px 22px', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  Create Group
+                </button>
               </div>
             </form>
           </div>

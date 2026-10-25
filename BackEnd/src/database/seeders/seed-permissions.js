@@ -8,10 +8,9 @@ export const SYSTEM_MODULES_DATA = [
   { moduleCode: 'MOD_RBAC', moduleName: 'Role & Permission Management', description: 'Enterprise role definition, permission matrix mapping, and role assignments', displayOrder: 5 },
   { moduleCode: 'MOD_CATALOG', moduleName: 'Service Catalog Management', description: 'Service catalog directory, categories, pricing, and SLA offerings', displayOrder: 6 },
   { moduleCode: 'MOD_ISSUE', moduleName: 'Issue Request Management', description: 'Request lifecycle, approval workflows, technician dispatch, work orders, and resolution', displayOrder: 7 },
-  { moduleCode: 'MOD_KB', moduleName: 'Knowledge Base', description: 'Standard operating procedures, known issues, solution articles, and FAQs', displayOrder: 8 },
-  { moduleCode: 'MOD_NOTIF', moduleName: 'Notification Management', description: 'Automated alert rules, notification templates, and delivery logs', displayOrder: 9 },
-  { moduleCode: 'MOD_REPORT', moduleName: 'Reports & Analytics', description: 'Enterprise executive dashboards, operational performance metrics, and data export', displayOrder: 10 },
-  { moduleCode: 'MOD_AUDIT', moduleName: 'Audit Logs', description: 'Comprehensive security audit trail, compliance logs, and event history', displayOrder: 11 }
+  { moduleCode: 'MOD_NOTIF', moduleName: 'Notification Management', description: 'Automated alert rules, notification templates, and delivery logs', displayOrder: 8 },
+  { moduleCode: 'MOD_REPORT', moduleName: 'Reports & Analytics', description: 'Enterprise executive dashboards, operational performance metrics, and data export', displayOrder: 9 },
+  { moduleCode: 'MOD_AUDIT', moduleName: 'Audit Logs', description: 'Comprehensive security audit trail, compliance logs, and event history', displayOrder: 10 }
 ];
 
 export const PERMISSION_GROUPS_DATA = [
@@ -45,9 +44,6 @@ export const PERMISSION_GROUPS_DATA = [
   { groupCode: 'ISSUE_APPROVALS', groupName: 'Approval Operations', moduleCode: 'MOD_ISSUE', description: 'Multi-level approval workflows, approve, and reject decisions', displayOrder: 2 },
   { groupCode: 'ISSUE_DISPATCH', groupName: 'Assignment & Dispatch', moduleCode: 'MOD_ISSUE', description: 'Workload dispatching, technician routing, and reassignments', displayOrder: 3 },
   { groupCode: 'ISSUE_WORKBENCH', groupName: 'Technician Operations', moduleCode: 'MOD_ISSUE', description: 'Technician workbench, issue resolution, work notes, and reopening', displayOrder: 4 },
-
-  // Knowledge Base
-  { groupCode: 'KB_ARTICLES', groupName: 'Knowledge Base Articles', moduleCode: 'MOD_KB', description: 'Create, publish, and manage solution articles and known issues', displayOrder: 1 },
 
   // Notification Management
   { groupCode: 'NOTIF_RULES', groupName: 'Notification Rules & Templates', moduleCode: 'MOD_NOTIF', description: 'Configure notification rules, templates, and delivery logs', displayOrder: 1 },
@@ -133,10 +129,6 @@ export const PERMISSIONS_DATA = [
   { groupCode: 'ISSUE_WORKBENCH', code: 'Issue.Resolve', name: 'Resolve Issue Request', desc: 'Mark work order as resolved with resolution summary', scope: 'OWN' },
   { groupCode: 'ISSUE_WORKBENCH', code: 'Issue.Close', name: 'Close Issue Request', desc: 'Perform final verification and close request', scope: 'COMPANY' },
   { groupCode: 'ISSUE_WORKBENCH', code: 'Issue.Reopen', name: 'Reopen Closed Issue', desc: 'Reopen unresolved requests', scope: 'COMPANY' },
-
-  // Knowledge Base
-  { groupCode: 'KB_ARTICLES', code: 'Knowledge.Read', name: 'View Solution Articles', desc: 'Read solution KB articles and FAQs', scope: 'ALL' },
-  { groupCode: 'KB_ARTICLES', code: 'Knowledge.Publish', name: 'Publish KB Article', desc: 'Author and publish knowledge base solutions', scope: 'COMPANY' },
 
   // Notification Management
   { groupCode: 'NOTIF_RULES', code: 'Notification.Manage', name: 'Manage Notifications', desc: 'Configure notification templates and rules', scope: 'COMPANY' },

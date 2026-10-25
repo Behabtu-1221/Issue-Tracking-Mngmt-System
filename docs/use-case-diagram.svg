@@ -1,0 +1,391 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 1060" width="100%" height="100%" style="background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155" />
+    </marker>
+    <marker id="arrow-include" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706" />
+    </marker>
+    <marker id="arrow-extend" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#7e22ce" />
+    </marker>
+    <marker id="generalize" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <polygon points="1,1 11,6 1,11" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+    </marker>
+
+    <!-- Gradients -->
+    <linearGradient id="ucGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0f7ff" />
+      <stop offset="100%" stop-color="#dbeafe" />
+    </linearGradient>
+    <linearGradient id="ucGradInclude" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb" />
+      <stop offset="100%" stop-color="#fef3c7" />
+    </linearGradient>
+    <linearGradient id="ucGradExtend" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#faf5ff" />
+      <stop offset="100%" stop-color="#f3e8ff" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="110%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.09" />
+    </filter>
+  </defs>
+
+  <!-- TITLE HEADER -->
+  <text x="760" y="38" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Enterprise Issue Tracking &amp; Management System (ITMS) — 5-Role Use Case Model</text>
+  <text x="760" y="60" text-anchor="middle" font-size="12" fill="#64748b">UML 2.5 Architecture: 5 Key Roles, System Boundaries, «include», «extend» &amp; Generalization</text>
+
+  <!-- ========================================================================= -->
+  <!-- SYSTEM BOUNDARY -->
+  <!-- ========================================================================= -->
+  <rect x="235" y="80" width="1010" height="950" rx="16" fill="#f8fafc" stroke="#334155" stroke-width="2.5" />
+  <rect x="235" y="80" width="1010" height="40" rx="16" fill="#1e293b" />
+  <rect x="235" y="105" width="1010" height="15" fill="#1e293b" />
+  <text x="740" y="106" text-anchor="middle" font-size="14" font-weight="700" fill="#f8fafc" letter-spacing="0.5">«system boundary» ITMS ENTERPRISE PLATFORM</text>
+
+  <!-- ========================================================================= -->
+  <!-- SUBSYSTEM PARTITIONS -->
+  <!-- ========================================================================= -->
+  <!-- Subsystem 1: Identity & Session -->
+  <rect x="255" y="132" width="475" height="168" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 3" />
+  <text x="270" y="152" font-size="11" font-weight="700" fill="#475569">1. IDENTITY &amp; ACCESS CONTROL</text>
+
+  <!-- Subsystem 2: Issue Request & Catalog -->
+  <rect x="255" y="312" width="475" height="340" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 3" />
+  <text x="270" y="332" font-size="11" font-weight="700" fill="#475569">2. SERVICE CATALOG &amp; REQUEST LIFECYCLE</text>
+
+  <!-- Subsystem 3: Field Execution -->
+  <rect x="255" y="664" width="475" height="305" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 3" />
+  <text x="270" y="684" font-size="11" font-weight="700" fill="#475569">3. WORK ORDER &amp; TECHNICIAN EXECUTION</text>
+
+  <!-- Subsystem 4: Management & SLA Engine -->
+  <rect x="750" y="132" width="475" height="360" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 3" />
+  <text x="765" y="152" font-size="11" font-weight="700" fill="#475569">4. MANAGEMENT APPROVALS, DISPATCH &amp; SLA</text>
+
+  <!-- Subsystem 5: Platform Admin & Governance -->
+  <rect x="750" y="504" width="475" height="465" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 3" />
+  <text x="765" y="524" font-size="11" font-weight="700" fill="#475569">5. INFRASTRUCTURE, RBAC &amp; PLATFORM GOVERNANCE</text>
+
+  <!-- ========================================================================= -->
+  <!-- USE CASES (OVAL NODES) -->
+  <!-- ========================================================================= -->
+
+  <!-- Subsystem 1: Identity & Access -->
+  <g id="uc-login">
+    <ellipse cx="375" cy="195" rx="90" ry="24" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="375" y="199" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Authenticate / Login</text>
+  </g>
+
+  <g id="uc-reset-pwd">
+    <ellipse cx="375" cy="260" rx="95" ry="24" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="375" y="264" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Reset Password via Token</text>
+  </g>
+
+  <g id="uc-force-pwd">
+    <ellipse cx="605" cy="195" rx="95" ry="24" fill="url(#ucGradExtend)" stroke="#9333ea" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="605" y="199" text-anchor="middle" font-size="11" font-weight="600" fill="#581c87">Enforce 1st-Time Password</text>
+  </g>
+
+  <!-- Subsystem 2: Catalog & Issue Requests -->
+  <g id="uc-catalog">
+    <ellipse cx="375" cy="370" rx="90" ry="24" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="375" y="374" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Browse Service Catalog</text>
+  </g>
+
+  <g id="uc-submit">
+    <ellipse cx="375" cy="445" rx="95" ry="26" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="2.2" filter="url(#cardShadow)" />
+    <text x="375" y="449" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0f172a">Submit Issue Request</text>
+  </g>
+
+  <g id="uc-validate">
+    <ellipse cx="610" cy="405" rx="95" ry="24" fill="url(#ucGradInclude)" stroke="#d97706" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="610" y="409" text-anchor="middle" font-size="11.5" font-weight="600" fill="#92400e">Validate Prerequisites</text>
+  </g>
+
+  <g id="uc-attach">
+    <ellipse cx="610" cy="475" rx="90" ry="24" fill="url(#ucGradExtend)" stroke="#9333ea" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="610" y="479" text-anchor="middle" font-size="11.5" font-weight="600" fill="#581c87">Attach Supporting Files</text>
+  </g>
+
+  <g id="uc-track">
+    <ellipse cx="375" cy="525" rx="92" ry="24" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="375" y="529" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Track Request Lifecycle</text>
+  </g>
+
+  <g id="uc-discuss">
+    <ellipse cx="375" cy="595" rx="92" ry="24" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="375" y="599" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Post Ticket Comments</text>
+  </g>
+
+  <!-- Subsystem 3: Technician & Field Execution -->
+  <g id="uc-view-work">
+    <ellipse cx="375" cy="715" rx="95" ry="24" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="375" y="719" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">View Assigned Tickets</text>
+  </g>
+
+  <g id="uc-exec">
+    <ellipse cx="375" cy="790" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="2.2" filter="url(#cardShadow)" />
+    <text x="375" y="794" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Execute Work Order</text>
+  </g>
+
+  <g id="uc-pause">
+    <ellipse cx="610" cy="790" rx="90" ry="24" fill="url(#ucGradExtend)" stroke="#9333ea" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="610" y="794" text-anchor="middle" font-size="11" font-weight="600" fill="#581c87">Pause Ticket (Reason)</text>
+  </g>
+
+  <g id="uc-resolve">
+    <ellipse cx="375" cy="870" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="375" y="874" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Mark Ticket Resolved</text>
+  </g>
+
+  <!-- Subsystem 4: Management Approvals & SLA -->
+  <g id="uc-review-app">
+    <ellipse cx="870" cy="195" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="870" y="199" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Review Approval Queue</text>
+  </g>
+
+  <g id="uc-exec-app">
+    <ellipse cx="1090" cy="195" rx="95" ry="25" fill="url(#ucGradExtend)" stroke="#9333ea" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="1090" y="199" text-anchor="middle" font-size="11.5" font-weight="600" fill="#581c87">Approve / Reject Request</text>
+  </g>
+
+  <g id="uc-delegate">
+    <ellipse cx="870" cy="270" rx="90" ry="23" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="870" y="274" text-anchor="middle" font-size="11" font-weight="600" fill="#0f172a">Delegate Authority</text>
+  </g>
+
+  <g id="uc-assign-tech">
+    <ellipse cx="1090" cy="270" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="1090" y="274" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Assign to Team / Tech</text>
+  </g>
+
+  <g id="uc-roster">
+    <ellipse cx="870" cy="345" rx="90" ry="23" fill="url(#ucGradInclude)" stroke="#d97706" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="870" y="349" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Verify Roster &amp; Capacity</text>
+  </g>
+
+  <g id="uc-sla">
+    <ellipse cx="870" cy="425" rx="95" ry="25" fill="url(#ucGradInclude)" stroke="#d97706" stroke-width="2" filter="url(#cardShadow)" />
+    <text x="870" y="429" text-anchor="middle" font-size="11.5" font-weight="700" fill="#92400e">Track SLA Timers</text>
+  </g>
+
+  <g id="uc-breach">
+    <ellipse cx="1090" cy="425" rx="95" ry="25" fill="url(#ucGradExtend)" stroke="#9333ea" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="1090" y="429" text-anchor="middle" font-size="11" font-weight="600" fill="#581c87">Escalate SLA Breach</text>
+  </g>
+
+  <!-- Subsystem 5: Platform Admin & Governance -->
+  <g id="uc-campus">
+    <ellipse cx="870" cy="570" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="870" y="574" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Manage Campus Facilities</text>
+  </g>
+
+  <g id="uc-tenants">
+    <ellipse cx="1090" cy="570" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="1090" y="574" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Manage Tenants &amp; Leases</text>
+  </g>
+
+  <g id="uc-catalog-admin">
+    <ellipse cx="870" cy="650" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="870" y="654" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Manage Service Catalog</text>
+  </g>
+
+  <g id="uc-rbac">
+    <ellipse cx="1090" cy="650" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="1090" y="654" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Manage RBAC &amp; Users</text>
+  </g>
+
+  <g id="uc-audit">
+    <ellipse cx="980" cy="735" rx="90" ry="24" fill="url(#ucGradInclude)" stroke="#d97706" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="980" y="739" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Log Immutable Audit</text>
+  </g>
+
+  <g id="uc-config">
+    <ellipse cx="870" cy="820" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="870" y="824" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Manage System Config</text>
+  </g>
+
+  <g id="uc-bi">
+    <ellipse cx="1090" cy="820" rx="95" ry="25" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="1090" y="824" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Generate Reports &amp; BI</text>
+  </g>
+
+  <g id="uc-ann">
+    <ellipse cx="980" cy="905" rx="95" ry="24" fill="url(#ucGrad)" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)" />
+    <text x="980" y="909" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Broadcast Announcements</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- RELATIONSHIP LINES: «include» AND «extend» -->
+  <!-- ========================================================================= -->
+
+  <!-- Extend: Enforce First Pwd -> Login -->
+  <path d="M 510 195 L 465 195" fill="none" stroke="#7e22ce" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-extend)" />
+  <text x="488" y="188" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7e22ce">«extend»</text>
+
+  <!-- Include: Submit -> Validate -->
+  <path d="M 455 432 L 525 415" fill="none" stroke="#d97706" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-include)" />
+  <text x="488" y="418" text-anchor="middle" font-size="9.5" font-weight="700" fill="#d97706">«include»</text>
+
+  <!-- Extend: Attach Docs -> Submit -->
+  <path d="M 525 465 L 465 452" fill="none" stroke="#7e22ce" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-extend)" />
+  <text x="495" y="475" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7e22ce">«extend»</text>
+
+  <!-- Extend: Approve/Reject Request -> Submit Issue Request -->
+  <path d="M 1005 210 C 820 280 620 370 460 435" fill="none" stroke="#7e22ce" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-extend)" />
+  <text x="730" y="305" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7e22ce">«extend» [cost &gt; threshold]</text>
+
+  <!-- Include: Assign Tech -> Verify Roster -->
+  <path d="M 1005 285 L 945 325" fill="none" stroke="#d97706" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-include)" />
+  <text x="980" y="318" text-anchor="middle" font-size="9.5" font-weight="700" fill="#d97706">«include»</text>
+
+  <!-- Extend: Pause Work -> Execute Work -->
+  <path d="M 520 790 L 470 790" fill="none" stroke="#7e22ce" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-extend)" />
+  <text x="495" y="783" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7e22ce">«extend»</text>
+
+  <!-- Include: Execute Work Order -> Track SLA Clocks -->
+  <path d="M 465 778 C 590 730 730 540 820 445" fill="none" stroke="#d97706" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-include)" />
+  <text x="645" y="605" text-anchor="middle" font-size="9.5" font-weight="700" fill="#d97706">«include»</text>
+
+  <!-- Extend: Escalate SLA Breach -> Track SLA Clocks -->
+  <path d="M 995 425 L 965 425" fill="none" stroke="#7e22ce" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-extend)" />
+  <text x="980" y="418" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7e22ce">«extend»</text>
+
+  <!-- Include: RBAC & Config -> Log Audit -->
+  <path d="M 1035 672 L 1005 712" fill="none" stroke="#d97706" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-include)" />
+  <path d="M 920 798 L 955 758" fill="none" stroke="#d97706" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow-include)" />
+  <text x="1035" y="710" text-anchor="middle" font-size="9.5" font-weight="700" fill="#d97706">«include»</text>
+
+  <!-- ========================================================================= -->
+  <!-- THE FIVE PRIMARY ACTORS (STICK FIGURES) -->
+  <!-- ========================================================================= -->
+
+  <!-- ROLE 1: Park Employee (Left Top) -->
+  <g id="actor-1" transform="translate(65, 340)">
+    <circle cx="25" cy="18" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2.2" />
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="2" y1="46" x2="48" y2="46" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="6" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="44" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <text x="25" y="125" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Park Employee</text>
+    <text x="25" y="139" text-anchor="middle" font-size="10.5" fill="#64748b">(Role 1: Requester)</text>
+  </g>
+
+  <!-- ROLE 2: Tenant Representative (Left Upper-Mid) -->
+  <g id="actor-2" transform="translate(65, 500)">
+    <circle cx="25" cy="18" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2.2" />
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="2" y1="46" x2="48" y2="46" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="6" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="44" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <text x="25" y="125" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Tenant Representative</text>
+    <text x="25" y="139" text-anchor="middle" font-size="10.5" fill="#64748b">(Role 2: Tenant Rep)</text>
+  </g>
+
+  <!-- Generalization: Tenant Representative inherits from Park Employee -->
+  <line x1="90" y1="500" x2="90" y2="475" stroke="#2563eb" stroke-width="1.8" marker-end="url(#generalize)" />
+
+  <!-- ROLE 3: Department Manager (Left Lower-Mid) -->
+  <g id="actor-3" transform="translate(65, 660)">
+    <circle cx="25" cy="18" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2.2" />
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="2" y1="46" x2="48" y2="46" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="6" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="44" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <text x="25" y="125" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Department Manager</text>
+    <text x="25" y="139" text-anchor="middle" font-size="10.5" fill="#64748b">(Role 3: Approver/Supervisor)</text>
+  </g>
+
+  <!-- ROLE 4: Technician (Left Bottom) -->
+  <g id="actor-4" transform="translate(65, 820)">
+    <circle cx="25" cy="18" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2.2" />
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="2" y1="46" x2="48" y2="46" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="6" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="44" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <text x="25" y="125" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Technician</text>
+    <text x="25" y="139" text-anchor="middle" font-size="10.5" fill="#64748b">(Role 4: Field Specialist)</text>
+  </g>
+
+  <!-- ROLE 5: Park / System Administrator (Right Center) -->
+  <g id="actor-5" transform="translate(1360, 570)">
+    <circle cx="25" cy="18" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2.2" />
+    <line x1="25" y1="32" x2="25" y2="70" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="2" y1="46" x2="48" y2="46" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="6" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <line x1="25" y1="70" x2="44" y2="105" stroke="#2563eb" stroke-width="2.4" />
+    <text x="25" y="125" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Park / System Admin</text>
+    <text x="25" y="139" text-anchor="middle" font-size="10.5" fill="#64748b">(Role 5: Platform Owner)</text>
+  </g>
+
+  <!-- SECONDARY ACTOR: Notification Gateway (Right Bottom) -->
+  <g id="actor-gateway" transform="translate(1310, 880)">
+    <rect x="0" y="0" width="150" height="56" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.8" />
+    <text x="75" y="24" text-anchor="middle" font-size="10" fill="#64748b">«secondary actor»</text>
+    <text x="75" y="42" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">Notification Gateway</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- SOLID ASSOCIATION LINES (ACTOR <-> USE CASE) -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. Park Employee Associations -->
+  <line x1="120" y1="370" x2="285" y2="195" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="380" x2="285" y2="370" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="390" x2="280" y2="445" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="400" x2="285" y2="525" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="410" x2="285" y2="595" stroke="#334155" stroke-width="1.4" />
+
+  <!-- 2. Tenant Representative Associations -->
+  <line x1="120" y1="540" x2="280" y2="445" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="550" x2="285" y2="525" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="560" x2="995" y2="570" stroke="#334155" stroke-width="1.2" stroke-dasharray="2 2" />
+
+  <!-- 3. Department Manager Associations -->
+  <line x1="120" y1="695" x2="775" y2="195" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="705" x2="780" y2="270" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="715" x2="995" y2="270" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="725" x2="995" y2="820" stroke="#334155" stroke-width="1.4" />
+
+  <!-- 4. Technician Associations -->
+  <line x1="120" y1="850" x2="280" y2="715" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="860" x2="280" y2="790" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="870" x2="280" y2="870" stroke="#334155" stroke-width="1.4" />
+  <line x1="120" y1="840" x2="285" y2="595" stroke="#334155" stroke-width="1.4" />
+
+  <!-- 5. Park / System Administrator Associations -->
+  <line x1="1360" y1="600" x2="965" y2="570" stroke="#334155" stroke-width="1.4" />
+  <line x1="1360" y1="610" x2="1185" y2="570" stroke="#334155" stroke-width="1.4" />
+  <line x1="1360" y1="620" x2="965" y2="650" stroke="#334155" stroke-width="1.4" />
+  <line x1="1360" y1="630" x2="1185" y2="650" stroke="#334155" stroke-width="1.4" />
+  <line x1="1360" y1="640" x2="965" y2="820" stroke="#334155" stroke-width="1.4" />
+  <line x1="1360" y1="650" x2="1185" y2="820" stroke="#334155" stroke-width="1.4" />
+  <line x1="1360" y1="660" x2="1075" y2="905" stroke="#334155" stroke-width="1.4" />
+
+  <!-- Notification Gateway Connection -->
+  <line x1="1185" y1="425" x2="1310" y2="900" stroke="#64748b" stroke-width="1.4" stroke-dasharray="3 3" />
+  <line x1="470" y1="260" x2="1310" y2="910" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" />
+
+  <!-- ========================================================================= -->
+  <!-- LEGEND -->
+  <!-- ========================================================================= -->
+  <g id="legend" transform="translate(255, 985)">
+    <rect x="0" y="0" width="750" height="30" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+    <text x="15" y="19" font-size="11" font-weight="700" fill="#334155">UML 2.5 Standard Legend:</text>
+    
+    <circle cx="155" cy="15" r="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5" />
+    <text x="168" y="19" font-size="10.5" fill="#334155">Base Use Case</text>
+
+    <line x1="265" y1="15" x2="295" y2="15" stroke="#d97706" stroke-width="1.6" stroke-dasharray="3 2" marker-end="url(#arrow-include)" />
+    <text x="303" y="19" font-size="10.5" font-weight="600" fill="#d97706">«include» (Mandatory)</text>
+
+    <line x1="440" y1="15" x2="470" y2="15" stroke="#7e22ce" stroke-width="1.6" stroke-dasharray="3 2" marker-end="url(#arrow-extend)" />
+    <text x="478" y="19" font-size="10.5" font-weight="600" fill="#7e22ce">«extend» (Conditional)</text>
+
+    <line x1="615" y1="15" x2="645" y2="15" stroke="#2563eb" stroke-width="1.6" marker-end="url(#generalize)" />
+    <text x="653" y="19" font-size="10.5" font-weight="600" fill="#2563eb">Generalization / Inheritance</text>
+  </g>
+</svg>

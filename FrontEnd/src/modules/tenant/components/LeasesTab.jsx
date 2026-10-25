@@ -19,6 +19,9 @@ import {
 import tenantApi from '../api/tenantApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 import { tenantSchemas } from '../../../validation';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { useTranslation } from '../../../i18n';
@@ -450,35 +453,33 @@ export default function LeasesTab({ onRefreshMetrics }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {getStatusBadge(l.Status)}
                       {isParkAdmin && (
-                        <button
-                          onClick={() => { setStatusModalLease(l); setTargetStatus(''); setTerminationReason(''); setErrorMsg(''); }}
+                        <ActionButton
+                          variant="warning"
+                          size="sm"
                           title="Transition Contract Status"
-                          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={13} />
-                        </button>
+                          onClick={() => { setStatusModalLease(l); setTargetStatus(''); setTerminationReason(''); setErrorMsg(''); }}
+                          icon={<Edit2 size={12} />}
+                        />
                       )}
                     </div>
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <ActionGroup align="right">
                       {isParkAdmin && l.Status === 'DRAFT' && (
-                        <button
+                        <ActionButton
+                          variant="edit"
                           onClick={() => handleOpenEdit(l)}
-                          style={{ padding: '6px 10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          <Edit2 size={14} />
-                        </button>
+                          title={t('common.edit')}
+                        />
                       )}
                       {isParkAdmin && l.Status === 'DRAFT' && (
-                        <button
+                        <ActionButton
+                          variant="delete"
                           onClick={() => handleDelete(l.LeaseAgreementID, l.AgreementNumber)}
-                          style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                          title={t('common.delete')}
+                        />
                       )}
-                    </div>
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -488,36 +489,41 @@ export default function LeasesTab({ onRefreshMetrics }) {
       </div>
 
       {/* Modal: Create/Edit Lease */}
-      {isModalOpen && createPortal(
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ width: '100%', maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto', padding: '28px', background: 'var(--bg-secondary)', borderRadius: '24px', border: '1px solid var(--glass-border-accent)', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-                <FileCheck color="var(--accent-primary)" />
-                {editingLease ? 'Edit Draft Lease Contract' : 'Draft New Lease Contract'}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                <X size={20} />
-              </button>
+      <ModalCard
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingLease ? t('tenant.editLease', 'Edit Draft Lease Contract') : t('tenant.draftNewLease', 'Draft New Lease Contract')}
+        subtitle={editingLease ? `Agreement #${editingLease.AgreementNumber}` : 'Register a new tenant lease agreement, term schedule, and financial terms'}
+        category={t('tenant.leaseGovernance', 'Lease Governance')}
+        icon={FileCheck}
+        accentStrip="primary"
+        maxWidth="680px"
+        onSubmit={handleSubmit}
+        submitText={editingLease ? t('common.saveChanges', 'Save Changes') : t('tenant.draftNewLease', 'Draft New Lease')}
+        cancelText={t('common.cancel', 'Cancel')}
+        error={errorMsg || (Object.keys(fieldErrors).length > 0 ? Object.values(fieldErrors)[0] : '')}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Section 1: Agreement & Tenant Identification */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-primary, #2563eb)' }}>
+              1. Agreement & Tenant Identification
             </div>
 
-            {(errorMsg || Object.keys(fieldErrors).length > 0) && (
-              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg || Object.values(fieldErrors)[0]}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Tenant *</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <FormField
+                label="Tenant *"
+                error={fieldErrors.TenantID}
+                icon={Building}
+              >
                 <select
                   value={formData.TenantID}
                   onChange={(e) => handleFieldChange('TenantID', e.target.value)}
                   onBlur={() => handleBlur('TenantID')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.TenantID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.TenantID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 >
                   <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Tenant</option>
@@ -527,15 +533,13 @@ export default function LeasesTab({ onRefreshMetrics }) {
                     </option>
                   ))}
                 </select>
-                {fieldErrors.TenantID && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.TenantID}
-                  </span>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Agreement # *</label>
+              <FormField
+                label="Agreement Number *"
+                error={fieldErrors.AgreementNumber}
+                icon={FileText}
+              >
                 <input
                   type="text"
                   placeholder="e.g. LEA-10023"
@@ -544,19 +548,26 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('AgreementNumber')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.AgreementNumber ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontFamily: 'monospace'
+                    border: `1px solid ${fieldErrors.AgreementNumber ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.AgreementNumber && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.AgreementNumber}
-                  </span>
-                )}
-              </div>
+              </FormField>
+            </div>
+          </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Start Date *</label>
+          {/* Section 2: Term Schedule & Grace Period */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid var(--color-border-subtle, var(--glass-border))', paddingTop: '16px' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-primary, #2563eb)' }}>
+              2. Contract Term Schedule
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <FormField
+                label="Start Date *"
+                error={fieldErrors.StartDate}
+                icon={Calendar}
+              >
                 <input
                   type="date"
                   value={formData.StartDate}
@@ -564,19 +575,17 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('StartDate')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.StartDate ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.StartDate ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.StartDate && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.StartDate}
-                  </span>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>End Date *</label>
+              <FormField
+                label="End Date *"
+                error={fieldErrors.EndDate}
+                icon={Calendar}
+              >
                 <input
                   type="date"
                   value={formData.EndDate}
@@ -584,19 +593,19 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('EndDate')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.EndDate ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.EndDate ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.EndDate && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.EndDate}
-                  </span>
-                )}
-              </div>
+              </FormField>
+            </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Execution Date *</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <FormField
+                label="Execution Date *"
+                error={fieldErrors.ExecutionDate}
+                icon={Calendar}
+              >
                 <input
                   type="date"
                   value={formData.ExecutionDate}
@@ -604,19 +613,17 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('ExecutionDate')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.ExecutionDate ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.ExecutionDate ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.ExecutionDate && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.ExecutionDate}
-                  </span>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Grace Period (Days)</label>
+              <FormField
+                label="Grace Period (Days)"
+                error={fieldErrors.GracePeriodDays}
+                icon={Clock}
+              >
                 <input
                   type="number"
                   min="0"
@@ -626,19 +633,26 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('GracePeriodDays')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.GracePeriodDays ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.GracePeriodDays ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.GracePeriodDays && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.GracePeriodDays}
-                  </span>
-                )}
-              </div>
+              </FormField>
+            </div>
+          </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Monthly Rent Amount *</label>
+          {/* Section 3: Financial Terms */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid var(--color-border-subtle, var(--glass-border))', paddingTop: '16px' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-primary, #2563eb)' }}>
+              3. Financial Terms & Security Deposit
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+              <FormField
+                label="Monthly Rent Amount (ETB) *"
+                error={fieldErrors.MonthlyRentAmount}
+                icon={DollarSign}
+              >
                 <input
                   type="number"
                   step="0.01"
@@ -649,19 +663,17 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('MonthlyRentAmount')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.MonthlyRentAmount ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.MonthlyRentAmount ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.MonthlyRentAmount && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.MonthlyRentAmount}
-                  </span>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Security Deposit Amount</label>
+              <FormField
+                label="Security Deposit Amount (ETB)"
+                error={fieldErrors.SecurityDepositAmount}
+                icon={DollarSign}
+              >
                 <input
                   type="number"
                   step="0.01"
@@ -672,70 +684,63 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   onBlur={() => handleBlur('SecurityDepositAmount')}
                   style={{
                     width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                    border: fieldErrors.SecurityDepositAmount ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
+                    border: `1px solid ${fieldErrors.SecurityDepositAmount ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
                   }}
                 />
-                {fieldErrors.SecurityDepositAmount && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {fieldErrors.SecurityDepositAmount}
-                  </span>
-                )}
-              </div>
-
-              <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)' }}
-                >
-                  {editingLease ? t('common.saveChanges') : t('tenant.draftNewLease')}
-                </button>
-              </div>
-            </form>
+              </FormField>
+            </div>
           </div>
-        </div>,
-        document.body
-      )}
+        </div>
+      </ModalCard>
 
       {/* Modal: Lease Status Transition */}
-      {statusModalLease && createPortal(
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ width: '100%', maxWidth: '480px', padding: '28px', background: 'var(--bg-secondary)', borderRadius: '24px', border: '1px solid var(--glass-border-accent)', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-                <FileCheck color="var(--accent-primary)" />
-                Update Lease Contract Status
-              </h2>
-              <button onClick={() => setStatusModalLease(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                <X size={20} />
-              </button>
+      <ModalCard
+        isOpen={Boolean(statusModalLease)}
+        onClose={() => setStatusModalLease(null)}
+        title="Update Lease Contract Status"
+        subtitle={statusModalLease ? `Agreement #${statusModalLease.AgreementNumber}` : ''}
+        category="Contract Lifecycle"
+        icon={FileCheck}
+        accentStrip="amber"
+        maxWidth="500px"
+        onSubmit={handleStatusChange}
+        submitText={t('common.confirm', 'Confirm Transition')}
+        cancelText={t('common.cancel', 'Cancel')}
+        submitDisabled={!targetStatus}
+        error={errorMsg}
+      >
+        {statusModalLease && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div
+              style={{
+                padding: '12px 14px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.85rem'
+              }}
+            >
+              <div>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'block' }}>Contract Agreement</span>
+                <strong style={{ color: 'var(--text-primary)', fontSize: '0.92rem' }}>{statusModalLease.AgreementNumber}</strong>
+              </div>
+              <span className="badge">{statusModalLease.Status}</span>
             </div>
 
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              Contract <strong style={{ color: 'var(--text-primary)' }}>{statusModalLease.AgreementNumber}</strong> is currently{' '}
-              <span className="badge">{statusModalLease.Status}</span>
-            </p>
-
-            {errorMsg && (
-              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleStatusChange}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '8px' }}>Select Target Lease Status:</label>
+            <FormField label="Target Lease Status *" icon={FileCheck}>
               <select
                 required
                 value={targetStatus}
                 onChange={(e) => setTargetStatus(e.target.value)}
-                style={{ width: '100%', padding: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', marginBottom: '16px' }}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)',
+                  color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
               >
                 <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>-- Choose New Status --</option>
                 {statusModalLease.Status === 'DRAFT' && <option value="ACTIVE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>ACTIVE (Activate Contract)</option>}
@@ -746,53 +751,33 @@ export default function LeasesTab({ onRefreshMetrics }) {
                   </>
                 )}
               </select>
+            </FormField>
 
-              {targetStatus === 'TERMINATED' && (
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px' }}>Termination Reason *</label>
-                  <textarea
-                    rows="3"
-                    value={terminationReason}
-                    onChange={(e) => {
-                      setTerminationReason(e.target.value);
-                      if (statusErrors.terminationReason) setStatusErrors({});
-                    }}
-                    placeholder="Provide detailed reason for contract termination..."
-                    style={{
-                      width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
-                      border: statusErrors.terminationReason ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)'
-                    }}
-                  />
-                  {statusErrors.terminationReason && (
-                    <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                      ⚠️ {statusErrors.terminationReason}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setStatusModalLease(null)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={!targetStatus}
-                  style={{ padding: '10px 22px', background: 'var(--accent-gradient)', border: 'none', borderRadius: 'var(--border-radius-sm)', color: '#ffffff', fontWeight: '700', cursor: 'pointer', boxShadow: 'var(--glow-accent)', opacity: !targetStatus ? 0.5 : 1 }}
-                >
-                  {t('common.confirm')}
-                </button>
-              </div>
-            </form>
+            {targetStatus === 'TERMINATED' && (
+              <FormField
+                label="Termination Reason *"
+                error={statusErrors.terminationReason}
+                icon={AlertTriangle}
+              >
+                <textarea
+                  rows="3"
+                  value={terminationReason}
+                  onChange={(e) => {
+                    setTerminationReason(e.target.value);
+                    if (statusErrors.terminationReason) setStatusErrors({});
+                  }}
+                  placeholder="Provide detailed reason for contract termination..."
+                  style={{
+                    width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                    border: `1px solid ${statusErrors.terminationReason ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                  }}
+                />
+              </FormField>
+            )}
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </ModalCard>
 
       {/* Shared Glass Modals */}
       <ConfirmDialogModal

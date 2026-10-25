@@ -220,41 +220,6 @@ export const SERVICE_CATALOG_MESSAGES = {
     categoryRequired: 'Select a service category.',
     departmentRequired: 'Select a responsible department.',
     duplicateMapping: 'This service category is already mapped to the selected department.'
-  },
-  pricing: {
-    serviceRequired: 'Select a service offering to configure pricing.',
-    pricingModelRequired: 'Select a pricing model.',
-    billingTypeRequired: 'Select a billing classification.',
-    unitPriceNegative: 'Unit price cannot be negative.',
-    unitPricePrecision: 'Unit price can have at most 2 decimal places.',
-    unitPriceRequiredForBillable: 'Unit price must be greater than 0 for billable services.',
-    unitPriceFreeWarning: 'Free service pricing model requires a 0.00 unit price.'
-  },
-  requirementField: {
-    fieldNameRequired: 'System field name identifier is required.',
-    fieldNameFormat: 'Field identifier must start with a letter and contain only letters, numbers, or underscores (e.g. serial_number).',
-    fieldNameLength: (min = 2, max = 100) => `Field identifier must be between ${min} and ${max} characters.`,
-    fieldLabelRequired: 'User-facing field label is required.',
-    fieldLabelLength: (min = 2, max = 100) => `Field label must be between ${min} and ${max} characters.`,
-    fieldTypeRequired: 'Select a field input type.',
-    displayOrderPositive: 'Display order must be 0 or a positive whole integer.'
-  },
-  requirementAttachment: {
-    attachmentNameRequired: 'Attachment requirement name is required.',
-    attachmentNameLength: (min = 2, max = 100) => `Attachment name must be between ${min} and ${max} characters.`,
-    allowedExtensionsRequired: 'Specify at least one allowed extension (e.g. pdf, docx, png).',
-    allowedExtensionsFormat: 'Extensions must be comma-separated alphanumeric codes (e.g. pdf, jpg, png, docx).',
-    maxFileSizeRange: (min = 1, max = 100) => `File size limit must be between ${min} MB and ${max} MB.`,
-    descriptionMaxLength: (max = 500) => `Description cannot exceed ${max} characters.`
-  },
-  governance: {
-    departmentRequired: 'Select a department to assign.',
-    departmentAlreadyAssigned: 'This department is already assigned to this service offering.',
-    ruleNameRequired: 'Approval rule name is required.',
-    ruleNameLength: (min = 3, max = 150) => `Rule name must be between ${min} and ${max} characters.`,
-    stagesCountRange: (min = 1, max = 10) => `Required approval stages must be between ${min} and ${max}.`,
-    autoApproveNonNegative: 'Auto-approve threshold cannot be negative.',
-    autoApprovePrecision: 'Auto-approve threshold can have at most 2 decimal places.'
   }
 };
 
@@ -315,16 +280,6 @@ export const ISSUE_MANAGEMENT_MESSAGES = {
   comment: {
     textRequired: 'Comment text cannot be empty.',
     textMaxLength: (max = 2000) => `Comment cannot exceed ${max} characters.`
-  },
-  knownIssue: {
-    titleRequired: 'Known issue title is required.',
-    titleLength: (min = 3, max = 250) => `Title must be between ${min} and ${max} characters.`,
-    symptomsRequired: 'Observable symptoms description is required.',
-    symptomsLength: (min = 5, max = 2000) => `Symptoms must be between ${min} and ${max} characters.`,
-    workaroundMaxLength: (max = 2000) => `Workaround cannot exceed ${max} characters.`,
-    permanentSolutionMaxLength: (max = 2000) => `Permanent solution cannot exceed ${max} characters.`,
-    categoryCodeMaxLength: (max = 50) => `Category code cannot exceed ${max} characters.`,
-    searchKeywordsMaxLength: (max = 500) => `Search keywords cannot exceed ${max} characters.`
   },
   feedback: {
     ratingRequired: 'Please select an overall satisfaction rating.',

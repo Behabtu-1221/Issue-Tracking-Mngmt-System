@@ -1,7 +1,9 @@
 import React from 'react';
 import { CheckCircle2, Clock, XCircle, Layers, ArrowUpRight, TrendingUp } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function ApprovalMetricsHeader({ metrics, activeFilter, onFilterChange }) {
+  const { t } = useTranslation();
   const total = metrics?.totalApprovals || 0;
   const pending = metrics?.pendingApprovals || 0;
   const approved = metrics?.approvedApprovals || 0;
@@ -13,9 +15,9 @@ export default function ApprovalMetricsHeader({ metrics, activeFilter, onFilterC
   const cards = [
     {
       id: 'ALL',
-      title: 'Total Workflows',
+      title: t('approval.metrics.totalWorkflows', 'Total Workflows'),
       value: total,
-      subtext: `${approvedPercent}% overall approval rate`,
+      subtext: t('approval.metrics.totalSubtext', '{rate}% overall approval rate').replace('{rate}', approvedPercent),
       icon: Layers,
       color: '#4f46e5',
       bgGlow: 'rgba(79, 70, 229, 0.12)',
@@ -24,9 +26,9 @@ export default function ApprovalMetricsHeader({ metrics, activeFilter, onFilterC
     },
     {
       id: 'PENDING',
-      title: 'Pending Action',
+      title: t('approval.metrics.pendingAction', 'Pending Action'),
       value: pending,
-      subtext: `${pendingPercent}% awaiting sign-off`,
+      subtext: t('approval.metrics.pendingSubtext', '{rate}% awaiting sign-off').replace('{rate}', pendingPercent),
       icon: Clock,
       color: '#d97706',
       bgGlow: 'rgba(217, 119, 6, 0.12)',
@@ -36,9 +38,9 @@ export default function ApprovalMetricsHeader({ metrics, activeFilter, onFilterC
     },
     {
       id: 'APPROVED',
-      title: 'Approved Requests',
+      title: t('approval.metrics.approvedRequests', 'Approved Requests'),
       value: approved,
-      subtext: 'Executed & finalized',
+      subtext: t('approval.metrics.approvedSubtext', 'Executed & finalized'),
       icon: CheckCircle2,
       color: '#059669',
       bgGlow: 'rgba(5, 150, 105, 0.12)',
@@ -47,9 +49,11 @@ export default function ApprovalMetricsHeader({ metrics, activeFilter, onFilterC
     },
     {
       id: 'REJECTED',
-      title: 'Rejected & Returned',
+      title: t('approval.metrics.rejectedReturned', 'Rejected & Returned'),
       value: rejected,
-      subtext: `${metrics?.rejectedApprovals || 0} Rejected • ${metrics?.returnedApprovals || 0} Returned`,
+      subtext: t('approval.metrics.rejectedSubtext', '{rejected} Rejected • {returned} Returned')
+        .replace('{rejected}', metrics?.rejectedApprovals || 0)
+        .replace('{returned}', metrics?.returnedApprovals || 0),
       icon: XCircle,
       color: '#dc2626',
       bgGlow: 'rgba(220, 38, 38, 0.12)',

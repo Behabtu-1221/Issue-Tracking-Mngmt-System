@@ -5,6 +5,7 @@ import {
   Info, ExternalLink, RefreshCw, Layers
 } from 'lucide-react';
 import { useAuth } from '../../../modules/authentication/contexts/AuthContext';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import ConversationListPanel from '../components/ConversationListPanel';
 import ConversationPanel from '../components/ConversationPanel';
 
@@ -14,6 +15,7 @@ import ConversationPanel from '../components/ConversationPanel';
  * and direct request deep-linking.
  */
 export default function CommDiscussionsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestIdFromUrl = searchParams.get('requestId');
@@ -49,11 +51,10 @@ export default function CommDiscussionsPage() {
   }, []);
 
   const getRolePortalLabel = () => {
-    if (userRole.includes('ADMIN')) return 'Admin Operations Hub';
-    if (userRole.includes('TECH')) return 'Technician Fulfillment Desk';
-    if (userRole.includes('MANAGER')) return 'Department Oversight';
-    if (userRole.includes('TENANT')) return 'Tenant Company Communications';
-    return 'Requester Support Portal';
+    if (userRole.includes('ADMIN')) return t('communication.roleBadges.admin', 'Admin Operations Hub');
+    if (userRole.includes('TECH')) return t('communication.roleBadges.tech', 'Technician Fulfillment Desk');
+    if (userRole.includes('MANAGER')) return t('communication.roleBadges.manager', 'Department Oversight');
+    return t('communication.roleBadges.requester', 'Requester Support Portal');
   };
 
   return (
@@ -71,7 +72,7 @@ export default function CommDiscussionsPage() {
               display: 'flex', alignItems: 'center', gap: '10px'
             }}>
               <MessageSquare size={28} color="var(--accent-primary)" />
-              Request Discussions
+              {t('communication.tabs.comments', 'Request Discussions')}
             </h1>
             <span style={{
               padding: '4px 10px', borderRadius: '20px',
@@ -82,7 +83,7 @@ export default function CommDiscussionsPage() {
             </span>
           </div>
           <p style={{ margin: '6px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Collaborate directly with requesters, facility managers, and assigned field technicians in real-time.
+            {t('communication.subtitle', 'Collaborate directly with requesters, facility managers, and assigned field technicians in real-time.')}
           </p>
         </div>
 
@@ -97,7 +98,7 @@ export default function CommDiscussionsPage() {
               alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600
             }}
           >
-            ← Communication Hub
+            ← {t('communication.title', 'Communication Hub')}
           </button>
         </div>
       </div>
@@ -115,7 +116,7 @@ export default function CommDiscussionsPage() {
             boxShadow: '0 4px 14px rgba(99, 102, 241, 0.25)'
           }}
         >
-          <ArrowLeft size={16} /> All Discussions List
+          <ArrowLeft size={16} /> {t('communication.tabs.conversations', 'All Discussions List')}
         </button>
       )}
 
@@ -144,7 +145,8 @@ export default function CommDiscussionsPage() {
           <div style={{ minWidth: 0, height: '660px' }}>
             {selectedConv ? (
               <ConversationPanel
-                issueRequestId={selectedConv.ReferenceIssueRequestID || selectedConv.ConversationID}
+                conversationId={selectedConv.ConversationID}
+                issueRequestId={selectedConv.ReferenceIssueRequestID}
                 currentUserId={currentUserId}
                 onRequestOpen={(id) => navigate(`/issues?requestId=${id}`)}
               />

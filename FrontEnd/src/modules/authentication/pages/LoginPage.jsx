@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import sessionManager from '../utils/sessionManager';
 import { useTranslation, LanguageSelector } from '../../../i18n';
+import NeuronLogo from '../../../components/common/NeuronLogo';
 
 import { authSchemas } from '../../../validation';
 
@@ -119,7 +120,8 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      width: '100vw',
+      width: '100%',
+      maxWidth: '100%',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -132,6 +134,7 @@ export default function LoginPage() {
       fontFamily: "'Inter', 'Outfit', system-ui, sans-serif",
       padding: '24px 16px',
       boxSizing: 'border-box',
+      overflowX: 'hidden',
       overflowY: 'auto'
     }}>
       {/* Top Language Bar */}
@@ -162,7 +165,7 @@ export default function LoginPage() {
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderRadius: '24px',
+          borderRadius: 'var(--border-radius-lg, 18px)',
           boxShadow: isCardHovered
             ? '0 30px 70px rgba(15, 23, 42, 0.38), 0 0 35px rgba(2, 132, 199, 0.22)'
             : '0 20px 50px rgba(15, 23, 42, 0.3), 0 4px 16px rgba(0, 0, 0, 0.08)',
@@ -184,20 +187,8 @@ export default function LoginPage() {
 
         {/* Brand Header Inside Card */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '24px', paddingTop: '4px' }}>
-          <div style={{
-            width: '68px', height: '68px', borderRadius: '20px',
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0284c7 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            marginBottom: '14px', boxShadow: '0 10px 25px rgba(2, 132, 199, 0.3)'
-          }}>
-            <img
-              src="/logoitms.png"
-              alt="ITMS Logo"
-              style={{
-                width: '44px', height: '44px', objectFit: 'contain',
-                filter: 'brightness(0) invert(1)'
-              }}
-            />
+          <div style={{ marginBottom: '14px' }}>
+            <NeuronLogo size={68} iconSize={44} showText={false} />
           </div>
 
           <h1 style={{

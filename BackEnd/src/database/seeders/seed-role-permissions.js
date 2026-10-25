@@ -8,13 +8,26 @@ const ROLE_PERMISSIONS_MAPPING = {
     'Role.Read', 'Role.Create', 'Role.Update', 'Role.Assign', 'Role.Permission.Assign',
     'Department.Read', 'Department.Create', 'Department.Update', 'Department.Manage',
     'Request.Create', 'Request.Read', 'Request.All.Read', 'Request.Update', 'Request.Approve', 'Request.Assign', 'Request.Reassign', 'Request.Resolve', 'Request.Close',
+    'Issue.Create', 'Issue.Read.All', 'Issue.Update', 'Issue.Approve', 'Issue.Reject', 'Issue.Assign', 'Issue.Dispatch', 'Issue.Resolve', 'Issue.Close',
     'Report.View', 'Report.Export', 'Report.Create', 'Report.Schedule', 'Report.Manage', 'Audit.Read', 'Audit.Export', 'Communication.Read', 'Communication.Send', 'Notification.Manage'
   ],
+
+  DEPARTMENT_MANAGER: [
+    'Department.Read', 'Department.Update',
+    'User.Read', 'User.Read.Company',
+    'Request.Create', 'Request.Read', 'Request.Update', 'Request.Approve', 'Request.Assign',
+    'Issue.Create', 'Issue.Read.Department', 'Issue.Read.Company', 'Issue.Update', 'Issue.Approve', 'Issue.Reject', 'Issue.Comment', 'Issue.Assign',
+    'Report.View', 'Report.Export',
+    'Communication.Read', 'Communication.Send',
+    'Notification.Manage', 'Team.Manage'
+  ],
+
   TENANT_REPRESENTATIVE: [
     'Tenant.Read',
     'User.Read', 'User.Read.Company',
-    'Request.Create', 'Request.Read', 'Request.Update',
-    'Service.Read', 'Knowledge.Read',
+    'Request.Create', 'Request.Read', 'Request.Update', 'Request.Approve',
+    'Issue.Create', 'Issue.Read.Company', 'Issue.Update', 'Issue.Approve', 'Issue.Reject',
+    'Service.Read',
     'Report.View', 'Report.Export',
     'Communication.Read', 'Communication.Send',
     'Notification.Manage'
@@ -22,14 +35,17 @@ const ROLE_PERMISSIONS_MAPPING = {
   DISPATCHER: [
     'User.Read', 'Department.Read',
     'Request.Create', 'Request.Read', 'Request.Update', 'Request.Approve', 'Request.Assign', 'Request.Reassign', 'Request.Resolve', 'Request.Close',
-    'Report.View', 'Communication.Read', 'Communication.Send'
+    'Issue.Create', 'Issue.Read.All', 'Issue.Update', 'Issue.Approve', 'Issue.Reject', 'Issue.Assign', 'Issue.Dispatch', 'Issue.Resolve', 'Issue.Close',
+    'Report.View', 'Communication.Read', 'Communication.Send', 'Team.Manage'
   ],
   TECHNICIAN: [
     'Request.Read', 'Request.Update', 'Request.Resolve',
+    'Issue.Read.Assigned', 'Issue.Resolve', 'Issue.Comment',
     'Communication.Read', 'Communication.Send'
   ],
   EMPLOYEE: [
     'Request.Create', 'Request.Read',
+    'Issue.Create', 'Issue.Read.Own', 'Issue.Comment',
     'Communication.Read', 'Communication.Send'
   ]
 };
@@ -37,12 +53,22 @@ const ROLE_PERMISSIONS_MAPPING = {
 export async function seedRolePermissions() {
   console.log('Seeding Default System Role Permissions...');
 
+  // Ensure DEPARTMENT_MANAGER role exists
+  const existingDeptRole = await db.query(`SELECT RoleID FROM \`Role\` WHERE RoleCode = 'DEPARTMENT_MANAGER' LIMIT 1`);
+  if (!existingDeptRole[0]) {
+    await db.query(`
+      INSERT INTO \`Role\` (TenantID, RoleCode, RoleName, Description, IsSystemRole, CreatedBy)
+      VALUES (NULL, 'DEPARTMENT_MANAGER', 'Department Manager', 'Department operational manager and request approver', 1, 1)
+    `);
+  }
+
   for (const [roleCode, permCodes] of Object.entries(ROLE_PERMISSIONS_MAPPING)) {
     const roleRows = await db.query(`SELECT RoleID FROM \`Role\` WHERE RoleCode = ? AND IsDeleted = 0 LIMIT 1`, [roleCode]);
     if (!roleRows[0]) {
       console.warn(`Role ${roleCode} not found in DB, skipping.`);
       continue;
     }
+
     const roleId = roleRows[0].RoleID;
 
     for (const code of permCodes) {

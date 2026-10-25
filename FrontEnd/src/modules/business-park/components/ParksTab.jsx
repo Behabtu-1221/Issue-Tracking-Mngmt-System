@@ -21,6 +21,7 @@ import parkApi from '../api/parkApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import BusinessParkFormModal from './BusinessParkFormModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { parkSchemas } from '../../../validation';
 import { useTranslation } from '../../../i18n';
 
@@ -138,17 +139,12 @@ export default function ParksTab() {
           </div>
         </div>
         {parks.length > 0 && (
-          <button
+          <ActionButton
+            variant="edit"
+            label={t('businessPark.editParkParameters')}
             onClick={() => openEditModal(parks[0])}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              padding: '7px 14px', borderRadius: '8px',
-              background: 'rgba(99, 102, 241, 0.2)', border: '1px solid rgba(99, 102, 241, 0.4)',
-              color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer'
-            }}
-          >
-            <Edit size={14} /> {t('businessPark.editParkParameters')}
-          </button>
+            title={t('businessPark.editParkParameters')}
+          />
         )}
       </div>
 
@@ -304,46 +300,20 @@ export default function ParksTab() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button
+                <ActionGroup style={{ width: '100%' }}>
+                  <ActionButton
+                    variant="edit"
+                    label={t('businessPark.editParkParameters')}
                     onClick={() => openEditModal(park)}
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      background: 'rgba(99, 102, 241, 0.15)',
-                      border: '1px solid rgba(99, 102, 241, 0.35)',
-                      color: 'var(--accent-primary)',
-                      cursor: 'pointer',
-                      fontWeight: 700,
-                      fontSize: '0.82rem',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <Edit size={14} /> {t('businessPark.editParkParameters')}
-                  </button>
-
-                  <button
+                    title={t('businessPark.editParkParameters')}
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  />
+                  <ActionButton
+                    variant="delete"
                     onClick={() => promptDeletePark(park)}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      background: 'rgba(239, 68, 68, 0.15)',
-                      border: '1px solid rgba(239, 68, 68, 0.35)',
-                      color: 'var(--color-danger)',
-                      cursor: 'pointer',
-                      fontWeight: 700,
-                      fontSize: '0.82rem',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+                    title={t('common.delete')}
+                  />
+                </ActionGroup>
               </div>
             </div>
           ))}
@@ -383,38 +353,20 @@ export default function ParksTab() {
                     )}
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="edit"
+                        label={t('common.edit')}
                         onClick={() => openEditModal(park)}
                         title={t('businessPark.editParkParameters')}
-                        style={{
-                          display: 'inline-flex', alignItems: 'center', gap: '4px',
-                          padding: '6px 12px', borderRadius: '8px',
-                          background: 'rgba(99, 102, 241, 0.15)',
-                          border: '1px solid rgba(99, 102, 241, 0.35)',
-                          color: 'var(--accent-primary)',
-                          fontWeight: 700, fontSize: '0.8rem',
-                          cursor: 'pointer', transition: 'all 0.2s'
-                        }}
-                      >
-                        <Edit size={14} /> {t('common.edit')}
-                      </button>
-                      <button
+                      />
+                      <ActionButton
+                        variant="delete"
+                        label={t('common.delete')}
                         onClick={() => promptDeletePark(park)}
                         title={t('common.delete')}
-                        style={{
-                          display: 'inline-flex', alignItems: 'center', gap: '4px',
-                          padding: '6px 12px', borderRadius: '8px',
-                          background: 'rgba(239, 68, 68, 0.15)',
-                          border: '1px solid rgba(239, 68, 68, 0.35)',
-                          color: 'var(--color-danger)',
-                          fontWeight: 700, fontSize: '0.8rem',
-                          cursor: 'pointer', transition: 'all 0.2s'
-                        }}
-                      >
-                        <Trash2 size={14} /> {t('common.delete')}
-                      </button>
-                    </div>
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}

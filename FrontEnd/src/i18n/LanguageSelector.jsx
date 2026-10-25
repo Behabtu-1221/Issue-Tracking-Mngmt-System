@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Check, ChevronDown, Languages, ArrowRightLeft } from 'lucide-react';
+import { Check, ChevronDown, Languages, ArrowRightLeft, Globe } from 'lucide-react';
 import { useTranslation } from './LanguageContext';
 
 /**
@@ -184,8 +184,8 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
           }
         }}
       >
-        {/* Crisp Vector Flag */}
-        <LocaleFlag code={current.code} width={20} height={14} />
+        {/* Global Language Icon */}
+        <Globe size={15} style={{ color: isOpen ? 'var(--color-primary, #2F81F7)' : 'var(--color-primary, #2F81F7)', flexShrink: 0 }} />
 
         {/* Primary Language Name */}
         <span
@@ -329,46 +329,29 @@ export default function LanguageSelector({ variant = 'navbar', className = '' })
                     }
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                    {/* Flag Container */}
+                  {/* Titles (flag removed at prefix) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                     <div
                       style={{
-                        padding: '3px',
-                        borderRadius: '5px',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
+                        fontSize: '0.88rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        color: isSelected ? 'var(--color-primary, #2F81F7)' : 'var(--color-text, #F5F7FA)',
+                        lineHeight: 1.2
                       }}
                     >
-                      <LocaleFlag code={loc.code} width={24} height={16} />
+                      {loc.nativeName}
                     </div>
-
-                    {/* Titles */}
-                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontSize: '0.88rem',
-                          fontWeight: isSelected ? 800 : 600,
-                          color: isSelected ? 'var(--color-primary, #2F81F7)' : 'var(--color-text, #F5F7FA)',
-                          lineHeight: 1.2
-                        }}
-                      >
-                        {loc.nativeName}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: '0.72rem',
-                          color: 'var(--color-text-secondary, #B6C2CF)',
-                          marginTop: '2px',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}
-                      >
-                        {loc.region || loc.name}
-                      </div>
+                    <div
+                      style={{
+                        fontSize: '0.72rem',
+                        color: 'var(--color-text-secondary, #B6C2CF)',
+                        marginTop: '2px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
+                    >
+                      {loc.region || loc.name}
                     </div>
                   </div>
 

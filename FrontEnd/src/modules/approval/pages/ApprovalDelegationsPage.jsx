@@ -1,15 +1,19 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import ApprovalDelegationsTab from '../components/ApprovalDelegationsTab';
 
 export default function ApprovalDelegationsPage() {
+  const { t } = useTranslation();
   return (
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>
+          {t('approval.delegations.title', 'Authority Delegations')}
+        </h1>
         <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-          Delegate approval authority and signature permissions during temporary absences or leave
+          {t('approval.delegations.subtitle', 'Delegate approval authority and signature permissions during temporary absences or leave')}
         </p>
       </div>
 

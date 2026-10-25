@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import tenantApi from '../api/tenantApi';
 import identityApi from '../../identity-access/api/identityApi';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { useTranslation } from '../../../i18n';
 
 export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeStatus }) {
@@ -41,7 +42,12 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
     if (tenantId) {
       fetchTenantDetails();
     }
-  }, [tenantId]);
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [tenantId, onClose]);
 
   const fetchTenantDetails = async () => {
     try {
@@ -117,53 +123,49 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 9999, padding: '20px'
+      zIndex: 9999, padding: 'clamp(8px, 2.5vw, 20px)'
     }}>
-      <div style={{
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--glass-border-accent)',
-        borderRadius: '24px',
-        width: '100%',
-        maxWidth: '880px',
-        maxHeight: '90vh',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        animation: 'fadeIn 0.25s ease-out'
-      }}>
-        {/* Header */}
-        <div style={{
-          padding: '24px 28px',
-          borderBottom: '1px solid var(--glass-border)',
-          background: 'var(--bg-tertiary)',
+      <div
+        className="modal-card accent-strip-brand"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tenant-detail-title"
+        style={{
+          width: '100%',
+          maxWidth: '880px',
+          maxHeight: '94vh',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexShrink: 0
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          flexDirection: 'column',
+          overflow: 'hidden',
+          animation: 'fadeIn 0.25s ease-out'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-3.5 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[var(--glass-border)] bg-[var(--bg-tertiary)] shrink-0">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
             <div style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '14px',
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
               background: 'var(--accent-gradient)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: 'var(--glow-accent)',
-              color: 'white'
+              color: 'white',
+              flexShrink: 0
             }}>
-              <Building2 size={26} />
+              <Building2 size={20} />
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <h2 id="tenant-detail-title" style={{ margin: 0, fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)', fontWeight: 800, color: 'var(--text-primary)', wordBreak: 'break-word' }}>
                   {loading ? t('tenant.loadingTenantDetails') : tenant?.CompanyName}
                 </h2>
                 {tenant && getStatusBadge(tenant.Status)}
               </div>
-              <div style={{ fontSize: '0.83rem', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', gap: '8px sm:gap-12px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <span>Code: <strong style={{ color: 'var(--accent-primary)', fontFamily: 'monospace' }}>{tenant?.TenantCode || '—'}</strong></span>
                 <span>•</span>
                 <span>Business Park: <strong style={{ color: 'var(--text-primary)' }}>{tenant?.BusinessParkName || 'Main Campus'}</strong></span>
@@ -174,7 +176,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
                       href={tenant.Website.startsWith('http') ? tenant.Website : `https://${tenant.Website}`}
                       target="_blank"
                       rel="noreferrer"
-                      style={{ color: 'var(--accent-primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                      style={{ color: 'var(--accent-primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600, wordBreak: 'break-all' }}
                     >
                       <Globe size={13} /> {tenant.Website} <ExternalLink size={11} />
                     </a>
@@ -184,42 +186,35 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {tenant && onEdit && (
-              <button
-                onClick={() => { onClose(); onEdit(tenant); }}
-                title="Edit Corporate Record"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '8px 14px', borderRadius: 'var(--border-radius-sm)',
-                  background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
-                  color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600
-                }}
-              >
-                <Edit2 size={14} /> {t('tenant.editProfile')}
-              </button>
-            )}
-            {tenant && onChangeStatus && (
-              <button
-                onClick={() => { onClose(); onChangeStatus(tenant); }}
-                title="Transition Account Status Lifecycle"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '8px 14px', borderRadius: 'var(--border-radius-sm)',
-                  background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.3)',
-                  color: 'var(--color-warning)', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600
-                }}
-              >
-                <ShieldAlert size={14} /> {t('tenant.changeLifecycle')}
-              </button>
-            )}
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--glass-border)]">
+            <ActionGroup align="right">
+              {tenant && onEdit && (
+                <ActionButton
+                  variant="edit"
+                  label={t('tenant.editProfile')}
+                  onClick={() => { onClose(); onEdit(tenant); }}
+                  title="Edit Corporate Record"
+                />
+              )}
+              {tenant && onChangeStatus && (
+                <ActionButton
+                  variant="warning"
+                  icon={<ShieldAlert size={14} />}
+                  label={t('tenant.changeLifecycle')}
+                  onClick={() => { onClose(); onChangeStatus(tenant); }}
+                  title="Transition Account Status Lifecycle"
+                />
+              )}
+            </ActionGroup>
             <button
               onClick={onClose}
+              className="touch-target"
               style={{
                 background: 'transparent', border: 'none',
                 color: 'var(--text-muted)', cursor: 'pointer', padding: '6px',
                 borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}
+              aria-label="Close modal"
             >
               <X size={22} />
             </button>
@@ -227,15 +222,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
         </div>
 
         {/* Modal Tab Controls */}
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          padding: '12px 28px',
-          background: 'var(--bg-tertiary)',
-          borderBottom: '1px solid var(--glass-border)',
-          flexShrink: 0,
-          overflowX: 'auto'
-        }}>
+        <div className="flex items-center gap-2 px-3.5 sm:px-6 py-2.5 overflow-x-auto max-w-full border-b border-[var(--glass-border)] bg-[var(--bg-tertiary)] shrink-0" style={{ scrollbarWidth: 'none' }}>
           {[
             { id: 'overview', label: t('tenant.overview'), icon: Building2 },
             { id: 'leases', label: `${t('tenant.leases')} (${leases.length})`, icon: FileText },
@@ -248,6 +235,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                className="touch-target-sm"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -261,7 +249,8 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
                   fontSize: '0.85rem',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
-                  boxShadow: isActive ? 'var(--glow-accent)' : 'none'
+                  boxShadow: isActive ? 'var(--glow-accent)' : 'none',
+                  flexShrink: 0
                 }}
               >
                 <Icon size={15} />
@@ -272,7 +261,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
         </div>
 
         {/* Modal Body */}
-        <div style={{ padding: '28px', overflowY: 'auto', flex: 1 }}>
+        <div className="p-3.5 sm:p-6" style={{ overflowY: 'auto', flex: 1 }}>
           {loading ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
               <Clock className="spin" size={32} style={{ marginBottom: '16px' }} />
@@ -286,60 +275,60 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
           ) : activeTab === 'overview' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Architecture Summary Statistics */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '14px' }}>
                 <div style={{
-                  padding: '18px', borderRadius: '16px',
+                  padding: '16px', borderRadius: '16px',
                   background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
                   display: 'flex', alignItems: 'center', gap: '14px'
                 }}>
-                  <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}>
-                    <FileText size={22} />
+                  <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', flexShrink: 0 }}>
+                    <FileText size={20} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Lease Contracts</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.LeaseCount || leases.length || 0}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Lease Contracts</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.LeaseCount || leases.length || 0}</div>
                   </div>
                 </div>
 
                 <div style={{
-                  padding: '18px', borderRadius: '16px',
+                  padding: '16px', borderRadius: '16px',
                   background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
                   display: 'flex', alignItems: 'center', gap: '14px'
                 }}>
-                  <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-success)' }}>
-                    <Layers size={22} />
+                  <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-success)', flexShrink: 0 }}>
+                    <Layers size={20} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Allocated Spaces</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.ActiveAllocationCount || allocations.length || 0}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Allocated Spaces</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.ActiveAllocationCount || allocations.length || 0}</div>
                   </div>
                 </div>
 
                 <div style={{
-                  padding: '18px', borderRadius: '16px',
+                  padding: '16px', borderRadius: '16px',
                   background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
                   display: 'flex', alignItems: 'center', gap: '14px'
                 }}>
-                  <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--color-info)' }}>
-                    <UserCheck size={22} />
+                  <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--color-info)', flexShrink: 0 }}>
+                    <UserCheck size={20} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Representatives</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.ContactCount || representatives.length || 0}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Representatives</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.ContactCount || representatives.length || 0}</div>
                   </div>
                 </div>
 
                 <div style={{
-                  padding: '18px', borderRadius: '16px',
+                  padding: '16px', borderRadius: '16px',
                   background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
                   display: 'flex', alignItems: 'center', gap: '14px'
                 }}>
-                  <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-warning)' }}>
-                    <Users size={22} />
+                  <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-warning)', flexShrink: 0 }}>
+                    <Users size={20} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Sub-Tenants</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.SubTenantCount || 0}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Sub-Tenants</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>{tenant.SubTenantCount || 0}</div>
                   </div>
                 </div>
               </div>
@@ -349,10 +338,10 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
                 background: 'var(--bg-tertiary)',
                 border: '1px solid var(--glass-border)',
                 borderRadius: '18px',
-                padding: '24px',
+                padding: 'clamp(14px, 3vw, 24px)',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '20px'
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+                gap: '16px'
               }}>
                 <div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>
@@ -474,7 +463,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
                   <p>No office spaces currently allocated for this tenant.</p>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '14px' }}>
                   {allocations.map(alloc => (
                     <div
                       key={alloc.OfficeAllocationID || alloc.id}
@@ -512,7 +501,7 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
                   <p>No registered tenant users or representatives found for this organization.</p>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '14px' }}>
                   {representatives.map(rep => {
                     const isPrimary = rep.UserTypeCode === 'TENANT_REPRESENTATIVE' || rep.UserTypeCode === 'COMPANY_ADMIN' || rep.UserTypeCode === 'TENANT_ADMIN' || rep.IsPrimary;
                     return (
@@ -558,6 +547,42 @@ export default function TenantDetailModal({ tenantId, onClose, onEdit, onChangeS
               )}
             </div>
           ) : null}
+        </div>
+
+        {/* Pinned Footer */}
+        <div style={{
+          padding: '12px 24px',
+          borderTop: '1px solid var(--color-border-subtle, var(--glass-border))',
+          background: 'var(--color-surface, var(--bg-secondary))',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexShrink: 0
+        }}>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+            {tenant ? `${tenant.CompanyName} (${tenant.TenantCode})` : ''}
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {onEdit && tenant && (
+              <button
+                type="button"
+                onClick={() => { onClose(); onEdit(tenant); }}
+                className="btn btn-secondary"
+                style={{ padding: '8px 16px', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Edit2 size={14} />
+                {t('common.edit', 'Edit Profile')}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-primary"
+              style={{ padding: '8px 20px', fontSize: '0.85rem' }}
+            >
+              {t('common.close', 'Close')}
+            </button>
+          </div>
         </div>
       </div>
     </div>,

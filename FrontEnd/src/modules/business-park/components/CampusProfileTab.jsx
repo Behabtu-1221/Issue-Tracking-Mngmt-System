@@ -55,12 +55,12 @@ export default function CampusProfileTab() {
         /* FIRST TIME REGISTRATION SETUP HERO CARD */
         <div style={{
           background: 'var(--bg-secondary)',
-          borderRadius: '24px', border: '1px solid var(--glass-border-accent)',
+          borderRadius: 'var(--border-radius-lg, 18px)', border: '1px solid var(--glass-border-accent)',
           padding: '48px 36px', textAlign: 'center', boxShadow: 'var(--shadow-lg)',
           backdropFilter: 'blur(16px)'
         }}>
           <div style={{
-            width: '72px', height: '72px', borderRadius: '24px', margin: '0 auto 20px',
+            width: '72px', height: '72px', borderRadius: 'var(--border-radius-lg, 18px)', margin: '0 auto 20px',
             background: 'var(--accent-gradient)', color: '#ffffff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: 'var(--glow-accent)'
@@ -92,7 +92,7 @@ export default function CampusProfileTab() {
         <>
           <div className="glass-panel" style={{
             padding: '32px', position: 'relative', overflow: 'hidden',
-            border: '1px solid var(--glass-border-accent)', borderRadius: '24px'
+            border: '1px solid var(--glass-border-accent)', borderRadius: 'var(--border-radius-lg, 18px)'
           }}>
             <div style={{
               position: 'absolute', top: 0, left: 0, right: 0, height: '4px',

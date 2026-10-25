@@ -68,6 +68,16 @@ export const notificationController = {
     }
   },
 
+  async markAsUnread(req, res, next) {
+    try {
+      const userId = req.actor?.userId || req.user?.id || null;
+      const data = await notificationService.markAsUnread(req.params.id, userId);
+      return sendSuccess(res, data);
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async markAllRead(req, res, next) {
     try {
       const userId = req.actor?.userId || req.user?.id || req.body.userId || 1;

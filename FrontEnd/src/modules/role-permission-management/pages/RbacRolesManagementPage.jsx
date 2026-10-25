@@ -9,6 +9,7 @@ import rbacApi from '../api/rbacApi';
 import CompanyRoleModal from '../components/CompanyRoleModal';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { usePermission } from '../hooks/usePermission';
 import { useTranslation } from '../../../i18n';
 
@@ -356,29 +357,20 @@ export default function RbacRolesManagementPage() {
                     <Sliders size={14} /> {t('rbac.matrixMap', 'Matrix Map')}
                   </button>
 
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <button
+                  <ActionGroup align="right">
+                    <ActionButton
+                      variant="edit"
+                      label={t('rbac.editRole', 'Edit Role')}
                       onClick={() => handleOpenEditRole(role)}
-                      style={{
-                        padding: '8px 14px', borderRadius: '10px', background: 'var(--bg-tertiary)',
-                        border: '1px solid var(--glass-border)', color: 'var(--text-primary)', fontSize: '0.82rem',
-                        fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
-                      }}
-                    >
-                      <Edit2 size={14} /> {t('rbac.editRole', 'Edit Role')}
-                    </button>
+                      title={t('rbac.editRole', 'Edit Role')}
+                    />
 
-                    <button
+                    <ActionButton
+                      variant="delete"
                       onClick={() => handleDeleteRole(role)}
-                      style={{
-                        padding: '8px 12px', borderRadius: '10px', background: 'rgba(220, 38, 38, 0.08)',
-                        border: '1px solid rgba(220, 38, 38, 0.2)', color: '#ef4444', fontSize: '0.82rem',
-                        fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
-                      }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+                      title={t('common.delete')}
+                    />
+                  </ActionGroup>
                 </div>
               </div>
             );

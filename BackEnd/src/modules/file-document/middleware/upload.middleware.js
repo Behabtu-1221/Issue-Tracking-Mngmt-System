@@ -27,13 +27,14 @@ const fileFilter = (req, file, cb) => {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/zip', 'application/x-zip-compressed', 'text/plain', 'text/csv'
+    'application/zip', 'application/x-zip-compressed', 'text/plain', 'text/csv',
+    'audio/webm', 'audio/ogg', 'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-m4a', 'audio/mp4', 'audio/aac'
   ];
 
-  if (allowedMimeTypes.includes(file.mimetype) || file.mimetype.startsWith('image/')) {
+  if (allowedMimeTypes.includes(file.mimetype) || file.mimetype.startsWith('image/') || file.mimetype.startsWith('audio/')) {
     cb(null, true);
   } else {
-    cb(new Error(`File type ${file.mimetype} is not permitted. Allowed types: PDF, Images, Word, Excel, CSV, ZIP, TXT.`), false);
+    cb(new Error(`File type ${file.mimetype} is not permitted. Allowed types: PDF, Images, Audio/Voice Notes, Word, Excel, CSV, ZIP, TXT.`), false);
   }
 };
 

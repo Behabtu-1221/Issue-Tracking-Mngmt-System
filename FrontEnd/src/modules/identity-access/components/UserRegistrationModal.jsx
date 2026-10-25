@@ -14,7 +14,7 @@ import parkApi from '../../business-park/api/parkApi';
 const glassModalStyle = {
   background: 'var(--bg-secondary)',
   border: '1px solid var(--glass-border-accent, var(--glass-border))',
-  borderRadius: '24px',
+  borderRadius: 'var(--border-radius-lg, 18px)',
   backdropFilter: 'blur(24px)',
   boxShadow: 'var(--shadow-lg)',
   animation: 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
@@ -329,6 +329,15 @@ export default function UserRegistrationModal({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   // Tenant Filter for Combobox
@@ -474,7 +483,7 @@ export default function UserRegistrationModal({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1100,
-        padding: '20px'
+        padding: 'clamp(8px, 2.5vw, 20px)'
       }}
       onClick={onClose}
       role="dialog"
@@ -482,54 +491,49 @@ export default function UserRegistrationModal({
       aria-labelledby="create-user-modal-title"
     >
       <div
+        className="modal-card accent-strip-brand enterprise-card"
         style={{
-          ...glassModalStyle,
           width: '840px',
           maxWidth: '96vw',
-          maxHeight: '92vh',
+          maxHeight: '94vh',
           display: 'flex',
           flexDirection: 'column',
+          borderRadius: 'var(--border-radius-lg, 18px)',
           overflow: 'hidden'
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── MODAL HEADER ── */}
         <div
-          style={{
-            padding: '22px 28px',
-            background: 'var(--bg-tertiary)',
-            borderBottom: '1px solid var(--glass-border)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexShrink: 0
-          }}
+          className="p-3.5 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[var(--color-border-subtle,var(--glass-border))] bg-[var(--bg-tertiary)] shrink-0"
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', width: '100%' }}>
             <div
               style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '14px',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 background: 'var(--accent-gradient)',
-                boxShadow: 'var(--glow-accent)'
+                boxShadow: 'var(--glow-accent)',
+                flexShrink: 0
               }}
             >
-              <UserPlus size={24} color="#ffffff" />
+              <UserPlus size={20} color="#ffffff" />
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <h3
                   id="create-user-modal-title"
                   style={{
                     margin: 0,
                     color: 'var(--text-primary)',
-                    fontSize: '1.25rem',
+                    fontSize: 'clamp(1.1rem, 2.5vw, 1.25rem)',
                     fontWeight: 800,
-                    letterSpacing: '-0.3px'
+                    letterSpacing: '-0.3px',
+                    wordBreak: 'break-word'
                   }}
                 >
                   {t('identity.registerModalTitle')}
@@ -559,10 +563,11 @@ export default function UserRegistrationModal({
           <button
             onClick={onClose}
             aria-label="Close"
+            className="btn-icon touch-target-sm sm:self-center self-end"
             style={{
               background: 'var(--bg-secondary)',
               border: '1px solid var(--glass-border)',
-              borderRadius: '10px',
+              borderRadius: '8px',
               padding: '8px',
               color: 'var(--text-muted)',
               cursor: 'pointer',
@@ -685,10 +690,10 @@ export default function UserRegistrationModal({
             style={{
               flex: 1,
               overflowY: 'auto',
-              padding: '24px 28px',
+              padding: 'clamp(14px, 3vw, 24px)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '24px',
+              gap: '20px',
               minHeight: 0
             }}
           >
@@ -752,9 +757,9 @@ export default function UserRegistrationModal({
                 {t('identity.sectionPersonalInfo')}
               </label>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {/* First Name & Last Name */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <FloatingInput
                     id="input-first-name"
                     label={t('identity.firstName')}
@@ -782,7 +787,7 @@ export default function UserRegistrationModal({
                 </div>
 
                 {/* Middle Name & Business Email */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <FloatingInput
                     id="input-middle-name"
                     label={t('identity.middleName')}
@@ -807,7 +812,7 @@ export default function UserRegistrationModal({
                 </div>
 
                 {/* Phone Number & Job Title */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <FloatingInput
                     id="input-phone"
                     type="tel"
@@ -1199,31 +1204,12 @@ export default function UserRegistrationModal({
             </div>
 
             {/* ── MODAL ACTION BUTTONS ── */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                gap: '12px',
-                marginTop: '12px',
-                paddingTop: '16px',
-                borderTop: '1px solid var(--glass-border)'
-              }}
-            >
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-[var(--glass-border)] mt-3">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                style={{
-                  padding: '11px 22px',
-                  background: 'transparent',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: '10px',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
-                  cursor: submitting ? 'not-allowed' : 'pointer'
-                }}
+                className="btn btn-secondary w-full sm:w-auto touch-target-sm"
               >
                 {t('common.cancel')}
               </button>
@@ -1231,20 +1217,12 @@ export default function UserRegistrationModal({
               <button
                 type="submit"
                 disabled={submitting}
+                className="btn btn-primary w-full sm:w-auto touch-target-sm"
                 style={{
-                  padding: '11px 26px',
-                  background: 'var(--accent-gradient)',
-                  border: 'none',
-                  borderRadius: '10px',
-                  color: '#ffffff',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  boxShadow: 'var(--glow-accent)',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  opacity: submitting ? 0.7 : 1
+                  justifyContent: 'center',
+                  gap: '8px'
                 }}
               >
                 {submitting ? (

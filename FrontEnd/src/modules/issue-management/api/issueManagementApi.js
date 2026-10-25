@@ -30,13 +30,6 @@ export const issueManagementApi = {
   addComment: (data) => api.post('/issue-comments', data),
   deleteComment: (id) => api.delete(`/issue-comments/${id}`),
 
-  // Knowledge Base & Known Issues
-  getKnownIssues: (params) => api.get('/known-issues', { params }),
-  getKnownIssueById: (id) => api.get(`/known-issues/${id}`),
-  createKnownIssue: (data) => api.post('/known-issues', data),
-  updateKnownIssue: (id, data) => api.put(`/known-issues/${id}`, data),
-  deleteKnownIssue: (id) => api.delete(`/known-issues/${id}`),
-
   // Tenant Satisfaction Feedback & Resolution Confirmation
   submitFeedback: (id, data) => api.post(`/issues/${id}/feedback`, data),
   getFeedback: (id) => api.get(`/issues/${id}/feedback`)

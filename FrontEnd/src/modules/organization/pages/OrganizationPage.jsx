@@ -15,8 +15,10 @@ import DepartmentsUnitsTab from '../components/DepartmentsUnitsTab';
 import TeamsPositionsTab from '../components/TeamsPositionsTab';
 import EmployeeAssignmentsTab from '../components/EmployeeAssignmentsTab';
 import FinancialsTab from '../components/FinancialsTab';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function OrganizationPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('departments');
   const [metrics, setMetrics] = useState(null);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
@@ -45,10 +47,10 @@ export default function OrganizationPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            Organization Structure & <span className="glow-text">Workforce Hub</span>
+            {t('organization.hubTitle', 'Organization Structure & Workforce Hub')}
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
-            Departments, Business Units, Teams, Positions, Employee Assignments, Reporting Chains & Financial Planning.
+            {t('organization.hubSubtitle', 'Departments, Business Units, Teams, Positions, Employee Assignments, Reporting Chains & Financial Planning.')}
           </p>
         </div>
       </div>
@@ -61,7 +63,7 @@ export default function OrganizationPage() {
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{m.totalDepartments || 0}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Departments</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('organization.metrics.departmentsMetric', 'Departments')}</div>
           </div>
         </div>
 
@@ -72,7 +74,7 @@ export default function OrganizationPage() {
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{m.totalTeams || 0}</div>
             <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Active Teams
+              {t('organization.metrics.activeTeamsMetric', 'Active Teams')}
             </div>
           </div>
         </div>
@@ -83,7 +85,7 @@ export default function OrganizationPage() {
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{m.totalPositions || 0}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Job Positions</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('organization.metrics.jobPositionsMetric', 'Job Positions')}</div>
           </div>
         </div>
 
@@ -93,7 +95,7 @@ export default function OrganizationPage() {
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: '700' }}>{m.totalAssignments || 0}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Staff Assignments</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t('organization.metrics.staffAssignmentsMetric', 'Staff Assignments')}</div>
           </div>
         </div>
       </div>
@@ -101,10 +103,10 @@ export default function OrganizationPage() {
       {/* Main Navigation Tabs */}
       <div style={{ borderBottom: '1px solid var(--glass-border)', display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '2px' }}>
         {[
-          { id: 'departments', label: 'Departments Directory', icon: Building2 },
-          { id: 'teams', label: 'Teams & Positions', icon: Users },
-          { id: 'assignments', label: 'Employee Assignments', icon: UserPlus },
-          { id: 'financials', label: 'Cost Centers & Budgets', icon: DollarSign }
+          { id: 'departments', label: t('organization.tabs.departments', 'Departments Directory'), icon: Building2 },
+          { id: 'teams', label: t('organization.tabs.teams', 'Teams & Positions'), icon: Users },
+          { id: 'assignments', label: t('organization.tabs.assignments', 'Employee Assignments'), icon: UserPlus },
+          { id: 'financials', label: t('organization.tabs.financials', 'Cost Centers & Budgets'), icon: DollarSign }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

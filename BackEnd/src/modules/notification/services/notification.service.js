@@ -12,6 +12,275 @@ export const notificationService = {
   },
 
   /**
+   * Generates tailored notification title and message based on the recipient's role
+   * in the business process (Requester, Dept Manager, Park Admin, Dispatcher, Technician).
+   */
+  generateRolePerspectiveContent({ eventCode, roleCode, context, defaultTitle, defaultMessage }) {
+    const {
+      requestNumber,
+      title,
+      departmentName,
+      priority,
+      status,
+      estimatedCost,
+      approvalReasons,
+      assigneeName,
+      newAssigneeName,
+      location,
+      targetResolution,
+      deadline,
+      breachType,
+      remarks,
+      commentAuthor,
+      commentSnippet,
+      progressPercentage,
+      milestone,
+      technicianName,
+      actorName
+    } = context || {};
+
+    const rNum = requestNumber ? `#${requestNumber}` : 'Ticket';
+    const tTitle = title ? `("${title}")` : '';
+    const dept = departmentName || 'Department';
+
+    switch (eventCode) {
+      case 'ISSUE_CREATED':
+      case 'REQUEST_SUBMITTED':
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Ticket Submitted: ${rNum}`,
+            message: `Your request ${rNum} ${tTitle} has been logged and routed to ${dept}. Priority: ${priority}. Target resolution: ${targetResolution}.`
+          };
+        }
+        if (roleCode === 'DEPARTMENT_MANAGER') {
+          return {
+            title: `New Intake [${priority}]: ${rNum}`,
+            message: `New ticket ${rNum} ${tTitle} was submitted to ${dept}. Priority: ${priority}. Location: ${location}.`
+          };
+        }
+        break;
+
+      case 'APPROVAL_REQUIRED':
+        if (roleCode === 'DEPARTMENT_MANAGER') {
+          return {
+            title: `Action Required: Department Approval ${rNum}`,
+            message: `Request ${rNum} ${tTitle} requires your department managerial review.${estimatedCost ? ` Estimated Cost: $${estimatedCost}.` : ''}`
+          };
+        }
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `In Review: ${rNum}`,
+            message: `Your request ${rNum} is currently undergoing department management approval.`
+          };
+        }
+        break;
+
+      case 'HIGHER_APPROVAL_REQUIRED':
+        if (roleCode === 'PARK_ADMIN' || roleCode === 'PARK_SUPER_ADMIN') {
+          return {
+            title: `Executive Approval Required: ${rNum}`,
+            message: `Request ${rNum} ${tTitle} from ${dept} requires Executive Administrator approval.${approvalReasons ? ` Reason: ${approvalReasons}.` : ''}`
+          };
+        }
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Executive Review: ${rNum}`,
+            message: `Your request ${rNum} passed department review and is now with the Business Park Administrator for executive authorization.`
+          };
+        }
+        break;
+
+      case 'DEPARTMENT_APPROVED':
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Department Approved: ${rNum}`,
+            message: `Your request ${rNum} was approved by ${dept} management and forwarded for final executive review.`
+          };
+        }
+        break;
+
+      case 'APPROVAL_COMPLETED':
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Fully Approved: ${rNum}`,
+            message: `All required approvals for request ${rNum} ${tTitle} have been granted. Your request is cleared for work execution.`
+          };
+        }
+        if (roleCode === 'DISPATCHER' || roleCode === 'DEPARTMENT_MANAGER') {
+          return {
+            title: `Ready for Dispatch: ${rNum}`,
+            message: `Request ${rNum} ${tTitle} is fully approved and cleared for technician dispatch in ${dept}.`
+          };
+        }
+        break;
+
+      case 'ISSUE_APPROVED_FOR_DISPATCH':
+        if (roleCode === 'DISPATCHER' || roleCode === 'DEPARTMENT_MANAGER') {
+          return {
+            title: `Dispatch Queue: ${rNum} (${priority})`,
+            message: `Approved ticket ${rNum} ${tTitle} is awaiting technician assignment in ${dept}. Priority: ${priority}. Target: ${targetResolution}.`
+          };
+        }
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Queued for Dispatch: ${rNum}`,
+            message: `Your approved ticket ${rNum} is queued for technician assignment in ${dept}.`
+          };
+        }
+        break;
+
+      case 'APPROVAL_REJECTED':
+      case 'DEPARTMENT_REJECTED':
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Request Not Approved: ${rNum}`,
+            message: `Your request ${rNum} ${tTitle} was declined during review.${remarks ? ` Remarks: "${remarks}"` : ''}`
+          };
+        }
+        break;
+
+      case 'ISSUE_ASSIGNED':
+        if (roleCode === 'TECHNICIAN') {
+          return {
+            title: `Work Order Assigned: ${rNum}`,
+            message: `You have been assigned to service ticket ${rNum} ${tTitle}. Location: ${location}. Priority: ${priority}. Target: ${targetResolution}.`
+          };
+        }
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Technician Assigned: ${rNum}`,
+            message: `A service technician (${assigneeName || 'Assigned Specialist'}) has been dispatched to work on your request ${rNum}.`
+          };
+        }
+        if (roleCode === 'DEPARTMENT_MANAGER' || roleCode === 'DISPATCHER') {
+          return {
+            title: `Work Order Dispatched: ${rNum}`,
+            message: `Ticket ${rNum} was assigned to ${assigneeName || 'technician'}. Status: ASSIGNED.`
+          };
+        }
+        break;
+
+      case 'ASSIGNMENT_REASSIGNED':
+        if (roleCode === 'TECHNICIAN') {
+          return {
+            title: `Work Order Reassigned: ${rNum}`,
+            message: `Work order ${rNum} has been reassigned to ${newAssigneeName || 'another technician'}.${remarks ? ` Reason: ${remarks}` : ''}`
+          };
+        }
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Technician Updated: ${rNum}`,
+            message: `Service for your ticket ${rNum} has been transferred to ${newAssigneeName || 'technician'}.`
+          };
+        }
+        break;
+
+      case 'REQUEST_STATUS_CHANGED':
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Status Updated: ${rNum} is now ${status}`,
+            message: `Your request ${rNum} ${tTitle} transitioned to status ${status}.${remarks ? ` Notes: ${remarks}` : ''}`
+          };
+        }
+        if (roleCode === 'DEPARTMENT_MANAGER' || roleCode === 'APPROVER' || roleCode === 'PARK_ADMIN') {
+          return {
+            title: `Status Changed: ${rNum} (${status})`,
+            message: `Ticket ${rNum} ${tTitle} in ${dept} transitioned to ${status}.${remarks ? ` Notes: "${remarks}"` : ''}`
+          };
+        }
+        return {
+          title: `Status Changed: ${rNum} (${status})`,
+          message: `Ticket ${rNum} status changed to ${status}.${remarks ? ` Notes: ${remarks}` : ''}`
+        };
+
+      case 'REQUEST_PROGRESS_UPDATED': {
+        const pct = progressPercentage !== undefined && progressPercentage !== null ? `${progressPercentage}%` : '';
+        const milestoneName = milestone || 'Field Execution';
+        const techName = technicianName || actorName || assigneeName || 'Technician';
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Progress Update: ${rNum} (${pct ? pct + ' - ' : ''}${milestoneName})`,
+            message: `${techName} updated progress on your request ${rNum} to ${pct} [${milestoneName}].${remarks ? ` Notes: "${remarks}"` : ''}`
+          };
+        }
+        if (roleCode === 'DEPARTMENT_MANAGER' || roleCode === 'APPROVER' || roleCode === 'PARK_ADMIN') {
+          return {
+            title: `Work Progress: ${rNum} (${pct ? pct + ' - ' : ''}${milestoneName})`,
+            message: `${techName} reported progress on approved ticket ${rNum} to ${pct} [${milestoneName}] in ${dept}.${remarks ? ` Notes: "${remarks}"` : ''}`
+          };
+        }
+        return {
+          title: `Progress Recorded: ${rNum} (${pct})`,
+          message: `Progress on ticket ${rNum} advanced to ${pct} [${milestoneName}]. Notes: ${remarks || 'None'}`
+        };
+      }
+
+      case 'SLA_WARNING':
+        return {
+          title: `SLA Warning: ${rNum} Approaching Deadline`,
+          message: `Ticket ${rNum} ${tTitle} is nearing its SLA resolution target (${deadline || 'Soon'}). Expedited action recommended.`
+        };
+
+      case 'SLA_BREACH':
+        return {
+          title: `CRITICAL SLA BREACH: ${rNum}`,
+          message: `URGENT: Request ${rNum} ${tTitle} in ${dept} has breached its ${breachType || 'resolution'} SLA threshold. Priority: ${priority}.`
+        };
+
+      case 'ISSUE_RESOLVED':
+        if (roleCode === 'REQUESTER' || roleCode === 'TENANT_REPRESENTATIVE') {
+          return {
+            title: `Work Completed: ${rNum} (Pending Verification)`,
+            message: `Technician has completed service on your ticket ${rNum} ${tTitle}. Please inspect the work and confirm satisfaction to close the ticket.`
+          };
+        }
+        if (roleCode === 'DEPARTMENT_MANAGER' || roleCode === 'DISPATCHER' || roleCode === 'APPROVER' || roleCode === 'PARK_ADMIN') {
+          return {
+            title: `Ticket Resolved: ${rNum}`,
+            message: `Service on ticket ${rNum} was marked RESOLVED by technician. Awaiting requester verification.`
+          };
+        }
+        break;
+
+      case 'REQUEST_CLOSED':
+        return {
+          title: `Ticket Closed: ${rNum}`,
+          message: `Ticket ${rNum} ${tTitle} has been verified and officially closed. Thank you.`
+        };
+
+      case 'REQUEST_CANCELLED':
+        return {
+          title: `Ticket Cancelled: ${rNum}`,
+          message: `Request ${rNum} ${tTitle} was cancelled.${remarks ? ` Reason: ${remarks}` : ''}`
+        };
+
+      case 'REQUEST_REOPENED':
+        return {
+          title: `Ticket Reopened: ${rNum}`,
+          message: `Request ${rNum} ${tTitle} has been reopened for additional service.${remarks ? ` Remarks: ${remarks}` : ''}`
+        };
+
+      case 'NEW_COMMENT_ADDED':
+      case 'NEW_COMMENT':
+        return {
+          title: `New Note on ${rNum} by ${commentAuthor || 'User'}`,
+          message: `${commentAuthor || 'A team member'} added a note to ticket ${rNum}: "${commentSnippet || 'View discussion in portal.'}"`
+        };
+
+      default:
+        return {
+          title: defaultTitle,
+          message: defaultMessage
+        };
+    }
+
+    return {
+      title: defaultTitle,
+      message: defaultMessage
+    };
+  },
+
+  /**
    * Primary centralized event trigger.
    * Business modules emit notification events here.
    * Recipient determination, multi-tenant isolation, template rendering,
@@ -34,6 +303,11 @@ export const notificationService = {
         // Fallback mapping for common aliases
         if (eventCode === 'REQUEST_SUBMITTED') notifType = types.find(t => t.TypeCode === 'ISSUE_CREATED');
         else if (eventCode === 'DEPARTMENT_REJECTED') notifType = types.find(t => t.TypeCode === 'APPROVAL_REJECTED');
+        else if (eventCode === 'NEW_COMMENT') notifType = types.find(t => t.TypeCode === 'NEW_COMMENT_ADDED');
+        else if (eventCode === 'DEPARTMENT_APPROVED') notifType = types.find(t => t.TypeCode === 'DEPARTMENT_APPROVED') || types.find(t => t.TypeCode === 'APPROVAL_REQUIRED');
+        else if (eventCode === 'HIGHER_APPROVAL_REQUIRED') notifType = types.find(t => t.TypeCode === 'HIGHER_APPROVAL_REQUIRED') || types.find(t => t.TypeCode === 'APPROVAL_REQUIRED');
+        else if (eventCode === 'APPROVAL_COMPLETED') notifType = types.find(t => t.TypeCode === 'APPROVAL_COMPLETED') || types.find(t => t.TypeCode === 'ISSUE_ASSIGNED');
+        else if (eventCode === 'ISSUE_APPROVED_FOR_DISPATCH') notifType = types.find(t => t.TypeCode === 'ISSUE_APPROVED_FOR_DISPATCH') || types.find(t => t.TypeCode === 'ISSUE_ASSIGNED');
       }
 
       if (!notifType) {
@@ -53,19 +327,38 @@ export const notificationService = {
       const reqId = contextData.requestId || contextData.IssueRequestID || issue?.IssueRequestID;
       if (!issue && reqId) {
         const [foundIssue] = await query(
-          `SELECT ir.*, d.DepartmentName, t.CompanyName AS TenantName
+          `SELECT ir.*, d.DepartmentName, t.CompanyName AS TenantName, b.BuildingName
            FROM IssueRequest ir
            LEFT JOIN Department d ON ir.AssignedDepartmentID = d.DepartmentID
            LEFT JOIN Tenant t ON ir.TenantID = t.TenantID
+           LEFT JOIN Building b ON ir.BuildingID = b.BuildingID
            WHERE ir.IssueRequestID = ? AND ir.IsDeleted = 0`,
           [reqId]
         );
         issue = foundIssue || null;
       }
 
-      let requestNumber = contextData.requestNumber || issue?.RequestNumber || '';
-      let issueTitle = contextData.title || issue?.Title || '';
-      let deptName = contextData.departmentName || issue?.DepartmentName || 'Department';
+      const requestNumber = contextData.requestNumber || issue?.RequestNumber || '';
+      const issueTitle = contextData.title || issue?.Title || '';
+      const deptName = contextData.departmentName || issue?.DepartmentName || 'Department';
+
+      let locationStr = contextData.location;
+      if (!locationStr && issue) {
+        const parts = [];
+        if (issue.BuildingName) parts.push(issue.BuildingName);
+        locationStr = parts.length > 0 ? parts.join(', ') : 'Campus Facility';
+      }
+
+      let targetResStr = contextData.targetResolution;
+      if (!targetResStr && issue?.TargetResolutionDateTime) {
+        try {
+          targetResStr = new Date(issue.TargetResolutionDateTime).toLocaleString('en-US', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+        } catch {
+          targetResStr = 'Standard SLA';
+        }
+      }
 
       // 4. Fetch Templates for IN_APP and EMAIL
       const inAppTemplate = await notificationRepository.getTemplateByTypeAndChannel(notifType.NotificationTypeID, 'IN_APP');
@@ -82,8 +375,8 @@ export const notificationService = {
         estimatedCost: contextData.estimatedCost ? Number(contextData.estimatedCost).toLocaleString() : '',
         assigneeName: contextData.assigneeName || '',
         newAssigneeName: contextData.newAssigneeName || contextData.assigneeName || '',
-        location: contextData.location || 'Campus Facility',
-        targetResolution: contextData.targetResolution || 'Standard SLA',
+        location: locationStr || 'Campus Facility',
+        targetResolution: targetResStr || 'Standard SLA',
         breachType: contextData.breachType || 'Resolution Target',
         deadline: contextData.deadline || 'Approaching Deadline',
         commentAuthor: contextData.commentAuthor || 'System',
@@ -111,13 +404,23 @@ export const notificationService = {
         CreatedBy: actorUserId || 1
       });
 
-      // 6. Fan-Out to Authorized Recipients based on Preferences
+      // 6. Fan-Out to Authorized Recipients based on Preferences & Role Perspectives
       let inAppDeliveredCount = 0;
       let emailQueuedCount = 0;
 
       for (const recipient of recipients) {
         const uid = recipient.userId;
+        const roleCode = (recipient.roleCode || '').toUpperCase();
         const userTemplateContext = { ...templateContext, recipientName: recipient.fullName };
+
+        // Generate Role-Perspective customized Title and Message
+        const customContent = this.generateRolePerspectiveContent({
+          eventCode,
+          roleCode,
+          context: userTemplateContext,
+          defaultTitle,
+          defaultMessage: masterMessage
+        });
 
         // Channel A: IN_APP
         const inAppAllowed = await notificationRepository.checkUserChannelPreference(uid, notifType.NotificationTypeID, 'IN_APP');
@@ -126,6 +429,8 @@ export const notificationService = {
             NotificationID: notificationId,
             UserID: uid,
             ChannelCode: 'IN_APP',
+            CustomTitle: customContent.title,
+            CustomMessage: customContent.message,
             CreatedBy: actorUserId || 1
           });
 
@@ -234,14 +539,30 @@ export const notificationService = {
           // Fetch Email template
           const template = await notificationRepository.getTemplateByTypeAndChannel(job.NotificationTypeID, 'EMAIL');
 
+          // If job has linked issue, fetch issue for rich email rendering
+          let issueData = null;
+          if (job.TriggeredByTable === 'IssueRequest' && job.TriggeredByID) {
+            const [found] = await query(
+              `SELECT ir.*, d.DepartmentName, b.BuildingName
+               FROM IssueRequest ir
+               LEFT JOIN Department d ON ir.AssignedDepartmentID = d.DepartmentID
+               LEFT JOIN Building b ON ir.BuildingID = b.BuildingID
+               WHERE ir.IssueRequestID = ? AND ir.IsDeleted = 0`,
+              [job.TriggeredByID]
+            );
+            issueData = found || null;
+          }
+
           const contextMap = {
             recipientName: job.FullName || 'Valued User',
-            requestNumber: job.Title?.match(/REQ-[0-9-]+/) ? job.Title.match(/REQ-[0-9-]+/)[0] : '',
-            title: job.Title || '',
+            requestNumber: issueData?.RequestNumber || (job.Title?.match(/REQ-[0-9-]+/) ? job.Title.match(/REQ-[0-9-]+/)[0] : ''),
+            title: issueData?.Title || job.Title || '',
             message: job.MessageText || '',
-            status: 'UPDATED',
-            priority: 'MEDIUM',
-            departmentName: 'Facilities & IT'
+            status: issueData?.StatusCode || 'UPDATED',
+            priority: issueData?.PriorityCode || 'MEDIUM',
+            departmentName: issueData?.DepartmentName || 'Facilities & IT',
+            location: issueData?.BuildingName || 'Campus Facility',
+            targetResolution: issueData?.TargetResolutionDateTime ? new Date(issueData.TargetResolutionDateTime).toLocaleString() : 'Standard SLA'
           };
 
           const rawSubject = template?.TemplateSubject || job.Title || 'ITMS Notification';
@@ -249,7 +570,12 @@ export const notificationService = {
 
           const renderedSubject = emailService.renderTemplate(rawSubject, contextMap);
           const renderedBody = emailService.renderTemplate(rawBody, contextMap);
-          const htmlContent = emailService.wrapInHtmlEmail(renderedSubject, renderedBody);
+          const htmlContent = emailService.wrapInHtmlEmail(renderedSubject, renderedBody, {
+            priority: contextMap.priority,
+            requestNumber: contextMap.requestNumber,
+            status: contextMap.status,
+            departmentName: contextMap.departmentName
+          });
 
           const emailRes = await emailService.sendEmail({
             to: job.Email,
@@ -319,6 +645,14 @@ export const notificationService = {
     }
     const updated = await notificationRepository.markAsRead(userNotificationId, userId);
     return { userNotificationId, read: updated };
+  },
+
+  async markAsUnread(userNotificationId, userId) {
+    if (!userNotificationId) {
+      throw new AppError('UserNotificationID is required', 400);
+    }
+    const updated = await notificationRepository.markAsUnread(userNotificationId, userId);
+    return { userNotificationId, read: false, unread: updated };
   },
 
   async markAllRead(userId) {

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { BookOpen, RefreshCw } from 'lucide-react';
 import NotifTemplatesTab from '../components/NotifTemplatesTab';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function NotifTemplatesPage() {
+  const { t } = useTranslation();
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (
@@ -15,10 +17,10 @@ export default function NotifTemplatesPage() {
             color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px'
           }}>
             <BookOpen size={28} color="#10b981" />
-            Notification Layouts & Dynamic Templates
+            {t('notifications.templatesTab.title', 'Notification Layouts & Dynamic Templates')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Configure Mustache HTML email bodies, in-app formats & placeholder parameters
+            {t('notifications.templatesTab.subtitle', 'Configure Mustache HTML email bodies, in-app formats & placeholder parameters')}
           </p>
         </div>
 
@@ -43,7 +45,7 @@ export default function NotifTemplatesPage() {
           onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
         >
           <RefreshCw size={14} />
-          <span>Refresh</span>
+          <span>{t('common.refresh', 'Refresh')}</span>
         </button>
       </div>
 

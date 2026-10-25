@@ -9,8 +9,7 @@ export const serviceAnalyticsRepository = {
         (SELECT COUNT(*) FROM IssueRequest WHERE ServiceID IS NOT NULL AND IsDeleted = 0) AS TotalServiceRequests,
         (SELECT COUNT(*) FROM ApprovalRequest WHERE IsDeleted = 0 AND ApprovalStatusCode = 'APPROVED') AS TotalApprovedRequests,
         (SELECT COUNT(*) FROM SLAClock WHERE ClockStatus = 'RUNNING' AND IsDeleted = 0) AS ActiveSLAClocks,
-        (SELECT COUNT(*) FROM SLAClock WHERE IsBreached = 1 AND IsDeleted = 0) AS SLABreachCount,
-        (SELECT COALESCE(SUM(UnitPrice), 0) FROM ServicePricing WHERE IsActive = 1 AND IsDeleted = 0) AS TotalCatalogPricingValue
+        (SELECT COUNT(*) FROM SLAClock WHERE IsBreached = 1 AND IsDeleted = 0) AS SLABreachCount
     `;
     const [summary] = await query(summarySql);
 

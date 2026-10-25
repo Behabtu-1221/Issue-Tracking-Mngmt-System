@@ -109,24 +109,24 @@ export default function BusinessParkPage() {
   return (
     <div>
       {/* Page Header */}
-      <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.2rem', marginBottom: '8px' }}>
+      <div style={{ marginBottom: '24px' }}>
+        <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 'clamp(1.4rem, 4vw, 2.2rem)', fontWeight: 800, marginBottom: '6px' }}>
           {t('businessPark.campusMasterTitle')}
         </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: 'clamp(0.85rem, 2vw, 0.95rem)' }}>
           {t('businessPark.campusMasterDesc')}
         </p>
       </div>
 
       {/* Top Overview Metrics Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(138, 75, 255, 0.15)', color: 'var(--accent-primary)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '14px', marginBottom: '24px' }}>
+        <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(138, 75, 255, 0.15)', color: 'var(--accent-primary)', flexShrink: 0 }}>
             <Building2 size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.campusKpi')}</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.campusKpi')}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {metrics.parks.totalParks || 1} Campus
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -135,13 +135,13 @@ export default function BusinessParkPage() {
           </div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--color-info)' }}>
+        <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--color-info)', flexShrink: 0 }}>
             <Building size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.buildingsFloorsKpi')}</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.buildingsFloorsKpi')}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {metrics.buildings.totalBuildings || 0}
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -150,13 +150,13 @@ export default function BusinessParkPage() {
           </div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-success)' }}>
+        <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-success)', flexShrink: 0 }}>
             <Grid size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.officesKpi')}</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.officesKpi')}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {metrics.offices.totalOffices || 0}
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--color-success)' }}>
@@ -165,13 +165,13 @@ export default function BusinessParkPage() {
           </div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-warning)' }}>
+        <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-warning)', flexShrink: 0 }}>
             <PieChart size={24} />
           </div>
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.occupancyRateKpi')}</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('businessPark.occupancyRateKpi')}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>
               {occupancyRate}%
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -182,16 +182,15 @@ export default function BusinessParkPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div style={{
-        display: 'flex',
-        gap: '6px',
-        padding: '6px',
-        background: 'var(--glass-bg)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: 'var(--border-radius-md)',
-        marginBottom: '28px',
-        overflowX: 'auto'
-      }}>
+      <div 
+        className="flex gap-1.5 p-1.5 overflow-x-auto max-w-full mb-6"
+        style={{
+          background: 'var(--glass-bg)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: 'var(--border-radius-md)',
+          scrollbarWidth: 'none'
+        }}
+      >
         {PARK_TABS.map((tab) => {
           const Icon = ICON_MAP[tab.icon];
           const isActive = activeTab === tab.id;
@@ -201,17 +200,18 @@ export default function BusinessParkPage() {
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
               title={getTabDesc(tab.id)}
+              className="touch-target-sm shrink-0"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '10px 18px',
+                padding: '8px 16px',
                 borderRadius: 'var(--border-radius-sm)',
                 border: 'none',
                 background: isActive ? 'var(--accent-gradient)' : 'transparent',
                 color: isActive ? 'white' : 'var(--text-muted)',
                 fontWeight: isActive ? '600' : '500',
-                fontSize: '0.88rem',
+                fontSize: '0.85rem',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 transition: 'all var(--transition-fast)',

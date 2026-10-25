@@ -5,8 +5,10 @@ import SLADashboardTab from '../components/SLADashboardTab';
 import SLABreachMonitoringTab from '../components/SLABreachMonitoringTab';
 import SLAPoliciesTab from '../components/SLAPoliciesTab';
 import { Clock, ShieldCheck, AlertTriangle, RefreshCw } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function SLAPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('clocks'); // 'clocks' | 'breaches' | 'policies'
   const [metrics, setMetrics] = useState(null);
 
@@ -35,10 +37,10 @@ export default function SLAPage() {
             </div>
             <div>
               <h1 style={{ fontSize: '1.75rem', fontWeight: '900', margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-                SLA & Escalation Management
+                {t('sla.managementTitle', 'SLA & Escalation Management')}
               </h1>
               <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                Performance monitoring against response & resolution targets, SLA clocks & automatic escalations
+                {t('sla.managementSubtitle', 'Performance monitoring against response & resolution targets, SLA clocks & automatic escalations')}
               </div>
             </div>
           </div>
@@ -49,7 +51,7 @@ export default function SLAPage() {
           className="btn btn-secondary"
           style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
         >
-          <RefreshCw size={16} /> Refresh Metrics
+          <RefreshCw size={16} /> {t('sla.refreshMetricsBtn', 'Refresh Metrics')}
         </button>
       </div>
 
@@ -79,7 +81,7 @@ export default function SLAPage() {
             display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
-          <Clock size={16} /> SLA Dashboard & Live Clocks
+          <Clock size={16} /> {t('sla.tabs.clocks', 'SLA Dashboard & Live Clocks')}
         </button>
 
         <button
@@ -96,7 +98,7 @@ export default function SLAPage() {
             display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
-          <AlertTriangle size={16} /> Breach Log & Violations
+          <AlertTriangle size={16} /> {t('sla.tabs.breaches', 'Breach Log & Violations')}
         </button>
 
         <button
@@ -113,7 +115,7 @@ export default function SLAPage() {
             display: 'flex', alignItems: 'center', gap: '8px'
           }}
         >
-          <ShieldCheck size={16} /> SLA Policies & Targets
+          <ShieldCheck size={16} /> {t('sla.tabs.policies', 'SLA Policies & Targets')}
         </button>
       </div>
 

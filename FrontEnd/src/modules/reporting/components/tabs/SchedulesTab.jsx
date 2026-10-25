@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, Clock, Play, Trash2, CheckCircle2, AlertCircle, Plus, Mail, FileText, Send } from 'lucide-react';
 import reportingApi from '../../api/reportingApi';
 import ReportDataTable from '../ReportDataTable';
+import { ActionButton } from '../../../../components/common/ActionButton';
 
 export default function SchedulesTab({
   schedules = [],
@@ -178,15 +179,11 @@ export default function SchedulesTab({
                       <Send size={12} /> {isTriggering ? 'Executing...' : 'Trigger Now'}
                     </button>
 
-                    <button
-                      type="button"
+                    <ActionButton
+                      variant="delete"
                       onClick={() => handleDelete(s.ReportScheduleID, s.ScheduleName)}
-                      className="btn btn-outline"
                       title="Remove Schedule"
-                      style={{ padding: '6px 10px', borderRadius: '8px', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    />
                   </div>
                 </div>
               </div>

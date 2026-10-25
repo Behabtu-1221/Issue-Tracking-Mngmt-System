@@ -64,6 +64,14 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
     setExpandedGroups(grps);
   }, [roleToEdit]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   // Search auto-expands all modules to show matches
   useEffect(() => {
     if (searchTerm.trim()) {
@@ -224,33 +232,49 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
-      backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px'
-    }} onClick={onClose}>
-      <div style={{
-        background: 'var(--bg-secondary)', border: '1px solid var(--glass-border-accent)',
-        borderRadius: '20px', color: 'var(--text-primary)',
-        width: '900px', maxWidth: '95vw', maxHeight: '90vh',
-        display: 'flex', flexDirection: 'column', padding: '24px',
-        boxShadow: 'var(--shadow-lg)',
-        animation: 'slideUp 0.3s ease-out'
-      }} onClick={(e) => e.stopPropagation()}>
-
-        {/* ── HEADER ── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexShrink: 0 }}>
+    <div
+      style={{
+        position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
+        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
+        padding: 'clamp(8px, 2.5vw, 20px)'
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="modal-card accent-strip-purple enterprise-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="company-role-modal-title"
+        style={{
+          borderRadius: 'var(--border-radius-lg, 18px)',
+          color: 'var(--text-primary)',
+          width: '900px', maxWidth: '95vw', maxHeight: '90vh',
+          display: 'flex', flexDirection: 'column', padding: '0',
+          overflow: 'hidden',
+          animation: 'slideUp 0.3s ease-out'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ── HEADER (Pinned) ── */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '16px 24px',
+          borderBottom: '1px solid var(--color-border-subtle, var(--glass-border))',
+          background: 'var(--bg-tertiary)',
+          flexShrink: 0
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              width: '42px', height: '42px', borderRadius: '12px', display: 'flex',
+              width: '38px', height: '38px', borderRadius: '10px', display: 'flex',
               alignItems: 'center', justifyContent: 'center',
               background: 'var(--accent-gradient)', color: '#fff',
-              boxShadow: 'var(--shadow-md)'
+              boxShadow: 'var(--shadow-md)', flexShrink: 0
             }}>
-              <ShieldCheck size={22} />
+              <ShieldCheck size={20} />
             </div>
             <div>
-              <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 800 }}>
+              <h3 id="company-role-modal-title" style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 800 }}>
                 {roleToEdit ? t('rbac.editRoleTitle', 'Edit Enterprise Security Role') : t('rbac.createRoleTitle', 'Create Enterprise Security Role')}
               </h3>
               <p style={{ margin: '2px 0 0', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
@@ -258,23 +282,40 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
               </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-muted)', borderRadius: '8px', padding: '6px', cursor: 'pointer' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-icon touch-target-sm"
+            style={{ borderRadius: '8px' }}
+            aria-label={t('common.close', 'Close')}
+          >
             <X size={18} />
           </button>
         </div>
 
-        {errorMsg && (
-          <div style={{
-            padding: '10px 16px', borderRadius: '10px', marginBottom: '14px', fontSize: '0.84rem',
-            background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: 'var(--color-danger)',
-            display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, flexShrink: 0
-          }}>
-            <AlertCircle size={16} /> {errorMsg}
-          </div>
-        )}
-
         {/* ── SCROLLABLE BODY ── */}
-        <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', minHeight: 0, paddingRight: '4px' }}>
+        <div
+          className="custom-scrollbar"
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            minHeight: 0,
+            padding: 'clamp(16px, 3vw, 24px)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}
+        >
+          {errorMsg && (
+            <div style={{
+              padding: '10px 16px', borderRadius: '8px', fontSize: '0.84rem',
+              background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: 'var(--color-danger)',
+              display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, flexShrink: 0
+            }}>
+              <AlertCircle size={16} /> {errorMsg}
+            </div>
+          )}
+
           <form id="roleForm" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
 
             {/* Preset Templates */}
@@ -624,37 +665,35 @@ export default function CompanyRoleModal({ roleToEdit, onClose, onSuccess }) {
           </form>
         </div>
 
-        {/* ── FOOTER ACTIONS ── */}
+        {/* ── FOOTER ACTIONS (Pinned) ── */}
         <div style={{
           display: 'flex', gap: '12px', justifyContent: 'space-between', alignItems: 'center',
-          paddingTop: '16px', borderTop: '1px solid var(--glass-border)', flexShrink: 0, marginTop: '12px'
+          padding: '16px 24px', borderTop: '1px solid var(--color-border-subtle, var(--glass-border))',
+          background: 'var(--bg-tertiary)', flexShrink: 0, flexWrap: 'wrap'
         }}>
           <span style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', fontWeight: 600 }}>
             ⚡ <strong>{selectedPermissions.length}</strong> {t('rbac.permissionsAssigned', '{count} permissions assigned to this role', { count: selectedPermissions.length })}
           </span>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
-              type="button" onClick={onClose}
-              style={{
-                background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)',
-                borderRadius: '10px', padding: '10px 20px', color: 'var(--text-secondary)', fontWeight: 600,
-                fontSize: '0.88rem', cursor: 'pointer'
-              }}
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary touch-target-sm"
             >
               {t('common.cancel', 'Cancel')}
             </button>
             <button
-              type="submit" form="roleForm" disabled={submitting}
+              type="submit"
+              form="roleForm"
+              disabled={submitting}
+              className="btn btn-primary touch-target-sm"
               style={{
-                background: 'var(--accent-gradient)',
-                border: 'none', borderRadius: '10px', padding: '10px 24px',
-                color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer',
-                boxShadow: 'var(--shadow-md)',
-                display: 'flex', alignItems: 'center', gap: '6px',
-                opacity: submitting ? 0.7 : 1
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              <Save size={16} /> {submitting ? t('rbac.saving', '⏳ Saving...') : ('✓ ' + t('rbac.saveRolePermissions', 'Save Role & Permissions'))}
+              <Save size={16} /> {submitting ? t('rbac.saving', 'Saving...') : ('✓ ' + t('rbac.saveRolePermissions', 'Save Role & Permissions'))}
             </button>
           </div>
         </div>

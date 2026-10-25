@@ -15,6 +15,9 @@ import {
 import tenantApi from '../api/tenantApi';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 import { tenantSchemas } from '../../../validation';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import { useTranslation } from '../../../i18n';
@@ -444,12 +447,11 @@ export default function ContactsAddressesTab() {
                       )}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                      <button
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleContactDelete(c.TenantContactID)}
-                        style={{ padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', color: '#f87171', cursor: 'pointer' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                        title={t('common.delete')}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -474,12 +476,12 @@ export default function ContactsAddressesTab() {
                     </span>
                     <h4 style={{ fontSize: '1.05rem', fontWeight: '600', marginTop: '8px', color: 'var(--text-primary)' }}>{a.TenantCompanyName}</h4>
                   </div>
-                  <button
+                  <ActionButton
+                    variant="delete"
+                    size="sm"
                     onClick={() => handleAddressDelete(a.TenantAddressID)}
-                    style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', padding: '4px' }}
-                  >
-                    <Trash2 size={15} />
-                  </button>
+                    title={t('common.delete')}
+                  />
                 </div>
 
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -494,320 +496,247 @@ export default function ContactsAddressesTab() {
         </div>
       )}
 
-      {/* Modal: Create Contact */}
-      {isContactModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '480px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <Phone color="var(--accent-primary)" /> Add Contact Channel
-            </h2>
+      {/* Modal: Create Contact Channel */}
+      <ModalCard
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        title="Add Contact Channel"
+        subtitle="Register telephone, email, messaging or mobile channels for tenant communication"
+        category="Tenant Directory"
+        icon={Phone}
+        accentStrip="primary"
+        maxWidth="500px"
+        onSubmit={handleContactSubmit}
+        submitText="Save Contact"
+        cancelText="Cancel"
+        error={errorMsg && Object.keys(contactErrors).length === 0 ? errorMsg : ''}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {isParkAdmin && (
+            <FormField label="Tenant *" error={contactErrors.TenantID} icon={Building2}>
+              <select
+                value={contactForm.TenantID}
+                onChange={(e) => handleContactFieldChange('TenantID', e.target.value)}
+                onBlur={() => handleContactBlur('TenantID')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${contactErrors.TenantID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              >
+                <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Tenant</option>
+                {tenants.map((t) => (
+                  <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                    {t.CompanyName}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          )}
 
-            {errorMsg && Object.keys(contactErrors).length === 0 && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
-            )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+            <FormField label="Contact Type *" error={contactErrors.ContactType} icon={Mail}>
+              <select
+                value={contactForm.ContactType}
+                onChange={(e) => handleContactFieldChange('ContactType', e.target.value)}
+                onBlur={() => handleContactBlur('ContactType')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${contactErrors.ContactType ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              >
+                <option value="EMAIL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>EMAIL</option>
+                <option value="PHONE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>PHONE</option>
+                <option value="MOBILE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>MOBILE</option>
+                <option value="FAX" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>FAX</option>
+                <option value="CHAT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>CHAT / MESSAGING</option>
+              </select>
+            </FormField>
 
-            <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {isParkAdmin && (
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Tenant *</label>
-                  <select
-                    value={contactForm.TenantID}
-                    onChange={(e) => handleContactFieldChange('TenantID', e.target.value)}
-                    onBlur={() => handleContactBlur('TenantID')}
-                    style={{
-                      width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                      border: contactErrors.TenantID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px', color: 'var(--text-primary)'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Tenant</option>
-                    {tenants.map((t) => (
-                      <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {t.CompanyName}
-                      </option>
-                    ))}
-                  </select>
-                  {contactErrors.TenantID && (
-                    <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                      ⚠️ {contactErrors.TenantID}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Contact Type *</label>
-                <select
-                  value={contactForm.ContactType}
-                  onChange={(e) => handleContactFieldChange('ContactType', e.target.value)}
-                  onBlur={() => handleContactBlur('ContactType')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: contactErrors.ContactType ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                >
-                  <option value="EMAIL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>EMAIL</option>
-                  <option value="PHONE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>PHONE</option>
-                  <option value="MOBILE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>MOBILE</option>
-                  <option value="FAX" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>FAX</option>
-                  <option value="CHAT" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>CHAT / MESSAGING</option>
-                </select>
-                {contactErrors.ContactType && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {contactErrors.ContactType}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Label / Title *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Primary Email, Reception"
-                  value={contactForm.Label}
-                  onChange={(e) => handleContactFieldChange('Label', e.target.value)}
-                  onBlur={() => handleContactBlur('Label')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: contactErrors.Label ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                />
-                {contactErrors.Label && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {contactErrors.Label}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Contact Value (Email / Number) *</label>
-                <input
-                  type="text"
-                  placeholder={contactForm.ContactType === 'EMAIL' ? 'user@company.com' : '+251 91 123 4567'}
-                  value={contactForm.ContactValue}
-                  onChange={(e) => handleContactFieldChange('ContactValue', e.target.value)}
-                  onBlur={() => handleContactBlur('ContactValue')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: contactErrors.ContactValue ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                />
-                {contactErrors.ContactValue && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {contactErrors.ContactValue}
-                  </span>
-                )}
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input
-                  type="checkbox"
-                  id="primaryContact"
-                  checked={!!contactForm.IsPrimary}
-                  onChange={(e) => setContactForm({ ...contactForm, IsPrimary: e.target.checked ? 1 : 0 })}
-                />
-                <label htmlFor="primaryContact" style={{ fontSize: '0.85rem', color: 'var(--text-primary)', cursor: 'pointer' }}>
-                  Set as Primary Contact for this Type
-                </label>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsContactModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Save Contact
-                </button>
-              </div>
-            </form>
+            <FormField label="Label / Title *" error={contactErrors.Label} icon={FileText}>
+              <input
+                type="text"
+                placeholder="e.g. Primary Email, Reception"
+                value={contactForm.Label}
+                onChange={(e) => handleContactFieldChange('Label', e.target.value)}
+                onBlur={() => handleContactBlur('Label')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${contactErrors.Label ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
           </div>
+
+          <FormField label="Contact Value (Email / Number) *" error={contactErrors.ContactValue} icon={Globe}>
+            <input
+              type="text"
+              placeholder={contactForm.ContactType === 'EMAIL' ? 'user@company.com' : '+251 91 123 4567'}
+              value={contactForm.ContactValue}
+              onChange={(e) => handleContactFieldChange('ContactValue', e.target.value)}
+              onBlur={() => handleContactBlur('ContactValue')}
+              style={{
+                width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                border: `1px solid ${contactErrors.ContactValue ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+              }}
+            />
+          </FormField>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '10px 12px', borderRadius: 'var(--border-radius-sm)', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)' }}>
+            <input
+              type="checkbox"
+              id="primaryContact"
+              checked={!!contactForm.IsPrimary}
+              onChange={(e) => setContactForm({ ...contactForm, IsPrimary: e.target.checked ? 1 : 0 })}
+              style={{ accentColor: 'var(--color-primary, #2563eb)', width: '16px', height: '16px' }}
+            />
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+              Set as Primary Contact for this Type
+            </span>
+          </label>
         </div>
-      )}
+      </ModalCard>
 
       {/* Modal: Create Address */}
-      {isAddressModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '540px', padding: '28px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <MapPin color="var(--accent-primary)" /> Add Registered Address
-            </h2>
-
-            {errorMsg && Object.keys(addressErrors).length === 0 && (
-              <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem', marginBottom: '16px' }}>
-                {errorMsg}
-              </div>
+      <ModalCard
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        title="Add Registered Address"
+        subtitle="Configure physical, legal, billing or mailing premises address"
+        category="Tenant Premises"
+        icon={MapPin}
+        accentStrip="primary"
+        maxWidth="600px"
+        onSubmit={handleAddressSubmit}
+        submitText="Save Address"
+        cancelText="Cancel"
+        error={errorMsg && Object.keys(addressErrors).length === 0 ? errorMsg : ''}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+            {isParkAdmin && (
+              <FormField label="Tenant *" error={addressErrors.TenantID} icon={Building2}>
+                <select
+                  value={addressForm.TenantID}
+                  onChange={(e) => handleAddressFieldChange('TenantID', e.target.value)}
+                  onBlur={() => handleAddressBlur('TenantID')}
+                  style={{
+                    width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                    border: `1px solid ${addressErrors.TenantID ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                    borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                  }}
+                >
+                  <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Tenant</option>
+                  {tenants.map((t) => (
+                    <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {t.CompanyName}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
             )}
 
-            <form onSubmit={handleAddressSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              {isParkAdmin && (
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Tenant *</label>
-                  <select
-                    value={addressForm.TenantID}
-                    onChange={(e) => handleAddressFieldChange('TenantID', e.target.value)}
-                    onBlur={() => handleAddressBlur('TenantID')}
-                    style={{
-                      width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                      border: addressErrors.TenantID ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                      borderRadius: '4px', color: 'var(--text-primary)'
-                    }}
-                  >
-                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Select Tenant</option>
-                    {tenants.map((t) => (
-                      <option key={t.TenantID} value={t.TenantID} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
-                        {t.CompanyName}
-                      </option>
-                    ))}
-                  </select>
-                  {addressErrors.TenantID && (
-                    <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                      ⚠️ {addressErrors.TenantID}
-                    </span>
-                  )}
-                </div>
-              )}
+            <FormField label="Address Type *" error={addressErrors.AddressType} icon={FileText}>
+              <select
+                value={addressForm.AddressType}
+                onChange={(e) => handleAddressFieldChange('AddressType', e.target.value)}
+                onBlur={() => handleAddressBlur('AddressType')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${addressErrors.AddressType ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              >
+                <option value="LEGAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>LEGAL</option>
+                <option value="BILLING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>BILLING</option>
+                <option value="MAILING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>MAILING</option>
+                <option value="PHYSICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>PHYSICAL</option>
+              </select>
+            </FormField>
+          </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Address Type *</label>
-                <select
-                  value={addressForm.AddressType}
-                  onChange={(e) => handleAddressFieldChange('AddressType', e.target.value)}
-                  onBlur={() => handleAddressBlur('AddressType')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: addressErrors.AddressType ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                >
-                  <option value="LEGAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>LEGAL</option>
-                  <option value="BILLING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>BILLING</option>
-                  <option value="MAILING" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>MAILING</option>
-                  <option value="PHYSICAL" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>PHYSICAL</option>
-                </select>
-                {addressErrors.AddressType && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {addressErrors.AddressType}
-                  </span>
-                )}
-              </div>
+          <FormField label="Address Line 1 *" error={addressErrors.AddressLine1} icon={MapPin}>
+            <input
+              type="text"
+              placeholder="e.g. Bole Subcity, Street 45, Bldg 2"
+              value={addressForm.AddressLine1}
+              onChange={(e) => handleAddressFieldChange('AddressLine1', e.target.value)}
+              onBlur={() => handleAddressBlur('AddressLine1')}
+              style={{
+                width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                border: `1px solid ${addressErrors.AddressLine1 ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+              }}
+            />
+          </FormField>
 
-              <div style={{ gridColumn: 'span 2' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Address Line 1 *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Bole Subcity, Street 45, Bldg 2"
-                  value={addressForm.AddressLine1}
-                  onChange={(e) => handleAddressFieldChange('AddressLine1', e.target.value)}
-                  onBlur={() => handleAddressBlur('AddressLine1')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: addressErrors.AddressLine1 ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                />
-                {addressErrors.AddressLine1 && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {addressErrors.AddressLine1}
-                  </span>
-                )}
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+            <FormField label="City *" error={addressErrors.City} icon={MapPin}>
+              <input
+                type="text"
+                placeholder="e.g. Addis Ababa"
+                value={addressForm.City}
+                onChange={(e) => handleAddressFieldChange('City', e.target.value)}
+                onBlur={() => handleAddressBlur('City')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${addressErrors.City ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>City *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Addis Ababa"
-                  value={addressForm.City}
-                  onChange={(e) => handleAddressFieldChange('City', e.target.value)}
-                  onBlur={() => handleAddressBlur('City')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: addressErrors.City ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                />
-                {addressErrors.City && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {addressErrors.City}
-                  </span>
-                )}
-              </div>
+            <FormField label="Sub-City" icon={MapPin}>
+              <input
+                type="text"
+                placeholder="e.g. Bole"
+                value={addressForm.SubCity}
+                onChange={(e) => handleAddressFieldChange('SubCity', e.target.value)}
+                onBlur={() => handleAddressBlur('SubCity')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)',
+                  color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
+          </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Sub-City</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Bole"
-                  value={addressForm.SubCity}
-                  onChange={(e) => handleAddressFieldChange('SubCity', e.target.value)}
-                  onBlur={() => handleAddressBlur('SubCity')}
-                  style={{ width: '100%', padding: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)' }}
-                />
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+            <FormField label="Country *" error={addressErrors.Country} icon={Globe}>
+              <input
+                type="text"
+                placeholder="e.g. Ethiopia"
+                value={addressForm.Country}
+                onChange={(e) => handleAddressFieldChange('Country', e.target.value)}
+                onBlur={() => handleAddressBlur('Country')}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: `1px solid ${addressErrors.Country ? 'var(--color-error, #ef4444)' : 'var(--glass-border)'}`,
+                  borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Country *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Ethiopia"
-                  value={addressForm.Country}
-                  onChange={(e) => handleAddressFieldChange('Country', e.target.value)}
-                  onBlur={() => handleAddressBlur('Country')}
-                  style={{
-                    width: '100%', padding: '10px', background: 'var(--bg-tertiary)',
-                    border: addressErrors.Country ? '1px solid #ef4444' : '1px solid var(--glass-border)',
-                    borderRadius: '4px', color: 'var(--text-primary)'
-                  }}
-                />
-                {addressErrors.Country && (
-                  <span style={{ fontSize: '0.74rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontWeight: 600 }}>
-                    ⚠️ {addressErrors.Country}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Postal Code</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 1000"
-                  value={addressForm.PostalCode}
-                  onChange={(e) => handleAddressFieldChange('PostalCode', e.target.value)}
-                  style={{ width: '100%', padding: '10px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsAddressModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'transparent', border: '1px solid var(--glass-border)', borderRadius: '4px', color: 'var(--text-primary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Save Address
-                </button>
-              </div>
-            </form>
+            <FormField label="Postal Code" icon={FileText}>
+              <input
+                type="text"
+                placeholder="e.g. 1000"
+                value={addressForm.PostalCode}
+                onChange={(e) => handleAddressFieldChange('PostalCode', e.target.value)}
+                style={{
+                  width: '100%', padding: '10px 14px', background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-sm)',
+                  color: 'var(--text-primary)', fontSize: '0.88rem'
+                }}
+              />
+            </FormField>
           </div>
         </div>
-      )}
+      </ModalCard>
 
       {/* Shared Glass Modals */}
       <ConfirmDialogModal

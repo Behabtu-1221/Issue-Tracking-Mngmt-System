@@ -1,7 +1,8 @@
 import AppError from '../errors/AppError.js';
 
 const validate = (schema, source = 'body') => (req, res, next) => {
-  const { error, value } = schema.validate(req[source], {
+  const target = req[source] !== undefined && req[source] !== null ? req[source] : {};
+  const { error, value } = schema.validate(target, {
     abortEarly: false,
     stripUnknown: true
   });
@@ -18,7 +19,7 @@ const validate = (schema, source = 'body') => (req, res, next) => {
   }
 
   if (source === 'body') {
-    req.body = value;
+    req.body = value ?? {};
   } else {
     req.validated = req.validated || {};
     req.validated[source] = value;

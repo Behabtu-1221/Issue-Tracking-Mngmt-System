@@ -35,6 +35,7 @@ import UserRoleAssignModal from '../../role-permission-management/components/Use
 import UserRegistrationModal from './UserRegistrationModal';
 import ConfirmDialogModal from '../../../components/common/ConfirmDialogModal';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 import { userSchemas } from '../../../validation';
 
 export default function UsersTab() {
@@ -201,6 +202,18 @@ export default function UsersTab() {
     fetchRoles();
     fetchTenants();
   }, [searchTerm, statusFilter, currentPage, pageSize]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && createdResult) {
+        setCreatedResult(null);
+      }
+    };
+    if (createdResult) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [createdResult]);
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
@@ -369,8 +382,8 @@ export default function UsersTab() {
   return (
     <div>
       {/* Header Controls */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '280px' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-6 flex-wrap">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 w-full min-w-0">
           <div style={{ position: 'relative', flex: 1 }}>
             <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
@@ -418,9 +431,10 @@ export default function UsersTab() {
           </select>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-end">
           <button
             onClick={fetchUsers}
+            className="touch-target-sm"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -440,6 +454,7 @@ export default function UsersTab() {
           {canCreateUser && (
             <button
               onClick={openCreateUserModal}
+              className="touch-target-sm"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -462,7 +477,7 @@ export default function UsersTab() {
       </div>
 
       {/* Users Table */}
-      <div className="glass-panel" style={{ overflowX: 'auto', width: '100%', borderRadius: 'var(--border-radius-md)' }}>
+      <div className="table-scroll-container glass-panel" style={{ width: '100%', borderRadius: 'var(--border-radius-md)' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
             <RefreshCw className="animate-spin" size={32} style={{ marginBottom: '16px' }} />
@@ -574,67 +589,32 @@ export default function UsersTab() {
                       )}
                     </td>
                     <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                        <button
+                      <ActionGroup align="right">
+                        <ActionButton
+                          variant="neutral"
                           onClick={() => openDetailView(u)}
                           title={t('identity.viewProfileTooltip')}
-                          style={{
-                            padding: '6px 10px',
-                            borderRadius: 'var(--border-radius-sm)',
-                            background: 'var(--bg-tertiary)',
-                            border: '1px solid var(--glass-border)',
-                            color: 'var(--text-primary)',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <Eye size={14} />
-                        </button>
-
-                        <button
+                          icon={<Eye size={14} />}
+                        />
+                        <ActionButton
+                          variant="view"
                           onClick={() => { setSelectedUser(u); setShowRoleAssignModal(true); }}
                           title={t('identity.assignRoleTooltip')}
-                          style={{
-                            padding: '6px 10px',
-                            borderRadius: 'var(--border-radius-sm)',
-                            background: 'rgba(99, 102, 241, 0.15)',
-                            border: '1px solid rgba(99, 102, 241, 0.3)',
-                            color: '#818cf8',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <Shield size={14} />
-                        </button>
-
-                        <button
+                          icon={<Shield size={14} />}
+                        />
+                        <ActionButton
+                          variant="warning"
                           onClick={() => { setSelectedUser(u); setShowStatusModal(true); }}
                           title={t('identity.changeStatusTooltip')}
-                          style={{
-                            padding: '6px 10px',
-                            borderRadius: 'var(--border-radius-sm)',
-                            background: 'rgba(234, 179, 8, 0.15)',
-                            border: '1px solid rgba(234, 179, 8, 0.3)',
-                            color: 'var(--color-warning)',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <ShieldCheck size={14} />
-                        </button>
-
-                        <button
+                          icon={<ShieldCheck size={14} />}
+                        />
+                        <ActionButton
+                          variant="delete"
                           onClick={() => { setSelectedUser(u); setShowDeleteModal(true); }}
                           title={t('identity.deleteUserTooltip')}
-                          style={{
-                            padding: '6px 10px',
-                            borderRadius: 'var(--border-radius-sm)',
-                            background: 'rgba(239, 68, 68, 0.15)',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
-                            color: 'var(--color-danger)',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                          icon={<Trash2 size={14} />}
+                        />
+                      </ActionGroup>
                     </td>
                   </tr>
                 );
@@ -780,16 +760,27 @@ export default function UsersTab() {
 
       {/* REGISTRATION CONFIRMATION MODAL */}
       {createdResult && (
-        <div className="modal-overlay" style={{
-          position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200
-        }}>
-          <div style={{
-            width: '540px', maxWidth: '92vw', background: 'var(--bg-secondary, #0f172a)',
-            border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '32px 28px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.15)',
-            display: 'flex', flexDirection: 'column', gap: '20px', animation: 'fadeIn 0.2s ease-out'
-          }}>
+        <div 
+          onClick={() => setCreatedResult(null)}
+          className="modal-overlay" 
+          style={{
+            position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200
+          }}
+        >
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="user-created-dialog-title"
+            className="modal-card accent-strip-success enterprise-card"
+            style={{
+              width: '540px', maxWidth: '92vw', background: 'var(--bg-secondary, #0f172a)',
+              border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: 'var(--border-radius-lg, 18px)', padding: '32px 28px',
+              boxShadow: 'var(--modal-shadow, 0 25px 50px -12px rgba(0, 0, 0, 0.6))',
+              display: 'flex', flexDirection: 'column', gap: '20px', animation: 'fadeIn 0.2s ease-out', position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header Badge & Title */}
             <div style={{ textAlign: 'center' }}>
               <div style={{

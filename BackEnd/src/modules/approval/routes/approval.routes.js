@@ -24,7 +24,7 @@ router.post(
 );
 router.post(
   '/decision',
-  authorizePermissions('Issue.Approve', 'Approval.Decide', 'issue:approve'),
+  authorizePermissions('Issue.Approve', 'Approval.Decide', 'issue:approve', 'Request.Approve', 'approval:decide'),
   validate(submitDecisionSchema),
   approvalController.submitDecision
 );

@@ -1,0 +1,4194 @@
+{
+  "info": {
+    "name": "Enterprise ITMS — Modules 6 to 10 Postman Inventory (Operations Core)",
+    "description": "Covers Modules 6 to 10: Service Catalog & Category Mappings, Issue Requests & Ticket Lifecycle, Technical Workbench & Investigations, Dispatch & SLA Automation, and Governance & Approvals.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "devResetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "entityId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "parkId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "buildingId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "floorId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "officeId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "locationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "facilityZoneId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "floorPlanId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "tenantId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "subTenantId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "contactId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "addressId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "leaseId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "allocationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "departmentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "teamId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "positionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "assignmentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "hierarchyId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "costCenterId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "budgetId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "serviceId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "mappingId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "issueRequestId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "commentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "investigationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "resolutionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "approvalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "delegationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "approvalRuleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "approvalGroupId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "dispatchId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "slaPolicyId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "conversationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "channelId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "announcementId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "templateId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reminderId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reportId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "settingId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "flagId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "sequenceId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "lookupTypeId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "lookupValueId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "calendarId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "workingHourId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "holidayId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "localizationId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "resourceId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "6. Service Catalog & Categories",
+      "item": [
+        {
+          "name": "6.1 Service Categories",
+          "item": [
+            {
+              "name": "List Service Categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/service-categories",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "service-categories"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/service-categories"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Service Category by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/service-categories/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "service-categories",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/service-categories/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Service Category",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/service-categories",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "service-categories"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/service-categories",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"CategoryCode\": \"CAT_HVAC\",\n  \"CategoryName\": \"HVAC & Climate Control\",\n  \"Description\": \"Heating, ventilation, air conditioning and chiller plant systems\",\n  \"DefaultPriority\": \"HIGH\",\n  \"DefaultSLAHours\": 4,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Service Category",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/service-categories/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "service-categories",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/service-categories/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"CategoryName\": \"HVAC & Environmental Control\",\n  \"DefaultPriority\": \"HIGH\",\n  \"DefaultSLAHours\": 4,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Service Category",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/service-categories/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "service-categories",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/service-categories/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "6.2 Services & Analytics",
+          "item": [
+            {
+              "name": "List Services",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/services",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/services"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Services Overview Metrics",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/services/metrics",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services",
+                    "metrics"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/services/metrics"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Service by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/services/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/services/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Service",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/services",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/services",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"CategoryID\": 1,\n  \"ServiceCode\": \"SRV_CHILLER_REPAIR\",\n  \"ServiceName\": \"Commercial Chiller Overhaul & Coolant Flush\",\n  \"Description\": \"Heavy mechanical repair and coolant replacement for central chillers\",\n  \"EstimatedDurationMinutes\": 180,\n  \"BasePrice\": 2500,\n  \"CurrencyCode\": \"ETB\",\n  \"RequiresApproval\": 1,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Service",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/services/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/services/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ServiceName\": \"Commercial Chiller Overhaul & Certified Refill\",\n  \"EstimatedDurationMinutes\": 240,\n  \"BasePrice\": 3200,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Service",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/services/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/services/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Service Analytics Metrics",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/service-analytics/metrics",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "service-analytics",
+                    "metrics"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/service-analytics/metrics"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "6.3 Category Department Mappings",
+          "item": [
+            {
+              "name": "List Category Mappings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/category-mappings",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "category-mappings"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/category-mappings"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Category Mapping by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/category-mappings/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "category-mappings",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/category-mappings/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Category Mapping",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/category-mappings",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "category-mappings"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/category-mappings",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"CategoryID\": 1,\n  \"DepartmentID\": 1,\n  \"DefaultTeamID\": 1,\n  \"AutoAssignEnabled\": 1,\n  \"PriorityOverride\": \"HIGH\",\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Category Mapping",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/category-mappings/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "category-mappings",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/category-mappings/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AutoAssignEnabled\": 1,\n  \"PriorityOverride\": \"CRITICAL\",\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Patch Category Mapping Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/category-mappings/:id/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "category-mappings",
+                    ":id",
+                    "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PATCH http://localhost:5000/api/category-mappings/:id/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Category Mapping",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/category-mappings/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "category-mappings",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/category-mappings/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Issue Requests & Lifecycle",
+      "item": [
+        {
+          "name": "7.1 Issue Requests & Lifecycle Operations",
+          "item": [
+            {
+              "name": "List Issue Requests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/issues"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Issue Requests Metrics & Counts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/metrics",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    "metrics"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/issues/metrics"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Issue Request by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/issues/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Issue Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issues",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ParkID\": 1,\n  \"BuildingID\": 1,\n  \"FloorID\": 1,\n  \"OfficeID\": 1,\n  \"TenantID\": 1,\n  \"CategoryID\": 1,\n  \"ServiceID\": 1,\n  \"Title\": \"Server Room Air Handler Water Leakage\",\n  \"Description\": \"Continuous water drip from primary air handling unit ceiling tile above rack 04\",\n  \"Priority\": \"CRITICAL\",\n  \"LocationDescription\": \"Rack Row B, Unit 4 Ceiling Grid\",\n  \"ContactPhone\": \"+251911223344\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Issue Request",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/issues/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Title\": \"Server Room Air Handler Major Coolant Drip\",\n  \"Priority\": \"CRITICAL\",\n  \"LocationDescription\": \"Rack Row B, Unit 4 Main Plenum\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Assign Issue to Technician / Team",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id/assign",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id",
+                    "assign"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issues/:id/assign",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assignedToUserId\": 1,\n  \"teamId\": 1,\n  \"assignmentNotes\": \"Immediate dispatch required due to critical server equipment proximity\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Issue Status",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id",
+                    "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issues/:id/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"statusNotes\": \"Technician on-site and isolating chiller valves\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Cancel Issue Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id/cancel",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id",
+                    "cancel"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issues/:id/cancel",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cancellationReason\": \"Duplicate ticket logged by assistant facilities officer\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reopen Issue Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id/reopen",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id",
+                    "reopen"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issues/:id/reopen",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reopenReason\": \"Water seepage recurred 2 hours after initial valve repair\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Submit Issue Feedback & CSAT",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id/feedback",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id",
+                    "feedback"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issues/:id/feedback",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Rapid response time and professional clean-up of the server room.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Issue Feedback & CSAT",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id/feedback",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id",
+                    "feedback"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/issues/:id/feedback"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Issue Request",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issues/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issues",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/issues/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "7.2 Technical Investigations",
+          "item": [
+            {
+              "name": "Get Investigations for Issue",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-investigations/issue/:issueRequestId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-investigations",
+                    "issue",
+                    ":issueRequestId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "issueRequestId",
+                      "value": "{{issueRequestId}}",
+                      "description": "URL path parameter :issueRequestId"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/issue-investigations/issue/:issueRequestId"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Technical Investigation Entry",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-investigations",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-investigations"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issue-investigations",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"IssueRequestID\": 1,\n  \"InvestigatedByUserID\": 1,\n  \"RootCause\": \"Secondary condensate drain line blockage caused overflow onto ceiling panel\",\n  \"PreventiveMeasures\": \"Install automated water sensor and clean bi-monthly with algaecide tablets\",\n  \"FindingsSummary\": \"No structural damage to equipment. Ceiling tile replaced.\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Investigation Entry",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-investigations/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-investigations",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/issue-investigations/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "7.3 Issue Resolutions",
+          "item": [
+            {
+              "name": "Get Resolutions for Issue",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-resolutions/issue/:issueRequestId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-resolutions",
+                    "issue",
+                    ":issueRequestId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "issueRequestId",
+                      "value": "{{issueRequestId}}",
+                      "description": "URL path parameter :issueRequestId"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/issue-resolutions/issue/:issueRequestId"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Issue Resolution Record",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-resolutions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-resolutions"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issue-resolutions",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"IssueRequestID\": 1,\n  \"ResolvedByUserID\": 1,\n  \"ResolutionSummary\": \"Cleared condensate blockage with CO2 drain gun and replaced PVC trap\",\n  \"PartsUsed\": \"1x 3/4-inch PVC P-Trap, 2x PVC Couplers\",\n  \"LaborHours\": 1.5,\n  \"TotalCost\": 350\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Resolution Record",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-resolutions/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-resolutions",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/issue-resolutions/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "7.4 Issue Comments",
+          "item": [
+            {
+              "name": "Get Comments for Issue",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-comments/issue/:issueRequestId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-comments",
+                    "issue",
+                    ":issueRequestId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "issueRequestId",
+                      "value": "{{issueRequestId}}",
+                      "description": "URL path parameter :issueRequestId"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/issue-comments/issue/:issueRequestId"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Issue Comment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-comments",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-comments"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/issue-comments",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"IssueRequestID\": 1,\n  \"CommentText\": \"HVAC parts ordered from local distributor. ETA 30 minutes.\",\n  \"IsInternalOnly\": 0\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Issue Comment",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/issue-comments/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "issue-comments",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/issue-comments/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Approval Workflows & Governance",
+      "item": [
+        {
+          "name": "8.1 Approvals Lifecycle & Decisions",
+          "item": [
+            {
+              "name": "List All Approval Requests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approvals"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Approvals Executive Metrics",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/metrics",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "metrics"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approvals/metrics"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Pending Approvals for Current User",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/pending",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "pending"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approvals/pending"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Approvals by Issue Request ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/by-request/:requestId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "by-request",
+                    ":requestId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "requestId",
+                      "value": "{{issueRequestId}}",
+                      "description": "URL path parameter :requestId"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approvals/by-request/:requestId"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Approval Request by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approvals/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Approval Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/approvals",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"IssueRequestID\": 1,\n  \"RuleID\": 1,\n  \"ApprovalType\": \"FINANCIAL\",\n  \"Amount\": 4500,\n  \"Reason\": \"Compressor replacement exceeds routine maintenance threshold\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Submit Managerial Approval Decision",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approvals/decision",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approvals",
+                    "decision"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/approvals/decision",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"approvalId\": 1,\n  \"decision\": \"APPROVED\",\n  \"decisionNotes\": \"Approved based on critical impact to tenant server uptime\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "8.2 Approval Delegations",
+          "item": [
+            {
+              "name": "List Approval Delegations",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-delegations",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-delegations"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approval-delegations"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Approval Delegation by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-delegations/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-delegations",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approval-delegations/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Approval Delegation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-delegations",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-delegations"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/approval-delegations",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"DelegatorUserID\": 1,\n  \"DelegateUserID\": 2,\n  \"StartDate\": \"2026-11-01\",\n  \"EndDate\": \"2026-11-15\",\n  \"Reason\": \"Annual operational leave delegation\",\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Approval Delegation",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-delegations/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-delegations",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/approval-delegations/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"EndDate\": \"2026-11-20\",\n  \"Reason\": \"Extended leave delegation\",\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Approval Delegation",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-delegations/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-delegations",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/approval-delegations/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "8.3 Approval Rules & Thresholds",
+          "item": [
+            {
+              "name": "List Approval Rules",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-rules",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-rules"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approval-rules"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Financial Approval Thresholds",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-rules/thresholds",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-rules",
+                    "thresholds"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approval-rules/thresholds"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Approval Rule by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-rules/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-rules",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approval-rules/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Financial Approval Threshold",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-rules/thresholds",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-rules",
+                    "thresholds"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/approval-rules/thresholds",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"RoleID\": 1,\n  \"MaxApprovalLimit\": 25000,\n  \"CurrencyCode\": \"ETB\",\n  \"RequiresDoubleApproval\": 0\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Approval Rule",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-rules",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-rules"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/approval-rules",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"RuleCode\": \"RULE_EMERGENCY_HVAC\",\n  \"RuleName\": \"HVAC Emergency Capital Approval\",\n  \"ApprovalType\": \"EMERGENCY\",\n  \"ThresholdAmount\": 5000,\n  \"ApprovalGroupID\": 1,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Approval Rule",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-rules/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-rules",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/approval-rules/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"RuleName\": \"HVAC Emergency Capital Approval (Updated)\",\n  \"ThresholdAmount\": 7500,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Approval Rule",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-rules/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-rules",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/approval-rules/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "8.4 Approval Groups & Members",
+          "item": [
+            {
+              "name": "List Approval Groups",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-groups",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-groups"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approval-groups"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Approval Group by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-groups/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-groups",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/approval-groups/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Approval Group",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-groups",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-groups"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/approval-groups",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"GroupCode\": \"GRP_CAPEX_REVIEW\",\n  \"GroupName\": \"Capital Expenditure Committee\",\n  \"Description\": \"Committee reviewing facilities expenditures > 20,000 ETB\",\n  \"MinApprovalsRequired\": 2,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Approval Group",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-groups/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-groups",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "PUT http://localhost:5000/api/approval-groups/:id",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"GroupName\": \"Capital Expenditure Review Board\",\n  \"MinApprovalsRequired\": 2,\n  \"IsActive\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Add Member to Approval Group",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-groups/:id/members",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-groups",
+                    ":id",
+                    "members"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/approval-groups/:id/members",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"UserID\": 1,\n  \"ApprovalOrder\": 1,\n  \"IsMandatory\": 1\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Remove Member from Approval Group",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/approval-groups/:id/members/:userId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "approval-groups",
+                    ":id",
+                    "members",
+                    ":userId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    },
+                    {
+                      "key": "userId",
+                      "value": "{{userId}}",
+                      "description": "URL path parameter :userId"
+                    }
+                  ]
+                },
+                "description": "DELETE http://localhost:5000/api/approval-groups/:id/members/:userId"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "9. Technician Assignment & Dispatch",
+      "item": [
+        {
+          "name": "9.1 Dispatch Queue & Assignment Operations",
+          "item": [
+            {
+              "name": "Get Dispatch Queue Overview Metrics",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/overview",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "overview"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/dispatch/overview"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Unassigned Issues in Queue",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/unassigned",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "unassigned"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/dispatch/unassigned"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Active Dispatch Assignments",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/dispatch/assignments"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Dispatch Assignment by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/dispatch/assignments/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Manual Issue Dispatch Assignment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assign/manual",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assign",
+                    "manual"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assign/manual",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"issueRequestId\": 1,\n  \"technicianUserId\": 1,\n  \"teamId\": 1,\n  \"priority\": \"HIGH\",\n  \"instructions\": \"Report directly to Building A security office before proceeding to roof\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Auto Issue Dispatch (AI/Rule-Based Engine)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assign/auto",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assign",
+                    "auto"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assign/auto",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"issueRequestId\": 1,\n  \"considerLocationProximity\": true,\n  \"considerWorkloadBalance\": true\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "9.2 Assignment Lifecycle",
+          "item": [
+            {
+              "name": "Accept Dispatch Assignment (Technician)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/accept",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "accept"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/accept",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"estimatedArrivalTime\": \"2026-10-25T11:00:00Z\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reject Dispatch Assignment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/reject",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "reject"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/reject",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rejectionReason\": \"Engaged in emergency elevator entrapment resolution\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Start Work on Assignment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/start",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "start"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/start",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"notes\": \"Clocking in on site; beginning safety isolation check\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pause Assignment (Wait for Parts / Vendor)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/pause",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "pause"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/pause",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pauseReason\": \"WAITING_FOR_PARTS\",\n  \"notes\": \"Replacement gasket is in transit from central warehouse\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Resume Paused Assignment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/resume",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "resume"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/resume",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"notes\": \"Parts received on-site; work resumed\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Record Work Progress Milestone",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/progress",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "progress"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/progress",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"percentComplete\": 75,\n  \"progressNotes\": \"Replaced piping joints; pressure testing underway\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Complete Assignment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/complete",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "complete"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/complete",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resolutionSummary\": \"Installed replacement seal; system tested at full pressure with zero leakage.\",\n  \"hoursSpent\": 2.5\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Escalate Assignment to Specialist / Supervisor",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/assignments/:id/escalate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "assignments",
+                    ":id",
+                    "escalate"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/assignments/:id/escalate",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"escalationReason\": \"Compressor motor windings burnt out; requires senior electrical engineer\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "9.3 Technician Workbench & Telemetry",
+          "item": [
+            {
+              "name": "Get Personal Technician Workbench",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/my-workbench",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "my-workbench"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/dispatch/my-workbench"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Active Technicians & Status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/technicians",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "technicians"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/dispatch/technicians"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Technician Availability Status",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/technicians/availability",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "technicians",
+                    "availability"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/technicians/availability",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"availabilityStatus\": \"AVAILABLE\",\n  \"shiftStatus\": \"ON_DUTY\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Technician Live Location (GPS Telemetry)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dispatch/technicians/location",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dispatch",
+                    "technicians",
+                    "location"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/dispatch/technicians/location",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"latitude\": 9.012345,\n  \"longitude\": 38.745678,\n  \"buildingId\": 1,\n  \"floorId\": 2\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10. SLA Policies & Escalations",
+      "item": [
+        {
+          "name": "10.1 SLA Clocks & Stopwatches",
+          "item": [
+            {
+              "name": "Get SLA Compliance Overview Metrics",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/overview",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "overview"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/sla/overview"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Active SLA Clocks",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/clocks",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "clocks"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/sla/clocks"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get SLA Clock by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/clocks/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "clocks",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/sla/clocks/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Start New SLA Clock for Issue",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/clocks",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "clocks"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/sla/clocks",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"issueRequestId\": 1,\n  \"policyId\": 1,\n  \"targetResponseMinutes\": 30,\n  \"targetResolutionMinutes\": 240\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pause SLA Clock (Pending Parts / Tenant Confirmation)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/clocks/:id/pause",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "clocks",
+                    ":id",
+                    "pause"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/sla/clocks/:id/pause",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pauseReason\": \"PENDING_PARTS\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Resume Paused SLA Clock",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/clocks/:id/resume",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "clocks",
+                    ":id",
+                    "resume"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/sla/clocks/:id/resume",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resumeNotes\": \"Parts delivered; SLA countdown active\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "10.2 SLA Policies & Definitions",
+          "item": [
+            {
+              "name": "List SLA Policies",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/policies",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "policies"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/sla/policies"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get SLA Policy by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/policies/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "policies",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/sla/policies/:id"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create SLA Policy",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/policies",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "policies"
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/sla/policies",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"policyCode\": \"SLA_CRITICAL_FACILITIES\",\n  \"policyName\": \"Critical Facilities Emergency SLA\",\n  \"priority\": \"CRITICAL\",\n  \"responseTargetMinutes\": 15,\n  \"resolutionTargetMinutes\": 120,\n  \"businessHoursOnly\": false,\n  \"escalationThresholdPercent\": 80,\n  \"isActive\": true\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "10.3 SLA Breaches & Acknowledgement",
+          "item": [
+            {
+              "name": "List SLA Breaches & Alerts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/breaches",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "breaches"
+                  ]
+                },
+                "description": "GET http://localhost:5000/api/sla/breaches"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Acknowledge SLA Breach Incident",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sla/breaches/:id/acknowledge",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sla",
+                    "breaches",
+                    ":id",
+                    "acknowledge"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{entityId}}",
+                      "description": "URL path parameter :id"
+                    }
+                  ]
+                },
+                "description": "POST http://localhost:5000/api/sla/breaches/:id/acknowledge",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"acknowledgementNotes\": \"Incident acknowledged by operations manager; senior vendor technician dispatched\"\n}"
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 2xx or expected\", function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204, 400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

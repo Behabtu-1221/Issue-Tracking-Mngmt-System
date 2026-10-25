@@ -12,6 +12,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const envSchema = Joi.object({
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
   PORT: Joi.number().port().default(5000),
+  HOST: Joi.string().default('0.0.0.0'),
 
   // Database
   DB_HOST: Joi.string().required().description('MySQL Database Hostname'),
@@ -78,6 +79,7 @@ export const env = {
   isProd,
   isTest,
   PORT: validatedEnv.PORT,
+  HOST: validatedEnv.HOST,
 
   // Database Configuration
   db: {

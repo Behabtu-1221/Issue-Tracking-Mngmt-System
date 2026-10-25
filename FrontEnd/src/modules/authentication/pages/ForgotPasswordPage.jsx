@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2, CheckCircle2, AlertCircle, User, ShieldCheck } from 'lucide-react';
 import authApi from '../api/authApi';
 import { useTranslation, LanguageSelector } from '../../../i18n';
+import NeuronLogo from '../../../components/common/NeuronLogo';
 
 export default function ForgotPasswordPage() {
   const { t, isRTL } = useTranslation();
@@ -73,7 +74,7 @@ export default function ForgotPasswordPage() {
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderRadius: '24px',
+          borderRadius: 'var(--border-radius-lg, 18px)',
           boxShadow: isCardHovered
             ? '0 30px 70px rgba(15, 23, 42, 0.38), 0 0 35px rgba(2, 132, 199, 0.22)'
             : '0 20px 50px rgba(15, 23, 42, 0.3), 0 4px 16px rgba(0, 0, 0, 0.08)',
@@ -95,20 +96,8 @@ export default function ForgotPasswordPage() {
 
         {/* Brand Header Inside Card */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '24px', paddingTop: '4px' }}>
-          <div style={{
-            width: '68px', height: '68px', borderRadius: '20px',
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0284c7 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            marginBottom: '14px', boxShadow: '0 10px 25px rgba(2, 132, 199, 0.3)'
-          }}>
-            <img
-              src="/logoitms.png"
-              alt="ITMS Logo"
-              style={{
-                width: '44px', height: '44px', objectFit: 'contain',
-                filter: 'brightness(0) invert(1)'
-              }}
-            />
+          <div style={{ marginBottom: '14px' }}>
+            <NeuronLogo size={68} iconSize={44} showText={false} />
           </div>
 
           <h1 style={{
@@ -214,7 +203,7 @@ export default function ForgotPasswordPage() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder={t('auth.enterUsernameOrEmailPlaceholder', 'Enter your username or email (e.g. employee, user@company.com)')}
+                    placeholder={t('auth.enterUsernameOrEmailPlaceholder', 'Enter your username or email')}
                     autoFocus
                     style={{ width: '100%', padding: isRTL ? '13px 44px 13px 14px' : '13px 14px 13px 44px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', color: '#0f172a', fontSize: '0.92rem', outline: 'none', transition: 'all 0.25s ease', boxSizing: 'border-box' }}
                     onFocus={(e) => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.18)'; e.target.style.background = '#ffffff'; }}

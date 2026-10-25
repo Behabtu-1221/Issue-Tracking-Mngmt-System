@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Globe, Plus, Trash2, RefreshCw, AlertCircle, Languages } from 'lucide-react';
 import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 
 export default function LocalizationTab() {
   const { t } = useTranslation();
@@ -100,25 +102,14 @@ export default function LocalizationTab() {
       {/* Left Column: Localizations */}
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>{t('config.localesTitle')}</h4>
+          <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)', margin: 0 }}>{t('config.localesTitle')}</h4>
           <button
+            type="button"
+            className="btn btn-primary btn-sm"
             onClick={() => {
               setLocaleForm({ languageCode: 'en', countryCode: 'US', localeName: 'English (United States)' });
               setError(null);
               setIsLocaleModalOpen(true);
-            }}
-            style={{
-              background: 'var(--accent-gradient)',
-              border: 'none',
-              borderRadius: '6px',
-              color: 'white',
-              padding: '6px 10px',
-              fontSize: '0.8rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
             }}
           >
             <Plus size={14} /> {t('config.newLocaleBtn')}
@@ -172,20 +163,7 @@ export default function LocalizationTab() {
                   setError(null);
                   setIsResourceModalOpen(true);
                 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 18px',
-                  borderRadius: 'var(--border-radius-sm)',
-                  background: 'var(--accent-gradient)',
-                  color: 'white',
-                  border: 'none',
-                  fontWeight: '600',
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  boxShadow: 'var(--glow-accent)'
-                }}
+                className="btn btn-primary"
               >
                 <Plus size={16} /> {t('config.addKeyBtn')}
               </button>
@@ -233,93 +211,118 @@ export default function LocalizationTab() {
       </div>
 
       {/* Modal: Create Locale */}
-      {isLocaleModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsLocaleModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '450px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.newLocaleBtn')}</h3>
-            {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
-            <form onSubmit={handleCreateLocale}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thLangCode')}</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. en"
-                    value={localeForm.languageCode}
-                    onChange={(e) => setLocaleForm({ ...localeForm, languageCode: e.target.value.toLowerCase() })}
-                    style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.countryCodeLabel')}</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. US"
-                    value={localeForm.countryCode}
-                    onChange={(e) => setLocaleForm({ ...localeForm, countryCode: e.target.value.toUpperCase() })}
-                    style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                  />
-                </div>
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thLocaleName')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. English (United States)"
-                  value={localeForm.localeName}
-                  onChange={(e) => setLocaleForm({ ...localeForm, localeName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsLocaleModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('common.save')}</button>
-              </div>
-            </form>
+      <ModalCard
+        isOpen={isLocaleModalOpen}
+        onClose={() => setIsLocaleModalOpen(false)}
+        title={t('config.newLocaleBtn')}
+        subtitle="Register language locale and country identification"
+        icon={Globe}
+        accentStrip="brand"
+        maxWidth="460px"
+        onSubmit={handleCreateLocale}
+        submitting={submitting}
+        submitText={t('common.save')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="form-grid-2">
+            <FormField
+              label={t('config.thLangCode')}
+              required
+              hint="e.g. en, fr, de"
+            >
+              <input
+                type="text"
+                required
+                className="form-control"
+                placeholder="e.g. en"
+                value={localeForm.languageCode}
+                onChange={(e) => setLocaleForm({ ...localeForm, languageCode: e.target.value.toLowerCase() })}
+                style={{ fontFamily: 'monospace' }}
+              />
+            </FormField>
+
+            <FormField
+              label={t('config.countryCodeLabel')}
+              required
+              hint="e.g. US, FR, DE"
+            >
+              <input
+                type="text"
+                required
+                className="form-control"
+                placeholder="e.g. US"
+                value={localeForm.countryCode}
+                onChange={(e) => setLocaleForm({ ...localeForm, countryCode: e.target.value.toUpperCase() })}
+                style={{ fontFamily: 'monospace' }}
+              />
+            </FormField>
           </div>
+
+          <FormField
+            label={t('config.thLocaleName')}
+            required
+          >
+            <input
+              type="text"
+              required
+              className="form-control"
+              placeholder="e.g. English (United States)"
+              value={localeForm.localeName}
+              onChange={(e) => setLocaleForm({ ...localeForm, localeName: e.target.value })}
+            />
+          </FormField>
         </div>
-      )}
+      </ModalCard>
 
       {/* Modal: Add Translation Resource */}
-      {isResourceModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsResourceModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '480px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.addKeyBtn')} ({selectedLocale?.LanguageCode}-{selectedLocale?.CountryCode})</h3>
-            {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
-            <form onSubmit={handleSaveResource}>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thResourceKey')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. button.submit"
-                  value={resourceForm.resourceKey}
-                  onChange={(e) => setResourceForm({ ...resourceForm, resourceKey: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thResourceValue')}</label>
-                <textarea
-                  rows={3}
-                  required
-                  placeholder="e.g. Submit Request"
-                  value={resourceForm.resourceValue}
-                  onChange={(e) => setResourceForm({ ...resourceForm, resourceValue: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsResourceModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('common.save')}</button>
-              </div>
-            </form>
-          </div>
+      <ModalCard
+        isOpen={isResourceModalOpen}
+        onClose={() => setIsResourceModalOpen(false)}
+        title={`${t('config.addKeyBtn')} (${selectedLocale?.LanguageCode}-${selectedLocale?.CountryCode})`}
+        subtitle={selectedLocale ? `Register localized string for ${selectedLocale.LocaleName}` : ''}
+        icon={Languages}
+        accentStrip="purple"
+        maxWidth="480px"
+        onSubmit={handleSaveResource}
+        submitting={submitting}
+        submitText={t('common.save')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <FormField
+            label={t('config.thResourceKey')}
+            required
+            hint="Dotted translation key path, e.g. button.submit"
+          >
+            <input
+              type="text"
+              required
+              className="form-control"
+              placeholder="e.g. button.submit"
+              value={resourceForm.resourceKey}
+              onChange={(e) => setResourceForm({ ...resourceForm, resourceKey: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </FormField>
+
+          <FormField
+            label={t('config.thResourceValue')}
+            required
+          >
+            <textarea
+              rows={3}
+              required
+              className="form-control"
+              placeholder="e.g. Submit Request"
+              value={resourceForm.resourceValue}
+              onChange={(e) => setResourceForm({ ...resourceForm, resourceValue: e.target.value })}
+            />
+          </FormField>
         </div>
-      )}
+      </ModalCard>
     </div>
   );
 }

@@ -3,6 +3,9 @@ import { Plus, Search, Edit3, Trash2, Sliders, CheckCircle, AlertCircle, Refresh
 import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
 import { DATA_TYPES } from '../constants/configConstants';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 
 export default function SystemSettingsTab() {
   const { t } = useTranslation();
@@ -121,20 +124,7 @@ export default function SystemSettingsTab() {
 
         <button
           onClick={() => handleOpenModal()}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 18px',
-            borderRadius: 'var(--border-radius-sm)',
-            background: 'var(--accent-gradient)',
-            color: 'white',
-            border: 'none',
-            fontWeight: '600',
-            fontSize: '0.88rem',
-            cursor: 'pointer',
-            boxShadow: 'var(--glow-accent)'
-          }}
+          className="btn btn-primary"
         >
           <Plus size={16} /> {t('config.newSettingBtn')}
         </button>
@@ -180,42 +170,18 @@ export default function SystemSettingsTab() {
                   </td>
                   <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{item.Description || '—'}</td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
+                    <ActionGroup align="right">
+                      <ActionButton
+                        variant="edit"
                         onClick={() => handleOpenModal(item)}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid var(--glass-border)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--text-secondary)'
-                        }}
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                      <button
+                        title={t('common.edit')}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDelete(item.SystemSettingID)}
-                        style={{
-                          background: 'rgba(239, 68, 68, 0.1)',
-                          border: '1px solid rgba(239, 68, 68, 0.2)',
-                          borderRadius: '6px',
-                          width: '32px',
-                          height: '32px',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          color: 'var(--color-danger)'
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                        title={t('common.delete')}
+                      />
+                    </ActionGroup>
                   </td>
                 </tr>
               ))}
@@ -224,101 +190,79 @@ export default function SystemSettingsTab() {
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '540px', padding: '28px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '20px' }}>
-              {editingItem ? t('config.editSettingTitle') : t('config.createSettingTitle')}
-            </h3>
+      <ModalCard
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingItem ? t('config.editSettingTitle') : t('config.createSettingTitle')}
+        subtitle="Manage dynamic global parameters, secrets, and environment behaviors"
+        icon={Sliders}
+        accentStrip="brand"
+        maxWidth="540px"
+        onSubmit={handleSubmit}
+        submitting={submitting}
+        submitText={submitting ? t('common.save') : editingItem ? t('config.updateSettingBtn') : t('config.createSettingBtn')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <div className="form-grid-2">
+          <FormField label={t('config.categoryCodeLabel')} required>
+            <input
+              type="text"
+              className="form-control"
+              required
+              value={formData.categoryCode}
+              onChange={(e) => setFormData({ ...formData, categoryCode: e.target.value })}
+            />
+          </FormField>
 
-            {error && (
-              <div style={{ padding: '10px 14px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={16} /> {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.categoryCodeLabel')}</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.categoryCode}
-                    onChange={(e) => setFormData({ ...formData, categoryCode: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.dataTypeLabel')}</label>
-                  <select
-                    value={formData.dataType}
-                    onChange={(e) => setFormData({ ...formData, dataType: e.target.value })}
-                    style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                  >
-                    {DATA_TYPES.map((dt) => (
-                      <option key={dt} value={dt} style={{ background: 'var(--bg-secondary)' }}>{dt}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.settingKeyLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  disabled={!!editingItem}
-                  placeholder="e.g. SYSTEM_DEFAULT_TIMEZONE"
-                  value={formData.settingKey}
-                  onChange={(e) => setFormData({ ...formData, settingKey: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.settingValueLabel')}</label>
-                <textarea
-                  rows={3}
-                  required
-                  placeholder="Enter setting value..."
-                  value={formData.settingValue}
-                  onChange={(e) => setFormData({ ...formData, settingValue: e.target.value })}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>{t('config.descriptionLabel')}</label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder={t('config.descriptionPlaceholder')}
-                  style={{ width: '100%', padding: '10px 14px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ padding: '10px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{ padding: '10px 20px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  {submitting ? t('common.save') : editingItem ? t('config.updateSettingBtn') : t('config.createSettingBtn')}
-                </button>
-              </div>
-            </form>
-          </div>
+          <FormField label={t('config.dataTypeLabel')} required>
+            <select
+              className="form-control"
+              value={formData.dataType}
+              onChange={(e) => setFormData({ ...formData, dataType: e.target.value })}
+            >
+              {DATA_TYPES.map((dt) => (
+                <option key={dt} value={dt}>{dt}</option>
+              ))}
+            </select>
+          </FormField>
         </div>
-      )}
+
+        <FormField label={t('config.settingKeyLabel')} required icon={Sliders}>
+          <input
+            type="text"
+            className="form-control"
+            required
+            disabled={!!editingItem}
+            placeholder="e.g. SYSTEM_DEFAULT_TIMEZONE"
+            value={formData.settingKey}
+            onChange={(e) => setFormData({ ...formData, settingKey: e.target.value })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
+
+        <FormField label={t('config.settingValueLabel')} required>
+          <textarea
+            rows={3}
+            className="form-control"
+            required
+            placeholder="Enter setting value..."
+            value={formData.settingValue}
+            onChange={(e) => setFormData({ ...formData, settingValue: e.target.value })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
+
+        <FormField label={t('config.descriptionLabel')} hint={t('config.descriptionPlaceholder')}>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder={t('config.descriptionPlaceholder')}
+          />
+        </FormField>
+      </ModalCard>
     </div>
   );
 }

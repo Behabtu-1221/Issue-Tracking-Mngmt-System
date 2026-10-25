@@ -7,8 +7,13 @@ const authenticate = async (req, res, next) => {
   let token = null;
 
   if (authHeader?.startsWith('Bearer ')) {
-    token = authHeader.slice(7);
-  } else if (req.query?.token) {
+    const candidate = authHeader.slice(7).trim();
+    if (candidate && candidate !== 'null' && candidate !== 'undefined') {
+      token = candidate;
+    }
+  }
+
+  if (!token && req.query?.token && req.query.token !== 'null' && req.query.token !== 'undefined') {
     token = req.query.token;
   }
 
@@ -17,7 +22,18 @@ const authenticate = async (req, res, next) => {
   }
 
   try {
-    const decoded = verifyAccessToken(token);
+    let decoded;
+    try {
+      decoded = verifyAccessToken(token);
+    } catch (err) {
+      // If header token was expired/invalid, try query token if available
+      if (req.query?.token && req.query.token !== token && req.query.token !== 'null') {
+        decoded = verifyAccessToken(req.query.token);
+      } else {
+        throw err;
+      }
+    }
+
     const account = await userAccountRepository.findAuthContextByUserId(decoded.userId);
 
     if (!account || !account.IsActive || (account.AccountStatusCode !== 'ACTIVE' && account.AccountStatusCode !== 'MUST_CHANGE_PASSWORD')) {

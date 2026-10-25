@@ -3,9 +3,11 @@ import { History, Send, RefreshCw } from 'lucide-react';
 import NotifDeliveryLogTab from '../components/NotifDeliveryLogTab';
 import SendNotificationModal from '../components/SendNotificationModal';
 import { useAuth } from '../../authentication/contexts/AuthContext';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function NotifDeliveryLogPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const userRole = (user?.role || user?.RoleName || '').toUpperCase();
   const isStaff = ['SUPER_ADMIN', 'PARK_ADMIN', 'DEPARTMENT_MANAGER', 'TECHNICIAN', 'STAFF', 'ADMIN'].some(r => userRole.includes(r)) || !userRole;
 
@@ -22,10 +24,10 @@ export default function NotifDeliveryLogPage() {
             color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px'
           }}>
             <History size={28} color="#8b5cf6" />
-            Delivery Audit Log & SMTP Trace
+            {t('notifications.deliveryLogTab.title', 'Delivery Audit Log & SMTP Trace')}
           </h1>
           <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            Historical log of dispatched emails, transmission latency, delivery status & error tracebacks
+            {t('notifications.deliveryLogTab.subtitle', 'Historical log of dispatched emails, transmission latency, delivery status & error tracebacks')}
           </p>
         </div>
 
@@ -50,7 +52,7 @@ export default function NotifDeliveryLogPage() {
               }}
             >
               <Send size={15} />
-              <span>Dispatch / Test Email</span>
+              <span>{t('notifications.sendNotifBtn', 'Dispatch / Test Email')}</span>
             </button>
           )}
 
@@ -75,7 +77,7 @@ export default function NotifDeliveryLogPage() {
             onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
           >
             <RefreshCw size={14} />
-            <span>Refresh</span>
+            <span>{t('common.refresh', 'Refresh')}</span>
           </button>
         </div>
       </div>

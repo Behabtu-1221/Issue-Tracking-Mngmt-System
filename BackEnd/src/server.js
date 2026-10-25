@@ -55,8 +55,9 @@ const startServer = async () => {
     appLifecycle.isReady = true;
 
     // 6. Bind HTTP listener
-    const server = app.listen(PORT, () => {
-      logger.info(`🚀 Server running in ${env.NODE_ENV} mode on port ${PORT}`);
+    const HOST = env.HOST || '0.0.0.0';
+    const server = app.listen(PORT, HOST, () => {
+      logger.info(`🚀 Server running in ${env.NODE_ENV} mode on port ${PORT} (host: ${HOST})`);
     });
 
     // 7. Register Graceful Shutdown Handlers (SIGTERM / SIGINT)

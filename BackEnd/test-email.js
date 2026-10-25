@@ -9,12 +9,11 @@ const smtpUser = clean(process.env.SMTP_USER);
 const smtpPass = clean(process.env.SMTP_PASS).replace(/\s/g, '');
 
 console.log('='.repeat(60));
-console.log('📧 ADVANCED GMAIL SMTP CONNECTION TEST');
+console.log('ADVANCED GMAIL SMTP CONNECTION TEST');
 console.log('='.repeat(60));
 console.log(`SMTP_USER: ${smtpUser ? '***CONFIGURED***' : 'NOT SET'}`);
 console.log(`SMTP_PASS: ${smtpPass ? '***REDACTED***' : 'NOT SET'}`);
 console.log('='.repeat(60));
-
 async function runTests() {
   const configs = [
     {

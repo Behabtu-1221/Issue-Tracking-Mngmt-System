@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { List, Plus, Edit3, Trash2, RefreshCw, AlertCircle, Layers } from 'lucide-react';
 import { useTranslation } from '../../../i18n';
 import configApi from '../api/configApi';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
+import { ModalCard } from '../../../components/common/ModalCard';
+import { FormField } from '../../../components/common/FormField';
 
 export default function LookupsTab() {
   const { t } = useTranslation();
@@ -238,23 +241,13 @@ export default function LookupsTab() {
                           </span>
                         </td>
                         <td style={{ textAlign: 'right' }}>
-                          <button
-                            onClick={() => handleDeleteValue(val.LookupValueID)}
-                            style={{
-                              background: 'rgba(239, 68, 68, 0.1)',
-                              border: '1px solid rgba(239, 68, 68, 0.2)',
-                              borderRadius: '6px',
-                              width: '32px',
-                              height: '32px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              cursor: 'pointer',
-                              color: 'var(--color-danger)'
-                            }}
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                          <ActionGroup align="right">
+                            <ActionButton
+                              variant="delete"
+                              onClick={() => handleDeleteValue(val.LookupValueID)}
+                              title={t('common.delete')}
+                            />
+                          </ActionGroup>
                         </td>
                       </tr>
                     ))}
@@ -272,89 +265,88 @@ export default function LookupsTab() {
       </div>
 
       {/* Modal: Create Lookup Type */}
-      {isTypeModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsTypeModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '450px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.createLookupTypeTitle')}</h3>
-            {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
-            <form onSubmit={handleCreateType}>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.typeCodeLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. SEVERITY_LEVEL"
-                  value={typeForm.lookupTypeCode}
-                  onChange={(e) => setTypeForm({ ...typeForm, lookupTypeCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.typeNameLabel')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Severity Level"
-                  value={typeForm.lookupTypeName}
-                  onChange={(e) => setTypeForm({ ...typeForm, lookupTypeName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsTypeModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('common.save')}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ModalCard
+        isOpen={isTypeModalOpen}
+        onClose={() => setIsTypeModalOpen(false)}
+        title={t('config.createLookupTypeTitle')}
+        subtitle="Define a distinct lookup category code and descriptive label"
+        icon={Layers}
+        accentStrip="brand"
+        maxWidth="460px"
+        onSubmit={handleCreateType}
+        submitting={submitting}
+        submitText={t('common.save')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <FormField label={t('config.typeCodeLabel')} required icon={Layers}>
+          <input
+            type="text"
+            className="form-control"
+            required
+            placeholder="e.g. SEVERITY_LEVEL"
+            value={typeForm.lookupTypeCode}
+            onChange={(e) => setTypeForm({ ...typeForm, lookupTypeCode: e.target.value.toUpperCase() })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
+        <FormField label={t('config.typeNameLabel')} required>
+          <input
+            type="text"
+            className="form-control"
+            required
+            placeholder="e.g. Severity Level"
+            value={typeForm.lookupTypeName}
+            onChange={(e) => setTypeForm({ ...typeForm, lookupTypeName: e.target.value })}
+          />
+        </FormField>
+      </ModalCard>
 
       {/* Modal: Create Lookup Value */}
-      {isValueModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsValueModalOpen(false)}>
-          <div className="glass-panel modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '450px', padding: '24px', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>{t('config.createLookupValueTitle')} ({selectedType?.LookupTypeCode})</h3>
-            {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '12px' }}>{error}</div>}
-            <form onSubmit={handleCreateValue}>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thValueCode')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. HIGH"
-                  value={valueForm.lookupValueCode}
-                  onChange={(e) => setValueForm({ ...valueForm, lookupValueCode: e.target.value.toUpperCase() })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', fontFamily: 'monospace' }}
-                />
-              </div>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thValueName')}</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. High Priority"
-                  value={valueForm.lookupValueName}
-                  onChange={(e) => setValueForm({ ...valueForm, lookupValueName: e.target.value })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('config.thDisplayOrder')}</label>
-                <input
-                  type="number"
-                  value={valueForm.displayOrder}
-                  onChange={(e) => setValueForm({ ...valueForm, displayOrder: parseInt(e.target.value, 10) || 0 })}
-                  style={{ width: '100%', padding: '10px', background: 'var(--color-elevated)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)' }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setIsValueModalOpen(false)} style={{ padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'var(--color-text)', cursor: 'pointer' }}>{t('common.cancel')}</button>
-                <button type="submit" disabled={submitting} style={{ padding: '8px 18px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '6px', color: 'white', fontWeight: '600', cursor: 'pointer' }}>{submitting ? t('common.save') : t('config.newLookupValueBtn')}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ModalCard
+        isOpen={isValueModalOpen}
+        onClose={() => setIsValueModalOpen(false)}
+        title={`${t('config.createLookupValueTitle')} (${selectedType?.LookupTypeCode || ''})`}
+        subtitle="Add a selectable value option to this lookup dictionary"
+        icon={List}
+        accentStrip="brand"
+        maxWidth="480px"
+        onSubmit={handleCreateValue}
+        submitting={submitting}
+        submitText={t('config.newLookupValueBtn')}
+        cancelText={t('common.cancel')}
+        error={error}
+      >
+        <FormField label={t('config.thValueCode')} required icon={List}>
+          <input
+            type="text"
+            className="form-control"
+            required
+            placeholder="e.g. HIGH"
+            value={valueForm.lookupValueCode}
+            onChange={(e) => setValueForm({ ...valueForm, lookupValueCode: e.target.value.toUpperCase() })}
+            style={{ fontFamily: 'monospace' }}
+          />
+        </FormField>
+        <FormField label={t('config.thValueName')} required>
+          <input
+            type="text"
+            className="form-control"
+            required
+            placeholder="e.g. High Priority"
+            value={valueForm.lookupValueName}
+            onChange={(e) => setValueForm({ ...valueForm, lookupValueName: e.target.value })}
+          />
+        </FormField>
+        <FormField label={t('config.thDisplayOrder')} hint="Numeric sorting index">
+          <input
+            type="number"
+            className="form-control"
+            value={valueForm.displayOrder}
+            onChange={(e) => setValueForm({ ...valueForm, displayOrder: parseInt(e.target.value, 10) || 0 })}
+          />
+        </FormField>
+      </ModalCard>
     </div>
   );
 }

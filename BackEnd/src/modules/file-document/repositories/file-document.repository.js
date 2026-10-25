@@ -151,10 +151,11 @@ class FileDocumentRepository {
     `);
 
     const recentUploads = await query(`
-      SELECT d.*, c.CategoryName, u.Username as UploaderName
+      SELECT d.*, c.CategoryName, COALESCE(ua.Username, CONCAT(u.FirstName, ' ', u.LastName)) as UploaderName
       FROM sys_documents d
       LEFT JOIN sys_document_categories c ON d.CategoryID = c.CategoryID
       LEFT JOIN \`User\` u ON d.UploadedBy = u.UserID
+      LEFT JOIN UserAccount ua ON ua.UserID = u.UserID
       ${whereClause}
       ORDER BY d.CreatedAt DESC LIMIT 5
     `, params);
@@ -204,10 +205,12 @@ class FileDocumentRepository {
 
     const listSql = `
       SELECT d.*, c.CategoryName, c.CategoryCode, c.Icon as CategoryIcon,
-             u.Username as UploaderName, u.FirstName as UploaderFirstName, u.LastName as UploaderLastName
+             COALESCE(ua.Username, CONCAT(u.FirstName, ' ', u.LastName)) as UploaderName,
+             u.FirstName as UploaderFirstName, u.LastName as UploaderLastName
       FROM sys_documents d
       LEFT JOIN sys_document_categories c ON d.CategoryID = c.CategoryID
       LEFT JOIN \`User\` u ON d.UploadedBy = u.UserID
+      LEFT JOIN UserAccount ua ON ua.UserID = u.UserID
       WHERE ${whereSql}
       ORDER BY d.CreatedAt DESC
       LIMIT ? OFFSET ?
@@ -224,10 +227,12 @@ class FileDocumentRepository {
   async findById(documentId) {
     const sql = `
       SELECT d.*, c.CategoryName, c.CategoryCode, c.Icon as CategoryIcon,
-             u.Username as UploaderName, u.Email as UploaderEmail
+             COALESCE(ua.Username, CONCAT(u.FirstName, ' ', u.LastName)) as UploaderName,
+             u.Email as UploaderEmail
       FROM sys_documents d
       LEFT JOIN sys_document_categories c ON d.CategoryID = c.CategoryID
       LEFT JOIN \`User\` u ON d.UploadedBy = u.UserID
+      LEFT JOIN UserAccount ua ON ua.UserID = u.UserID
       WHERE d.DocumentID = ?
     `;
     const res = await query(sql, [documentId]);
@@ -371,9 +376,10 @@ class FileDocumentRepository {
 
   async findVersionsByDocumentId(documentId) {
     const sql = `
-      SELECT v.*, u.Username as UploaderName
+      SELECT v.*, COALESCE(ua.Username, CONCAT(u.FirstName, ' ', u.LastName)) as UploaderName
       FROM sys_document_versions v
       LEFT JOIN \`User\` u ON v.UploadedBy = u.UserID
+      LEFT JOIN UserAccount ua ON ua.UserID = u.UserID
       WHERE v.DocumentID = ?
       ORDER BY v.VersionNumber DESC
     `;

@@ -7,7 +7,6 @@ import {
   AlertTriangle,
   BarChart3,
   ListChecks,
-  BookOpen,
   RefreshCw,
   Zap,
   TrendingUp
@@ -18,12 +17,10 @@ import IssueDetailView from '../components/IssueDetailView';
 import CreateIssueModal from '../components/CreateIssueModal';
 import AssignIssueModal from '../components/AssignIssueModal';
 import StatusUpdateModal from '../components/StatusUpdateModal';
-import KnownIssuesTab from '../components/KnownIssuesTab';
 import { useTranslation } from '../../../i18n';
 
 export default function IssueManagementPage() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('issues');
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [metrics, setMetrics] = useState(null);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
@@ -205,45 +202,7 @@ export default function IssueManagementPage() {
         })}
       </div>
 
-      {/* Navigation Tabs */}
-      {!selectedIssue && (
-        <div style={{ borderBottom: '1px solid var(--glass-border)', display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
-          {[
-            { id: 'issues', label: t('issues.tabIssueRequests', 'Issue Requests'), icon: ListChecks },
-            { id: 'knowledge', label: t('issues.tabKnowledgeBase', 'Knowledge Base'), icon: BookOpen }
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 20px',
-                  backgroundColor: isActive ? 'rgba(138, 75, 255, 0.15)' : 'transparent',
-                  border: 'none',
-                  borderBottom: isActive ? '3px solid var(--accent-primary)' : '3px solid transparent',
-                  borderRadius: '8px 8px 0 0',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
-                  fontWeight: isActive ? '700' : '500',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                <Icon size={18} style={{ color: isActive ? 'var(--accent-primary)' : 'var(--text-muted)' }} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Tab Content */}
+      {/* Content */}
       <div>
         {selectedIssue ? (
           <IssueDetailView
@@ -251,7 +210,7 @@ export default function IssueManagementPage() {
             onBack={handleBackToList}
             onRefresh={handleRefreshAll}
           />
-        ) : activeTab === 'issues' ? (
+        ) : (
           <IssueListTab
             onSelectIssue={handleSelectIssue}
             onOpenCreateModal={() => setShowCreateModal(true)}
@@ -259,9 +218,7 @@ export default function IssueManagementPage() {
             onOpenStatusModal={(issue) => setStatusModalIssue(issue)}
             refreshKey={refreshKey}
           />
-        ) : activeTab === 'knowledge' ? (
-          <KnownIssuesTab />
-        ) : null}
+        )}
       </div>
 
       {/* Modals */}

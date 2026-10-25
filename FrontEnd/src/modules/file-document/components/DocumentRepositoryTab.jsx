@@ -6,6 +6,7 @@ import {
   Layers, Folder, ExternalLink, ChevronRight, File
 } from 'lucide-react';
 import fileDocumentApi from '../api/fileDocumentApi';
+import { ActionButton, ActionGroup } from '../../../components/common/ActionButton';
 
 export default function DocumentRepositoryTab() {
   const [documents, setDocuments] = useState([]);
@@ -66,6 +67,21 @@ export default function DocumentRepositoryTab() {
   useEffect(() => {
     fetchDocuments();
   }, [search, categoryFilter, sensitiveFilter, archivedFilter]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showUploadModal) setShowUploadModal(false);
+        if (showVersionModal) setShowVersionModal(false);
+        if (showShareModal) setShowShareModal(false);
+        if (showPreviewModal) setShowPreviewModal(false);
+      }
+    };
+    if (showUploadModal || showVersionModal || showShareModal || showPreviewModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showUploadModal, showVersionModal, showShareModal, showPreviewModal]);
 
   const fetchCategories = async () => {
     try {
@@ -395,67 +411,61 @@ export default function DocumentRepositoryTab() {
                   By {doc.UploaderName || 'System'}
                 </div>
 
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button
+                <ActionGroup align="right">
+                  <ActionButton
+                    variant="neutral"
                     onClick={() => handleOpenPreview(doc)}
                     title="Preview File"
-                    style={{ padding: '6px 9px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                  >
-                    <Eye size={15} />
-                  </button>
+                    icon={<Eye size={14} />}
+                  />
 
                   <a
                     href={fileDocumentApi.getDownloadUrl(doc.DocumentID)}
                     download
                     title="Download File"
-                    style={{ padding: '6px 9px', borderRadius: '8px', background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+                    className="action-btn action-btn-primary"
                   >
-                    <Download size={15} />
+                    <Download size={14} />
                   </a>
 
-                  <button
+                  <ActionButton
+                    variant="neutral"
                     onClick={() => handleOpenVersions(doc)}
                     title="Version History"
-                    style={{ padding: '6px 9px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                  >
-                    <History size={15} />
-                  </button>
+                    icon={<History size={14} />}
+                  />
 
-                  <button
+                  <ActionButton
+                    variant="neutral"
                     onClick={() => handleOpenShare(doc)}
                     title="Share Document"
-                    style={{ padding: '6px 9px', borderRadius: '8px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                  >
-                    <Share2 size={15} />
-                  </button>
+                    icon={<Share2 size={14} />}
+                  />
 
                   {archivedFilter === '0' ? (
-                    <button
+                    <ActionButton
+                      variant="delete"
                       onClick={() => handleArchive(doc.DocumentID)}
                       title="Archive Document"
-                      style={{ padding: '6px 9px', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', cursor: 'pointer' }}
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                      icon={<Trash2 size={14} />}
+                    />
                   ) : (
                     <>
-                      <button
+                      <ActionButton
+                        variant="success"
                         onClick={() => handleRestore(doc.DocumentID)}
                         title="Restore Document"
-                        style={{ padding: '6px 9px', borderRadius: '8px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80', cursor: 'pointer' }}
-                      >
-                        <RefreshCw size={15} />
-                      </button>
-                      <button
+                        icon={<RefreshCw size={14} />}
+                      />
+                      <ActionButton
+                        variant="delete"
                         onClick={() => handleDeletePermanent(doc.DocumentID)}
                         title="Permanent Delete"
-                        style={{ padding: '6px 9px', borderRadius: '8px', background: 'rgba(239,68,68,0.2)', border: '1px solid #ef4444', color: '#ef4444', cursor: 'pointer' }}
-                      >
-                        <X size={15} />
-                      </button>
+                        icon={<X size={14} />}
+                      />
                     </>
                   )}
-                </div>
+                </ActionGroup>
               </div>
             </div>
           ))}
@@ -464,8 +474,8 @@ export default function DocumentRepositoryTab() {
 
       {/* ── UPLOAD MODAL ── */}
       {showUploadModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '580px', padding: '28px', borderRadius: '20px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
+        <div onClick={() => setShowUploadModal(false)} style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div role="dialog" aria-modal="true" className="modal-card accent-strip-brand enterprise-card" style={{ width: '100%', maxWidth: '580px', padding: '28px', borderRadius: 'var(--border-radius-lg, 18px)', boxShadow: 'var(--modal-shadow, 0 20px 50px rgba(0,0,0,0.5))', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Upload size={22} color="var(--accent-primary)" /> Upload Document to Repository
@@ -637,8 +647,8 @@ export default function DocumentRepositoryTab() {
 
       {/* ── VERSIONS MODAL ── */}
       {showVersionModal && selectedDocForVersion && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '640px', padding: '28px', borderRadius: '20px' }}>
+        <div onClick={() => setShowVersionModal(false)} style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div role="dialog" aria-modal="true" className="modal-card accent-strip-brand enterprise-card" style={{ width: '100%', maxWidth: '640px', padding: '28px', borderRadius: 'var(--border-radius-lg, 18px)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Version History & Control</h3>
@@ -701,8 +711,8 @@ export default function DocumentRepositoryTab() {
 
       {/* ── SHARE MODAL ── */}
       {showShareModal && selectedDocForShare && (
-        <div style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '520px', padding: '28px', borderRadius: '20px' }}>
+        <div onClick={() => setShowShareModal(false)} style={{ position: 'fixed', inset: 0, background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div role="dialog" aria-modal="true" className="modal-card accent-strip-brand enterprise-card" style={{ width: '100%', maxWidth: '520px', padding: '28px', borderRadius: 'var(--border-radius-lg, 18px)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>

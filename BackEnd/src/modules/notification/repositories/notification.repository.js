@@ -8,6 +8,8 @@ export const notificationRepository = {
         NotificationID BIGINT NOT NULL,
         UserID BIGINT NOT NULL,
         ChannelCode VARCHAR(30) NOT NULL DEFAULT 'IN_APP',
+        CustomTitle VARCHAR(255) NULL,
+        CustomMessage TEXT NULL,
         IsRead TINYINT NOT NULL DEFAULT 0,
         ReadDateTime DATETIME(6) NULL,
         IsActive TINYINT NOT NULL DEFAULT 1,
@@ -17,6 +19,16 @@ export const notificationRepository = {
         INDEX idx_usernotif_user (UserID, IsRead, IsDeleted)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+
+    // Ensure CustomTitle & CustomMessage columns exist on existing UserNotification table
+    const existingCols = await query(`SHOW COLUMNS FROM UserNotification`);
+    const colNames = existingCols.map(c => c.Field);
+    if (!colNames.includes('CustomTitle')) {
+      await query(`ALTER TABLE UserNotification ADD COLUMN CustomTitle VARCHAR(255) NULL AFTER ChannelCode`);
+    }
+    if (!colNames.includes('CustomMessage')) {
+      await query(`ALTER TABLE UserNotification ADD COLUMN CustomMessage TEXT NULL AFTER CustomTitle`);
+    }
 
     await query(`
       CREATE TABLE IF NOT EXISTS NotificationLog (
@@ -48,6 +60,190 @@ export const notificationRepository = {
         CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+
+    // Seed Enterprise Notification Types
+    const enterpriseTypes = [
+      { code: 'ISSUE_CREATED', name: 'Ticket Submitted & Acknowledged' },
+      { code: 'APPROVAL_REQUIRED', name: 'Department Review Required' },
+      { code: 'HIGHER_APPROVAL_REQUIRED', name: 'Executive Administrator Review Required' },
+      { code: 'DEPARTMENT_APPROVED', name: 'Department Approved & Forwarded' },
+      { code: 'APPROVAL_COMPLETED', name: 'All Approvals Completed' },
+      { code: 'ISSUE_APPROVED_FOR_DISPATCH', name: 'Ticket Approved for Dispatch' },
+      { code: 'APPROVAL_REJECTED', name: 'Approval Request Declined' },
+      { code: 'ISSUE_ASSIGNED', name: 'Work Order Assigned' },
+      { code: 'ASSIGNMENT_REASSIGNED', name: 'Work Order Reassigned' },
+      { code: 'REQUEST_STATUS_CHANGED', name: 'Ticket Status Updated' },
+      { code: 'REQUEST_PROGRESS_UPDATED', name: 'Technician Progress & Milestone Update' },
+      { code: 'SLA_WARNING', name: 'SLA Milestone Approaching' },
+      { code: 'SLA_BREACH', name: 'SLA Threshold Breached' },
+      { code: 'ISSUE_RESOLVED', name: 'Work Completed & Ready for Verification' },
+      { code: 'REQUEST_CLOSED', name: 'Ticket Closed & Completed' },
+      { code: 'REQUEST_CANCELLED', name: 'Ticket Cancelled' },
+      { code: 'REQUEST_REOPENED', name: 'Ticket Reopened' },
+      { code: 'NEW_COMMENT_ADDED', name: 'New Activity & Comment' },
+      { code: 'PARTS_REQUIRED', name: 'Materials / Spare Parts Requested' },
+      { code: 'MAINTENANCE_SCHEDULED', name: 'Scheduled Maintenance Advisory' }
+    ];
+
+    for (const t of enterpriseTypes) {
+      await query(
+        `INSERT INTO NotificationType (TypeCode, TypeName, IsActive, IsDeleted, CreatedBy)
+         SELECT ?, ?, 1, 0, 1
+         WHERE NOT EXISTS (SELECT 1 FROM NotificationType WHERE TypeCode = ? AND IsDeleted = 0)`,
+        [t.code, t.name, t.code]
+      );
+    }
+
+    // Seed Enterprise Notification Templates (for both IN_APP and EMAIL channels)
+    const existingChannels = await query(`SELECT NotificationChannelID, ChannelCode FROM NotificationChannel WHERE IsDeleted = 0`);
+    const inAppChannel = existingChannels.find(c => c.ChannelCode === 'IN_APP');
+    const emailChannel = existingChannels.find(c => c.ChannelCode === 'EMAIL');
+    const dbTypes = await query(`SELECT NotificationTypeID, TypeCode FROM NotificationType WHERE IsDeleted = 0`);
+    const typeMap = new Map(dbTypes.map(t => [t.TypeCode, t.NotificationTypeID]));
+
+    const defaultTemplates = [
+      {
+        typeCode: 'ISSUE_CREATED',
+        inApp: 'Ticket #{{requestNumber}} ("{{title}}") has been logged and routed to {{departmentName}}. Priority: {{priority}}.',
+        emailSubject: '[ITMS {{priority}}] Ticket Received: #{{requestNumber}} - {{title}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Your service request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) has been recorded successfully and routed to the <strong>{{departmentName}}</strong> department.</p><p><strong>Priority:</strong> {{priority}}<br><strong>Location:</strong> {{location}}<br><strong>Target Resolution:</strong> {{targetResolution}}</p><p>You will receive automated status notifications as our team reviews and progresses your request.</p>'
+      },
+      {
+        typeCode: 'APPROVAL_REQUIRED',
+        inApp: 'Action Required: Request #{{requestNumber}} ("{{title}}") requires department management review.',
+        emailSubject: '[Action Required] Department Review: Request #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>A new request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) has been submitted and requires your department managerial review.</p><p><strong>Department:</strong> {{departmentName}}<br><strong>Priority:</strong> {{priority}}<br><strong>Estimated Cost:</strong> {{estimatedCost}}</p><p>Please log in to your ITMS Approvals Dashboard to review and take action.</p>'
+      },
+      {
+        typeCode: 'HIGHER_APPROVAL_REQUIRED',
+        inApp: 'Executive Review: Request #{{requestNumber}} ("{{title}}") escalated for Business Park Administrator approval.',
+        emailSubject: '[Executive Review] Administrator Authorization Required: Request #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) has passed department review and requires higher-level Executive Park Administrator authorization.</p><p><strong>Department:</strong> {{departmentName}}<br><strong>Priority:</strong> {{priority}}<br><strong>Escalation Reason:</strong> {{approvalReasons}}</p><p>Please access the executive approvals portal to approve or decline.</p>'
+      },
+      {
+        typeCode: 'DEPARTMENT_APPROVED',
+        inApp: 'Progress Update: Request #{{requestNumber}} approved by department management and forwarded for final review.',
+        emailSubject: '[Update] Department Approved: Request #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Request <strong>#{{requestNumber}}</strong> has received stage 1 approval from {{departmentName}} management and has been forwarded for executive confirmation.</p>'
+      },
+      {
+        typeCode: 'APPROVAL_COMPLETED',
+        inApp: 'Request #{{requestNumber}} ("{{title}}") is fully approved and authorized for execution.',
+        emailSubject: '[Authorized] Full Approval Granted: Request #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>All necessary approvals for request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) have been completed. The request is now cleared for operational execution and dispatch.</p>'
+      },
+      {
+        typeCode: 'ISSUE_APPROVED_FOR_DISPATCH',
+        inApp: 'Ready for Dispatch: Approved Request #{{requestNumber}} is queued for technician assignment in {{departmentName}}.',
+        emailSubject: '[Dispatch Queue] Approved Ticket Ready: #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Authorized request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) is now in the dispatch queue for <strong>{{departmentName}}</strong>.</p><p><strong>Priority:</strong> {{priority}}<br><strong>Target Resolution:</strong> {{targetResolution}}</p><p>Please assign an individual technician or service team to begin work.</p>'
+      },
+      {
+        typeCode: 'APPROVAL_REJECTED',
+        inApp: 'Notice: Request #{{requestNumber}} ("{{title}}") was not approved. Remarks: {{remarks}}',
+        emailSubject: '[Notice] Request #{{requestNumber}} Review Update',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Your request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) was reviewed by management and could not be approved at this time.</p><p><strong>Review Remarks:</strong> {{remarks}}</p><p>Please consult with your supervisor or tenant representative if additional clarification is needed.</p>'
+      },
+      {
+        typeCode: 'ISSUE_ASSIGNED',
+        inApp: 'Work Order #{{requestNumber}} ("{{title}}") has been assigned to you. Location: {{location}}.',
+        emailSubject: '[Work Order] Assignment: #{{requestNumber}} - {{title}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>You have been assigned to service request <strong>#{{requestNumber}}</strong>: <em>{{title}}</em>.</p><p><strong>Location:</strong> {{location}}<br><strong>Priority:</strong> {{priority}}<br><strong>Target Resolution:</strong> {{targetResolution}}</p><p>Please acknowledge and begin dispatch execution through the ITMS Work Orders module.</p>'
+      },
+      {
+        typeCode: 'ASSIGNMENT_REASSIGNED',
+        inApp: 'Assignment Transferred: Work Order #{{requestNumber}} reassigned to {{newAssigneeName}}.',
+        emailSubject: '[Assignment Update] Ticket #{{requestNumber}} Reassigned',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Work order for request <strong>#{{requestNumber}}</strong> has been reassigned to <strong>{{newAssigneeName}}</strong>.</p><p>Remarks: {{remarks}}</p>'
+      },
+      {
+        typeCode: 'REQUEST_STATUS_CHANGED',
+        inApp: 'Status Update: Request #{{requestNumber}} transitioned to status {{status}}.',
+        emailSubject: '[Status Update] Request #{{requestNumber}} is now {{status}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>The status of request <strong>#{{requestNumber}}</strong> has transitioned to <strong>{{status}}</strong>.</p><p>Remarks: {{remarks}}</p>'
+      },
+      {
+        typeCode: 'REQUEST_PROGRESS_UPDATED',
+        inApp: 'Progress Update on #{{requestNumber}}: {{progressPercentage}}% ({{progressMilestone}}). {{remarks}}',
+        emailSubject: '[Progress {{progressPercentage}}%] Field Update on Request #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Technician <strong>{{technicianName}}</strong> updated progress on ticket <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>).</p><p><strong>Progress:</strong> {{progressPercentage}}% ({{progressMilestone}})<br><strong>Status:</strong> {{status}}<br><strong>Work Log / Notes:</strong> {{remarks}}</p><p>You can follow the live resolution timeline in your ITMS dashboard.</p>'
+      },
+      {
+        typeCode: 'SLA_WARNING',
+        inApp: 'SLA Warning: Request #{{requestNumber}} is approaching its service target deadline ({{deadline}}).',
+        emailSubject: '[SLA Warning] Approaching Deadline on Ticket #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p><strong style="color:#d97706">SLA Alert:</strong> Request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) is within 15% of its service level milestone deadline (<strong>{{deadline}}</strong>).</p><p>Please expedite resolution to avoid an SLA breach.</p>'
+      },
+      {
+        typeCode: 'SLA_BREACH',
+        inApp: 'CRITICAL SLA BREACH: Request #{{requestNumber}} has exceeded resolution SLA threshold.',
+        emailSubject: '[CRITICAL SLA BREACH] Escalation on Ticket #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p><strong style="color:#dc2626;font-size:16px">CRITICAL SLA BREACH ESCALATION:</strong></p><p>Request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) has exceeded its SLA threshold for <strong>{{breachType}}</strong>.</p><p><strong>Department:</strong> {{departmentName}}<br><strong>Priority:</strong> {{priority}}</p><p>Immediate supervisory intervention is required.</p>'
+      },
+      {
+        typeCode: 'ISSUE_RESOLVED',
+        inApp: 'Work Completed: Ticket #{{requestNumber}} marked RESOLVED by technician. Please inspect and confirm.',
+        emailSubject: '[Action: Verification] Request #{{requestNumber}} Marked as Resolved',
+        emailBody: '<p>Dear {{recipientName}},</p><p>The assigned technician has resolved request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>).</p><p><strong>Resolution Remarks:</strong> {{remarks}}</p><p>Please inspect the resolution and confirm closure via the portal, or reopen if further attention is required.</p>'
+      },
+      {
+        typeCode: 'REQUEST_CLOSED',
+        inApp: 'Ticket #{{requestNumber}} has been verified and closed. Thank you.',
+        emailSubject: '[Closed] Ticket #{{requestNumber}} Completed',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) has been verified and officially closed.</p><p>Thank you for using the Enterprise ITMS portal.</p>'
+      },
+      {
+        typeCode: 'REQUEST_CANCELLED',
+        inApp: 'Ticket #{{requestNumber}} was cancelled. Reason: {{remarks}}',
+        emailSubject: '[Cancelled] Ticket #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Request <strong>#{{requestNumber}}</strong> was cancelled.</p><p><strong>Reason:</strong> {{remarks}}</p>'
+      },
+      {
+        typeCode: 'REQUEST_REOPENED',
+        inApp: 'Reopened: Ticket #{{requestNumber}} has been reopened. Remarks: {{remarks}}',
+        emailSubject: '[Reopened] Ticket #{{requestNumber}} Reopened for Service',
+        emailBody: '<p>Dear {{recipientName}},</p><p>Request <strong>#{{requestNumber}}</strong> (<em>{{title}}</em>) has been reopened for additional attention.</p><p><strong>Remarks:</strong> {{remarks}}</p>'
+      },
+      {
+        typeCode: 'NEW_COMMENT_ADDED',
+        inApp: 'New Note on #{{requestNumber}} by {{commentAuthor}}: {{commentSnippet}}',
+        emailSubject: '[New Note] Activity on Ticket #{{requestNumber}}',
+        emailBody: '<p>Dear {{recipientName}},</p><p><strong>{{commentAuthor}}</strong> added a note to request <strong>#{{requestNumber}}</strong>:</p><blockquote style="border-left:3px solid #6366f1;padding-left:12px;margin:8px 0;color:#475569">{{commentText}}</blockquote>'
+      }
+    ];
+
+    if (inAppChannel && emailChannel) {
+      for (const tpl of defaultTemplates) {
+        const typeId = typeMap.get(tpl.typeCode);
+        if (!typeId) continue;
+
+        // In-App Template
+        if (tpl.inApp) {
+          await query(
+            `INSERT INTO NotificationTemplate (NotificationTypeID, NotificationChannelID, TemplateCode, TemplateBody, CreatedBy)
+             SELECT ?, ?, ?, ?, 1
+             WHERE NOT EXISTS (
+               SELECT 1 FROM NotificationTemplate 
+               WHERE NotificationTypeID = ? AND NotificationChannelID = ? AND IsDeleted = 0
+             )`,
+            [typeId, inAppChannel.NotificationChannelID, `${tpl.typeCode}_INAPP`, tpl.inApp, typeId, inAppChannel.NotificationChannelID]
+          );
+        }
+
+        // Email Template
+        if (tpl.emailSubject && tpl.emailBody) {
+          await query(
+            `INSERT INTO NotificationTemplate (NotificationTypeID, NotificationChannelID, TemplateCode, TemplateSubject, TemplateBody, CreatedBy)
+             SELECT ?, ?, ?, ?, ?, 1
+             WHERE NOT EXISTS (
+               SELECT 1 FROM NotificationTemplate 
+               WHERE NotificationTypeID = ? AND NotificationChannelID = ? AND IsDeleted = 0
+             )`,
+            [typeId, emailChannel.NotificationChannelID, `${tpl.typeCode}_EMAIL`, tpl.emailSubject, tpl.emailBody, typeId, emailChannel.NotificationChannelID]
+          );
+        }
+      }
+    }
   },
 
   /* ── Overview Metrics ── */
@@ -108,13 +304,15 @@ export const notificationRepository = {
   async createUserNotification(data) {
     await this.initTables();
     const sql = `
-      INSERT INTO UserNotification (NotificationID, UserID, ChannelCode, CreatedBy)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO UserNotification (NotificationID, UserID, ChannelCode, CustomTitle, CustomMessage, CreatedBy)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
     const res = await query(sql, [
       data.NotificationID,
       data.UserID,
       data.ChannelCode || 'IN_APP',
+      data.CustomTitle || null,
+      data.CustomMessage || null,
       data.CreatedBy || 1
     ]);
     return res.insertId;
@@ -124,11 +322,21 @@ export const notificationRepository = {
     await this.initTables();
     let sql = `
       SELECT un.UserNotificationID, un.NotificationID, un.UserID, un.ChannelCode, un.IsRead, un.ReadDateTime, un.CreatedDate,
-        n.Title, n.MessageText, n.TriggeredByTable, n.TriggeredByID, n.CreatedDate AS NotificationDate,
-        nt.TypeCode, nt.TypeName
+        COALESCE(un.CustomTitle, n.Title) AS Title,
+        COALESCE(un.CustomMessage, n.MessageText) AS MessageText,
+        n.TriggeredByTable, n.TriggeredByID, n.CreatedDate AS NotificationDate,
+        nt.TypeCode, nt.TypeName,
+        ir.IssueRequestID, ir.RequestNumber, ir.PriorityCode, ir.StatusCode, ir.CategoryCode,
+        ir.Title AS IssueTitle, ir.Description AS IssueDescription, ir.TargetResolutionDateTime,
+        d.DepartmentName, t.CompanyName AS TenantName,
+        b.BuildingName
       FROM UserNotification un
       JOIN Notification n ON un.NotificationID = n.NotificationID
       LEFT JOIN NotificationType nt ON n.NotificationTypeID = nt.NotificationTypeID
+      LEFT JOIN IssueRequest ir ON (n.TriggeredByTable = 'IssueRequest' AND n.TriggeredByID = ir.IssueRequestID)
+      LEFT JOIN Department d ON ir.AssignedDepartmentID = d.DepartmentID
+      LEFT JOIN Tenant t ON ir.TenantID = t.TenantID
+      LEFT JOIN Building b ON ir.BuildingID = b.BuildingID
       WHERE un.UserID = ? AND un.IsDeleted = 0
     `;
     const params = [Number(userId)];
@@ -155,6 +363,18 @@ export const notificationRepository = {
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
     let sql = `UPDATE UserNotification SET IsRead = 1, ReadDateTime = ? WHERE UserNotificationID = ?`;
     const params = [now, userNotificationId];
+    if (userId) {
+      sql += ` AND UserID = ?`;
+      params.push(Number(userId));
+    }
+    const res = await query(sql, params);
+    return res.affectedRows > 0;
+  },
+
+  async markAsUnread(userNotificationId, userId = null) {
+    await this.initTables();
+    let sql = `UPDATE UserNotification SET IsRead = 0, ReadDateTime = NULL WHERE UserNotificationID = ?`;
+    const params = [userNotificationId];
     if (userId) {
       sql += ` AND UserID = ?`;
       params.push(Number(userId));
@@ -255,7 +475,7 @@ export const notificationRepository = {
         ON np.NotificationTypeID = nt.NotificationTypeID 
        AND np.NotificationChannelID = nc.NotificationChannelID 
        AND np.UserID = ? AND np.IsDeleted = 0
-      WHERE nt.IsDeleted = 0 AND nc.IsDeleted = 0
+      WHERE nt.IsDeleted = 0 AND nc.IsDeleted = 0 AND nc.IsActive = 1 AND nc.ChannelCode != 'SMS'
       ORDER BY nt.NotificationTypeID ASC, nc.NotificationChannelID ASC
     `;
     return await query(sql, [Number(userId)]);
@@ -365,7 +585,7 @@ export const notificationRepository = {
   },
 
   async getNotificationChannels() {
-    return await query(`SELECT * FROM NotificationChannel WHERE IsDeleted = 0 ORDER BY NotificationChannelID ASC`);
+    return await query(`SELECT * FROM NotificationChannel WHERE IsDeleted = 0 AND IsActive = 1 AND ChannelCode != 'SMS' ORDER BY NotificationChannelID ASC`);
   },
 
   /* ── Reminders ── */

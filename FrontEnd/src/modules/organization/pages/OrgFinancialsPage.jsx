@@ -1,15 +1,15 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
 import FinancialsTab from '../components/FinancialsTab';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 export default function OrgFinancialsPage() {
+  const { t } = useTranslation();
+
   return (
     <div>
-      {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-{/* Header */}
         <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-          Financial cost centers, department budget codes, GL accounts, and operational expenditure tracking
+          {t('organization.financialsSubtitle', 'Financial cost centers, department budget codes, GL accounts, and operational expenditure tracking')}
         </p>
       </div>
 

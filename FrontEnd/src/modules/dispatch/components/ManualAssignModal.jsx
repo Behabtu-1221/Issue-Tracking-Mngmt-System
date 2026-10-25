@@ -41,6 +41,11 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
 
   useEffect(() => {
     fetchOptions();
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const fetchOptions = async () => {
@@ -77,7 +82,7 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
       Remarks: remarks
     });
 
-    if (request?.StatusCode && request.StatusCode !== 'APPROVED') {
+    if (request?.StatusCode && !['APPROVED', 'NEW'].includes(request.StatusCode)) {
       const msg = `Cannot assign: Request is currently in '${request.StatusCode}' status. It must complete all required approvals and be in 'APPROVED' status before technician assignment.`;
       setErrorMsg(msg);
       showAlert('Approval Required', msg, 'warning');
@@ -155,17 +160,21 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '24px'
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '8px'
     }}>
       <div
+        className="modal-card accent-strip-brand enterprise-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="manual-assign-modal-title"
         style={{
           width: '100%',
           maxWidth: '980px',
-          maxHeight: '90vh',
+          maxHeight: '94vh',
           display: 'flex',
           flexDirection: 'column',
           padding: '0',
-          borderRadius: '24px',
+          borderRadius: 'var(--border-radius-lg, 18px)',
           border: '1px solid rgba(138, 75, 255, 0.35)',
           overflow: 'hidden',
           boxShadow: '0 30px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(138, 75, 255, 0.2)',
@@ -173,6 +182,7 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
           animation: 'fadeIn 0.25s ease-out',
           position: 'relative'
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Top Multi-Tone Brand Line Accent */}
         <div style={{
@@ -183,7 +193,7 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
 
         {/* Modal Header */}
         <div style={{
-          padding: '20px 28px',
+          padding: '16px 24px',
           borderBottom: '1px solid var(--glass-border)',
           background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%)',
           display: 'flex',
@@ -193,13 +203,14 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              width: '42px', height: '42px', borderRadius: '14px',
+              width: '38px', height: '38px', borderRadius: '10px',
               background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
               color: '#ffffff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 6px 18px rgba(99, 102, 241, 0.35)'
+              boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+              flexShrink: 0
             }}>
-              <Wrench size={22} />
+              <Wrench size={20} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -210,7 +221,7 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
                   {pBadge.label} PRIORITY
                 </span>
               </div>
-              <h3 style={{ margin: '2px 0 0', fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+              <h3 id="manual-assign-modal-title" style={{ margin: '2px 0 0', fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
                 Service Dispatch & Intelligent Routing
               </h3>
             </div>
@@ -218,13 +229,13 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
 
           <button
             onClick={handleClose}
+            className="btn-icon touch-target-sm"
             style={{
               background: 'rgba(255, 255, 255, 0.06)', border: '1px solid var(--glass-border)',
-              color: 'var(--text-muted)', cursor: 'pointer', padding: '8px', borderRadius: '50%',
+              color: 'var(--text-muted)', cursor: 'pointer', padding: '8px', borderRadius: '8px',
               display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'; e.currentTarget.style.color = '#ef4444'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+            aria-label="Close"
           >
             <X size={18} />
           </button>
@@ -531,19 +542,11 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
             </FormField>
 
             {/* Action Footer Buttons */}
-            <div style={{
-              display: 'flex', justifyContent: 'flex-end', gap: '12px',
-              paddingTop: '16px', borderTop: '1px solid var(--glass-border)', flexShrink: 0
-            }}>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 pt-4 border-t border-[var(--glass-border)] flex-shrink-0">
               <button
                 type="button"
                 onClick={handleClose}
-                style={{
-                  padding: '11px 20px', borderRadius: '12px',
-                  border: '1px solid var(--glass-border)', background: 'transparent',
-                  color: 'var(--text-primary)', fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
+                className="btn btn-secondary w-full sm:w-auto touch-target-sm justify-center"
               >
                 Cancel
               </button>
@@ -551,11 +554,11 @@ export default function ManualAssignModal({ request, onClose, onAssigned }) {
               <button
                 type="submit"
                 disabled={submitting}
+                className="btn btn-primary w-full sm:w-auto touch-target-sm justify-center"
                 style={{
-                  padding: '11px 24px', borderRadius: '12px', border: 'none',
-                  background: 'var(--accent-gradient)', color: '#ffffff', fontWeight: 800,
-                  fontSize: '0.88rem', cursor: submitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                  boxShadow: 'var(--glow-accent)', transition: 'all 0.2s'
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}
               >
                 {submitting ? <RefreshCw size={16} className="animate-spin" /> : <UserCheck size={16} />}

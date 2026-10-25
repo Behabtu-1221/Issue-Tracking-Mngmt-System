@@ -110,11 +110,12 @@ export default function AlertDialogModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="modal-card no-accent-strip"
         style={{
           width: '100%',
           maxWidth: '480px',
           background: 'var(--color-elevated, #20262D)',
-          borderRadius: '24px',
+          borderRadius: 'var(--border-radius-lg, 18px)',
           border: '1px solid var(--color-border, #303841)',
           boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45)',
           overflow: 'hidden',
@@ -225,17 +226,8 @@ export default function AlertDialogModal({
           </div>
 
           {/* Action Footer with Pill Button */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              gap: '12px',
-              paddingTop: '16px',
-              borderTop: '1px solid var(--glass-border, rgba(255, 255, 255, 0.08))'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--text-muted)', marginRight: 'auto' }}>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t border-[var(--glass-border,rgba(255,255,255,0.08))]">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[var(--text-muted)] mr-auto">
               <Info size={14} />
               <span>System Notification</span>
             </div>
@@ -243,6 +235,7 @@ export default function AlertDialogModal({
             <button
               type="button"
               onClick={onClose}
+              className="touch-target-sm justify-center w-full sm:w-auto"
               style={{
                 padding: '10px 26px',
                 borderRadius: '9999px',
@@ -253,7 +246,9 @@ export default function AlertDialogModal({
                 cursor: 'pointer',
                 fontSize: '0.88rem',
                 boxShadow: style.btnShadow,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center'
               }}
             >
               {buttonText}

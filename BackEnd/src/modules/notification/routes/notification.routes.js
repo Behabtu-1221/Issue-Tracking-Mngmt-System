@@ -22,6 +22,7 @@ router.get('/inbox', notificationController.getUserNotifications);
 router.get('/unread-count', notificationController.getUnreadCount);
 router.patch('/read-all', notificationController.markAllRead);
 router.patch('/:id/read', notificationController.markAsRead);
+router.patch('/:id/unread', notificationController.markAsUnread);
 
 // Event Trigger & Dispatch
 router.post('/event', notificationController.notifyEvent);

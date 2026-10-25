@@ -1,0 +1,184 @@
+========================================================================================================================
+ENTERPRISE ISSUE TRACKING MANAGEMENT SYSTEM (ITMS) — API ENDPOINTS INVENTORY
+BASE URL: http://localhost:5000
+FORMAT  : [METHOD] (LEFT) | [FULL URL] (RIGHT)
+========================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 1: SYSTEM HEALTH & DIAGNOSTICS
+# ----------------------------------------------------------------------------------------------------------------------
+GET      http://localhost:5000/api/health
+GET      http://localhost:5000/api/health/live
+GET      http://localhost:5000/api/health/ready
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 2: IDENTITY & ACCESS MANAGEMENT — AUTHENTICATION & SESSIONS
+# ----------------------------------------------------------------------------------------------------------------------
+POST     http://localhost:5000/api/auth/login
+POST     http://localhost:5000/api/auth/refresh
+POST     http://localhost:5000/api/auth/forgot-password
+POST     http://localhost:5000/api/auth/reset-password
+POST     http://localhost:5000/api/auth/logout
+GET      http://localhost:5000/api/auth/me
+PUT      http://localhost:5000/api/auth/profile
+PUT      http://localhost:5000/api/auth/notification-preferences
+POST     http://localhost:5000/api/auth/change-password
+GET      http://localhost:5000/api/auth/sessions
+DELETE   http://localhost:5000/api/auth/sessions/:sessionId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 2: IDENTITY & ACCESS MANAGEMENT — USER ACCOUNTS & PROFILES
+# ----------------------------------------------------------------------------------------------------------------------
+GET      http://localhost:5000/api/users
+POST     http://localhost:5000/api/users
+GET      http://localhost:5000/api/users/:id
+PUT      http://localhost:5000/api/users/:id
+PATCH    http://localhost:5000/api/users/:id/status
+DELETE   http://localhost:5000/api/users/:id
+GET      http://localhost:5000/api/users/:id/sessions
+DELETE   http://localhost:5000/api/users/:id/sessions
+GET      http://localhost:5000/api/users/:id/login-history
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 2: IDENTITY & ACCESS MANAGEMENT — ROLES, PERMISSIONS & RBAC
+# ----------------------------------------------------------------------------------------------------------------------
+GET      http://localhost:5000/api/roles/permissions
+GET      http://localhost:5000/api/roles/audit-logs
+GET      http://localhost:5000/api/roles
+POST     http://localhost:5000/api/roles
+POST     http://localhost:5000/api/roles/assign
+GET      http://localhost:5000/api/roles/:id
+PUT      http://localhost:5000/api/roles/:id
+DELETE   http://localhost:5000/api/roles/:id
+PUT      http://localhost:5000/api/roles/:id/permissions
+POST     http://localhost:5000/api/roles/users/:id/assign
+DELETE   http://localhost:5000/api/roles/users/:id/roles/:roleId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 3: BUSINESS PARK & CAMPUS FACILITY MANAGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+GET      http://localhost:5000/api/parks
+GET      http://localhost:5000/api/parks/metrics
+GET      http://localhost:5000/api/parks/:id
+POST     http://localhost:5000/api/parks
+PUT      http://localhost:5000/api/parks/:id
+DELETE   http://localhost:5000/api/parks/:id
+GET      http://localhost:5000/api/buildings
+GET      http://localhost:5000/api/buildings/:id
+GET      http://localhost:5000/api/buildings/:buildingId/floors
+POST     http://localhost:5000/api/buildings
+PUT      http://localhost:5000/api/buildings/:id
+DELETE   http://localhost:5000/api/buildings/:id
+GET      http://localhost:5000/api/floors
+GET      http://localhost:5000/api/floors/:id
+GET      http://localhost:5000/api/floors/:floorId/offices
+POST     http://localhost:5000/api/floors
+PUT      http://localhost:5000/api/floors/:id
+DELETE   http://localhost:5000/api/floors/:id
+GET      http://localhost:5000/api/offices
+GET      http://localhost:5000/api/offices/:id
+POST     http://localhost:5000/api/offices
+PUT      http://localhost:5000/api/offices/:id
+PATCH    http://localhost:5000/api/offices/:id/status
+DELETE   http://localhost:5000/api/offices/:id
+GET      http://localhost:5000/api/locations
+GET      http://localhost:5000/api/locations/:id
+POST     http://localhost:5000/api/locations
+PUT      http://localhost:5000/api/locations/:id
+DELETE   http://localhost:5000/api/locations/:id
+GET      http://localhost:5000/api/facility-zones
+GET      http://localhost:5000/api/facility-zones/:id
+GET      http://localhost:5000/api/facility-zones/:zoneId/buildings
+POST     http://localhost:5000/api/facility-zones
+PUT      http://localhost:5000/api/facility-zones/:id
+DELETE   http://localhost:5000/api/facility-zones/:id
+GET      http://localhost:5000/api/floor-plans/floor/:floorId
+POST     http://localhost:5000/api/floor-plans
+PUT      http://localhost:5000/api/floor-plans/:id
+DELETE   http://localhost:5000/api/floor-plans/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 4: TENANT ORGANIZATIONS & SPACE ALLOCATIONS
+# ----------------------------------------------------------------------------------------------------------------------
+GET      http://localhost:5000/api/tenants
+GET      http://localhost:5000/api/tenants/metrics
+GET      http://localhost:5000/api/tenants/:id
+POST     http://localhost:5000/api/tenants
+PUT      http://localhost:5000/api/tenants/:id
+PATCH    http://localhost:5000/api/tenants/:id/status
+DELETE   http://localhost:5000/api/tenants/:id
+GET      http://localhost:5000/api/sub-tenants
+GET      http://localhost:5000/api/sub-tenants/:id
+POST     http://localhost:5000/api/sub-tenants
+PUT      http://localhost:5000/api/sub-tenants/:id
+DELETE   http://localhost:5000/api/sub-tenants/:id
+GET      http://localhost:5000/api/tenant-contacts
+GET      http://localhost:5000/api/tenant-contacts/:id
+POST     http://localhost:5000/api/tenant-contacts
+PUT      http://localhost:5000/api/tenant-contacts/:id
+DELETE   http://localhost:5000/api/tenant-contacts/:id
+GET      http://localhost:5000/api/tenant-addresses
+GET      http://localhost:5000/api/tenant-addresses/:id
+POST     http://localhost:5000/api/tenant-addresses
+PUT      http://localhost:5000/api/tenant-addresses/:id
+DELETE   http://localhost:5000/api/tenant-addresses/:id
+GET      http://localhost:5000/api/leases
+GET      http://localhost:5000/api/leases/expiring-soon
+GET      http://localhost:5000/api/leases/:id
+POST     http://localhost:5000/api/leases
+PUT      http://localhost:5000/api/leases/:id
+PATCH    http://localhost:5000/api/leases/:id/status
+DELETE   http://localhost:5000/api/leases/:id
+GET      http://localhost:5000/api/office-allocations
+GET      http://localhost:5000/api/office-allocations/history
+GET      http://localhost:5000/api/office-allocations/:id
+POST     http://localhost:5000/api/office-allocations
+PATCH    http://localhost:5000/api/office-allocations/:id/release
+DELETE   http://localhost:5000/api/office-allocations/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 5: ORGANIZATIONAL STRUCTURE & STAFF MANAGEMENT
+# ----------------------------------------------------------------------------------------------------------------------
+GET      http://localhost:5000/api/departments
+GET      http://localhost:5000/api/departments/:id
+POST     http://localhost:5000/api/departments
+PUT      http://localhost:5000/api/departments/:id
+DELETE   http://localhost:5000/api/departments/:id
+GET      http://localhost:5000/api/departments/:id/locations
+POST     http://localhost:5000/api/departments/:id/locations
+DELETE   http://localhost:5000/api/departments/locations/:locId
+GET      http://localhost:5000/api/teams/eligible-technicians
+GET      http://localhost:5000/api/teams/workload-summary
+GET      http://localhost:5000/api/teams
+GET      http://localhost:5000/api/teams/:id
+POST     http://localhost:5000/api/teams
+PUT      http://localhost:5000/api/teams/:id
+DELETE   http://localhost:5000/api/teams/:id
+GET      http://localhost:5000/api/teams/:id/members
+POST     http://localhost:5000/api/teams/:id/members
+DELETE   http://localhost:5000/api/teams/:id/members/:userId
+GET      http://localhost:5000/api/positions
+GET      http://localhost:5000/api/positions/:id
+POST     http://localhost:5000/api/positions
+PUT      http://localhost:5000/api/positions/:id
+DELETE   http://localhost:5000/api/positions/:id
+GET      http://localhost:5000/api/employee-assignments
+GET      http://localhost:5000/api/employee-assignments/:id
+POST     http://localhost:5000/api/employee-assignments
+PUT      http://localhost:5000/api/employee-assignments/:id
+DELETE   http://localhost:5000/api/employee-assignments/:id
+GET      http://localhost:5000/api/reporting-hierarchies
+GET      http://localhost:5000/api/reporting-hierarchies/:id
+POST     http://localhost:5000/api/reporting-hierarchies
+PUT      http://localhost:5000/api/reporting-hierarchies/:id
+DELETE   http://localhost:5000/api/reporting-hierarchies/:id
+GET      http://localhost:5000/api/financials/cost-centers
+GET      http://localhost:5000/api/financials/cost-centers/:id
+POST     http://localhost:5000/api/financials/cost-centers
+PUT      http://localhost:5000/api/financials/cost-centers/:id
+DELETE   http://localhost:5000/api/financials/cost-centers/:id
+GET      http://localhost:5000/api/financials/budgets
+GET      http://localhost:5000/api/financials/budgets/:id
+POST     http://localhost:5000/api/financials/budgets
+PUT      http://localhost:5000/api/financials/budgets/:id
+DELETE   http://localhost:5000/api/financials/budgets/:id

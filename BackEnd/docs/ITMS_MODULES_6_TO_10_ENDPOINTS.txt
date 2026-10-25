@@ -1,0 +1,118 @@
+========================================================================================================================
+ENTERPRISE ISSUE TRACKING MANAGEMENT SYSTEM (ITMS) — MODULES 6 TO 10 API ENDPOINTS
+BASE URL : http://localhost:5000
+FORMAT   : [METHOD] (LEFT)                    | [FULL URL] (RIGHT)
+========================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 6: SERVICE CATALOG & CATEGORY MAPPINGS (18 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+01. GET      http://localhost:5000/api/service-categories
+02. GET      http://localhost:5000/api/service-categories/:id
+03. POST     http://localhost:5000/api/service-categories
+04. PUT      http://localhost:5000/api/service-categories/:id
+05. DELETE   http://localhost:5000/api/service-categories/:id
+06. GET      http://localhost:5000/api/services
+07. GET      http://localhost:5000/api/services/metrics
+08. GET      http://localhost:5000/api/services/:id
+09. POST     http://localhost:5000/api/services
+10. PUT      http://localhost:5000/api/services/:id
+11. DELETE   http://localhost:5000/api/services/:id
+12. GET      http://localhost:5000/api/service-analytics/metrics
+13. GET      http://localhost:5000/api/category-mappings
+14. GET      http://localhost:5000/api/category-mappings/:id
+15. POST     http://localhost:5000/api/category-mappings
+16. PUT      http://localhost:5000/api/category-mappings/:id
+17. PATCH    http://localhost:5000/api/category-mappings/:id/status
+18. DELETE   http://localhost:5000/api/category-mappings/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 7: ISSUE REQUESTS & TICKET LIFECYCLE MANAGEMENT (21 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+19. GET      http://localhost:5000/api/issues
+20. GET      http://localhost:5000/api/issues/metrics
+21. GET      http://localhost:5000/api/issues/:id
+22. POST     http://localhost:5000/api/issues
+23. PUT      http://localhost:5000/api/issues/:id
+24. POST     http://localhost:5000/api/issues/:id/assign
+25. POST     http://localhost:5000/api/issues/:id/status
+26. POST     http://localhost:5000/api/issues/:id/cancel
+27. POST     http://localhost:5000/api/issues/:id/reopen
+28. POST     http://localhost:5000/api/issues/:id/feedback
+29. GET      http://localhost:5000/api/issues/:id/feedback
+30. DELETE   http://localhost:5000/api/issues/:id
+31. GET      http://localhost:5000/api/issue-investigations/issue/:issueRequestId
+32. POST     http://localhost:5000/api/issue-investigations
+33. DELETE   http://localhost:5000/api/issue-investigations/:id
+34. GET      http://localhost:5000/api/issue-resolutions/issue/:issueRequestId
+35. POST     http://localhost:5000/api/issue-resolutions
+36. DELETE   http://localhost:5000/api/issue-resolutions/:id
+37. GET      http://localhost:5000/api/issue-comments/issue/:issueRequestId
+38. POST     http://localhost:5000/api/issue-comments
+39. DELETE   http://localhost:5000/api/issue-comments/:id
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 8: APPROVAL WORKFLOWS & MANAGERIAL DECISIONS (25 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+40. GET      http://localhost:5000/api/approvals
+41. GET      http://localhost:5000/api/approvals/metrics
+42. GET      http://localhost:5000/api/approvals/pending
+43. GET      http://localhost:5000/api/approvals/by-request/:requestId
+44. GET      http://localhost:5000/api/approvals/:id
+45. POST     http://localhost:5000/api/approvals
+46. POST     http://localhost:5000/api/approvals/decision
+47. GET      http://localhost:5000/api/approval-delegations
+48. GET      http://localhost:5000/api/approval-delegations/:id
+49. POST     http://localhost:5000/api/approval-delegations
+50. PUT      http://localhost:5000/api/approval-delegations/:id
+51. DELETE   http://localhost:5000/api/approval-delegations/:id
+52. GET      http://localhost:5000/api/approval-rules
+53. GET      http://localhost:5000/api/approval-rules/thresholds
+54. GET      http://localhost:5000/api/approval-rules/:id
+55. POST     http://localhost:5000/api/approval-rules/thresholds
+56. POST     http://localhost:5000/api/approval-rules
+57. PUT      http://localhost:5000/api/approval-rules/:id
+58. DELETE   http://localhost:5000/api/approval-rules/:id
+59. GET      http://localhost:5000/api/approval-groups
+60. GET      http://localhost:5000/api/approval-groups/:id
+61. POST     http://localhost:5000/api/approval-groups
+62. PUT      http://localhost:5000/api/approval-groups/:id
+63. POST     http://localhost:5000/api/approval-groups/:id/members
+64. DELETE   http://localhost:5000/api/approval-groups/:id/members/:userId
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 9: TECHNICIAN ASSIGNMENT & DISPATCH WORKBENCH (18 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+65. GET      http://localhost:5000/api/dispatch/overview
+66. GET      http://localhost:5000/api/dispatch/unassigned
+67. GET      http://localhost:5000/api/dispatch/assignments
+68. GET      http://localhost:5000/api/dispatch/assignments/:id
+69. POST     http://localhost:5000/api/dispatch/assign/manual
+70. POST     http://localhost:5000/api/dispatch/assign/auto
+71. POST     http://localhost:5000/api/dispatch/assignments/:id/accept
+72. POST     http://localhost:5000/api/dispatch/assignments/:id/reject
+73. POST     http://localhost:5000/api/dispatch/assignments/:id/start
+74. POST     http://localhost:5000/api/dispatch/assignments/:id/pause
+75. POST     http://localhost:5000/api/dispatch/assignments/:id/resume
+76. POST     http://localhost:5000/api/dispatch/assignments/:id/progress
+77. POST     http://localhost:5000/api/dispatch/assignments/:id/complete
+78. POST     http://localhost:5000/api/dispatch/assignments/:id/escalate
+79. GET      http://localhost:5000/api/dispatch/my-workbench
+80. GET      http://localhost:5000/api/dispatch/technicians
+81. POST     http://localhost:5000/api/dispatch/technicians/availability
+82. POST     http://localhost:5000/api/dispatch/technicians/location
+
+# ----------------------------------------------------------------------------------------------------------------------
+# MODULE 10: SLA POLICIES, MONITORING & ESCALATIONS (11 Endpoints)
+# ----------------------------------------------------------------------------------------------------------------------
+83. GET      http://localhost:5000/api/sla/overview
+84. GET      http://localhost:5000/api/sla/clocks
+85. GET      http://localhost:5000/api/sla/clocks/:id
+86. POST     http://localhost:5000/api/sla/clocks
+87. POST     http://localhost:5000/api/sla/clocks/:id/pause
+88. POST     http://localhost:5000/api/sla/clocks/:id/resume
+89. GET      http://localhost:5000/api/sla/policies
+90. GET      http://localhost:5000/api/sla/policies/:id
+91. POST     http://localhost:5000/api/sla/policies
+92. GET      http://localhost:5000/api/sla/breaches
+93. POST     http://localhost:5000/api/sla/breaches/:id/acknowledge

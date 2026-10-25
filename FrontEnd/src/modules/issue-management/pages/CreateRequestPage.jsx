@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   LifeBuoy, ArrowLeft, Upload, Paperclip, CheckCircle, FileText,
   Trash2, Shield, Clock, Plus, AlertCircle, CheckCircle2, ChevronRight, X,
-  Building2, User, Layers, ShieldCheck, Lock, Mail, Phone, Sparkles
+  Building2, User, Layers, ShieldCheck, Lock, Mail, Phone, Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 import issueManagementApi from '../api/issueManagementApi';
 import serviceCatalogApi from '../../service-catalog/api/serviceCatalogApi';
@@ -39,6 +40,7 @@ export default function CreateRequestPage() {
   });
 
   const [attachedFiles, setAttachedFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
@@ -136,6 +138,36 @@ export default function CreateRequestPage() {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
+      const combined = [...attachedFiles, ...newFiles];
+
+      const check = fileSchemas.validateAttachments(combined);
+      if (!check.isValid) {
+        setError(check.error);
+        return;
+      }
+      setError(null);
+      setAttachedFiles(combined);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFiles = Array.from(e.dataTransfer.files);
       const combined = [...attachedFiles, ...newFiles];
 
       const check = fileSchemas.validateAttachments(combined);
@@ -250,11 +282,8 @@ export default function CreateRequestPage() {
       </div>
 
       {/* Auto-Fetched Requester Profile Information Box */}
-      <div className="glass-panel" style={{
+      <div className="form-card accent-strip-cyan" style={{
         padding: '18px 24px',
-        background: 'linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(124,58,237,0.08) 100%)',
-        borderRadius: '16px',
-        border: '1px solid rgba(37, 99, 235, 0.25)',
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gap: '16px',
@@ -303,149 +332,204 @@ export default function CreateRequestPage() {
       )}
 
       {/* Form Card */}
-      <form onSubmit={handleSubmit} className="glass-panel" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {/* Company & Service Category Selection */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
-              {t('issues.campus', 'Business Park Campus')}
-            </label>
-            <div style={{
-              width: '100%',
-              padding: '10px 14px',
-              borderRadius: '8px',
-              border: '1px solid var(--glass-border)',
-              background: 'rgba(255,255,255,0.03)',
-              color: 'var(--text-primary)',
-              fontSize: '0.9rem',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxSizing: 'border-box'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                <Building2 size={16} color="var(--accent-primary, #0284c7)" style={{ flexShrink: 0 }} />
-                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                  <span style={{ fontWeight: 800 }}>{businessParkName}</span>
-                  {tenantNameDisplay && (
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                      {t('nav.tenants', 'Tenant')}: {tenantNameDisplay}
-                    </span>
-                  )}
+      <form onSubmit={handleSubmit} className="form-card accent-strip-brand enterprise-card" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+        {/* Section 1: Campus Location & Service Category */}
+        <div>
+          <div className="form-section-header">
+            <span className="form-section-number">1</span>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                {t('issues.locationCategoryTitle', 'Campus Location & Service Domain')}
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                {t('issues.locationCategorySubtitle', 'Identify campus premises and service classification')}
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>
+                {t('issues.campus', 'Business Park Campus')}
+              </label>
+              <div style={{
+                width: '100%',
+                padding: '11px 14px',
+                borderRadius: '8px',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-elevated)',
+                color: 'var(--color-text-main)',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxSizing: 'border-box'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                  <Building2 size={16} color="var(--color-primary, #0284c7)" style={{ flexShrink: 0 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <span style={{ fontWeight: 800 }}>{businessParkName}</span>
+                    {tenantNameDisplay && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
+                        {t('nav.tenants', 'Tenant')}: {tenantNameDisplay}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                <Lock size={15} color="var(--color-text-secondary)" title="Registered campus location" />
               </div>
-              <Lock size={15} color="var(--text-muted)" title="Registered campus location" />
+            </div>
+
+            <FormField
+              label={t('issues.category', 'Service Category')}
+              id="ServiceCategoryID"
+              required
+              icon={Layers}
+              error={formErrors.ServiceCategoryID}
+              helpText={t('issues.selectDomain', 'Select domain of request')}
+            >
+              <select
+                id="ServiceCategoryID"
+                value={form.ServiceCategoryID}
+                onChange={e => handleCategorySelect(e.target.value)}
+                className={`enterprise-input ${formErrors.ServiceCategoryID ? 'input-error' : ''}`}
+              >
+                <option value="">{t('issues.chooseCategory', '-- Select Service Category --')}</option>
+                {categoriesList.map(c => (
+                  <option key={c.ServiceCategoryID} value={c.ServiceCategoryID}>
+                    {c.CategoryName} ({c.CategoryCode})
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          </div>
+
+          {/* Specific Service Selection (Optional) */}
+          <div style={{ marginTop: '16px' }}>
+            <FormField
+              label={t('issues.serviceItemOptional', 'Service Catalog Item (Optional)')}
+              id="ServiceID"
+              icon={FileText}
+              error={formErrors.ServiceID}
+              helpText={t('issues.serviceOptionalHelp', 'Optional. Leave blank when raising a typed or ad-hoc request.')}
+            >
+              <select
+                id="ServiceID"
+                value={form.ServiceID}
+                onChange={e => handleServiceSelect(e.target.value)}
+                className={`enterprise-input ${formErrors.ServiceID ? 'input-error' : ''}`}
+              >
+                <option value="">{t('issues.chooseServiceOptional', '-- None / General Request (No Catalog Item) --')}</option>
+                {servicesList
+                  .filter(s => !form.ServiceCategoryID || String(s.ServiceCategoryID) === String(form.ServiceCategoryID))
+                  .map(s => (
+                    <option key={s.ServiceID} value={s.ServiceID}>
+                      {s.ServiceName} ({s.CategoryName || s.CategoryCode || 'General'})
+                    </option>
+                  ))}
+              </select>
+            </FormField>
+            {selectedService && (
+              <div style={{
+                marginTop: '8px',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                background: 'rgba(37,99,235,0.08)',
+                border: '1px solid rgba(37,99,235,0.2)',
+                fontSize: '0.82rem',
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                flexWrap: 'wrap'
+              }}>
+                <span><strong>SLA Target:</strong> {selectedService.SLATargetHours || 24} hours</span>
+                <span><strong>Description:</strong> {selectedService.Description || 'Standard tenant service.'}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Section 2: Urgency & Priority Level */}
+        <div>
+          <div className="form-section-header">
+            <span className="form-section-number">2</span>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                {t('issues.urgencyPriority', 'Urgency & Impact Level')}
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                {t('issues.urgencySubtitle', 'Choose appropriate SLA response priority for facility dispatch')}
+              </p>
             </div>
           </div>
 
           <FormField
-            label={t('issues.category', 'Service Category')}
-            id="ServiceCategoryID"
-            required
-            icon={Layers}
-            error={formErrors.ServiceCategoryID}
-            helpText={t('issues.selectDomain', 'Select domain of request')}
-          >
-            <select
-              id="ServiceCategoryID"
-              value={form.ServiceCategoryID}
-              onChange={e => handleCategorySelect(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: formErrors.ServiceCategoryID ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
-                background: 'var(--bg-tertiary)',
-                color: 'var(--text-primary)',
-                fontSize: '0.9rem',
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-            >
-              <option value="">{t('issues.chooseCategory', '-- Select Service Category --')}</option>
-              {categoriesList.map(c => (
-                <option key={c.ServiceCategoryID} value={c.ServiceCategoryID}>
-                  {c.CategoryName} ({c.CategoryCode})
-                </option>
-              ))}
-            </select>
-          </FormField>
-        </div>
-
-        {/* Specific Service Selection (Optional) */}
-        <div>
-          <FormField
-            label={t('issues.serviceItem', 'Specific Catalog Service (Optional)')}
-            id="ServiceID"
-            icon={FileText}
-            error={formErrors.ServiceID}
-          >
-            <select
-              id="ServiceID"
-              value={form.ServiceID}
-              onChange={e => handleServiceSelect(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: formErrors.ServiceID ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
-                background: 'var(--bg-tertiary)',
-                color: 'var(--text-primary)',
-                fontSize: '0.9rem',
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-            >
-              <option value="">{t('issues.chooseService', '-- General Category Request --')}</option>
-              {servicesList
-                .filter(s => !form.ServiceCategoryID || String(s.ServiceCategoryID) === String(form.ServiceCategoryID))
-                .map(s => (
-                  <option key={s.ServiceID} value={s.ServiceID}>
-                    {s.ServiceName} ({s.CategoryName || s.CategoryCode || 'General'})
-                  </option>
-                ))}
-            </select>
-          </FormField>
-          {selectedService && (
-            <div style={{ marginTop: '8px', padding: '10px 14px', borderRadius: '8px', background: 'rgba(37,99,235,0.1)', border: '1px solid rgba(37,99,235,0.2)', fontSize: '0.8rem', color: '#60a5fa' }}>
-              <strong>SLA Target:</strong> {selectedService.SLATargetHours || 24} hours | <strong>Description:</strong> {selectedService.Description || 'Standard tenant service.'}
-            </div>
-          )}
-        </div>
-
-        {/* Priority */}
-        <div>
-          <FormField
-            label={t('issues.urgencyPriority', 'Urgency / Priority Level')}
+            label=""
             id="PriorityCode"
             required
-            icon={Clock}
             error={formErrors.PriorityCode}
           >
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
               {[
-                { code: 'LOW', label: t('issues.priorityLow', 'Low'), desc: 'Routine request', color: '#94a3b8' },
-                { code: 'MEDIUM', label: t('issues.priorityMedium', 'Medium'), desc: 'Standard response', color: '#60a5fa' },
-                { code: 'HIGH', label: t('issues.priorityHigh', 'High'), desc: 'Important issue', color: '#facc15' },
-                { code: 'URGENT', label: t('issues.priorityUrgent', 'Urgent'), desc: 'Severe impact', color: '#f87171' }
+                { code: 'LOW', label: t('issues.priorityLow', 'Low'), desc: 'Routine request · 48h SLA', color: '#94a3b8', icon: Clock, badge: 'Standard' },
+                { code: 'MEDIUM', label: t('issues.priorityMedium', 'Medium'), desc: 'Normal dispatch · 24h SLA', color: '#38bdf8', icon: Sparkles, badge: 'Normal' },
+                { code: 'HIGH', label: t('issues.priorityHigh', 'High'), desc: 'Urgent response · 8h SLA', color: '#facc15', icon: AlertCircle, badge: 'Important' },
+                { code: 'URGENT', label: t('issues.priorityUrgent', 'Urgent'), desc: 'Critical halt · Immediate', color: '#f87171', icon: AlertTriangle, badge: 'Emergency' }
               ].map(p => {
                 const isSel = form.PriorityCode === p.code;
+                const IconComponent = p.icon;
                 return (
                   <div
                     key={p.code}
                     onClick={() => handleInputChange('PriorityCode', p.code)}
+                    className={`form-selection-tile ${isSel ? 'selected' : ''}`}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleInputChange('PriorityCode', p.code)}
                     style={{
-                      padding: '12px',
-                      borderRadius: '10px',
-                      background: isSel ? 'rgba(37,99,235,0.15)' : 'var(--bg-tertiary)',
-                      border: isSel ? `2px solid ${p.color}` : '1px solid var(--glass-border)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
+                      position: 'relative',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '110px'
                     }}
                   >
-                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: p.color }}>{p.label}</div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{p.desc}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        background: isSel ? `${p.color}25` : 'rgba(255,255,255,0.05)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: p.color,
+                        transition: 'all 0.2s ease'
+                      }}>
+                        <IconComponent size={18} />
+                      </div>
+                      <span style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        padding: '2px 7px',
+                        borderRadius: '12px',
+                        background: isSel ? `${p.color}25` : 'var(--color-elevated)',
+                        color: isSel ? p.color : 'var(--color-text-secondary)',
+                        border: `1px solid ${isSel ? p.color : 'var(--color-border)'}`
+                      }}>
+                        {p.badge}
+                      </span>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 800, color: isSel ? p.color : 'var(--color-text-main)' }}>
+                        {p.label}
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', marginTop: '2px', lineHeight: 1.3 }}>
+                        {p.desc}
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -453,71 +537,74 @@ export default function CreateRequestPage() {
           </FormField>
         </div>
 
-        {/* Subject Title */}
-        <FormField
-          label={t('issues.requestTitle', 'Subject / Request Title')}
-          id="Title"
-          required
-          icon={Sparkles}
-          error={formErrors.Title}
-          helpText="Brief summary of the issue (min 3 characters)."
-        >
-          <input
-            id="Title"
-            type="text"
-            placeholder={t('issues.titlePlaceholder', 'e.g. AC unit in office 304 making loud noise')}
-            value={form.Title}
-            onChange={e => handleInputChange('Title', e.target.value)}
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              borderRadius: '8px',
-              border: formErrors.Title ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
-              background: 'var(--bg-tertiary)',
-              color: 'var(--text-primary)',
-              fontSize: '0.9rem',
-              outline: 'none',
-              boxSizing: 'border-box'
-            }}
-          />
-        </FormField>
-
-        {/* Detailed Description */}
-        <FormField
-          label={t('issues.descriptionDetails', 'Detailed Request Description')}
-          id="Description"
-          required
-          icon={FileText}
-          error={formErrors.Description}
-          helpText="Explain symptoms, locations, and when this started (min 10 characters)."
-        >
-          <textarea
-            id="Description"
-            rows={5}
-            placeholder={t('issues.descPlaceholder', 'Please describe the issue or service required in detail, including specific building, floor, room number, or symptom...')}
-            value={form.Description}
-            onChange={e => handleInputChange('Description', e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px 14px',
-              borderRadius: '8px',
-              border: formErrors.Description ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
-              background: 'var(--bg-tertiary)',
-              color: 'var(--text-primary)',
-              fontSize: '0.9rem',
-              resize: 'vertical',
-              fontFamily: 'inherit',
-              outline: 'none',
-              boxSizing: 'border-box'
-            }}
-          />
-        </FormField>
-
-        {/* File Attachments Uploader */}
+        {/* Section 3: Subject Title & Detailed Description */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
-            {t('issues.attachFiles', 'Upload Supporting Documents / Photos (Optional)')}
-          </label>
+          <div className="form-section-header">
+            <span className="form-section-number">3</span>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                {t('issues.requestDetailsTitle', 'Subject & Issue Description')}
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                {t('issues.requestDetailsSubtitle', 'Provide detailed summary and symptoms for engineering staff')}
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <FormField
+              label={t('issues.requestTitle', 'Subject / Request Title')}
+              id="Title"
+              required
+              icon={Sparkles}
+              error={formErrors.Title}
+              helpText="Brief summary of the issue (min 3 characters)."
+            >
+              <input
+                id="Title"
+                type="text"
+                placeholder={t('issues.titlePlaceholder', 'e.g. AC unit in office 304 making loud noise')}
+                value={form.Title}
+                onChange={e => handleInputChange('Title', e.target.value)}
+                className={`enterprise-input ${formErrors.Title ? 'input-error' : ''}`}
+              />
+            </FormField>
+
+            <FormField
+              label={t('issues.descriptionDetails', 'Detailed Request Description')}
+              id="Description"
+              required
+              icon={FileText}
+              error={formErrors.Description}
+              helpText="Explain symptoms, locations, and when this started (min 10 characters)."
+            >
+              <textarea
+                id="Description"
+                rows={5}
+                placeholder={t('issues.descPlaceholder', 'Please describe the issue or service required in detail, including specific building, floor, room number, or symptom...')}
+                value={form.Description}
+                onChange={e => handleInputChange('Description', e.target.value)}
+                className={`enterprise-input ${formErrors.Description ? 'input-error' : ''}`}
+                style={{ resize: 'vertical' }}
+              />
+            </FormField>
+          </div>
+        </div>
+
+        {/* Section 4: File Attachments Uploader */}
+        <div>
+          <div className="form-section-header">
+            <span className="form-section-number">4</span>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                {t('issues.attachmentsTitle', 'Supporting Documents & Photos')}
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                {t('issues.attachmentsSubtitle', 'Attach diagnostics, screenshots, or equipment photos (Optional)')}
+              </p>
+            </div>
+          </div>
+
           <input
             type="file"
             ref={fileInputRef}
@@ -527,57 +614,99 @@ export default function CreateRequestPage() {
           />
 
           <div
+            className={`enterprise-dropzone ${isDragging ? 'dragover' : ''}`}
             onClick={() => fileInputRef.current?.click()}
-            style={{
-              border: '2px dashed var(--glass-border)',
-              borderRadius: '12px',
-              padding: '24px',
-              textAlign: 'center',
-              cursor: 'pointer',
-              background: 'rgba(255,255,255,0.02)',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
-            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--glass-border)'}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && fileInputRef.current?.click()}
           >
-            <Upload size={28} style={{ color: 'var(--accent-primary)', marginBottom: '8px' }} />
-            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              {t('issues.dragDropBrowse', 'Click to browse or drop files here')}
+            <div className="dropzone-icon" style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '50%',
+              background: 'rgba(37, 99, 235, 0.1)',
+              color: 'var(--color-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 12px'
+            }}>
+              <Upload size={22} />
             </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+            <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+              {t('issues.dragDropBrowse', 'Click to browse or drag and drop files here')}
+            </div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
               {t('issues.fileSupportHint', 'Upload photos, error screenshots, PDFs, or equipment logs (Max 10 MB per file)')}
             </div>
           </div>
 
           {attachedFiles.length > 0 && (
-            <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ marginTop: '14px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '10px' }}>
               {attachedFiles.map((file, idx) => (
                 <div
                   key={idx}
                   style={{
-                    padding: '8px 14px',
-                    borderRadius: '8px',
-                    background: 'var(--bg-tertiary)',
-                    border: '1px solid var(--glass-border)',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    fontSize: '0.83rem'
+                    gap: '10px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
                   }}
+                  className="hover:border-blue-400 hover:shadow-md"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileText size={16} color="var(--accent-primary)" />
-                    <span style={{ fontWeight: 600 }}>{file.name}</span>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                      ({(file.size / 1024).toFixed(1)} KB)
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: 'rgba(37, 99, 235, 0.1)',
+                      color: 'var(--color-primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      <FileText size={16} />
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--color-text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={file.name}>
+                        {file.name}
+                      </div>
+                      <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.72rem' }}>
+                        {(file.size / 1024).toFixed(1)} KB
+                      </div>
+                    </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => removeFile(idx)}
-                    style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer' }}
+                    onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      border: 'none',
+                      borderRadius: '6px',
+                      color: '#f87171',
+                      width: '26px',
+                      height: '26px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      transition: 'all 0.15s ease'
+                    }}
+                    title="Remove attachment"
+                    className="hover:bg-red-500 hover:text-white"
                   >
-                    <Trash2 size={15} />
+                    <Trash2 size={13} />
                   </button>
                 </div>
               ))}
@@ -586,41 +715,12 @@ export default function CreateRequestPage() {
         </div>
 
         {/* Submit Actions */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px', borderTop: '1px solid var(--glass-border)', paddingTop: '20px' }}>
-          <button
-            type="button"
-            onClick={() => navigate('/issues/my-requests')}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '8px',
-              border: '1px solid var(--glass-border)',
-              background: 'var(--bg-tertiary)',
-              color: 'var(--text-secondary)',
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
-          >
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px', borderTop: '1px solid var(--color-border)', paddingTop: '20px' }}>
+          <button type="button" onClick={() => navigate('/issues/my-requests')} className="btn btn-secondary">
             {t('common.cancel', 'Cancel')}
           </button>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              padding: '10px 24px',
-              borderRadius: '8px',
-              border: 'none',
-              background: 'var(--accent-gradient)',
-              color: '#ffffff',
-              fontWeight: 700,
-              cursor: submitting ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 14px rgba(37,99,235,0.35)',
-              opacity: submitting ? 0.7 : 1
-            }}
-          >
+          <button type="submit" disabled={submitting} className="btn btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <Plus size={18} />
             {submitting ? t('issues.submitting', 'Submitting Request...') : t('issues.submitServiceRequest', 'Submit Service Request')}
           </button>

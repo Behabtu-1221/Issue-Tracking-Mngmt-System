@@ -206,28 +206,83 @@ export const emailService = {
   /**
    * Build a professional HTML email wrapper around content.
    */
-  wrapInHtmlEmail(subject, bodyHtml) {
+  wrapInHtmlEmail(subject, bodyHtml, meta = {}) {
+    const priority = meta.priority || '';
+    const requestNumber = meta.requestNumber || '';
+    const status = meta.status || '';
+    const departmentName = meta.departmentName || '';
+
+    const priorityBadge = priority ? `
+      <span style="display:inline-block;padding:3px 10px;font-size:11px;font-weight:700;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px;background:${priority === 'CRITICAL' ? '#fee2e2;color:#b91c1c' : priority === 'HIGH' ? '#fef3c7;color:#b45309' : '#e0e7ff;color:#4338ca'};">
+        ${priority} PRIORITY
+      </span>` : '';
+
+    const summaryCard = (requestNumber || departmentName) ? `
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 18px;margin-bottom:20px">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left">
+              ${requestNumber ? `<span style="font-size:11px;color:#64748b;font-weight:600">TICKET REF: </span><strong style="color:#0f172a;font-size:13px">${requestNumber}</strong>` : ''}
+              ${departmentName ? `<span style="margin-left:14px;font-size:11px;color:#64748b;font-weight:600">DEPARTMENT: </span><strong style="color:#0f172a;font-size:13px">${departmentName}</strong>` : ''}
+            </td>
+            <td align="right">
+              ${priorityBadge}
+            </td>
+          </tr>
+        </table>
+      </div>` : '';
+
+    const portalUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
     return `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif">
-  <div style="max-width:600px;margin:24px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08)">
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#6366f1,#4f46e5);padding:28px 32px">
-      <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700">🔔 ${subject}</h1>
-      <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:13px">Enterprise Issue Tracking Management System</p>
-    </div>
-    <!-- Body -->
-    <div style="padding:28px 32px;color:#334155;font-size:14px;line-height:1.7">
-      ${bodyHtml}
-    </div>
-    <!-- Footer -->
-    <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center">
-      <p style="margin:0;color:#94a3b8;font-size:11px">This is an automated notification. Please do not reply directly to this email.</p>
-      <p style="margin:4px 0 0;color:#94a3b8;font-size:11px">© ${new Date().getFullYear()} Enterprise ITMS Platform</p>
-    </div>
-  </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1f5f9;padding:32px 12px">
+    <tr>
+      <td align="center">
+        <div style="max-width:620px;width:100%;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px -5px rgba(0,0,0,0.06),0 8px 10px -6px rgba(0,0,0,0.04);border:1px solid #e2e8f0">
+          <!-- Corporate Header -->
+          <div style="background:linear-gradient(135deg,#4f46e5 0%,#3730a3 100%);padding:28px 32px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:6px">
+              Enterprise Issue Tracking Management System
+            </div>
+            <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:800;line-height:1.3">
+              ${subject}
+            </h1>
+          </div>
+          <!-- Body Content -->
+          <div style="padding:32px;color:#334155;font-size:14px;line-height:1.7">
+            ${summaryCard}
+            <div style="color:#334155;font-size:14px;line-height:1.75">
+              ${bodyHtml}
+            </div>
+            <!-- Action Button -->
+            <div style="margin-top:28px;text-align:center">
+              <a href="${portalUrl}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#4338ca);color:#ffffff;text-decoration:none;font-weight:700;font-size:13px;padding:12px 28px;border-radius:10px;box-shadow:0 4px 12px rgba(79,70,229,0.35)">
+                Access ITMS Portal &rarr;
+              </a>
+            </div>
+          </div>
+          <!-- Compliance & Security Footer -->
+          <div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center">
+            <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.5">
+              This is an automated system transmission generated by the Enterprise ITMS notification engine.<br>
+              Confidentiality Notice: Intended solely for the designated recipient.
+            </p>
+            <p style="margin:8px 0 0;color:#94a3b8;font-size:11px">
+              &copy; ${new Date().getFullYear()} Enterprise Issue Tracking & Management System. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
   },

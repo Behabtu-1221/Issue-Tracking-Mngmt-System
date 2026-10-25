@@ -5,9 +5,11 @@ import {
   Home, ChevronRight, Activity, ExternalLink, ArrowUpRight,
   BarChart2, Timer, TrendingDown
 } from 'lucide-react';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import slaApi from '../api/slaApi';
 
 export default function SLADashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,32 +34,29 @@ export default function SLADashboardPage() {
   const m = metrics || {};
 
   const kpiCards = [
-    { key: 'compliance', label: 'SLA Compliance Rate', value: loading ? '...' : `${m.complianceRate || 0}%`, sub: 'Overall performance score', icon: CheckCircle2, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)', border: '#4ade80', route: '/sla/clocks' },
-    { key: 'active', label: 'Active SLA Clocks', value: loading ? '...' : (m.activeSLAClocks || 0), sub: 'Timers currently running', icon: Timer, color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.15)', border: '#60a5fa', route: '/sla/clocks' },
-    { key: 'breaches', label: 'Breach Violations', value: loading ? '...' : (m.totalBreaches || 0), sub: `${m.responseBreaches || 0} response / ${m.resolutionBreaches || 0} resolution`, icon: AlertTriangle, color: '#f87171', bg: 'rgba(239, 68, 68, 0.15)', border: '#f87171', route: '/sla/breaches' },
-    { key: 'atrisk', label: 'At-Risk Requests', value: loading ? '...' : (m.atRiskCount || 0), sub: 'Approaching breach threshold', icon: TrendingDown, color: '#facc15', bg: 'rgba(250, 204, 21, 0.15)', border: '#facc15', route: '/sla/breaches' }
+    { key: 'compliance', label: t('sla.complianceRate', 'SLA Compliance Rate'), value: loading ? '...' : `${m.complianceRate || 0}%`, sub: t('sla.complianceScore', 'Overall performance score'), icon: CheckCircle2, color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)', border: '#4ade80', route: '/sla/clocks' },
+    { key: 'active', label: t('sla.activeClocks', 'Active SLA Clocks'), value: loading ? '...' : (m.activeSLAClocks || 0), sub: t('sla.timersRunning', 'Timers currently running'), icon: Timer, color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.15)', border: '#60a5fa', route: '/sla/clocks' },
+    { key: 'breaches', label: t('sla.breachViolations', 'Breach Violations'), value: loading ? '...' : (m.totalBreaches || 0), sub: `${m.responseBreaches || 0} ${t('sla.responseTime', 'response')} / ${m.resolutionBreaches || 0} ${t('sla.resolutionTime', 'resolution')}`, icon: AlertTriangle, color: '#f87171', bg: 'rgba(239, 68, 68, 0.15)', border: '#f87171', route: '/sla/breaches' },
+    { key: 'atrisk', label: t('sla.atRiskRequests', 'At-Risk Requests'), value: loading ? '...' : (m.atRiskCount || 0), sub: t('sla.approachingBreach', 'Approaching breach threshold'), icon: TrendingDown, color: '#facc15', bg: 'rgba(250, 204, 21, 0.15)', border: '#facc15', route: '/sla/breaches' }
   ];
 
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-{/* Header */}
-          <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              SLA Overview & <span className="glow-text">Analytics</span>
-            </h1>
-            <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Service level performance monitoring, breach analytics, escalation tracking & policy governance
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: '0.78rem', fontWeight: 700 }}>
-              <Activity size={14} /> SLA Monitoring Active
-            </span>
-          </div>
-        <div style={{ marginBottom: '24px' }}>
-</div>
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {t('sla.managementTitle', 'SLA Overview & Analytics')}
+          </h1>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+            {t('sla.managementSubtitle', 'Service level performance monitoring, breach analytics, escalation tracking & policy governance')}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: '0.78rem', fontWeight: 700 }}>
+            <Activity size={14} /> {t('sla.monitoringActive', 'SLA Monitoring Active')}
+          </span>
+        </div>
       </div>
 
       {/* KPI Cards Grid */}
@@ -102,11 +101,15 @@ export default function SLADashboardPage() {
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Live SLA Clocks</h3>
-              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>Active response & resolution timers</p>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+                {t('sla.tabs.clocks', 'Live SLA Clocks')}
+              </h3>
+              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                {t('sla.clocksSubtitle', 'Active response & resolution timers')}
+              </p>
             </div>
             <button onClick={() => navigate('/sla/clocks')} style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px' }}>
-              View Clocks <ArrowUpRight size={13} />
+              {t('common.view', 'View Clocks')} <ArrowUpRight size={13} />
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -114,11 +117,15 @@ export default function SLADashboardPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ padding: '10px', borderRadius: '10px', background: 'rgba(96,165,250,0.15)', color: '#60a5fa' }}><Timer size={20} /></div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Active SLA Timer Dashboard</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.activeSLAClocks || 0} clocks running across all requests</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>
+                    {t('sla.activeClocks', 'Active SLA Timer Dashboard')}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {m.activeSLAClocks || 0} {t('sla.timersRunning', 'clocks running across all requests')}
+                  </div>
                 </div>
               </div>
-              <span className="badge badge-info">Live</span>
+              <span className="badge badge-info">{t('sla.running', 'Live')}</span>
             </div>
           </div>
         </div>
@@ -127,20 +134,24 @@ export default function SLADashboardPage() {
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Governance & Compliance</h3>
-              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>Breach violations & policy configuration</p>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+                {t('sla.policies', 'Governance & Compliance')}
+              </h3>
+              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                {t('sla.policiesSubtitle', 'Breach violations & policy configuration')}
+              </p>
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div onClick={() => navigate('/sla/breaches')} style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
               <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(239,68,68,0.15)', color: '#f87171', width: 'fit-content', marginBottom: '10px' }}><AlertTriangle size={18} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Violations</div>
-              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>Breach Log</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('sla.breaches', 'Violations')}</div>
+              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{t('sla.tabs.breaches', 'Breach Log')}</div>
             </div>
             <div onClick={() => navigate('/sla/policies')} style={{ padding: '16px', borderRadius: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--glass-border)', cursor: 'pointer', transition: 'all 0.2s' }}>
               <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(16,185,129,0.15)', color: '#10b981', width: 'fit-content', marginBottom: '10px' }}><ShieldCheck size={18} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Configuration</div>
-              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>SLA Policies</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('sla.policies', 'Configuration')}</div>
+              <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{t('sla.tabs.policies', 'SLA Policies')}</div>
             </div>
           </div>
         </div>
@@ -148,12 +159,12 @@ export default function SLADashboardPage() {
 
       {/* Shortcuts Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--border-radius-md)', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>SLA System Shortcuts</div>
+        <div style={{ fontSize: '0.88rem', fontWeight: 600 }}>{t('common.actions', 'SLA System Shortcuts')}</div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           {[
-            { label: 'SLA Dashboard & Clocks', icon: Clock, route: '/sla/clocks' },
-            { label: 'Breach Log & Violations', icon: AlertTriangle, route: '/sla/breaches' },
-            { label: 'SLA Policies & Targets', icon: ShieldCheck, route: '/sla/policies' }
+            { label: t('sla.tabs.clocks', 'SLA Dashboard & Clocks'), icon: Clock, route: '/sla/clocks' },
+            { label: t('sla.tabs.breaches', 'Breach Log & Violations'), icon: AlertTriangle, route: '/sla/breaches' },
+            { label: t('sla.tabs.policies', 'SLA Policies & Targets'), icon: ShieldCheck, route: '/sla/policies' }
           ].map((s) => {
             const ShortIcon = s.icon;
             return (

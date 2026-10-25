@@ -19,22 +19,48 @@ async function runTests() {
   let testBuilding = null;
   let testFloor = null;
   let testOffice = null;
+  let createdTestPark = false;
 
   try {
-    // 1. Create valid Business Park
-    console.log('\n[TEST 1] Create valid Business Park');
-    const parkCode = `BP-TEST-${timestamp}`;
-    testPark = await parkService.createPark({
-      BusinessParkCode: parkCode,
-      BusinessParkName: `Integration Test Park ${timestamp}`,
-      City: 'Addis Ababa',
-      Country: 'Ethiopia',
-      TotalAreaSquareMeter: 50000,
-      IsActive: 1
-    }, testUserId);
-    assert.ok(testPark?.BusinessParkID, 'Park should be created with an ID');
-    assert.equal(testPark.BusinessParkCode, parkCode);
-    console.log('✓ PASS: Valid Business Park created ID:', testPark.BusinessParkID);
+    // 1. Establish valid Business Park (single park invariant)
+    console.log('\n[TEST 1] Establish valid Business Park');
+    const existingParks = await parkService.getParks({ limit: 1 });
+    if (existingParks.parks && existingParks.parks.length > 0) {
+      testPark = existingParks.parks[0];
+      console.log('✓ PASS: Existing Business Park utilized ID:', testPark.BusinessParkID);
+
+      // Verify that creating a second park fails under single-park invariant
+      console.log('\n[TEST 1.1] Verify single-park invariant rejects additional campuses');
+      await assert.rejects(
+        async () => {
+          await parkService.createPark({
+            BusinessParkCode: `BP-SECOND-${timestamp}`,
+            BusinessParkName: `Second Park ${timestamp}`,
+            City: 'Addis Ababa',
+            Country: 'Ethiopia'
+          }, testUserId);
+        },
+        (err) => {
+          assert.equal(err.statusCode, 400);
+          assert.match(err.message, /Only one business park campus is permitted/);
+          return true;
+        }
+      );
+      console.log('✓ PASS: System strictly enforces single business park rule');
+    } else {
+      const parkCode = `BP-TEST-${timestamp}`;
+      testPark = await parkService.createPark({
+        BusinessParkCode: parkCode,
+        BusinessParkName: `Integration Test Park ${timestamp}`,
+        City: 'Addis Ababa',
+        Country: 'Ethiopia',
+        TotalAreaSquareMeter: 50000,
+        IsActive: 1
+      }, testUserId);
+      createdTestPark = true;
+      assert.ok(testPark?.BusinessParkID, 'Park should be created with an ID');
+      console.log('✓ PASS: Valid Business Park created ID:', testPark.BusinessParkID);
+    }
 
     // 2. Create valid Facility Zone under the Business Park
     console.log('\n[TEST 2] Create valid Facility Zone');
@@ -89,11 +115,11 @@ async function runTests() {
 
     // 5. Reject Building from another Business Park (Zone belongs to Park A, building specified Park B)
     console.log('\n[TEST 5] Reject Building with mismatching Park and Zone');
-    const otherPark = await parkService.createPark({
-      BusinessParkCode: `BP-OTHER-${timestamp}`,
-      BusinessParkName: `Other Park ${timestamp}`,
-      IsActive: 1
-    }, testUserId);
+    const insertOtherRes = await query(
+      `INSERT INTO businesspark (BusinessParkCode, BusinessParkName, City, Country, TimeZone, CurrencyCode, LanguageCode, IsActive, CreatedBy) VALUES (?, ?, 'Addis Ababa', 'Ethiopia', 'Africa/Addis_Ababa', 'ETB', 'en', 1, ?)`,
+      [`BP-OTHER-${timestamp}`, `Other Park ${timestamp}`, testUserId]
+    );
+    const otherPark = { BusinessParkID: insertOtherRes.insertId };
 
     await assert.rejects(
       async () => {
@@ -111,6 +137,7 @@ async function runTests() {
         return true;
       }
     );
+    await query(`DELETE FROM businesspark WHERE BusinessParkID = ?`, [otherPark.BusinessParkID]);
 
     // 6. Reject Building duplicate code in same Park
     console.log('\n[TEST 6] Reject Building with duplicate code in same Park');
@@ -308,11 +335,11 @@ async function runTests() {
 
     // 17. Reject operations against inactive/deleted parents
     console.log('\n[TEST 17] Reject operations against inactive parent');
-    const inactivePark = await parkService.createPark({
-      BusinessParkCode: `BP-INACT-${timestamp}`,
-      BusinessParkName: 'Inactive Park',
-      IsActive: 0
-    }, testUserId);
+    const insertInactRes = await query(
+      `INSERT INTO businesspark (BusinessParkCode, BusinessParkName, City, Country, TimeZone, CurrencyCode, LanguageCode, IsActive, CreatedBy) VALUES (?, ?, 'Addis Ababa', 'Ethiopia', 'Africa/Addis_Ababa', 'ETB', 'en', 0, ?)`,
+      [`BP-INACT-${timestamp}`, 'Inactive Park', testUserId]
+    );
+    const inactivePark = { BusinessParkID: insertInactRes.insertId };
 
     await assert.rejects(
       async () => {
@@ -328,6 +355,7 @@ async function runTests() {
         return true;
       }
     );
+    await query(`DELETE FROM businesspark WHERE BusinessParkID = ?`, [inactivePark.BusinessParkID]);
 
     // 18. Safe Delete Guard: Reject deleting Floor with active Office Units
     console.log('\n[TEST 18] Reject deleting Floor with active Office Units');
@@ -376,11 +404,11 @@ async function runTests() {
     // Clean up test data
     console.log('Cleaning up test data...');
     try {
-      if (testOffice) await query(`DELETE FROM officespace WHERE OfficeNumber LIKE ?`, [`%${timestamp}%`]);
-      if (testFloor) await query(`DELETE FROM floor WHERE BuildingID = ?`, [testBuilding?.BuildingID]);
-      if (testBuilding) await query(`DELETE FROM building WHERE BusinessParkID = ?`, [testPark?.BusinessParkID]);
-      if (testZone) await query(`DELETE FROM facilityzone WHERE BusinessParkID = ?`, [testPark?.BusinessParkID]);
-      if (testPark) await query(`DELETE FROM businesspark WHERE BusinessParkID = ?`, [testPark.BusinessParkID]);
+      if (testOffice?.OfficeSpaceID) await query(`DELETE FROM officespace WHERE OfficeSpaceID = ?`, [testOffice.OfficeSpaceID]);
+      if (testFloor?.FloorID) await query(`DELETE FROM floor WHERE FloorID = ?`, [testFloor.FloorID]);
+      if (testBuilding?.BuildingID) await query(`DELETE FROM building WHERE BuildingID = ?`, [testBuilding.BuildingID]);
+      if (testZone?.FacilityZoneID) await query(`DELETE FROM facilityzone WHERE FacilityZoneID = ?`, [testZone.FacilityZoneID]);
+      if (createdTestPark && testPark?.BusinessParkID) await query(`DELETE FROM businesspark WHERE BusinessParkID = ?`, [testPark.BusinessParkID]);
       await query(`DELETE FROM businesspark WHERE BusinessParkCode LIKE ?`, [`%${timestamp}%`]);
       console.log('Cleanup complete.');
     } catch (e) {

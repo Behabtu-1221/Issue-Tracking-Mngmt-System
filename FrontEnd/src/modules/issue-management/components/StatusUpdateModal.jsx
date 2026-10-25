@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, RefreshCw, MessageSquare, ShieldAlert } from 'lucide-react';
+import { RefreshCw, MessageSquare } from 'lucide-react';
 import issueManagementApi from '../api/issueManagementApi';
 import { requestSchemas } from '../../../validation';
 import { FormField } from '../../../components/common/FormField';
+import { ModalCard } from '../../../components/common/ModalCard';
 import { useTranslation } from '../../../i18n';
 
 const STATUS_TRANSITIONS = {
@@ -104,146 +105,85 @@ export const StatusUpdateModal = ({ isOpen, onClose, issue, onStatusUpdated }) =
   const isJustificationRequired = newStatus === 'PENDING' || newStatus === 'CANCELLED' || newStatus === 'REJECTED';
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 1000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--modal-backdrop, rgba(16, 20, 24, 0.78))',
-      backdropFilter: 'blur(6px)'
-    }}>
-      <div className="glass-panel" style={{
-        width: '100%', maxWidth: '500px',
-        borderRadius: 'var(--border-radius-lg)', padding: '0'
-      }}>
-        {/* Header */}
-        <div style={{
-          padding: '20px 28px',
-          borderBottom: '1px solid var(--glass-border)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'linear-gradient(135deg, rgba(47, 129, 247, 0.08), rgba(56, 163, 255, 0.04))'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--color-primary-subtle)' }}>
-              <RefreshCw size={20} style={{ color: 'var(--color-primary)' }} />
-            </div>
-            <div>
-              <h2 style={{ fontWeight: '700', fontSize: '1.1rem' }}>{t('issues.updateStatusTitle', 'Update Status')}</h2>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {issue.RequestNumber} — {t('common.status', 'Current')}: <strong style={{ color: getStatusColor(issue.StatusCode) }}>{issue.StatusCode?.replace('_', ' ')}</strong>
-              </p>
-            </div>
-          </div>
-          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', border: '1px solid var(--glass-border)', backgroundColor: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-            <X size={18} />
-          </button>
+    <ModalCard
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('issues.updateStatusTitle', 'Update Status')}
+      subtitle={`${issue.RequestNumber || ''} — Current: ${issue.StatusCode?.replace('_', ' ') || ''}`}
+      icon={RefreshCw}
+      accentStrip="brand"
+      maxWidth="520px"
+      onSubmit={availableStatuses.length > 0 ? handleSubmit : undefined}
+      submitting={submitting}
+      submitText={t('issues.updateStatusBtn', 'Update Status')}
+      cancelText={t('common.cancel', 'Cancel')}
+      error={serverError}
+    >
+      {availableStatuses.length === 0 ? (
+        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          <p style={{ fontWeight: '600', marginBottom: '4px' }}>{t('issues.noTransitionsAvailable', 'No transitions available')}</p>
+          <p style={{ fontSize: '0.85rem' }}>{t('issues.terminalStateDesc', { status: issue.StatusCode }, `This issue is in a terminal state (${issue.StatusCode}).`)}</p>
         </div>
-
-        {/* Body */}
-        <form onSubmit={handleSubmit} style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-          {serverError && (
-            <div style={{ padding: '12px 16px', borderRadius: '8px', backgroundColor: 'var(--color-error-bg)', border: '1px solid var(--color-error-border)', color: 'var(--color-error)', fontSize: '0.85rem' }}>
-              {serverError}
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          {/* Status Select Buttons */}
+          <FormField
+            label={t('issues.targetStatusTransition', 'Target Status Transition')}
+            id="newStatus"
+            required
+            icon={RefreshCw}
+            error={fieldErrors.Status}
+            helpText={t('issues.selectNextStatusHelp', 'Select the next allowable lifecycle status for this request.')}
+          >
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', paddingTop: '4px' }}>
+              {availableStatuses.map((status) => {
+                const color = getStatusColor(status);
+                const isSelected = newStatus === status;
+                return (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => handleStatusChange(status)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      border: isSelected ? `2px solid ${color}` : '1px solid var(--glass-border)',
+                      backgroundColor: isSelected ? `${color}18` : 'rgba(255,255,255,0.03)',
+                      color: isSelected ? color : 'var(--text-secondary)',
+                      fontWeight: isSelected ? '700' : '500',
+                      fontSize: '0.84rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {status.replace(/_/g, ' ')}
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </FormField>
 
-          {availableStatuses.length === 0 ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              <p style={{ fontWeight: '600', marginBottom: '4px' }}>{t('issues.noTransitionsAvailable', 'No transitions available')}</p>
-              <p style={{ fontSize: '0.85rem' }}>{t('issues.terminalStateDesc', { status: issue.StatusCode }, `This issue is in a terminal state (${issue.StatusCode}).`)}</p>
-            </div>
-          ) : (
-            <>
-              {/* Status Select Buttons */}
-              <FormField
-                label={t('issues.targetStatusTransition', 'Target Status Transition')}
-                id="newStatus"
-                required
-                icon={RefreshCw}
-                error={fieldErrors.Status}
-                helpText={t('issues.selectNextStatusHelp', 'Select the next allowable lifecycle status for this request.')}
-              >
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                  {availableStatuses.map((status) => (
-                    <button
-                      key={status}
-                      type="button"
-                      onClick={() => handleStatusChange(status)}
-                      style={{
-                        padding: '10px 18px',
-                        borderRadius: '10px',
-                        border: newStatus === status ? `2px solid ${getStatusColor(status)}` : '1px solid var(--glass-border)',
-                        backgroundColor: newStatus === status ? `${getStatusColor(status)}15` : 'rgba(255,255,255,0.03)',
-                        color: newStatus === status ? getStatusColor(status) : 'var(--text-secondary)',
-                        fontWeight: newStatus === status ? '700' : '500',
-                        fontSize: '0.85rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      {status.replace(/_/g, ' ')}
-                    </button>
-                  ))}
-                </div>
-              </FormField>
-
-              {/* Status Remarks */}
-              <FormField
-                label={t('issues.transitionRemarks', 'Transition Remarks / Justification')}
-                id="remarks"
-                required={isJustificationRequired}
-                icon={MessageSquare}
-                error={fieldErrors.Remarks}
-                helpText={isJustificationRequired ? t('issues.justificationRequiredHelp', 'Reason is required when placing on hold or cancelling.') : t('issues.optionalStatusNotesHelp', 'Optional explanation or status notes.')}
-              >
-                <textarea
-                  id="remarks"
-                  rows={3}
-                  value={remarks}
-                  onChange={(e) => handleRemarksChange(e.target.value)}
-                  placeholder={isJustificationRequired ? t('issues.provideReasonPlaceholder', 'Provide the specific reason or blocker for this status update...') : t('issues.optionalNotesPlaceholder', 'Optional notes about this status change...')}
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    border: fieldErrors.Remarks ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
-                    borderRadius: '8px',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.9rem',
-                    outline: 'none',
-                    resize: 'vertical'
-                  }}
-                />
-              </FormField>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)' }}>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--glass-border)',
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    color: 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    fontWeight: '600'
-                  }}
-                >
-                  {t('common.cancel', 'Cancel')}
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  disabled={submitting}
-                  style={{ padding: '10px 24px' }}
-                >
-                  {submitting ? t('issues.updatingStatus', 'Updating...') : t('issues.updateStatusBtn', 'Update Status')}
-                </button>
-              </div>
-            </>
-          )}
-        </form>
-      </div>
-    </div>
+          {/* Status Remarks */}
+          <FormField
+            label={t('issues.transitionRemarks', 'Transition Remarks / Justification')}
+            id="remarks"
+            required={isJustificationRequired}
+            icon={MessageSquare}
+            error={fieldErrors.Remarks}
+            helpText={isJustificationRequired ? t('issues.justificationRequiredHelp', 'Reason is required when placing on hold or cancelling.') : t('issues.optionalStatusNotesHelp', 'Optional explanation or status notes.')}
+          >
+            <textarea
+              id="remarks"
+              rows={3}
+              value={remarks}
+              onChange={(e) => handleRemarksChange(e.target.value)}
+              placeholder={isJustificationRequired ? t('issues.provideReasonPlaceholder', 'Provide the specific reason or blocker for this status update...') : t('issues.optionalNotesPlaceholder', 'Optional notes about this status change...')}
+              className={`form-control ${fieldErrors.Remarks ? 'input-error' : ''}`}
+            />
+          </FormField>
+        </div>
+      )}
+    </ModalCard>
   );
 };
 

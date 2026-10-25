@@ -7,7 +7,7 @@ export const assignmentRepository = {
         (SELECT COUNT(*) 
          FROM IssueRequest ir 
          LEFT JOIN Assignment a ON ir.IssueRequestID = a.RequestID AND a.IsDeleted = 0 AND a.AssignmentStatusCode != 'REJECTED' 
-         WHERE ir.StatusCode = 'APPROVED' AND a.AssignmentID IS NULL AND ir.IsDeleted = 0 
+         WHERE ir.StatusCode IN ('APPROVED', 'NEW') AND a.AssignmentID IS NULL AND ir.IsDeleted = 0 
            ${departmentId ? 'AND ir.AssignedDepartmentID = ' + Number(departmentId) : ''}
         ) AS unassignedCount,
         (SELECT COUNT(*) 
@@ -50,19 +50,19 @@ export const assignmentRepository = {
     const offset = (page - 1) * limit;
     let sql = `
       SELECT ir.*,
-        s.ServiceName,
+        COALESCE(s.ServiceName, 'General Request') AS ServiceName,
         b.BuildingName,
         d.DepartmentName AS AssignedDepartmentName,
         CONCAT(u.FirstName, ' ', u.LastName) AS RequesterName,
         u.Email AS RequesterEmail
       FROM IssueRequest ir
-      JOIN Service s ON ir.ServiceID = s.ServiceID
+      LEFT JOIN Service s ON ir.ServiceID = s.ServiceID
       JOIN \`User\` u ON ir.RequesterUserID = u.UserID
       LEFT JOIN Building b ON ir.BuildingID = b.BuildingID
       LEFT JOIN Department d ON ir.AssignedDepartmentID = d.DepartmentID
       LEFT JOIN Assignment a ON ir.IssueRequestID = a.RequestID AND a.IsDeleted = 0 AND a.AssignmentStatusCode != 'REJECTED'
       WHERE ir.IsDeleted = 0
-        AND ir.StatusCode = 'APPROVED'
+        AND ir.StatusCode IN ('APPROVED', 'NEW')
         AND a.AssignmentID IS NULL
     `;
 
@@ -89,7 +89,7 @@ export const assignmentRepository = {
       SELECT COUNT(*) AS total 
       FROM IssueRequest ir 
       LEFT JOIN Assignment a ON ir.IssueRequestID = a.RequestID AND a.IsDeleted = 0 AND a.AssignmentStatusCode != 'REJECTED'
-      WHERE ir.IsDeleted = 0 AND ir.StatusCode = 'APPROVED' AND a.AssignmentID IS NULL
+      WHERE ir.IsDeleted = 0 AND ir.StatusCode IN ('APPROVED', 'NEW') AND a.AssignmentID IS NULL
     `;
     const countParams = [];
     if (departmentId) {
@@ -124,8 +124,8 @@ export const assignmentRepository = {
         tm.TeamName
       FROM Assignment a
       JOIN IssueRequest ir ON a.RequestID = ir.IssueRequestID
-      JOIN Service s ON ir.ServiceID = s.ServiceID
-      LEFT JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
+      LEFT JOIN Service s ON ir.ServiceID = s.ServiceID
+      LEFT JOIN ServiceCategory sc ON (s.ServiceCategoryID = sc.ServiceCategoryID OR (ir.ServiceID IS NULL AND ir.CategoryCode = sc.CategoryCode))
       LEFT JOIN \`User\` reqU ON ir.RequesterUserID = reqU.UserID
       LEFT JOIN Department d ON ir.AssignedDepartmentID = d.DepartmentID
       LEFT JOIN \`User\` u ON a.AssignedUserID = u.UserID
@@ -207,7 +207,7 @@ export const assignmentRepository = {
         tm.TeamName
       FROM Assignment a
       JOIN IssueRequest ir ON a.RequestID = ir.IssueRequestID
-      JOIN Service s ON ir.ServiceID = s.ServiceID
+      LEFT JOIN Service s ON ir.ServiceID = s.ServiceID
       LEFT JOIN \`User\` u ON a.AssignedUserID = u.UserID
       LEFT JOIN Team tm ON a.AssignedTeamID = tm.TeamID
       WHERE a.AssignmentID = ? AND a.IsDeleted = 0
@@ -232,7 +232,7 @@ export const assignmentRepository = {
     return rows[0] || null;
   },
 
-  async createAssignment(data) {
+  async createAssignment(data, tx = null) {
     const sql = `
       INSERT INTO Assignment (
         RequestID, AssignedUserID, AssignedTeamID, AssignmentStatusCode, CreatedBy

@@ -1,3 +1,4 @@
+import { query } from '../../../database/connection.js';
 import assignmentRepository from '../repositories/assignment.repository.js';
 import issueRequestRepository from '../../issue-management/repositories/issue-request.repository.js';
 import issueHistoryRepository from '../../issue-management/repositories/issue-history.repository.js';
@@ -11,16 +12,22 @@ export const assignmentService = {
   async getUserDepartmentId(userId) {
     if (!userId || userId === 1) return null; // Super admin has global scope
 
-    // Check if user is Department Manager
+    // 1. Check if user is designated Manager of any department
     const [dept] = await query(
       `SELECT DepartmentID FROM Department WHERE ManagerUserID = ? AND IsDeleted = 0 LIMIT 1`,
       [userId]
     );
     if (dept) return dept.DepartmentID;
 
-    // Check EmployeeAssignment
+    // 2. Check EmployeeAssignment prioritized by manager/dispatcher roles
     const [emp] = await query(
-      `SELECT DepartmentID FROM EmployeeAssignment WHERE UserID = ? AND IsActive = 1 AND IsDeleted = 0 LIMIT 1`,
+      `SELECT ea.DepartmentID 
+       FROM EmployeeAssignment ea 
+       LEFT JOIN UserRole ur ON ea.UserID = ur.UserID 
+       LEFT JOIN Role r ON ur.RoleID = r.RoleID 
+       WHERE ea.UserID = ? AND ea.IsActive = 1 AND ea.IsDeleted = 0 
+       ORDER BY (CASE WHEN r.RoleCode IN ('DEPARTMENT_MANAGER', 'MANAGER', 'DISPATCHER') THEN 1 ELSE 2 END) ASC 
+       LIMIT 1`,
       [userId]
     );
     return emp ? emp.DepartmentID : null;
@@ -28,14 +35,17 @@ export const assignmentService = {
 
   async isUserParkAdmin(userId) {
     if (!userId || userId === 1) return true;
-    const [role] = await query(
-      `SELECT r.RoleCode 
-       FROM UserRole ur 
-       JOIN Role r ON ur.RoleID = r.RoleID 
-       WHERE ur.UserID = ? AND r.RoleCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN')`,
+    const [user] = await query(
+      `SELECT u.UserID 
+       FROM \`User\` u
+       LEFT JOIN UserRole ur ON u.UserID = ur.UserID 
+       LEFT JOIN Role r ON ur.RoleID = r.RoleID 
+       WHERE u.UserID = ? 
+         AND (r.RoleCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN', 'SUPER_ADMIN') 
+              OR u.UserTypeCode IN ('PARK_SUPER_ADMIN', 'PARK_ADMIN', 'SUPER_ADMIN'))`,
       [userId]
     );
-    return Boolean(role);
+    return Boolean(user);
   },
 
   async getOverviewMetrics(tenantId, actionUserId = 1) {
@@ -65,7 +75,7 @@ export const assignmentService = {
     return { ...assignment, history };
   },
 
-  async manualAssign({ RequestID, AssignedUserID, AssignedTeamID, Remarks }, actionUserId = 1) {
+  async manualAssign({ RequestID, AssignedUserID, AssignedTeamID, Remarks, expectedRowVersion }, actionUserId = 1) {
     if (!RequestID) {
       throw new AppError('RequestID is required', 400);
     }
@@ -79,8 +89,8 @@ export const assignmentService = {
       throw new AppError(`Issue request with ID ${RequestID} not found`, 404);
     }
 
-    // CRITICAL RULE: Request MUST be in APPROVED state before it can be assigned
-    if (issue.StatusCode !== 'APPROVED') {
+    // CRITICAL RULE: Request MUST be in APPROVED or NEW state before it can be assigned
+    if (!['APPROVED', 'NEW'].includes(issue.StatusCode)) {
       throw new AppError(
         `Request '${issue.RequestNumber}' cannot be assigned while in '${issue.StatusCode}' status. It must complete all required approvals and be in 'APPROVED' status before assignment.`,
         400
@@ -151,9 +161,9 @@ export const assignmentService = {
     }
 
     // 5. Transactional Execution: Create / Update Assignment
-    const expectedRowVersion = Remarks?.expectedRowVersion || issue.RowVersion || null;
+    const resolvedRowVersion = expectedRowVersion || Remarks?.expectedRowVersion || issue.RowVersion || null;
 
-    return await unitOfWork.execute(async (tx) => {
+    const createdAssignmentId = await unitOfWork.execute(async (tx) => {
       const existing = await assignmentRepository.findByRequestId(RequestID);
       let assignmentId;
       const now = new Date();
@@ -179,12 +189,12 @@ export const assignmentService = {
       // 6. Transition IssueRequest to ASSIGNED with Optimistic Locking check
       await issueRequestRepository.update(RequestID, {
         StatusCode: 'ASSIGNED',
-        expectedRowVersion,
+        expectedRowVersion: resolvedRowVersion,
         ModifiedBy: actionUserId
       }, tx);
 
       const assignTargetDesc = AssignedUserID ? `Technician ${technicianName} (#${AssignedUserID})` : `Technical Team '${teamName}' (#${AssignedTeamID})`;
-      const assignRemarks = Remarks || `Assigned to ${assignTargetDesc} by department manager/dispatcher.`;
+      const assignRemarks = (typeof Remarks === 'string' ? Remarks : '') || `Assigned to ${assignTargetDesc} by department manager/dispatcher.`;
 
       // 7. Audit Histories
       await assignmentRepository.createHistory({
@@ -199,20 +209,13 @@ export const assignmentService = {
         IssueRequestID: RequestID,
         UserID: actionUserId,
         FieldName: 'StatusCode',
-        OldValue: 'APPROVED',
+        OldValue: issue.StatusCode,
         NewValue: 'ASSIGNED',
         ActionTypeCode: 'ASSIGNED',
         Remarks: assignRemarks
       }, tx);
 
-      // 8. Start / update SLA timers
-      try {
-        await slaClockService.startClockForIssue(RequestID, 1, issue.PriorityCode || 'MEDIUM', actionUserId);
-      } catch (slaErr) {
-        console.warn('SLA Clock notice upon assignment:', slaErr.message);
-      }
-
-      // 9. Notify Assigned Technician / Team & Requester via Transactional Outbox
+      // 8. Notify Assigned Technician / Team & Requester via Transactional Outbox
       await outboxService.emit(tx, {
         aggregateType: 'Assignment',
         aggregateId: assignmentId,
@@ -230,8 +233,17 @@ export const assignmentService = {
         }
       });
 
-      return assignmentRepository.findById(assignmentId);
+      return assignmentId;
     });
+
+    // 9. Start / update SLA timers (after successful commit)
+    try {
+      await slaClockService.startClockForIssue(RequestID, 1, issue.PriorityCode || 'MEDIUM', actionUserId);
+    } catch (slaErr) {
+      console.warn('SLA Clock notice upon assignment:', slaErr.message);
+    }
+
+    return assignmentRepository.findById(createdAssignmentId);
   },
 
   async autoAssign(RequestID, actionUserId = 1) {
@@ -244,7 +256,7 @@ export const assignmentService = {
       throw new AppError(`Issue request with ID ${RequestID} not found`, 404);
     }
 
-    if (issue.StatusCode !== 'APPROVED') {
+    if (!['APPROVED', 'NEW'].includes(issue.StatusCode)) {
       throw new AppError(
         `Cannot auto-assign request in '${issue.StatusCode}' status. It must be in 'APPROVED' status before dispatch.`,
         400
@@ -357,27 +369,226 @@ export const assignmentService = {
       Remarks: 'Technician initiated field work execution'
     });
 
+    // Announce status change to Requester, Approvers, and Managers
+    try {
+      const issue = await issueRequestRepository.findById(assignment.RequestID);
+      await notificationService.notifyEvent('REQUEST_STATUS_CHANGED', {
+        issue,
+        requestId: assignment.RequestID,
+        status: 'IN_PROGRESS',
+        remarks: 'Technician has arrived on site and initiated field execution.'
+      }, userId);
+    } catch (notifErr) {
+      console.warn('[Dispatch] Start work notification notice:', notifErr.message);
+    }
+
     return assignmentRepository.findById(assignmentId);
   },
 
-  async pauseWork(assignmentId, pauseReason, userId = 1) {
+  async pauseWork(assignmentId, pauseReasonOrData, userId = 1) {
     const assignment = await assignmentRepository.findById(assignmentId);
     if (!assignment) throw new AppError('Assignment not found', 404);
+
+    const pauseReason = typeof pauseReasonOrData === 'string'
+      ? pauseReasonOrData
+      : (pauseReasonOrData?.pauseReason || pauseReasonOrData?.remarks || 'Work paused by technician');
 
     await assignmentRepository.updateAssignment(assignmentId, {
       AssignmentStatusCode: 'PAUSED',
       ModifiedBy: userId
     });
 
+    // Update IssueRequest status to PENDING
+    await query(
+      `UPDATE IssueRequest SET StatusCode = 'PENDING', ModifiedBy = ?, ModifiedDate = CURRENT_TIMESTAMP(6) WHERE IssueRequestID = ?`,
+      [userId, assignment.RequestID]
+    );
+
     await assignmentRepository.createHistory({
       AssignmentID: assignmentId,
       ActionUserID: userId,
       ActionTypeCode: 'WORK_PAUSED',
-      Remarks: pauseReason || 'Work paused by technician',
+      Remarks: pauseReason,
       CreatedBy: userId
     });
 
+    await issueHistoryRepository.create({
+      IssueRequestID: assignment.RequestID,
+      UserID: userId,
+      FieldName: 'StatusCode',
+      OldValue: 'IN_PROGRESS',
+      NewValue: 'PENDING',
+      ActionTypeCode: 'WORK_PAUSED',
+      Remarks: `Work paused by technician: ${pauseReason}`
+    });
+
+    // Announce pause to Requester and Approver(s)
+    try {
+      const issue = await issueRequestRepository.findById(assignment.RequestID);
+      await notificationService.notifyEvent('REQUEST_STATUS_CHANGED', {
+        issue,
+        requestId: assignment.RequestID,
+        status: 'PENDING',
+        remarks: `Work paused by technician: ${pauseReason}`
+      }, userId);
+    } catch (notifErr) {
+      console.warn('[Dispatch] Pause work notification notice:', notifErr.message);
+    }
+
     return assignmentRepository.findById(assignmentId);
+  },
+
+  async resumeWork(assignmentId, resumeData = {}, userId = 1) {
+    const assignment = await assignmentRepository.findById(assignmentId);
+    if (!assignment) throw new AppError('Assignment not found', 404);
+
+    const remarks = typeof resumeData === 'string'
+      ? resumeData
+      : (resumeData?.remarks || resumeData?.notes || 'Technician resumed field work execution');
+
+    await assignmentRepository.updateAssignment(assignmentId, {
+      AssignmentStatusCode: 'IN_PROGRESS',
+      ModifiedBy: userId
+    });
+
+    await query(
+      `UPDATE IssueRequest SET StatusCode = 'IN_PROGRESS', ModifiedBy = ?, ModifiedDate = CURRENT_TIMESTAMP(6) WHERE IssueRequestID = ?`,
+      [userId, assignment.RequestID]
+    );
+
+    await assignmentRepository.createHistory({
+      AssignmentID: assignmentId,
+      ActionUserID: userId,
+      ActionTypeCode: 'WORK_RESUMED',
+      Remarks: remarks,
+      CreatedBy: userId
+    });
+
+    await issueHistoryRepository.create({
+      IssueRequestID: assignment.RequestID,
+      UserID: userId,
+      FieldName: 'StatusCode',
+      OldValue: 'PENDING',
+      NewValue: 'IN_PROGRESS',
+      ActionTypeCode: 'WORK_RESUMED',
+      Remarks: `Work execution resumed: ${remarks}`
+    });
+
+    // Announce resumption to Requester and Approver(s)
+    try {
+      const issue = await issueRequestRepository.findById(assignment.RequestID);
+      await notificationService.notifyEvent('REQUEST_STATUS_CHANGED', {
+        issue,
+        requestId: assignment.RequestID,
+        status: 'IN_PROGRESS',
+        remarks: `Work execution resumed by technician: ${remarks}`
+      }, userId);
+    } catch (notifErr) {
+      console.warn('[Dispatch] Resume work notification notice:', notifErr.message);
+    }
+
+    return assignmentRepository.findById(assignmentId);
+  },
+
+  async updateProgress(assignmentId, progressData = {}, userId = 1) {
+    const assignment = await assignmentRepository.findById(assignmentId);
+    if (!assignment) throw new AppError('Assignment not found', 404);
+
+    const rawPct = progressData.progressPercentage ?? progressData.percentage ?? 0;
+    const progressPercentage = Math.min(100, Math.max(0, Number(rawPct)));
+    const milestone = (progressData.milestone || progressData.progressMilestone || 'Field Work Execution').trim();
+    const remarks = (progressData.remarks || progressData.notes || progressData.workNotes || 'Technician posted field progress update').trim();
+    const estimatedCompletion = progressData.estimatedCompletion || null;
+    const timeSpentMinutes = progressData.timeSpentMinutes ? Number(progressData.timeSpentMinutes) : null;
+
+    const issue = await issueRequestRepository.findById(assignment.RequestID);
+    if (!issue) throw new AppError('Associated issue request not found', 404);
+
+    let customData = {};
+    try {
+      customData = typeof issue.CustomFieldsDataJson === 'string'
+        ? JSON.parse(issue.CustomFieldsDataJson)
+        : (issue.CustomFieldsDataJson || {});
+    } catch (e) {
+      customData = {};
+    }
+
+    const previousProgress = customData.progressPercentage || 0;
+    customData.progressPercentage = progressPercentage;
+    customData.progressMilestone = milestone;
+    customData.latestProgressNotes = remarks;
+    customData.lastProgressUpdatedAt = new Date().toISOString();
+    customData.lastProgressUpdatedBy = userId;
+    if (estimatedCompletion) customData.estimatedCompletion = estimatedCompletion;
+    if (timeSpentMinutes) customData.totalTimeSpentMinutes = (customData.totalTimeSpentMinutes || 0) + timeSpentMinutes;
+
+    // Ensure status is IN_PROGRESS if it was ASSIGNED, ACCEPTED, or PENDING
+    let newStatusCode = issue.StatusCode;
+    if (['ASSIGNED', 'ACCEPTED', 'PENDING'].includes(issue.StatusCode)) {
+      newStatusCode = 'IN_PROGRESS';
+      await assignmentRepository.updateAssignment(assignmentId, {
+        AssignmentStatusCode: 'IN_PROGRESS',
+        StartDateTime: assignment.StartDateTime || new Date().toISOString().slice(0, 19).replace('T', ' '),
+        ModifiedBy: userId
+      });
+    }
+
+    await query(
+      `UPDATE IssueRequest 
+       SET CustomFieldsDataJson = ?, 
+           StatusCode = ?, 
+           ModifiedBy = ?, 
+           ModifiedDate = CURRENT_TIMESTAMP(6) 
+       WHERE IssueRequestID = ?`,
+      [JSON.stringify(customData), newStatusCode, userId, assignment.RequestID]
+    );
+
+    await assignmentRepository.createHistory({
+      AssignmentID: assignmentId,
+      ActionUserID: userId,
+      ActionTypeCode: 'PROGRESS_UPDATED',
+      Remarks: `Progress: ${progressPercentage}% (${milestone}). ${remarks}`,
+      CreatedBy: userId
+    });
+
+    await issueHistoryRepository.create({
+      IssueRequestID: assignment.RequestID,
+      UserID: userId,
+      FieldName: 'ProgressPercentage',
+      OldValue: `${previousProgress}%`,
+      NewValue: `${progressPercentage}% (${milestone})`,
+      ActionTypeCode: 'PROGRESS_UPDATED',
+      Remarks: remarks
+    });
+
+    // Real-Time Notification Broadcast to Requester & Approvers & Dept Manager
+    try {
+      const updatedIssue = await issueRequestRepository.findById(assignment.RequestID);
+      const [tech] = await query('SELECT CONCAT(FirstName, " ", LastName) AS FullName FROM `User` WHERE UserID = ?', [userId]);
+      const technicianName = tech?.FullName || 'Assigned Technician';
+
+      await notificationService.notifyEvent('REQUEST_PROGRESS_UPDATED', {
+        issue: updatedIssue,
+        requestId: assignment.RequestID,
+        progressPercentage,
+        milestone,
+        remarks,
+        technicianName,
+        status: newStatusCode
+      }, userId);
+    } catch (notifErr) {
+      console.warn('[Dispatch] Progress update notification notice:', notifErr.message);
+    }
+
+    return {
+      assignmentId,
+      requestId: assignment.RequestID,
+      progressPercentage,
+      milestone,
+      remarks,
+      status: newStatusCode,
+      customFields: customData
+    };
   },
 
   async completeWork(assignmentId, bodyOrNotes, userId = 1) {
