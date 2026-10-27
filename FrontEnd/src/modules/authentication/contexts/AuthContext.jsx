@@ -57,20 +57,34 @@ export function AuthProvider({ children }) {
       sessionManager.setRememberedUsername('');
     }
 
-    if (data.mustChangePassword) {
-      setUser({
+    if (data.mustChangePassword || data.user?.mustChangePassword) {
+      const userProfile = data.user || {
         userId: data.userId,
         userAccountId: data.userAccountId,
         username: data.username,
         userTypeCode: data.userTypeCode,
         mustChangePassword: true
-      });
+      };
+      setUser(userProfile);
       setIsAuthenticated(true);
       setMustChangePassword(true);
+      sessionManager.setUserProfile(userProfile, rememberMe);
       return { mustChangePassword: true };
     }
 
-    await loadUserProfile();
+    if (data.user) {
+      setUser(data.user);
+      setIsAuthenticated(true);
+      setMustChangePassword(false);
+      sessionManager.setUserProfile(data.user, rememberMe);
+    }
+
+    // Refresh profile in background to ensure up-to-date permissions
+    try {
+      await loadUserProfile();
+    } catch (profileErr) {
+      console.warn('Background profile sync had warning, user remains logged in:', profileErr);
+    }
     return { mustChangePassword: false };
   };
 

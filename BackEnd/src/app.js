@@ -36,24 +36,47 @@ app.set('trust proxy', 1);
 
 app.use(helmet());
 
-// Strict CORS: Allow explicit origins from environment variable, or local/RFC1918 private network in development
-const allowedOrigins = env.cors.allowedOrigins;
+// Enhanced CORS: Normalize origins (strip trailing slashes), support wildcards, and allow private network in dev
+const rawAllowedOrigins = env.cors.allowedOrigins || [];
+const allowedOrigins = rawAllowedOrigins.map((o) => o.trim().replace(/\/+$/, '')).filter(Boolean);
+if (env.cors.clientUrl) {
+  const normalizedClient = env.cors.clientUrl.trim().replace(/\/+$/, '');
+  if (!allowedOrigins.includes(normalizedClient)) {
+    allowedOrigins.push(normalizedClient);
+  }
+}
 const isDev = env.NODE_ENV === 'development';
 const localNetworkPattern = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/;
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    const normalizedOrigin = origin.trim().replace(/\/+$/, '');
+
+    // Allow wildcard '*' or exact match in configured allowed origins
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
-    if (isDev && localNetworkPattern.test(origin)) {
+
+    // Support wildcard subdomains, e.g. '*.vercel.app' or '*.onrender.com'
+    const matchesWildcard = allowedOrigins.some((allowed) => {
+      if (allowed.startsWith('*.')) {
+        const domain = allowed.slice(2);
+        return normalizedOrigin.endsWith(domain) || normalizedOrigin.endsWith('.' + domain);
+      }
+      return false;
+    });
+    if (matchesWildcard) {
+      return callback(null, true);
+    }
+
+    if (isDev && localNetworkPattern.test(normalizedOrigin)) {
       return callback(null, true);
     }
     return callback(new AppError(`Origin "${origin}" is not permitted by CORS policy.`, 403));
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Idempotency-Key', 'Cache-Control', 'Pragma'],
   credentials: false,
   maxAge: 86400
 }));
@@ -110,6 +133,12 @@ modules.forEach((module) => {
 
 app.use('/api/audit-logs', (req, res, next) => {
   req.url = '/audit-logs' + (req.url === '/' ? '' : req.url);
+  identityModule.router(req, res, next);
+});
+
+// Dual-route support: Forward /auth directly to identityModule so both /api/auth and /auth paths are resolved
+app.use('/auth', (req, res, next) => {
+  req.url = '/auth' + (req.url === '/' ? '' : req.url);
   identityModule.router(req, res, next);
 });
 

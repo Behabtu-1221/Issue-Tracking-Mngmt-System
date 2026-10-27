@@ -15,9 +15,7 @@ const createLimitHandler = (customMessage) => (req, res, next, options) => {
 };
 
 const isBypass = (req) =>
-  env.isTest ||
-  req.headers['x-bypass-rate-limit'] === 'test-suite-bypass' ||
-  (env.NODE_ENV === 'development' && process.env.STRICT_RATE_LIMIT !== 'true');
+  req.headers['x-bypass-rate-limit'] === 'test-suite-bypass';
 
 /**
  * Global API Rate Limiter
