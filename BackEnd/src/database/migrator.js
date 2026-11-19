@@ -17,9 +17,21 @@ const LOCK_NAME = 'itms_db_migrator_lock';
  */
 class Migrator {
   async acquireLock(connection, timeoutSec = 15) {
-    const [rows] = await connection.query('SELECT GET_LOCK(?, ?) AS acquired', [LOCK_NAME, timeoutSec]);
-    if (!rows || rows[0].acquired !== 1) {
-      throw new Error(`Failed to acquire migration lock '${LOCK_NAME}'. Another migration process may be running.`);
+    try {
+      const [rows] = await connection.query('SELECT GET_LOCK(?, ?) AS acquired', [LOCK_NAME, timeoutSec]);
+      // If acquired is 0, another client actually holds the lock
+      if (rows && rows[0]?.acquired === 0) {
+        throw new Error(`Failed to acquire migration lock '${LOCK_NAME}'. Another migration process may be running.`);
+      }
+      // If acquired is null/undefined (common in cloud databases like TiDB Serverless), log notice and proceed safely
+      if (!rows || rows[0]?.acquired === null || rows[0]?.acquired === undefined) {
+        logger.warn(`[Migrator] Advisory locks not supported by database engine (e.g. TiDB Cloud). Proceeding without distributed lock.`);
+      }
+    } catch (err) {
+      if (err.message && err.message.includes('Another migration process')) {
+        throw err;
+      }
+      logger.warn(`[Migrator] Advisory lock notice: ${err.message}. Proceeding without lock.`);
     }
   }
 

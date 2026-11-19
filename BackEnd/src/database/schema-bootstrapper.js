@@ -89,9 +89,13 @@ export async function ensureBaseSchema() {
 
   try {
     // Acquire distributed lock to prevent race conditions during multi-instance deployment
-    const [lockRows] = await connection.query('SELECT GET_LOCK(?, 60) AS acquired', [BOOTSTRAP_LOCK]);
-    if (!lockRows || lockRows[0].acquired !== 1) {
-      logger.warn('[SchemaBootstrapper] Could not acquire bootstrap lock. Proceeding after timeout.');
+    try {
+      const [lockRows] = await connection.query('SELECT GET_LOCK(?, 60) AS acquired', [BOOTSTRAP_LOCK]);
+      if (lockRows && lockRows[0]?.acquired === 0) {
+        logger.warn('[SchemaBootstrapper] Could not acquire bootstrap lock. Proceeding after timeout.');
+      }
+    } catch (lockErr) {
+      logger.warn(`[SchemaBootstrapper] Advisory lock notice: ${lockErr.message}. Proceeding without lock.`);
     }
 
     // 1. Check if core tables exist
@@ -103,8 +107,16 @@ export async function ensureBaseSchema() {
       logger.info('📦 [BOOTSTRAP] Base tables missing. Initializing master schema from Database.sql...');
       const statements = parseSqlStatements(DATABASE_SQL_PATH);
 
-      await connection.query('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0');
-      await connection.query('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0');
+      try {
+        await connection.query('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0');
+      } catch (fkErr) {
+        logger.warn(`[BOOTSTRAP] FOREIGN_KEY_CHECKS notice: ${fkErr.message}`);
+      }
+      try {
+        await connection.query('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0');
+      } catch (ucErr) {
+        logger.warn(`[BOOTSTRAP] UNIQUE_CHECKS notice: ${ucErr.message}`);
+      }
 
       let executed = 0;
       for (const stmt of statements) {
@@ -116,8 +128,12 @@ export async function ensureBaseSchema() {
         }
       }
 
-      await connection.query('SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS');
-      await connection.query('SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS');
+      try {
+        await connection.query('SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS');
+        await connection.query('SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS');
+      } catch (rstErr) {
+        logger.warn(`[BOOTSTRAP] Reset checks notice: ${rstErr.message}`);
+      }
       logger.info(`✓ [BOOTSTRAP] Executed ${executed} DDL statements. Master tables established.`);
     }
 
@@ -131,8 +147,16 @@ export async function ensureBaseSchema() {
         logger.info('🌱 [BOOTSTRAP] Database has 0 users. Seeding foundational accounts and master data...');
         const seedStatements = parseSqlStatements(SEED_DATA_SQL_PATH);
 
-        await connection.query('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0');
-        await connection.query('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0');
+        try {
+          await connection.query('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0');
+        } catch (fkErr) {
+          logger.warn(`[BOOTSTRAP SEED] FOREIGN_KEY_CHECKS notice: ${fkErr.message}`);
+        }
+        try {
+          await connection.query('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0');
+        } catch (ucErr) {
+          logger.warn(`[BOOTSTRAP SEED] UNIQUE_CHECKS notice: ${ucErr.message}`);
+        }
 
         let seedCount = 0;
         for (const stmt of seedStatements) {
@@ -144,8 +168,12 @@ export async function ensureBaseSchema() {
           }
         }
 
-        await connection.query('SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS');
-        await connection.query('SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS');
+        try {
+          await connection.query('SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS');
+          await connection.query('SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS');
+        } catch (rstErr) {
+          logger.warn(`[BOOTSTRAP SEED] Reset checks notice: ${rstErr.message}`);
+        }
         logger.info(`✓ [BOOTSTRAP] Seeded foundational data (${seedCount} operations).`);
       }
     }

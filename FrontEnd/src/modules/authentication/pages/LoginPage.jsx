@@ -31,11 +31,31 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState('');
   const [error, setError] = useState('');
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isCardHovered, setIsCardHovered] = useState(false);
   const [activeRolePill, setActiveRolePill] = useState('');
   const usernameRef = useRef(null);
+
+  useEffect(() => {
+    let timer1, timer2;
+    if (loading) {
+      setLoadingPhase('Authenticating...');
+      timer1 = setTimeout(() => {
+        setLoadingPhase('Connecting to Cloud Server...');
+      }, 4000);
+      timer2 = setTimeout(() => {
+        setLoadingPhase('Waking up Render backend (~30-50s cold start)...');
+      }, 12000);
+    } else {
+      setLoadingPhase('');
+    }
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [loading]);
 
   useEffect(() => {
     const remembered = sessionManager.getRememberedUsername();
@@ -309,12 +329,59 @@ export default function LoginPage() {
             }}
           >
             {loading ? (
-              <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.loggingIn', 'Authenticating...')}</>
+              <><Loader2 size={19} style={{ animation: 'spin 1s linear infinite' }} /> {loadingPhase || t('auth.loggingIn', 'Authenticating...')}</>
             ) : (
               <><ArrowRight size={18} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} /> {t('auth.signIn', 'Sign In')}</>
             )}
           </button>
         </form>
+
+        {/* Quick Demo Credentials */}
+        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', textAlign: 'center' }}>
+            Quick Demo Accounts
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
+            {DEMO_ROLES.slice(0, 3).map((role) => (
+              <button
+                key={role.user}
+                type="button"
+                onClick={() => handleSelectDemoRole(role)}
+                style={{
+                  fontSize: '0.73rem',
+                  fontWeight: 600,
+                  padding: '5px 10px',
+                  borderRadius: '6px',
+                  border: activeRolePill === role.label ? '1px solid #0284c7' : '1px solid #cbd5e1',
+                  background: activeRolePill === role.label ? '#f0f9ff' : '#f8fafc',
+                  color: activeRolePill === role.label ? '#0284c7' : '#334155',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>{role.icon}</span> {role.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Server Target Indicator */}
+        <div style={{ marginTop: '14px', textAlign: 'center', fontSize: '0.72rem', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }}></span>
+          <span>Target Backend:</span>
+          <a
+            href={`${getApiBaseUrl()}/health`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Click to check backend health in a new tab"
+            style={{ fontFamily: 'monospace', color: '#0284c7', textDecoration: 'underline', fontWeight: 600 }}
+          >
+            {getApiBaseUrl()}
+          </a>
+        </div>
       </div>
 
       {/* Footer */}

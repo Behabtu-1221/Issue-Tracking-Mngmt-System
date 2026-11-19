@@ -9,6 +9,19 @@ import { STORAGE_KEYS } from '../modules/authentication/constants/authConstants'
  * 3. Fallback: http://localhost:5000/api
  */
 export const getApiBaseUrl = () => {
+  // 1. Runtime override in localStorage (allows instant hot-configuration without rebuild)
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const runtimeUrl = window.localStorage.getItem('ITMS_API_URL');
+    if (runtimeUrl && typeof runtimeUrl === 'string' && runtimeUrl.trim()) {
+      let url = runtimeUrl.trim().replace(/\/+$/, '');
+      if (!url.endsWith('/api')) {
+        url += '/api';
+      }
+      return url;
+    }
+  }
+
+  // 2. Build-time environment variable baked in by Vite
   const envUrl = import.meta.env?.VITE_API_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
     let url = envUrl.trim().replace(/\/+$/, '');
@@ -18,13 +31,19 @@ export const getApiBaseUrl = () => {
     return url;
   }
 
+  // 3. Browser environment fallback
   if (typeof window !== 'undefined' && window.location) {
     const { hostname, origin } = window.location;
     // Local development mode: default to backend port 5000
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return `http://${hostname}:5000/api`;
     }
-    // Deployed environment: default to the hosting origin's /api route
+    // Deployed to Vercel but VITE_API_URL was omitted in Vercel settings:
+    // Default to known Render backend rather than calling Vercel itself
+    if (hostname.includes('vercel.app')) {
+      return 'https://issue-tracking-mngmt-system.onrender.com/api';
+    }
+    // Generic deployed origin
     if (origin && origin !== 'null') {
       return `${origin.replace(/\/+$/, '')}/api`;
     }
@@ -42,6 +61,7 @@ export const getServerBaseUrl = () => {
 
 const api = axios.create({
   baseURL: getApiBaseUrl(),
+  timeout: 90000, // 90s timeout to accommodate Render free-tier cold starts
   headers: {
     'Content-Type': 'application/json'
   }
@@ -49,6 +69,9 @@ const api = axios.create({
 
 // Request interceptor — attach access token only for authenticated requests
 api.interceptors.request.use((config) => {
+  // Keep baseURL synchronized with any dynamic runtime resolution
+  config.baseURL = getApiBaseUrl();
+
   const url = config.url || '';
   const isPublicAuthCall = ['/auth/login', '/auth/forgot-password', '/auth/reset-password', '/health'].some(
     (p) => url.includes(p)
