@@ -45,7 +45,9 @@ import {
   Award,
   GitCommit,
   TrendingUp,
-  Activity
+  Activity,
+  Copy,
+  Check
 } from 'lucide-react';
 import issueManagementApi from '../api/issueManagementApi';
 import fileDocumentApi from '../../file-document/api/fileDocumentApi';
@@ -199,6 +201,17 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
   const [lightboxRotation, setLightboxRotation] = useState(0);
   const [timelineFilter, setTimelineFilter] = useState('ALL'); // 'ALL' | 'STATUS' | 'ASSIGNMENT' | 'APPROVAL'
   const [discussionSubTab, setDiscussionSubTab] = useState('public'); // 'public' | 'notes'
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  const copyRequestCode = (e) => {
+    e?.stopPropagation?.();
+    const code = d?.RequestNumber || d?.IssueRequestCode || issue?.RequestNumber || issue?.IssueRequestCode;
+    if (code && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    }
+  };
 
   const issueId = issue?.IssueRequestID;
 
@@ -483,6 +496,21 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
     );
   };
 
+  const getPriorityTheme = (priorityStr) => {
+    const p = (priorityStr || '').toUpperCase();
+    switch (p) {
+      case 'CRITICAL':
+      case 'URGENT':
+        return { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.08)', border: 'rgba(239, 68, 68, 0.3)', gradient: 'linear-gradient(90deg, #ef4444, #f97316)' };
+      case 'HIGH':
+        return { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.3)', gradient: 'linear-gradient(90deg, #f59e0b, #eab308)' };
+      case 'LOW':
+        return { color: '#10b981', bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.3)', gradient: 'linear-gradient(90deg, #10b981, #059669)' };
+      default:
+        return { color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.08)', border: 'rgba(59, 130, 246, 0.3)', gradient: 'linear-gradient(90deg, #3b82f6, #6366f1)' };
+    }
+  };
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '—';
     return new Date(dateStr).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -517,305 +545,652 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
       </button>
 
       {/* Issue Header Card */}
-      <div className="enterprise-card p-4 sm:p-6 lg:p-7">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px', flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: 'monospace', fontWeight: '800', fontSize: '1.1rem', color: 'var(--accent-primary)' }}>
-                {d.RequestNumber}
-              </span>
+      <div
+        className="enterprise-card"
+        style={{
+          position: 'relative',
+          borderRadius: '20px',
+          overflow: 'hidden',
+          border: '1px solid var(--color-border)',
+          boxShadow: '0 4px 24px -2px rgba(0, 0, 0, 0.06)'
+        }}
+      >
+        {/* Top Priority Accent Glow Line */}
+        <div style={{ height: '4px', width: '100%', background: getPriorityTheme(d.PriorityCode).gradient }} />
+
+        <div className="p-5 sm:p-7 lg:p-8" style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+          
+          {/* Header row: Code, Badges, Copy button & Refresh */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 12px',
+                  borderRadius: '10px',
+                  background: 'var(--color-elevated)',
+                  border: '1px solid var(--color-border)',
+                  fontFamily: 'monospace',
+                  fontWeight: 800,
+                  fontSize: '1rem',
+                  color: 'var(--color-primary)'
+                }}
+              >
+                <span>{d.RequestNumber}</span>
+                <button
+                  type="button"
+                  onClick={copyRequestCode}
+                  title={copiedCode ? 'Copied to clipboard!' : 'Copy Request Code'}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '2px',
+                    color: copiedCode ? '#10b981' : 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    transition: 'color 0.15s ease'
+                  }}
+                >
+                  {copiedCode ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+              </div>
+
               {getStatusBadge(d.StatusCode)}
               {getPriorityBadge(d.PriorityCode)}
-              <span style={{ padding: '3px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', backgroundColor: 'rgba(255,255,255,0.08)', color: 'var(--text-secondary)', border: '1px solid var(--glass-border)' }}>
-                {d.RequestTypeCode?.replace('_', ' ')}
+
+              <span style={{
+                padding: '4px 12px',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                letterSpacing: '0.4px',
+                textTransform: 'uppercase',
+                backgroundColor: 'var(--color-elevated)',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--color-border)'
+              }}>
+                {d.RequestTypeCode?.replace(/_/g, ' ')}
               </span>
+
               {(d.IsMajorIncident === 1 || d.IsMajorIncident === true) && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '800', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
-                  <AlertTriangle size={12} /> {t('issues.majorIncident', 'MAJOR INCIDENT')}
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '4px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  color: '#ef4444',
+                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                  boxShadow: '0 0 12px rgba(239, 68, 68, 0.2)'
+                }}>
+                  <AlertTriangle size={13} /> {t('issues.majorIncident', 'MAJOR INCIDENT')}
                 </span>
               )}
             </div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '8px', letterSpacing: '-0.3px' }}>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={fetchAllData}
+                className="btn btn-secondary btn-sm"
+                title="Refresh Request Data"
+                style={{ padding: '6px 12px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <RefreshCw size={13} /> <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Title & Description Card */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h2 style={{
+              fontSize: '1.65rem',
+              fontWeight: 800,
+              margin: 0,
+              letterSpacing: '-0.025em',
+              color: 'var(--text-primary)',
+              lineHeight: 1.3
+            }}>
               {d.Title}
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', maxWidth: '700px' }}>
-              {d.Description}
-            </p>
-          </div>
-        </div>
 
-        {/* Metadata Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4.5 mt-5 pt-4 border-t border-[var(--glass-border)]">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <User size={16} style={{ color: 'var(--accent-primary)' }} />
-            <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.requester', 'Requester')}</div>
-              <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.RequesterName || 'N/A'}</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Tag size={16} style={{ color: '#10b981' }} />
-            <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.service', 'Service')}</div>
-              <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.ServiceName || 'N/A'}</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Building size={16} style={{ color: '#f59e0b' }} />
-            <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.assignedStaff', 'Assigned Dept')}</div>
-              <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.AssignedDepartmentName || 'Unassigned'}</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Calendar size={16} style={{ color: '#60a5fa' }} />
-            <div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.submitted', 'Submitted')}</div>
-              <div style={{ fontWeight: '600', color: 'var(--text-primary)', fontSize: '0.85rem' }}>{formatDate(d.CreatedDate)}</div>
-            </div>
-          </div>
-          {d.BuildingName && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <MapPin size={16} style={{ color: '#ec4899' }} />
-              <div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.locationDetails', 'Location')}</div>
-                <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.BuildingName}{d.OfficeSpaceNumber ? ` / ${d.OfficeSpaceNumber}` : ''}</div>
-              </div>
-            </div>
-          )}
-          {d.CategoryCode && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Tag size={16} style={{ color: '#a78bfa' }} />
-              <div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('issues.category', 'Category')}</div>
-                <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{d.CategoryCode}</div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── Real-Time Request Progress & Status Announcement Card ── */}
-        {(() => {
-          let custom = {};
-          try {
-            custom = d.CustomFieldsDataJson
-              ? (typeof d.CustomFieldsDataJson === 'string' ? JSON.parse(d.CustomFieldsDataJson) : d.CustomFieldsDataJson)
-              : {};
-          } catch (e) {}
-
-          const pct = custom.progressPercentage !== undefined
-            ? Number(custom.progressPercentage)
-            : (d.StatusCode === 'RESOLVED' || d.StatusCode === 'CLOSED' ? 100 : (d.StatusCode === 'IN_PROGRESS' ? 35 : (d.StatusCode === 'ASSIGNED' ? 15 : (d.StatusCode === 'APPROVED' ? 10 : 0))));
-
-          const milestone = custom.progressMilestone || (
-            d.StatusCode === 'NEW' ? 'Registered & Awaiting Initial Review' :
-            d.StatusCode === 'PENDING_APPROVAL' ? 'Under Management Approval Review' :
-            d.StatusCode === 'APPROVED' ? 'Approved & Queued for Technician Dispatch' :
-            d.StatusCode === 'ASSIGNED' ? 'Technician Assigned & En Route' :
-            d.StatusCode === 'IN_PROGRESS' ? 'Active Field Execution' :
-            d.StatusCode === 'PENDING' ? 'Work On Hold / Awaiting Parts' :
-            d.StatusCode === 'RESOLVED' ? 'Service Completed - Ready for Sign-Off' :
-            d.StatusCode === 'CLOSED' ? 'Officially Verified & Closed' :
-            'Active Request'
-          );
-
-          const notes = custom.latestProgressNotes || '';
-          const lastUpdated = custom.lastProgressUpdatedAt;
-
-          const getStatusTheme = (status) => {
-            switch (status) {
-              case 'RESOLVED':
-              case 'CLOSED':
-                return { bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.3)', color: '#10b981', gradient: 'linear-gradient(90deg, #10b981, #059669)' };
-              case 'IN_PROGRESS':
-                return { bg: 'rgba(99, 102, 241, 0.08)', border: 'rgba(99, 102, 241, 0.3)', color: '#818cf8', gradient: 'linear-gradient(90deg, #6366f1, #3b82f6)' };
-              case 'PENDING':
-                return { bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.3)', color: '#f59e0b', gradient: 'linear-gradient(90deg, #f59e0b, #d97706)' };
-              case 'APPROVED':
-              case 'ASSIGNED':
-                return { bg: 'rgba(59, 130, 246, 0.08)', border: 'rgba(59, 130, 246, 0.3)', color: '#60a5fa', gradient: 'linear-gradient(90deg, #3b82f6, #06b6d4)' };
-              default:
-                return { bg: 'rgba(255, 255, 255, 0.03)', border: 'var(--glass-border)', color: 'var(--text-secondary)', gradient: 'linear-gradient(90deg, #64748b, #475569)' };
-            }
-          };
-
-          const theme = getStatusTheme(d.StatusCode);
-
-          return (
-            <div style={{
-              marginTop: '22px', padding: '18px 20px', borderRadius: '16px',
-              background: theme.bg, border: `1.5px solid ${theme.border}`,
-              display: 'flex', flexDirection: 'column', gap: '12px',
-              boxShadow: d.StatusCode === 'IN_PROGRESS' ? '0 0 20px rgba(99, 102, 241, 0.12)' : 'none'
-            }}>
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <TrendingUp size={18} color={theme.color} />
-                  <span style={{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: theme.color }}>
-                    Live Request Progress & Execution Status
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {lastUpdated && (
-                    <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                      Updated {formatRelativeTime(lastUpdated)}
-                    </span>
-                  )}
-                  <span style={{
-                    fontSize: '0.9rem', fontWeight: 900, color: theme.color,
-                    padding: '2px 10px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.08)'
-                  }}>
-                    {pct}% Complete
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Track */}
-              <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '999px', overflow: 'hidden' }}>
-                <div style={{
-                  width: `${pct}%`, height: '100%',
-                  background: theme.gradient, borderRadius: '999px',
-                  transition: 'width 0.5s ease-in-out'
-                }} />
-              </div>
-
-              {/* Current Milestone & Notes */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)' }}>
-                    Current Milestone Stage
-                  </div>
-                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Activity size={14} color={theme.color} /> {milestone.replace(/_/g, ' ')}
-                  </div>
-                </div>
-
-                {notes && (
-                  <div style={{
-                    flex: 1, minWidth: '260px', padding: '8px 12px', borderRadius: '10px',
-                    background: 'rgba(0, 0, 0, 0.15)', borderLeft: `3px solid ${theme.color}`,
-                    fontSize: '0.82rem', color: 'var(--text-secondary)'
-                  }}>
-                    <strong style={{ color: 'var(--text-primary)' }}>Technician Note:</strong> "{notes}"
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* ── Attached Evidence & Photos Strip ── */}
-        <div style={{ marginTop: '22px', paddingTop: '18px', borderTop: '1px solid var(--glass-border)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(99, 102, 241, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
-                <ImageIcon size={16} />
-              </div>
-              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                {t('issues.evidencePhotos', 'Attached Evidence & Media Photos')}
-              </h4>
-              <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'var(--color-elevated)', border: '1px solid var(--color-border)', color: 'var(--text-secondary)', fontWeight: 700 }}>
-                {imageDocuments.length} {imageDocuments.length === 1 ? 'image' : 'images'}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowAddDocModal(true)}
-              className="btn btn-secondary btn-sm"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', padding: '6px 12px' }}
+            {/* Description Container with Modern Left Border Accent */}
+            <div
+              style={{
+                position: 'relative',
+                borderRadius: '14px',
+                padding: '18px 22px',
+                background: 'var(--color-elevated)',
+                border: '1px solid var(--color-border)',
+                borderLeft: '4px solid var(--color-primary)',
+                boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.02)'
+              }}
             >
-              <Upload size={13} /> {t('issues.attachEvidence', 'Attach Photo / Evidence')}
-            </button>
+              <div style={{
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.8px',
+                color: 'var(--text-muted)',
+                marginBottom: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <FileText size={13} style={{ color: 'var(--color-primary)' }} />
+                <span>{t('issues.problemDescription', 'Issue Description & Scope')}</span>
+              </div>
+              <p style={{
+                margin: 0,
+                color: 'var(--text-primary)',
+                fontSize: '0.94rem',
+                lineHeight: '1.65',
+                whiteSpace: 'pre-wrap'
+              }}>
+                {d.Description || 'No description provided.'}
+              </p>
+            </div>
           </div>
 
-          {imageDocuments.length === 0 ? (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px',
-              padding: '14px 18px', borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.02)',
-              border: '1px dashed var(--color-border)',
-              fontSize: '0.85rem', color: 'var(--text-muted)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <ImageIcon size={18} style={{ color: 'var(--text-muted)' }} />
-                <span>{t('issues.noImagesAttached', 'No evidence images attached yet. Visual proof speeds up technician diagnostics.')}</span>
+          {/* Metadata Grid (6 Modern Rounded Tiles) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4 pt-1">
+            {/* Requester */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                background: 'var(--color-elevated)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+              }}
+            >
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'rgba(99, 102, 241, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#6366f1',
+                  flexShrink: 0
+                }}
+              >
+                <User size={18} />
               </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 700 }}>
+                  {t('issues.requester', 'Requester')}
+                </div>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.92rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {d.RequesterName || 'N/A'}
+                </div>
+              </div>
+            </div>
+
+            {/* Service */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                background: 'var(--color-elevated)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+              }}
+            >
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#10b981',
+                  flexShrink: 0
+                }}
+              >
+                <Tag size={18} />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 700 }}>
+                  {t('issues.service', 'Service')}
+                </div>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.92rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {d.ServiceName || 'General Request'}
+                </div>
+              </div>
+            </div>
+
+            {/* Assigned Dept */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                background: 'var(--color-elevated)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+              }}
+            >
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#f59e0b',
+                  flexShrink: 0
+                }}
+              >
+                <Building size={18} />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 700 }}>
+                  {t('issues.assignedStaff', 'Assigned Dept')}
+                </div>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.92rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {d.AssignedDepartmentName || 'Unassigned'}
+                </div>
+              </div>
+            </div>
+
+            {/* Submitted Date */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                background: 'var(--color-elevated)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+              }}
+            >
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'rgba(2, 132, 199, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#0284c7',
+                  flexShrink: 0
+                }}
+              >
+                <Calendar size={18} />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 700 }}>
+                  {t('issues.submitted', 'Submitted')}
+                </div>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {formatDate(d.CreatedDate)}
+                </div>
+              </div>
+            </div>
+
+            {/* Location (Building & Office Suite) */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                background: 'var(--color-elevated)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+              }}
+            >
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'rgba(225, 29, 72, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#e11d48',
+                  flexShrink: 0
+                }}
+              >
+                <MapPin size={18} />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 700 }}>
+                  {t('issues.locationDetails', 'Location')}
+                </div>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.92rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {d.BuildingName ? `${d.BuildingName}${d.OfficeSpaceNumber ? ` / ${d.OfficeSpaceNumber}` : ''}` : 'Ethiopian IT Park Campus'}
+                </div>
+              </div>
+            </div>
+
+            {/* Category */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                background: 'var(--color-elevated)',
+                border: '1px solid var(--color-border)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+              }}
+            >
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'rgba(139, 92, 246, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#8b5cf6',
+                  flexShrink: 0
+                }}
+              >
+                <Layers size={18} />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 700 }}>
+                  {t('issues.category', 'Category')}
+                </div>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.92rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {d.CategoryCode || d.CategoryName || 'GENERAL'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Real-Time Request Progress & Status Announcement Card ── */}
+          {(() => {
+            let custom = {};
+            try {
+              custom = d.CustomFieldsDataJson
+                ? (typeof d.CustomFieldsDataJson === 'string' ? JSON.parse(d.CustomFieldsDataJson) : d.CustomFieldsDataJson)
+                : {};
+            } catch (e) {}
+
+            const pct = custom.progressPercentage !== undefined
+              ? Number(custom.progressPercentage)
+              : (d.StatusCode === 'RESOLVED' || d.StatusCode === 'CLOSED' ? 100 : (d.StatusCode === 'IN_PROGRESS' ? 35 : (d.StatusCode === 'ASSIGNED' ? 15 : (d.StatusCode === 'APPROVED' ? 10 : 0))));
+
+            const milestone = custom.progressMilestone || (
+              d.StatusCode === 'NEW' ? 'Registered & Awaiting Initial Review' :
+              d.StatusCode === 'PENDING_APPROVAL' ? 'Under Management Approval Review' :
+              d.StatusCode === 'APPROVED' ? 'Approved & Queued for Technician Dispatch' :
+              d.StatusCode === 'ASSIGNED' ? 'Technician Assigned & En Route' :
+              d.StatusCode === 'IN_PROGRESS' ? 'Active Field Execution' :
+              d.StatusCode === 'PENDING' ? 'Work On Hold / Awaiting Parts' :
+              d.StatusCode === 'RESOLVED' ? 'Service Completed - Ready for Sign-Off' :
+              d.StatusCode === 'CLOSED' ? 'Officially Verified & Closed' :
+              'Active Request'
+            );
+
+            const notes = custom.latestProgressNotes || '';
+            const lastUpdated = custom.lastProgressUpdatedAt;
+
+            const getStatusTheme = (status) => {
+              switch (status) {
+                case 'RESOLVED':
+                case 'CLOSED':
+                  return { bg: 'rgba(16, 185, 129, 0.06)', border: 'rgba(16, 185, 129, 0.25)', color: '#10b981', gradient: 'linear-gradient(90deg, #10b981, #059669)', glow: 'rgba(16, 185, 129, 0.15)' };
+                case 'IN_PROGRESS':
+                  return { bg: 'rgba(99, 102, 241, 0.06)', border: 'rgba(99, 102, 241, 0.25)', color: '#6366f1', gradient: 'linear-gradient(90deg, #6366f1, #3b82f6)', glow: 'rgba(99, 102, 241, 0.15)' };
+                case 'PENDING':
+                  return { bg: 'rgba(245, 158, 11, 0.06)', border: 'rgba(245, 158, 11, 0.25)', color: '#f59e0b', gradient: 'linear-gradient(90deg, #f59e0b, #d97706)', glow: 'rgba(245, 158, 11, 0.15)' };
+                case 'APPROVED':
+                case 'ASSIGNED':
+                  return { bg: 'rgba(59, 130, 246, 0.06)', border: 'rgba(59, 130, 246, 0.25)', color: '#3b82f6', gradient: 'linear-gradient(90deg, #3b82f6, #06b6d4)', glow: 'rgba(59, 130, 246, 0.15)' };
+                default:
+                  return { bg: 'rgba(100, 116, 139, 0.06)', border: 'rgba(100, 116, 139, 0.2)', color: '#64748b', gradient: 'linear-gradient(90deg, #64748b, #475569)', glow: 'rgba(100, 116, 139, 0.1)' };
+              }
+            };
+
+            const theme = getStatusTheme(d.StatusCode);
+
+            return (
+              <div
+                style={{
+                  position: 'relative',
+                  borderRadius: '16px',
+                  padding: '20px 24px',
+                  background: theme.bg,
+                  border: `1.5px solid ${theme.border}`,
+                  boxShadow: `0 4px 20px ${theme.glow}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <TrendingUp size={16} color={theme.color} />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: theme.color }}>
+                        {t('issues.liveProgressStatus', 'Live Request Progress & Execution Status')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {lastUpdated && (
+                      <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                        Updated {formatRelativeTime(lastUpdated)}
+                      </span>
+                    )}
+                    <span style={{
+                      fontSize: '0.88rem',
+                      fontWeight: 900,
+                      color: theme.color,
+                      padding: '4px 12px',
+                      borderRadius: '20px',
+                      background: 'var(--color-surface)',
+                      border: `1px solid ${theme.border}`,
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+                    }}>
+                      {pct}% Complete
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress Track */}
+                <div style={{ width: '100%', height: '10px', background: 'rgba(0, 0, 0, 0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${pct}%`,
+                    height: '100%',
+                    background: theme.gradient,
+                    borderRadius: '999px',
+                    transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: `0 0 10px ${theme.color}`
+                  }} />
+                </div>
+
+                {/* Current Milestone & Notes */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', fontWeight: 700 }}>
+                      {t('issues.currentMilestoneStage', 'Current Milestone Stage')}
+                    </div>
+                    <div style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: theme.color, boxShadow: `0 0 6px ${theme.color}` }} />
+                      <Activity size={15} color={theme.color} />
+                      <span>{milestone.replace(/_/g, ' ')}</span>
+                    </div>
+                  </div>
+
+                  {notes && (
+                    <div style={{
+                      flex: 1, minWidth: '280px', padding: '10px 14px', borderRadius: '10px',
+                      background: 'var(--color-surface)', borderLeft: `4px solid ${theme.color}`,
+                      border: '1px solid var(--color-border)',
+                      fontSize: '0.84rem', color: 'var(--text-secondary)'
+                    }}>
+                      <strong style={{ color: 'var(--text-primary)' }}>Technician Note:</strong> "{notes}"
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ── Attached Evidence & Photos Strip ── */}
+          <div style={{ paddingTop: '10px', borderTop: '1px solid var(--color-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
+                  <ImageIcon size={18} />
+                </div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {t('issues.evidencePhotos', 'Attached Evidence & Media Photos')}
+                  </h4>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '12px', background: 'var(--color-elevated)', border: '1px solid var(--color-border)', color: 'var(--text-secondary)', fontWeight: 800 }}>
+                  {imageDocuments.length} {imageDocuments.length === 1 ? 'image' : 'images'}
+                </span>
+              </div>
+
               <button
                 type="button"
                 onClick={() => setShowAddDocModal(true)}
-                style={{
-                  background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 700,
-                  fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
-                }}
+                className="btn btn-secondary btn-sm"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', fontSize: '0.82rem', padding: '7px 14px', borderRadius: '10px', fontWeight: 700 }}
               >
-                <Plus size={14} /> {t('issues.uploadNow', 'Upload Photo')}
+                <Upload size={14} /> {t('issues.attachEvidence', 'Attach Photo / Evidence')}
               </button>
             </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '14px' }}>
-              {imageDocuments.map((doc, idx) => {
-                const docId = doc.DocumentID || doc.DocumentUUID;
-                const previewUrl = getDocumentPreviewUrl(doc);
-                const ext = (doc.FileExtension || (doc.FileName || '').split('.').pop() || 'IMG').toUpperCase();
-                return (
-                  <div key={docId || idx} className="evidence-card">
-                    <div className="evidence-thumbnail-wrapper">
-                      <img
-                        src={previewUrl}
-                        alt={doc.Title || doc.FileName || 'Evidence Image'}
-                        className="evidence-thumbnail"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                      <div className="evidence-overlay">
-                        <button
-                          type="button"
-                          className="evidence-btn-action"
-                          onClick={() => openLightbox(doc)}
-                          title="View Full Resolution"
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <a
-                          href={previewUrl}
-                          download={doc.FileName || 'evidence.jpg'}
-                          className="evidence-btn-action"
-                          title="Download Image"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Download size={15} />
-                        </a>
-                      </div>
-                      <span style={{
-                        position: 'absolute', top: '8px', right: '8px',
-                        fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px',
-                        borderRadius: '4px', background: 'rgba(0,0,0,0.65)', color: '#fff',
-                        backdropFilter: 'blur(4px)'
-                      }}>
-                        {ext}
-                      </span>
-                    </div>
-                    <div style={{ padding: '10px 12px', background: 'var(--color-surface)' }}>
-                      <div style={{
-                        fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-primary)',
-                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                      }} title={doc.Title || doc.FileName}>
-                        {doc.Title || doc.FileName}
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                        <span>{formatFileSize(doc.FileSizeBytes)}</span>
-                        <span>{formatRelativeTime(doc.CreatedDate)}</span>
-                      </div>
-                    </div>
+
+            {imageDocuments.length === 0 ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  padding: '28px 20px',
+                  borderRadius: '16px',
+                  background: 'var(--color-elevated)',
+                  border: '2px dashed var(--color-border)',
+                  gap: '12px'
+                }}
+              >
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                  <ImageIcon size={22} />
+                </div>
+                <div style={{ maxWidth: '440px' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.94rem', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                    {t('issues.noImagesAttachedTitle', 'No Evidence Photos Attached')}
                   </div>
-                );
-              })}
-            </div>
-          )}
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    {t('issues.noImagesAttached', 'Visual diagnostic photos help our maintenance technicians identify equipment faults, leakages, and hardware issues faster.')}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDocModal(true)}
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', marginTop: '4px', borderRadius: '8px' }}
+                >
+                  <Plus size={14} /> {t('issues.uploadPhotoNow', 'Upload Photo Now')}
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '14px' }}>
+                {imageDocuments.map((doc, idx) => {
+                  const docId = doc.DocumentID || doc.DocumentUUID;
+                  const previewUrl = getDocumentPreviewUrl(doc);
+                  const ext = (doc.FileExtension || (doc.FileName || '').split('.').pop() || 'IMG').toUpperCase();
+                  return (
+                    <div key={docId || idx} className="evidence-card" style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+                      <div className="evidence-thumbnail-wrapper">
+                        <img
+                          src={previewUrl}
+                          alt={doc.Title || doc.FileName || 'Evidence Image'}
+                          className="evidence-thumbnail"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                        <div className="evidence-overlay">
+                          <button
+                            type="button"
+                            className="evidence-btn-action"
+                            onClick={() => openLightbox(doc)}
+                            title="View Full Resolution"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <a
+                            href={previewUrl}
+                            download={doc.FileName || 'evidence.jpg'}
+                            className="evidence-btn-action"
+                            title="Download Image"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Download size={15} />
+                          </a>
+                        </div>
+                        <span style={{
+                          position: 'absolute', top: '8px', right: '8px',
+                          fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px',
+                          borderRadius: '4px', background: 'rgba(0,0,0,0.65)', color: '#fff',
+                          backdropFilter: 'blur(4px)'
+                        }}>
+                          {ext}
+                        </span>
+                      </div>
+                      <div style={{ padding: '10px 12px', background: 'var(--color-surface)' }}>
+                        <div style={{
+                          fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-primary)',
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                        }} title={doc.Title || doc.FileName}>
+                          {doc.Title || doc.FileName}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          <span>{formatFileSize(doc.FileSizeBytes)}</span>
+                          <span>{formatRelativeTime(doc.CreatedDate)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1502,7 +1877,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
             {/* Investigation Form (Staff) */}
             {showInvestigationForm && (
-              <form onSubmit={handleAddInvestigation} style={{ marginBottom: '24px', padding: '22px', borderRadius: '12px', backgroundColor: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+              <form onSubmit={handleAddInvestigation} style={{ marginBottom: '28px', padding: '24px', borderRadius: '16px', background: 'var(--color-surface)', border: '1.5px solid rgba(245, 158, 11, 0.35)', borderTop: '4px solid #f59e0b', boxShadow: '0 8px 24px rgba(245, 158, 11, 0.08)' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                   <div style={{ gridColumn: '1 / -1' }}>
                     <FormField
@@ -2038,7 +2413,7 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
 
               {/* Add Resolution Form (Staff) */}
               {showResolutionForm && (
-                <form onSubmit={handleAddResolution} style={{ marginBottom: '24px', padding: '20px', borderRadius: '12px', backgroundColor: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                <form onSubmit={handleAddResolution} style={{ marginBottom: '28px', padding: '24px', borderRadius: '16px', background: 'var(--color-surface)', border: '1.5px solid rgba(16, 185, 129, 0.35)', borderTop: '4px solid #10b981', boxShadow: '0 8px 24px rgba(16, 185, 129, 0.08)' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                     <div>
                       <FormField
@@ -2554,6 +2929,132 @@ export const IssueDetailView = ({ issue, onBack, onRefresh }) => {
             onRefresh?.();
           }}
         />
+      )}
+
+      {/* ── Attach Photo / Diagnostic Evidence Modal ── */}
+      {showAddDocModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1200,
+            padding: '20px'
+          }}
+          onClick={() => setShowAddDocModal(false)}
+        >
+          <div
+            className="enterprise-card"
+            style={{
+              width: '100%',
+              maxWidth: '540px',
+              borderRadius: '20px',
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-surface)',
+              boxShadow: '0 24px 60px -10px rgba(0, 0, 0, 0.45)',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid var(--color-border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1' }}>
+                  <Upload size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {t('issues.uploadEvidenceTitle', 'Attach Diagnostic Evidence')}
+                  </h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    Link diagnostic media or defect photos to ticket #{d?.RequestNumber}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddDocModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px', borderRadius: '8px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleUploadAttachment} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '6px', color: 'var(--text-primary)' }}>
+                  {t('issues.photoEvidenceFile', 'Select Evidence File / Photo')} *
+                </label>
+                <input
+                  type="file"
+                  id="evidence-file-input"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewDocFile(file);
+                      if (!newDocTitle) setNewDocTitle(file.name.replace(/\.[^/.]+$/, ''));
+                    }
+                  }}
+                  className="enterprise-input"
+                  style={{ padding: '10px 14px', fontSize: '0.85rem' }}
+                  required
+                />
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                  Supports PNG, JPG, JPEG, WEBP, GIF, PDF (up to 10 MB).
+                </span>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '6px', color: 'var(--text-primary)' }}>
+                  {t('issues.photoTitle', 'Document / Photo Title')}
+                </label>
+                <input
+                  type="text"
+                  value={newDocTitle}
+                  onChange={(e) => setNewDocTitle(e.target.value)}
+                  placeholder="e.g. AC compressor wiring failure, Server rack B-12 inspection"
+                  className="enterprise-input"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDocModal(false)}
+                  className="btn btn-secondary"
+                  disabled={uploadingDoc}
+                >
+                  {t('common.cancel', 'Cancel')}
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={uploadingDoc || !newDocFile}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}
+                >
+                  {uploadingDoc ? <RefreshCw size={15} className="animate-spin" /> : <Upload size={15} />}
+                  <span>{uploadingDoc ? t('common.uploading', 'Uploading...') : t('issues.uploadEvidence', 'Upload & Link to Ticket')}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
       {/* ── Interactive Fullscreen Image Lightbox Modal ── */}
       {lightboxDoc && (

@@ -205,6 +205,7 @@ function AuthenticatedShell() {
           <Route path="organization/departments" element={<ProtectedRoute permission="Department.Read" onBack={() => handleNavigate('dashboard')}><OrgDepartmentsPage /></ProtectedRoute>} />
           <Route path="organization/teams" element={<ProtectedRoute permission="Department.Read" onBack={() => handleNavigate('dashboard')}><OrgTeamsPage /></ProtectedRoute>} />
           <Route path="organization/assignments" element={<ProtectedRoute permission="Department.Read" onBack={() => handleNavigate('dashboard')}><OrgAssignmentsPage /></ProtectedRoute>} />
+          <Route path="organization/workforce" element={<ProtectedRoute permission="Department.Read" onBack={() => handleNavigate('dashboard')}><OrgAssignmentsPage /></ProtectedRoute>} />
           <Route path="organization/financials" element={<ProtectedRoute permission="Department.Read" onBack={() => handleNavigate('dashboard')}><OrgFinancialsPage /></ProtectedRoute>} />
           <Route path="documents" element={<Navigate to="/documents/dashboard" replace />} />
           <Route path="documents/dashboard" element={<ProtectedRoute permission="Document.Read" onBack={() => handleNavigate('dashboard')}><DocDashboardPage /></ProtectedRoute>} />

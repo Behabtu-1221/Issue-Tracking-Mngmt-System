@@ -16,14 +16,18 @@ export const serviceCategoryService = {
   },
 
   async createCategory(data, userId) {
-    // Uniqueness: CategoryCode per Tenant
-    const existing = await serviceCategoryRepository.findByTenantAndCode(data.TenantID, data.CategoryCode);
+    // Uniqueness: CategoryCode per Business Park
+    const existing = await serviceCategoryRepository.findByCode(data.CategoryCode);
     if (existing) {
       throw new AppError(`Service category code '${data.CategoryCode}' already exists`, 409);
     }
 
     const { DepartmentID, ...categoryData } = data;
-    const newId = await serviceCategoryRepository.create({ ...categoryData, CreatedBy: userId });
+    const newId = await serviceCategoryRepository.create({
+      ...categoryData,
+      DepartmentID: DepartmentID ? Number(DepartmentID) : null,
+      CreatedBy: userId
+    });
 
     if (DepartmentID) {
       await serviceCategoryMappingRepository.create({

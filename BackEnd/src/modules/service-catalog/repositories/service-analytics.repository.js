@@ -7,7 +7,7 @@ export const serviceAnalyticsRepository = {
         (SELECT COUNT(*) FROM ServiceCategory WHERE IsDeleted = 0) AS TotalCategories,
         (SELECT COUNT(*) FROM Service WHERE IsDeleted = 0 AND IsActive = 1) AS TotalActiveServices,
         (SELECT COUNT(*) FROM IssueRequest WHERE ServiceID IS NOT NULL AND IsDeleted = 0) AS TotalServiceRequests,
-        (SELECT COUNT(*) FROM ApprovalRequest WHERE IsDeleted = 0 AND ApprovalStatusCode = 'APPROVED') AS TotalApprovedRequests,
+        (SELECT COUNT(*) FROM Approval WHERE IsDeleted = 0 AND ApprovalStatusCode = 'APPROVED') AS TotalApprovedRequests,
         (SELECT COUNT(*) FROM SLAClock WHERE ClockStatus = 'RUNNING' AND IsDeleted = 0) AS ActiveSLAClocks,
         (SELECT COUNT(*) FROM SLAClock WHERE IsBreached = 1 AND IsDeleted = 0) AS SLABreachCount
     `;
@@ -57,7 +57,7 @@ export const serviceAnalyticsRepository = {
         SUM(CASE WHEN ar.ApprovalStatusCode = 'PENDING' THEN 1 ELSE 0 END) AS PendingCount
       FROM Service s
       JOIN IssueRequest ir ON s.ServiceID = ir.ServiceID AND ir.IsDeleted = 0
-      JOIN ApprovalRequest ar ON ir.IssueRequestID = ar.RequestID AND ar.IsDeleted = 0
+      JOIN Approval ar ON ir.IssueRequestID = ar.RequestID AND ar.IsDeleted = 0
       WHERE s.IsDeleted = 0
       GROUP BY s.ServiceID, s.ServiceName
       ORDER BY TotalApprovalsTriggered DESC

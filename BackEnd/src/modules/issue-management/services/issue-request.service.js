@@ -11,8 +11,8 @@ import outboxService from '../../../shared/outbox/outbox.service.js';
 import businessCalendar from '../../sla/utils/business-calendar.js';
 
 export const issueRequestService = {
-  async getOverviewMetrics(tenantId) {
-    return issueRequestRepository.getOverviewMetrics(tenantId);
+  async getOverviewMetrics(tenantId, dataScope) {
+    return issueRequestRepository.getOverviewMetrics(tenantId, dataScope);
   },
 
   async getIssues(params, dataScope) {
@@ -103,45 +103,82 @@ export const issueRequestService = {
       categoryCode = data.CategoryCode || 'GENERAL';
     }
 
-    // 2. Department Resolution
+    // 2. Department Resolution: Intelligently route by Department-to-ServiceCategory mapping
+    if (!assignedDeptId && data.ServiceCategoryID) {
+      try {
+        const [catMapping] = await query(
+          `SELECT COALESCE(m.DepartmentID, sc.DepartmentID) AS DepartmentID, d.DepartmentName, d.DepartmentCode
+           FROM ServiceCategory sc
+           LEFT JOIN ServiceCategoryDepartmentMapping m ON sc.ServiceCategoryID = m.ServiceCategoryID AND m.IsActive = 1 AND m.IsDeleted = 0
+           JOIN Department d ON COALESCE(m.DepartmentID, sc.DepartmentID) = d.DepartmentID
+           WHERE sc.ServiceCategoryID = ? AND sc.IsDeleted = 0
+           LIMIT 1`,
+          [data.ServiceCategoryID]
+        );
+        if (catMapping && catMapping.DepartmentID) {
+          assignedDeptId = catMapping.DepartmentID;
+          resolvedDeptName = catMapping.DepartmentName;
+        }
+      } catch (catMapErr) {
+        console.warn('Category mapping lookup notice:', catMapErr.message);
+      }
+    }
+
     if (!assignedDeptId && data.ServiceID) {
       try {
-        const [sd] = await query(
-          `SELECT sd.DepartmentID, d.DepartmentName, d.DepartmentCode
-           FROM servicedepartment sd
-           JOIN Department d ON sd.DepartmentID = d.DepartmentID
-           WHERE sd.ServiceID = ? AND sd.IsActive = 1 AND sd.IsDeleted = 0
-           ORDER BY sd.IsPrimary DESC
+        // Route via Service's category mapping
+        const [svcCatMapping] = await query(
+          `SELECT COALESCE(m.DepartmentID, sc.DepartmentID) AS DepartmentID, d.DepartmentName, d.DepartmentCode
+           FROM Service s
+           JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
+           LEFT JOIN ServiceCategoryDepartmentMapping m ON sc.ServiceCategoryID = m.ServiceCategoryID AND m.IsActive = 1 AND m.IsDeleted = 0
+           JOIN Department d ON COALESCE(m.DepartmentID, sc.DepartmentID) = d.DepartmentID
+           WHERE s.ServiceID = ? AND s.IsDeleted = 0
            LIMIT 1`,
           [data.ServiceID]
         );
-        if (sd && sd.DepartmentID) {
-          assignedDeptId = sd.DepartmentID;
-          resolvedDeptName = sd.DepartmentName;
+        if (svcCatMapping && svcCatMapping.DepartmentID) {
+          assignedDeptId = svcCatMapping.DepartmentID;
+          resolvedDeptName = svcCatMapping.DepartmentName;
+        } else {
+          // Fallback to ServiceDepartment table
+          const [sd] = await query(
+            `SELECT sd.DepartmentID, d.DepartmentName, d.DepartmentCode
+             FROM ServiceDepartment sd
+             JOIN Department d ON sd.DepartmentID = d.DepartmentID
+             WHERE sd.ServiceID = ? AND sd.IsActive = 1 AND sd.IsDeleted = 0
+             ORDER BY sd.IsPrimary DESC
+             LIMIT 1`,
+            [data.ServiceID]
+          );
+          if (sd && sd.DepartmentID) {
+            assignedDeptId = sd.DepartmentID;
+            resolvedDeptName = sd.DepartmentName;
+          }
         }
       } catch (deptErr) {
         console.warn('Service department lookup notice:', deptErr.message);
       }
     }
 
-    // If still no department, try matching by CategoryCode
+    // If still no department, try matching by CategoryCode via mapping
     if (!assignedDeptId && categoryCode && categoryCode !== 'GENERAL') {
       try {
-        const catKey = categoryCode.split('-')[0].trim();
-        const [deptMatch] = await query(
-          `SELECT DepartmentID, DepartmentName 
-           FROM Department 
-           WHERE (DepartmentCode = ? OR DepartmentName LIKE ? OR DepartmentCode LIKE ?) 
-             AND IsActive = 1 AND IsDeleted = 0 
+        const [mappedByCode] = await query(
+          `SELECT COALESCE(m.DepartmentID, sc.DepartmentID) AS DepartmentID, d.DepartmentName, d.DepartmentCode
+           FROM ServiceCategory sc
+           LEFT JOIN ServiceCategoryDepartmentMapping m ON sc.ServiceCategoryID = m.ServiceCategoryID AND m.IsActive = 1 AND m.IsDeleted = 0
+           JOIN Department d ON COALESCE(m.DepartmentID, sc.DepartmentID) = d.DepartmentID
+           WHERE (sc.CategoryCode = ? OR sc.CategoryCode LIKE ?) AND sc.IsDeleted = 0
            LIMIT 1`,
-          [categoryCode, `%${catKey}%`, `%${catKey}%`]
+          [categoryCode, `%${categoryCode.split('-')[0].trim()}%`]
         );
-        if (deptMatch && deptMatch.DepartmentID) {
-          assignedDeptId = deptMatch.DepartmentID;
-          resolvedDeptName = deptMatch.DepartmentName;
+        if (mappedByCode && mappedByCode.DepartmentID) {
+          assignedDeptId = mappedByCode.DepartmentID;
+          resolvedDeptName = mappedByCode.DepartmentName;
         }
-      } catch (catDeptErr) {
-        console.warn('Category department lookup notice:', catDeptErr.message);
+      } catch (codeErr) {
+        console.warn('Category code mapping notice:', codeErr.message);
       }
     }
 

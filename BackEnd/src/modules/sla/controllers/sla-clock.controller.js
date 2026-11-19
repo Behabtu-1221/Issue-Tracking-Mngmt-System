@@ -4,7 +4,8 @@ import { sendSuccess } from '../../../shared/utils/apiResponse.js';
 export const slaClockController = {
   async getOverviewMetrics(req, res, next) {
     try {
-      const data = await slaClockService.getOverviewMetrics(req.query.tenantId);
+      const departmentId = req.dataScope?.type === 'DEPARTMENT' ? req.dataScope.departmentId : req.query.departmentId;
+      const data = await slaClockService.getOverviewMetrics(req.query.tenantId, departmentId);
       return sendSuccess(res, data);
     } catch (err) {
       next(err);
@@ -13,11 +14,13 @@ export const slaClockController = {
 
   async findAllClocks(req, res, next) {
     try {
+      const departmentId = req.dataScope?.type === 'DEPARTMENT' ? req.dataScope.departmentId : req.query.departmentId;
       const data = await slaClockService.findAllClocks({
         search: req.query.search,
         clockStatus: req.query.clockStatus,
         priorityCode: req.query.priorityCode,
         isBreached: req.query.isBreached === 'true',
+        departmentId,
         page: Number(req.query.page || 1),
         limit: Number(req.query.limit || 50)
       });

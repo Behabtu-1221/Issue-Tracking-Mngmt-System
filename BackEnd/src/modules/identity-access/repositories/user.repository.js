@@ -11,8 +11,13 @@ class UserRepository {
     }
 
     if (departmentId) {
-      whereConditions.push('ea.DepartmentID = ?');
-      queryParams.push(departmentId);
+      whereConditions.push(`(
+        u.DepartmentID = ?
+        OR ea.DepartmentID = ?
+        OR EXISTS (SELECT 1 FROM Department d_mgr WHERE d_mgr.DepartmentID = ? AND d_mgr.ManagerUserID = u.UserID AND d_mgr.IsDeleted = 0)
+        OR EXISTS (SELECT 1 FROM TeamAssignment ta_sub JOIN Team t_sub ON ta_sub.TeamID = t_sub.TeamID WHERE ta_sub.UserID = u.UserID AND t_sub.DepartmentID = ? AND ta_sub.IsDeleted = 0 AND t_sub.IsDeleted = 0)
+      )`);
+      queryParams.push(Number(departmentId), Number(departmentId), Number(departmentId), Number(departmentId));
     }
 
     if (userTypeCode) {
@@ -49,10 +54,14 @@ class UserRepository {
     const rows = await db.query(
       `SELECT
          u.UserID,
+         u.BusinessParkID,
          u.TenantID,
+         COALESCE(u.DepartmentID, ea.DepartmentID) AS DepartmentID,
          u.UserTypeCode,
          u.FirstName,
          u.LastName,
+         u.Age,
+         u.Gender,
          u.Email,
          u.PhoneNumber,
          u.MobileNumber,
@@ -69,9 +78,22 @@ class UserRepository {
          ua.IsMfaEnabled,
          t.CompanyName AS TenantName,
          t.TenantCode,
-         d.DepartmentID,
-         d.DepartmentName,
-         (SELECT bp.BusinessParkName FROM BusinessPark bp WHERE bp.IsDeleted = 0 LIMIT 1) AS BusinessParkName,
+         COALESCE(d.DepartmentName, ud.DepartmentName) AS DepartmentName,
+         COALESCE(bp.BusinessParkName, 'Ethiopian IT Park') AS BusinessParkName,
+         (
+           SELECT tm.TeamName
+           FROM TeamAssignment ta
+           INNER JOIN Team tm ON tm.TeamID = ta.TeamID AND tm.IsDeleted = 0
+           WHERE ta.UserID = u.UserID AND ta.IsActive = 1 AND ta.IsDeleted = 0
+           LIMIT 1
+         ) AS AssignedTeamName,
+         (
+           SELECT tm.TeamID
+           FROM TeamAssignment ta
+           INNER JOIN Team tm ON tm.TeamID = ta.TeamID AND tm.IsDeleted = 0
+           WHERE ta.UserID = u.UserID AND ta.IsActive = 1 AND ta.IsDeleted = 0
+           LIMIT 1
+         ) AS AssignedTeamID,
          (
            SELECT GROUP_CONCAT(CONCAT(r.RoleID, ':', r.RoleName, ':', r.RoleCode) SEPARATOR '||')
            FROM UserRole ur
@@ -80,9 +102,11 @@ class UserRepository {
          ) AS AssignedRolesGroup
        FROM \`User\` u
        INNER JOIN UserAccount ua ON ua.UserID = u.UserID
+       LEFT JOIN BusinessPark bp ON bp.BusinessParkID = u.BusinessParkID AND bp.IsDeleted = 0
        LEFT JOIN Tenant t ON t.TenantID = u.TenantID AND t.IsDeleted = 0
        LEFT JOIN EmployeeAssignment ea ON ea.UserID = u.UserID AND ea.IsPrimary = 1 AND ea.IsActive = 1 AND ea.IsDeleted = 0
        LEFT JOIN Department d ON d.DepartmentID = ea.DepartmentID AND d.IsDeleted = 0
+       LEFT JOIN Department ud ON ud.DepartmentID = u.DepartmentID AND ud.IsDeleted = 0
        WHERE ${whereClause}
        ORDER BY u.UserID DESC
        LIMIT ? OFFSET ?`,
@@ -119,10 +143,14 @@ class UserRepository {
     const rows = await db.query(
       `SELECT
          u.UserID,
+         u.BusinessParkID,
          u.TenantID,
+         COALESCE(u.DepartmentID, ea.DepartmentID) AS DepartmentID,
          u.UserTypeCode,
          u.FirstName,
          u.LastName,
+         u.Age,
+         u.Gender,
          u.Email,
          u.PhoneNumber,
          u.MobileNumber,
@@ -141,13 +169,15 @@ class UserRepository {
          ua.IsMfaEnabled,
          t.CompanyName AS TenantName,
          t.TenantCode,
-         d.DepartmentID,
-         d.DepartmentName
+         COALESCE(d.DepartmentName, ud.DepartmentName) AS DepartmentName,
+         COALESCE(bp.BusinessParkName, 'Ethiopian IT Park') AS BusinessParkName
        FROM \`User\` u
        INNER JOIN UserAccount ua ON ua.UserID = u.UserID AND ua.IsDeleted = 0
+       LEFT JOIN BusinessPark bp ON bp.BusinessParkID = u.BusinessParkID AND bp.IsDeleted = 0
        LEFT JOIN Tenant t ON t.TenantID = u.TenantID AND t.IsDeleted = 0
        LEFT JOIN EmployeeAssignment ea ON ea.UserID = u.UserID AND ea.IsPrimary = 1 AND ea.IsActive = 1 AND ea.IsDeleted = 0
        LEFT JOIN Department d ON d.DepartmentID = ea.DepartmentID AND d.IsDeleted = 0
+       LEFT JOIN Department ud ON ud.DepartmentID = u.DepartmentID AND ud.IsDeleted = 0
        WHERE u.UserID = ?
          AND u.IsDeleted = 0
        LIMIT 1`,
@@ -195,22 +225,30 @@ class UserRepository {
     const queryFn = tx ? tx.query : db.query;
     const result = await queryFn(
       `INSERT INTO \`User\` (
+         BusinessParkID,
          TenantID,
+         DepartmentID,
          UserTypeCode,
          FirstName,
          LastName,
+         Age,
+         Gender,
          Email,
          PhoneNumber,
          MobileNumber,
          JobTitle,
          PreferredLanguage,
          CreatedBy
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        userData.businessParkId || 1,
         userData.tenantId || null,
+        userData.departmentId ? Number(userData.departmentId) : null,
         userData.userTypeCode || 'STAFF',
         userData.firstName,
         userData.lastName,
+        userData.age !== undefined && userData.age !== null && userData.age !== '' ? Number(userData.age) : null,
+        userData.gender ? String(userData.gender).toUpperCase() : null,
         userData.email,
         userData.phoneNumber || null,
         userData.mobileNumber || null,
@@ -258,6 +296,9 @@ class UserRepository {
       `UPDATE \`User\`
        SET FirstName = COALESCE(?, FirstName),
            LastName = COALESCE(?, LastName),
+           DepartmentID = COALESCE(?, DepartmentID),
+           Age = COALESCE(?, Age),
+           Gender = COALESCE(?, Gender),
            Email = COALESCE(?, Email),
            PhoneNumber = COALESCE(?, PhoneNumber),
            MobileNumber = COALESCE(?, MobileNumber),
@@ -270,6 +311,9 @@ class UserRepository {
       [
         userData.firstName || null,
         userData.lastName || null,
+        userData.departmentId ? Number(userData.departmentId) : null,
+        userData.age !== undefined && userData.age !== null && userData.age !== '' ? Number(userData.age) : null,
+        userData.gender ? String(userData.gender).toUpperCase() : null,
         userData.email || null,
         userData.phoneNumber || null,
         userData.mobileNumber || null,

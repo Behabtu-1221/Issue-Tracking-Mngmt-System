@@ -85,7 +85,17 @@ export const teamService = {
   },
 
   async addTeamMember(teamId, { userId, roleInTeam }, actorUserId, dataScope) {
-    await this.getTeamById(teamId, dataScope); // Access check
+    const team = await this.getTeamById(teamId, dataScope); // Access check
+
+    // Guardrail: technician must belong to the same department as the team
+    const userDept = await teamRepository.getUserDepartment(userId);
+    if (!userDept) {
+      throw new AppError('User not found', 404);
+    }
+    if (userDept.DepartmentID && Number(userDept.DepartmentID) !== Number(team.DepartmentID)) {
+      throw new AppError('Cannot assign technician to team: Technician belongs to a different department', 400);
+    }
+
     return teamRepository.addMember({ teamId, userId, roleInTeam, createdBy: actorUserId });
   },
 

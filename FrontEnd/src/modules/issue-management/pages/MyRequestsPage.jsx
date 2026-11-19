@@ -511,6 +511,16 @@ export default function MyRequestsPage() {
                     key={req.IssueRequestID || req.id}
                     onClick={() => setSelectedRequest(req)}
                     className="enterprise-interactive-card"
+                    style={{
+                      borderLeft: `4px solid ${
+                        req.PriorityCode === 'CRITICAL' ? '#ef4444' :
+                        req.PriorityCode === 'HIGH' ? '#f59e0b' :
+                        req.PriorityCode === 'LOW' ? '#10b981' : '#3b82f6'
+                      }`,
+                      borderRadius: '14px',
+                      padding: '18px 20px',
+                      marginBottom: '2px'
+                    }}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>

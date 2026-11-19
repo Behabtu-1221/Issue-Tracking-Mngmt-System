@@ -176,13 +176,13 @@ export const serviceRepository = {
   /**
    * Overview metrics for Service Catalog dashboard.
    */
-  async getOverviewMetrics(tenantId) {
+  async getOverviewMetrics(parkId = null) {
     const params = [];
-    const tenantFilter = tenantId ? ' AND sc.TenantID = ?' : '';
-    if (tenantId) params.push(Number(tenantId));
+    const parkFilter = parkId ? ' AND sc.BusinessParkID = ?' : '';
+    if (parkId) params.push(Number(parkId));
 
     const totalCats = await query(
-      `SELECT COUNT(*) as total FROM ServiceCategory sc WHERE sc.IsDeleted = 0 ${tenantFilter}`,
+      `SELECT COUNT(*) as total FROM ServiceCategory sc WHERE sc.IsDeleted = 0 ${parkFilter}`,
       params
     );
 
@@ -190,14 +190,14 @@ export const serviceRepository = {
       SELECT COUNT(*) as total
       FROM Service s
       JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
-      WHERE s.IsDeleted = 0 AND sc.IsDeleted = 0 ${tenantFilter}
+      WHERE s.IsDeleted = 0 AND sc.IsDeleted = 0 ${parkFilter}
     `, params);
 
     const activeSvcs = await query(`
       SELECT COUNT(*) as total
       FROM Service s
       JOIN ServiceCategory sc ON s.ServiceCategoryID = sc.ServiceCategoryID
-      WHERE s.IsDeleted = 0 AND s.IsActive = 1 AND sc.IsDeleted = 0 ${tenantFilter}
+      WHERE s.IsDeleted = 0 AND s.IsActive = 1 AND sc.IsDeleted = 0 ${parkFilter}
     `, params);
 
     return {

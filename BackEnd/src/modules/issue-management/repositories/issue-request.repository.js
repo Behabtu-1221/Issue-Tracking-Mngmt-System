@@ -12,13 +12,9 @@ function applyDataScopeSQL(dataScope, baseSql, params) {
     sql += ` AND (ir.RequesterUserID = ? OR EXISTS (SELECT 1 FROM Assignment a WHERE a.IssueRequestID = ir.IssueRequestID AND a.AssignedTechnicianID = ? AND a.Status = 'ACTIVE'))`;
     params.push(Number(dataScope.userId), Number(dataScope.userId));
   } else if (dataScope.type === 'DEPARTMENT') {
-    if (dataScope.tenantId) {
-      sql += ` AND ir.TenantID = ?`;
-      params.push(Number(dataScope.tenantId));
-    }
     if (dataScope.departmentId) {
-      sql += ` AND ir.AssignedDepartmentID = ?`;
-      params.push(Number(dataScope.departmentId));
+      sql += ` AND (ir.AssignedDepartmentID = ? OR ir.RequesterUserID IN (SELECT u_sub.UserID FROM \`User\` u_sub WHERE u_sub.DepartmentID = ? AND u_sub.IsDeleted = 0))`;
+      params.push(Number(dataScope.departmentId), Number(dataScope.departmentId));
     }
   } else if (dataScope.type === 'TENANT') {
     if (dataScope.tenantId) {

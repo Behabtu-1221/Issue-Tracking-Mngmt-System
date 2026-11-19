@@ -2,20 +2,22 @@ import Joi from 'joi';
 
 // ── Service Category ──
 export const createServiceCategorySchema = Joi.object({
-  TenantID: Joi.number().integer().allow(null, ''),
+  BusinessParkID: Joi.number().integer().allow(null, '').default(1),
   CategoryCode: Joi.string().trim().max(50).required(),
   CategoryName: Joi.string().trim().max(150).required(),
   Description: Joi.string().trim().max(1000).allow(null, ''),
   IsActive: Joi.number().integer().valid(0, 1).default(1),
-  DepartmentID: Joi.number().integer().allow(null, '')
+  DepartmentID: Joi.number().integer().allow(null, ''),
+  TenantID: Joi.any().optional()
 });
 
 export const updateServiceCategorySchema = Joi.object({
-  TenantID: Joi.number().integer().allow(null, ''),
+  BusinessParkID: Joi.number().integer().allow(null, ''),
   CategoryName: Joi.string().trim().max(150),
   Description: Joi.string().trim().max(1000).allow(null, ''),
   IsActive: Joi.number().integer().valid(0, 1),
-  DepartmentID: Joi.number().integer().allow(null, '')
+  DepartmentID: Joi.number().integer().allow(null, ''),
+  TenantID: Joi.any().optional()
 });
 
 // ── Core Service ──

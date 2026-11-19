@@ -13,6 +13,9 @@ export const departmentService = {
     if (!isParkAdminActor(actor) && actor?.tenantId) {
       filters.tenantId = actor.tenantId;
     }
+    if (dataScope && dataScope.type === 'DEPARTMENT' && dataScope.departmentId) {
+      filters.departmentId = dataScope.departmentId;
+    }
     return departmentRepository.findAll(filters);
   },
 
@@ -23,6 +26,9 @@ export const departmentService = {
     }
     if (!isParkAdminActor(actor) && dept.TenantID && dept.TenantID !== actor?.tenantId) {
       throw new AppError(`Department with ID ${id} not found`, 404);
+    }
+    if (dataScope && dataScope.type === 'DEPARTMENT' && dataScope.departmentId && Number(dept.DepartmentID) !== Number(dataScope.departmentId)) {
+      throw new AppError(`Access denied: You can only access your assigned department`, 403);
     }
     return dept;
   },

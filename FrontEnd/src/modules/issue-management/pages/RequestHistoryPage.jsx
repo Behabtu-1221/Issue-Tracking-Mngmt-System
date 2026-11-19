@@ -454,6 +454,16 @@ export default function RequestHistoryPage() {
                     key={item.IssueRequestID || item.id}
                     onClick={() => setSelectedRequest(item)}
                     className="enterprise-interactive-card"
+                    style={{
+                      borderLeft: `4px solid ${
+                        item.StatusCode === 'RESOLVED' ? '#10b981' :
+                        item.StatusCode === 'CLOSED' ? '#64748b' :
+                        item.StatusCode === 'CANCELLED' ? '#ef4444' : '#3b82f6'
+                      }`,
+                      borderRadius: '14px',
+                      padding: '18px 20px',
+                      marginBottom: '2px'
+                    }}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>

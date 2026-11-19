@@ -491,10 +491,11 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     staffCommunicationMenuItem,
     {
       id: 'organization',
-      label: 'Department',
+      label: 'Department Management',
       icon: Network,
       children: [
-        { id: 'organization/assignments', tabId: 'users', label: 'Department Users', icon: Users }
+        { id: 'organization/workforce', tabId: 'workforce', label: 'Department Workforce', icon: Users },
+        { id: 'organization/teams', tabId: 'teams', label: 'Work Teams & Technicians', icon: Briefcase }
       ]
     },
     { id: 'sla/dashboard', label: 'Operational Reports', icon: BarChart2 },
@@ -739,6 +740,12 @@ export default function DashboardLayout({ children, activeMenu = 'parks', onNavi
     if (!item) return '';
     const rawId = item.id || '';
     const cleanId = rawId.split('?')[0];
+
+    if (isManagerRole) {
+      if (cleanId === 'organization') return t('nav.deptManagement', 'Department Management');
+      if (cleanId === 'organization/workforce' || cleanId === 'organization/assignments') return t('nav.deptWorkforce', 'Department Workforce');
+      if (cleanId === 'organization/teams') return t('nav.deptTeams', 'Work Teams & Technicians');
+    }
 
     const keyMap = {
       'dashboard': 'nav.dashboard',

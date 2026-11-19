@@ -30,7 +30,7 @@ export const ActionButton = ({
   ...rest
 }) => {
   // Normalize variant class mapping
-  let variantClass = 'action-btn-neutral';
+  let variantClass;
   let DefaultIcon = null;
 
   switch (variant) {

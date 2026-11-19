@@ -24,6 +24,8 @@ export const dispatchApi = {
 
   // Roster & Availability
   getTechnicians: (params) => api.get('/dispatch/technicians', { params }),
+  getTeams: (params) => api.get('/teams', { params }),
+  getTeamsWorkloadSummary: (params) => api.get('/teams/workload-summary', { params }),
   updateAvailability: (data) => api.post('/dispatch/technicians/availability', data),
   updateLocation: (data) => api.post('/dispatch/technicians/location', data)
 };

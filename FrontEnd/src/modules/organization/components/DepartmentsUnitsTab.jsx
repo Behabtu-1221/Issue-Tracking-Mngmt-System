@@ -27,6 +27,14 @@ export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
   const [offices, setOffices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Modals & Location Mapping States
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
@@ -72,8 +80,8 @@ export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
   }, []);
 
   useEffect(() => {
-    fetchDepartments();
-  }, [search]);
+    fetchDepartments(debouncedSearch);
+  }, [debouncedSearch]);
 
   const fetchParks = async () => {
     try {
@@ -102,10 +110,10 @@ export default function DepartmentsUnitsTab({ onRefreshMetrics }) {
     }
   };
 
-  const fetchDepartments = async () => {
+  const fetchDepartments = async (searchTerm = debouncedSearch) => {
     try {
       setLoading(true);
-      const res = await orgApi.getDepartments({ search });
+      const res = await orgApi.getDepartments({ search: searchTerm });
       setDepartments(res.data?.data?.departments || res.data?.data || []);
     } catch (err) {
       console.error('Failed to fetch departments', err);

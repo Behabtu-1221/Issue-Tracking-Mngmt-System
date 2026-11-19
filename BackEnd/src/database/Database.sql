@@ -28,11 +28,7 @@
 -- * Indexes for FK columns and common query predicates are at the end
 -- ============================================================================
 
-CREATE DATABASE IF NOT EXISTS issue_tracking_system
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
-USE issue_tracking_system;
+-- Schema session initialization (schema-neutral)
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
@@ -423,6 +419,7 @@ CREATE TABLE IF NOT EXISTS BusinessPark (
 CREATE TABLE IF NOT EXISTS Building (
     BuildingID BIGINT AUTO_INCREMENT PRIMARY KEY,
     BusinessParkID BIGINT NOT NULL,
+    FacilityZoneID BIGINT NULL,
     BuildingCode VARCHAR(30) NOT NULL,
     BuildingName VARCHAR(200) NOT NULL,
     ShortName VARCHAR(100) NULL,
@@ -747,7 +744,7 @@ CREATE TABLE IF NOT EXISTS OfficeAllocationHistory (
 -- Table: OrganizationUnit
 CREATE TABLE IF NOT EXISTS OrganizationUnit (
     OrganizationUnitID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    TenantID BIGINT NULL,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
     ParentUnitID BIGINT NULL,
     UnitCode VARCHAR(30) NOT NULL,
     UnitName VARCHAR(150) NOT NULL,
@@ -761,8 +758,9 @@ CREATE TABLE IF NOT EXISTS OrganizationUnit (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT uq_orgunit_tenant_code UNIQUE(TenantID, UnitCode),
-    CONSTRAINT fk_orgunit_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE CASCADE,
+    INDEX idx_orgunit_park (BusinessParkID),
+    CONSTRAINT uq_orgunit_code UNIQUE(BusinessParkID, UnitCode),
+    CONSTRAINT fk_orgunit_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_orgunit_parent FOREIGN KEY (ParentUnitID) REFERENCES OrganizationUnit(OrganizationUnitID) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -790,6 +788,7 @@ CREATE TABLE IF NOT EXISTS BusinessUnit (
 -- Table: Department
 CREATE TABLE IF NOT EXISTS Department (
     DepartmentID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
     OrganizationUnitID BIGINT NULL DEFAULT 1,
     DepartmentCode VARCHAR(30) NOT NULL,
     DepartmentName VARCHAR(150) NOT NULL,
@@ -803,9 +802,11 @@ CREATE TABLE IF NOT EXISTS Department (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT uq_dept UNIQUE(OrganizationUnitID, DepartmentCode),
-    CONSTRAINT fk_dept_orgunit FOREIGN KEY (OrganizationUnitID) REFERENCES OrganizationUnit(OrganizationUnitID) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT fk_dept_manager FOREIGN KEY (ManagerUserID) REFERENCES `User`(UserID) ON UPDATE CASCADE ON DELETE SET NULL
+    CONSTRAINT uq_dept UNIQUE(BusinessParkID, DepartmentCode),
+    CONSTRAINT fk_dept_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_dept_orgunit FOREIGN KEY (OrganizationUnitID) REFERENCES OrganizationUnit(OrganizationUnitID) ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_dept_manager FOREIGN KEY (ManagerUserID) REFERENCES `User`(UserID) ON UPDATE CASCADE ON DELETE SET NULL,
+    INDEX idx_dept_park (BusinessParkID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: Team
@@ -898,7 +899,7 @@ CREATE TABLE IF NOT EXISTS ReportingHierarchy (
 -- Table: CostCenter
 CREATE TABLE IF NOT EXISTS CostCenter (
     CostCenterID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    TenantID BIGINT NULL,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
     CostCenterCode VARCHAR(50) NOT NULL,
     CostCenterName VARCHAR(150) NOT NULL,
     Description VARCHAR(500) NULL,
@@ -911,8 +912,9 @@ CREATE TABLE IF NOT EXISTS CostCenter (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT uq_cost_center UNIQUE(TenantID, CostCenterCode),
-    CONSTRAINT fk_costcenter_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE CASCADE
+    INDEX idx_costcenter_park (BusinessParkID),
+    CONSTRAINT uq_cost_center UNIQUE(BusinessParkID, CostCenterCode),
+    CONSTRAINT fk_costcenter_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: DepartmentBudget
@@ -981,10 +983,14 @@ CREATE TABLE IF NOT EXISTS AuthenticationProvider (
 -- Table: User
 CREATE TABLE IF NOT EXISTS `User` (
     UserID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
     TenantID BIGINT NULL,
+    DepartmentID BIGINT NULL,
     UserTypeCode VARCHAR(30) NOT NULL DEFAULT 'STAFF',
     FirstName VARCHAR(100) NOT NULL,
     LastName VARCHAR(100) NOT NULL,
+    Age INT NULL,
+    Gender VARCHAR(20) NULL,
     Email VARCHAR(200) NOT NULL UNIQUE,
     PhoneNumber VARCHAR(50) NULL,
     MobileNumber VARCHAR(50) NULL,
@@ -1000,7 +1006,16 @@ CREATE TABLE IF NOT EXISTS `User` (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT fk_user_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE RESTRICT
+    INDEX idx_user_park (BusinessParkID),
+    INDEX idx_user_tenant (TenantID),
+    INDEX idx_user_dept (DepartmentID),
+    INDEX idx_user_type (UserTypeCode),
+    CONSTRAINT chk_user_age CHECK (Age IS NULL OR (Age >= 18 AND Age <= 120)),
+    CONSTRAINT chk_user_gender CHECK (Gender IS NULL OR Gender IN ('MALE', 'FEMALE', 'OTHER')),
+    CONSTRAINT chk_user_org_boundary CHECK (TenantID IS NULL OR DepartmentID IS NULL),
+    CONSTRAINT fk_user_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_user_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_user_dept FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: UserAccount
@@ -1285,6 +1300,26 @@ CREATE TABLE IF NOT EXISTS VisitorAccount (
 -- ============================================================================
 -- MODULE 5: ROLE & PERMISSION MANAGEMENT (Enterprise RBAC)
 -- ============================================================================
+
+-- Table: SystemModule
+CREATE TABLE IF NOT EXISTS SystemModule (
+    SystemModuleID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ModuleCode VARCHAR(50) NOT NULL UNIQUE,
+    ModuleName VARCHAR(150) NOT NULL,
+    Description VARCHAR(500) NULL,
+    DisplayOrder INT NOT NULL DEFAULT 0,
+    IsActive TINYINT NOT NULL DEFAULT 1,
+    IsDeleted TINYINT NOT NULL DEFAULT 0,
+    CreatedBy BIGINT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ModifiedBy BIGINT NULL,
+    ModifiedDate DATETIME(6) NULL,
+    DeletedBy BIGINT NULL,
+    DeletedDate DATETIME(6) NULL,
+    RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- Table: Resource
 CREATE TABLE IF NOT EXISTS `Resource` (
     ResourceID BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -1342,6 +1377,7 @@ CREATE TABLE IF NOT EXISTS ResourcePermission (
 -- Table: PermissionGroup
 CREATE TABLE IF NOT EXISTS PermissionGroup (
     PermissionGroupID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    SystemModuleID BIGINT NULL,
     GroupCode VARCHAR(50) NOT NULL UNIQUE,
     GroupName VARCHAR(150) NOT NULL,
     Description VARCHAR(500) NULL,
@@ -1380,7 +1416,7 @@ CREATE TABLE IF NOT EXISTS Permission (
 -- Table: Role
 CREATE TABLE IF NOT EXISTS `Role` (
     RoleID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    TenantID BIGINT NULL,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
     RoleCode VARCHAR(50) NOT NULL,
     RoleName VARCHAR(150) NOT NULL,
     Description VARCHAR(500) NULL,
@@ -1394,8 +1430,10 @@ CREATE TABLE IF NOT EXISTS `Role` (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT uq_role_tenant_code UNIQUE(TenantID, RoleCode),
-    CONSTRAINT fk_role_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE CASCADE
+    INDEX idx_role_park (BusinessParkID),
+    INDEX idx_role_code (RoleCode),
+    CONSTRAINT uq_role_code UNIQUE(BusinessParkID, RoleCode),
+    CONSTRAINT fk_role_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: RoleHierarchy
@@ -1563,7 +1601,8 @@ CREATE TABLE IF NOT EXISTS HolidayCalendar (
 -- Table: ServiceCategory
 CREATE TABLE IF NOT EXISTS ServiceCategory (
     ServiceCategoryID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    TenantID BIGINT NULL,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
+    DepartmentID BIGINT NULL,
     CategoryCode VARCHAR(50) NOT NULL,
     CategoryName VARCHAR(150) NOT NULL,
     Description VARCHAR(1000) NULL,
@@ -1576,8 +1615,11 @@ CREATE TABLE IF NOT EXISTS ServiceCategory (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT uq_service_cat UNIQUE(TenantID, CategoryCode),
-    CONSTRAINT fk_svccat_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE CASCADE
+    CONSTRAINT uq_service_cat UNIQUE(BusinessParkID, CategoryCode),
+    CONSTRAINT fk_svccat_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_svccat_dept FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) ON UPDATE CASCADE ON DELETE SET NULL,
+    INDEX idx_svccat_dept (DepartmentID),
+    INDEX idx_svccat_park (BusinessParkID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: Service
@@ -1787,6 +1829,29 @@ CREATE TABLE IF NOT EXISTS ServiceDepartment (
     CONSTRAINT fk_svcdep_service FOREIGN KEY (ServiceID) REFERENCES Service(ServiceID) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT fk_svcdep_dept FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Table: ServiceCategoryDepartmentMapping
+CREATE TABLE IF NOT EXISTS ServiceCategoryDepartmentMapping (
+    MappingID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ServiceCategoryID BIGINT NOT NULL,
+    DepartmentID BIGINT NOT NULL,
+    IsActive TINYINT NOT NULL DEFAULT 1,
+    IsDeleted TINYINT NOT NULL DEFAULT 0,
+    CreatedBy BIGINT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ModifiedBy BIGINT NULL,
+    ModifiedDate DATETIME(6) NULL,
+    DeletedBy BIGINT NULL,
+    DeletedDate DATETIME(6) NULL,
+    RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    CONSTRAINT uq_scdm_cat_dept UNIQUE (ServiceCategoryID, DepartmentID),
+    CONSTRAINT fk_scdm_category FOREIGN KEY (ServiceCategoryID) REFERENCES ServiceCategory(ServiceCategoryID) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_scdm_dept FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) ON UPDATE CASCADE ON DELETE CASCADE,
+    INDEX idx_scdm_dept (DepartmentID),
+    INDEX idx_scdm_cat (ServiceCategoryID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Table: ServiceSkill
 CREATE TABLE IF NOT EXISTS ServiceSkill (
@@ -2142,9 +2207,16 @@ CREATE TABLE IF NOT EXISTS IssueRequest (
     OfficeSpaceID BIGINT NULL,
     AssignedDepartmentID BIGINT NULL,
     TargetResolutionDateTime DATETIME(6) NULL,
+    ResponseDueAt DATETIME(6) NULL,
+    ResolutionDueAt DATETIME(6) NULL,
+    SLAWarningSentAt DATETIME(6) NULL,
+    SLAResponseBreachedAt DATETIME(6) NULL,
+    SLAResolutionBreachedAt DATETIME(6) NULL,
     ActualResolutionDateTime DATETIME(6) NULL,
     ClosedDateTime DATETIME(6) NULL,
     CancellationReason VARCHAR(1000) NULL,
+    EstimatedCost DECIMAL(18,2) NULL,
+    ResolutionNotes VARCHAR(2000) NULL,
     IsMajorIncident TINYINT NOT NULL DEFAULT 0,
     CustomFieldsDataJson JSON NULL,
     IsActive TINYINT NOT NULL DEFAULT 1,
@@ -2272,6 +2344,34 @@ CREATE TABLE IF NOT EXISTS IssueRequestComment (
     CONSTRAINT fk_comment_issuereq FOREIGN KEY (IssueRequestID) REFERENCES IssueRequest(IssueRequestID) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT fk_comment_user FOREIGN KEY (UserID) REFERENCES `User`(UserID) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Table: IssueRequestFeedback
+CREATE TABLE IF NOT EXISTS IssueRequestFeedback (
+    FeedbackID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    IssueRequestID BIGINT NOT NULL,
+    TenantID BIGINT NOT NULL,
+    SubmittedByUserID BIGINT NOT NULL,
+    Rating INT NOT NULL,
+    ResolutionConfirmed TINYINT(1) DEFAULT 1,
+    Comments TEXT NULL,
+    TimelinessRating INT NULL,
+    QualityRating INT NULL,
+    IsActive TINYINT(1) DEFAULT 1,
+    IsDeleted TINYINT(1) DEFAULT 0,
+    CreatedBy BIGINT DEFAULT NULL,
+    CreatedDate DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    ModifiedBy BIGINT DEFAULT NULL,
+    ModifiedDate DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+    DeletedBy BIGINT DEFAULT NULL,
+    DeletedDate DATETIME(6) DEFAULT NULL,
+    RowVersion DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    UNIQUE KEY uq_feedback_issue (IssueRequestID),
+    CONSTRAINT fk_feedback_issue FOREIGN KEY (IssueRequestID) REFERENCES IssueRequest(IssueRequestID) ON DELETE CASCADE,
+    CONSTRAINT fk_feedback_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON DELETE CASCADE,
+    CONSTRAINT fk_feedback_user FOREIGN KEY (SubmittedByUserID) REFERENCES `User`(UserID) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Table: IssueRequestHistory
 CREATE TABLE IF NOT EXISTS IssueRequestHistory (
@@ -3798,7 +3898,7 @@ CREATE TABLE IF NOT EXISTS CommunicationLog (
 -- Table: KnowledgeCategory
 CREATE TABLE IF NOT EXISTS KnowledgeCategory (
     KnowledgeCategoryID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    TenantID BIGINT NULL,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
     ParentCategoryID BIGINT NULL,
     CategoryCode VARCHAR(50) NOT NULL,
     CategoryName VARCHAR(150) NOT NULL,
@@ -3812,8 +3912,9 @@ CREATE TABLE IF NOT EXISTS KnowledgeCategory (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT uq_kb_category UNIQUE(TenantID, CategoryCode),
-    CONSTRAINT fk_kbcat_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE CASCADE,
+    INDEX idx_kbcat_park (BusinessParkID),
+    CONSTRAINT uq_kb_category UNIQUE(BusinessParkID, CategoryCode),
+    CONSTRAINT fk_kbcat_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_kbcat_parent FOREIGN KEY (ParentCategoryID) REFERENCES KnowledgeCategory(KnowledgeCategoryID) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -4016,7 +4117,7 @@ CREATE TABLE IF NOT EXISTS KnowledgeSearch (
 -- Table: FAQ
 CREATE TABLE IF NOT EXISTS FAQ (
     FAQID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    TenantID BIGINT NULL,
+    BusinessParkID BIGINT NOT NULL DEFAULT 1,
     Question VARCHAR(1000) NOT NULL,
     AnswerHTML TEXT NOT NULL,
     DisplayOrder INT NOT NULL DEFAULT 0,
@@ -4029,7 +4130,8 @@ CREATE TABLE IF NOT EXISTS FAQ (
     DeletedBy BIGINT NULL,
     DeletedDate DATETIME(6) NULL,
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    CONSTRAINT fk_faq_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE CASCADE
+    INDEX idx_faq_park (BusinessParkID),
+    CONSTRAINT fk_faq_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: SolutionTemplate
@@ -4342,6 +4444,62 @@ CREATE TABLE IF NOT EXISTS BroadcastNotification (
     RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     CONSTRAINT fk_broadcast_park FOREIGN KEY (BusinessParkID) REFERENCES BusinessPark(BusinessParkID) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Table: UserNotification
+CREATE TABLE IF NOT EXISTS UserNotification (
+    UserNotificationID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    NotificationID BIGINT NOT NULL,
+    UserID BIGINT NOT NULL,
+    ChannelCode VARCHAR(30) NOT NULL DEFAULT 'IN_APP',
+    CustomTitle VARCHAR(255) NULL,
+    CustomMessage TEXT NULL,
+    IsRead TINYINT NOT NULL DEFAULT 0,
+    ReadDateTime DATETIME(6) NULL,
+    IsActive TINYINT NOT NULL DEFAULT 1,
+    IsDeleted TINYINT NOT NULL DEFAULT 0,
+    CreatedBy BIGINT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ModifiedBy BIGINT NULL,
+    ModifiedDate DATETIME(6) NULL,
+    DeletedBy BIGINT NULL,
+    DeletedDate DATETIME(6) NULL,
+    RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    INDEX idx_usernotif_user (UserID, IsRead, IsDeleted)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: NotificationLog
+CREATE TABLE IF NOT EXISTS NotificationLog (
+    NotificationLogID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    NotificationID BIGINT NOT NULL,
+    UserID BIGINT NULL,
+    ChannelCode VARCHAR(30) NOT NULL,
+    DeliveryStatus VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+    RecipientAddress VARCHAR(255) NULL,
+    ErrorMessage TEXT NULL,
+    SentDateTime DATETIME(6) NULL,
+    CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    INDEX idx_notiflog_channel (ChannelCode, DeliveryStatus)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: NotificationReminder
+CREATE TABLE IF NOT EXISTS NotificationReminder (
+    NotificationReminderID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    MessageText TEXT NULL,
+    ReminderDateTime DATETIME(6) NOT NULL,
+    LinkedIssueRequestID BIGINT NULL,
+    AssignedToUserID BIGINT NULL,
+    Status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+    IsActive TINYINT NOT NULL DEFAULT 1,
+    IsDeleted TINYINT NOT NULL DEFAULT 0,
+    CreatedBy BIGINT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    INDEX idx_notifrem_status (Status, ReminderDateTime),
+    INDEX idx_notifrem_issue (LinkedIssueRequestID),
+    INDEX idx_notifrem_user (AssignedToUserID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 -- ============================================================================
@@ -5148,6 +5306,9 @@ CREATE TABLE IF NOT EXISTS SearchPermission (
 -- ============================================================================
 -- PERFORMANCE INDEXES
 -- ============================================================================
+CREATE INDEX idx_user_department ON `User`(DepartmentID);
+CREATE INDEX idx_user_gender ON `User`(Gender);
+CREATE INDEX idx_building_facility_zone ON Building(FacilityZoneID);
 CREATE INDEX idx_message_convo ON Message(ConversationID);
 CREATE INDEX idx_sla_clocks_stage ON SLAClock(SLAStageID);
 CREATE INDEX idx_kb_version_article ON KnowledgeVersion(KnowledgeArticleID);
@@ -5306,3 +5467,198 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- ============================================================================
 -- END OF SCHEMA
 -- ============================================================================
+
+
+-- Transactional Outbox & Idempotency
+CREATE TABLE IF NOT EXISTS outbox_events (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  aggregate_type VARCHAR(50) NOT NULL,
+  aggregate_id BIGINT NOT NULL,
+  event_type VARCHAR(100) NOT NULL,
+  payload JSON NOT NULL,
+  status ENUM('PENDING', 'PROCESSING', 'PUBLISHED', 'FAILED', 'DEAD_LETTER') NOT NULL DEFAULT 'PENDING',
+  retry_count INT NOT NULL DEFAULT 0,
+  max_retries INT NOT NULL DEFAULT 5,
+  created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  scheduled_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  processed_at TIMESTAMP(6) NULL,
+  error_message TEXT NULL,
+  INDEX idx_outbox_status_scheduled (status, scheduled_at),
+  INDEX idx_outbox_aggregate (aggregate_type, aggregate_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS idempotency_keys (
+  idempotency_key VARCHAR(128) NOT NULL,
+  user_id BIGINT NOT NULL,
+  request_hash VARCHAR(64) NOT NULL,
+  response_status INT NOT NULL,
+  response_body JSON NOT NULL,
+  created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  expires_at TIMESTAMP(6) NOT NULL,
+  PRIMARY KEY (idempotency_key, user_id),
+  INDEX idx_idempotency_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ============================================================================
+-- SYSTEM DOCUMENT MANAGEMENT & MEDIA REPOSITORY
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS sys_document_categories (
+    CategoryID INT AUTO_INCREMENT PRIMARY KEY,
+    CategoryCode VARCHAR(50) NOT NULL UNIQUE,
+    CategoryName VARCHAR(100) NOT NULL,
+    Description TEXT NULL,
+    Icon VARCHAR(50) NULL DEFAULT 'Folder',
+    IsActive TINYINT(1) DEFAULT 1,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sys_documents (
+    DocumentID INT AUTO_INCREMENT PRIMARY KEY,
+    DocumentUUID VARCHAR(64) NOT NULL UNIQUE,
+    Title VARCHAR(255) NOT NULL,
+    Description TEXT NULL,
+    CategoryID INT NULL,
+    FileName VARCHAR(255) NOT NULL,
+    StoredFileName VARCHAR(255) NOT NULL,
+    FilePath VARCHAR(500) NOT NULL,
+    MimeType VARCHAR(100) NOT NULL,
+    FileExtension VARCHAR(20) NULL,
+    FileSize BIGINT NOT NULL DEFAULT 0,
+    EntityRefType VARCHAR(50) NULL,
+    EntityRefID INT NULL,
+    TenantID INT NULL,
+    IsSensitive TINYINT(1) DEFAULT 0,
+    IsPublic TINYINT(1) DEFAULT 0,
+    CurrentVersion INT DEFAULT 1,
+    DownloadCount INT DEFAULT 0,
+    Tags VARCHAR(255) NULL,
+    UploadedBy INT NULL,
+    IsArchived TINYINT(1) DEFAULT 0,
+    ArchivedAt DATETIME NULL,
+    ArchivedBy INT NULL,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_sysdoc_tenant (TenantID),
+    INDEX idx_sysdoc_category (CategoryID),
+    INDEX idx_sysdoc_uuid (DocumentUUID),
+    INDEX idx_sysdoc_entity (EntityRefType, EntityRefID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sys_document_versions (
+    VersionID INT AUTO_INCREMENT PRIMARY KEY,
+    DocumentID INT NOT NULL,
+    VersionNumber INT NOT NULL,
+    FileName VARCHAR(255) NOT NULL,
+    StoredFileName VARCHAR(255) NOT NULL,
+    FilePath VARCHAR(500) NOT NULL,
+    FileSize BIGINT NOT NULL,
+    MimeType VARCHAR(100) NOT NULL,
+    ChangeNotes TEXT NULL,
+    UploadedBy INT NULL,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_sysdoc_ver_doc (DocumentID),
+    CONSTRAINT fk_sysdocver_doc FOREIGN KEY (DocumentID) REFERENCES sys_documents(DocumentID) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sys_document_shares (
+    ShareID INT AUTO_INCREMENT PRIMARY KEY,
+    ShareUUID VARCHAR(64) NOT NULL UNIQUE,
+    DocumentID INT NOT NULL,
+    SharedWithUserID INT NULL,
+    SharedWithEmail VARCHAR(150) NULL,
+    AccessLevel VARCHAR(20) DEFAULT 'VIEW',
+    ExpiresAt DATETIME NULL,
+    CreatedBy INT NULL,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_sysdocshare_doc (DocumentID),
+    INDEX idx_sysdocshare_uuid (ShareUUID),
+    CONSTRAINT fk_sysdocshare_doc FOREIGN KEY (DocumentID) REFERENCES sys_documents(DocumentID) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sys_document_audit_logs (
+    LogID INT AUTO_INCREMENT PRIMARY KEY,
+    DocumentID INT NULL,
+    Action VARCHAR(50) NOT NULL,
+    ActorID INT NULL,
+    IpAddress VARCHAR(45) NULL,
+    Details TEXT NULL,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_sysdoclog_doc (DocumentID),
+    INDEX idx_sysdoclog_actor (ActorID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ============================================================================
+-- ENTERPRISE REPORTING & ANALYTICS
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS SavedReport (
+    SavedReportID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    TenantID BIGINT NULL,
+    ReportName VARCHAR(150) NOT NULL,
+    Description VARCHAR(500) NULL,
+    ReportTypeCode VARCHAR(50) NOT NULL DEFAULT 'REQUEST_ANALYTICS',
+    ConfigJson JSON NULL,
+    VisibilityCode VARCHAR(30) NOT NULL DEFAULT 'PRIVATE',
+    CreatedBy BIGINT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ModifiedBy BIGINT NULL,
+    ModifiedDate DATETIME(6) NULL,
+    DeletedBy BIGINT NULL,
+    DeletedDate DATETIME(6) NULL,
+    IsActive TINYINT NOT NULL DEFAULT 1,
+    IsDeleted TINYINT NOT NULL DEFAULT 0,
+    RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    INDEX idx_saved_report_tenant (TenantID),
+    INDEX idx_saved_report_user (CreatedBy),
+    INDEX idx_saved_report_type (ReportTypeCode),
+    CONSTRAINT fk_savedrep_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_savedrep_user FOREIGN KEY (CreatedBy) REFERENCES `User`(UserID) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ReportSchedule (
+    ReportScheduleID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    SavedReportID BIGINT NULL,
+    TenantID BIGINT NULL,
+    ScheduleName VARCHAR(150) NOT NULL,
+    ReportTypeCode VARCHAR(50) NOT NULL DEFAULT 'EXECUTIVE_SUMMARY',
+    FrequencyCode VARCHAR(30) NOT NULL DEFAULT 'WEEKLY',
+    CronExpression VARCHAR(50) NULL,
+    RecipientsJson JSON NULL,
+    ExportFormat VARCHAR(20) NOT NULL DEFAULT 'CSV',
+    LastRunDateTime DATETIME(6) NULL,
+    NextRunDateTime DATETIME(6) NULL,
+    Status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    IsActive TINYINT NOT NULL DEFAULT 1,
+    IsDeleted TINYINT NOT NULL DEFAULT 0,
+    CreatedBy BIGINT NOT NULL DEFAULT 1,
+    CreatedDate DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ModifiedBy BIGINT NULL,
+    ModifiedDate DATETIME(6) NULL,
+    DeletedBy BIGINT NULL,
+    DeletedDate DATETIME(6) NULL,
+    RowVersion TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    INDEX idx_schedule_tenant (TenantID),
+    INDEX idx_schedule_status (Status),
+    INDEX idx_schedule_next_run (NextRunDateTime),
+    CONSTRAINT fk_repsched_saved_report FOREIGN KEY (SavedReportID) REFERENCES SavedReport(SavedReportID) ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_repsched_tenant FOREIGN KEY (TenantID) REFERENCES Tenant(TenantID) ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_repsched_user FOREIGN KEY (CreatedBy) REFERENCES `User`(UserID) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ReportExecutionHistory (
+    ExecutionID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ReportScheduleID BIGINT NOT NULL,
+    ExecutedAt DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    Status VARCHAR(30) NOT NULL DEFAULT 'SUCCESS',
+    RecordsCount INT NOT NULL DEFAULT 0,
+    DurationMs INT NOT NULL DEFAULT 0,
+    FileUrl VARCHAR(500) NULL,
+    ErrorMessage TEXT NULL,
+    INDEX idx_rephist_schedule (ReportScheduleID),
+    INDEX idx_rephist_status (Status),
+    CONSTRAINT fk_rephist_schedule FOREIGN KEY (ReportScheduleID) REFERENCES ReportSchedule(ReportScheduleID) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -142,3 +142,5 @@ export function useAuth() {
   }
   return ctx;
 }
+
+export const useAuthContext = useAuth;

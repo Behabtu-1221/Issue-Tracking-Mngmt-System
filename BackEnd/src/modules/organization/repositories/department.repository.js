@@ -1,22 +1,28 @@
 import { query } from '../../../database/connection.js';
 
 export const departmentRepository = {
-  async findAll({ search, page = 1, limit = 100 }) {
+  async findAll({ search, departmentId, page = 1, limit = 100 }) {
     const offset = (page - 1) * limit;
     let sql = `
       SELECT d.*,
-        (SELECT bp.BusinessParkName FROM BusinessPark bp WHERE bp.IsDeleted = 0 LIMIT 1) AS BusinessParkName,
-        (SELECT bp.BusinessParkCode FROM BusinessPark bp WHERE bp.IsDeleted = 0 LIMIT 1) AS BusinessParkCode,
+        COALESCE(bp.BusinessParkName, 'Ethiopian IT Park') AS BusinessParkName,
+        COALESCE(bp.BusinessParkCode, 'ICT_PARK_AA') AS BusinessParkCode,
         u.Email AS ManagerEmail,
         CONCAT(COALESCE(u.FirstName, ''), ' ', COALESCE(u.LastName, '')) AS ManagerFullName,
         (SELECT COUNT(*) FROM Team t WHERE t.DepartmentID = d.DepartmentID AND t.IsDeleted = 0) AS TeamCount,
         (SELECT COUNT(*) FROM EmployeeAssignment ea WHERE ea.DepartmentID = d.DepartmentID AND ea.IsActive = 1 AND ea.IsDeleted = 0) AS ActiveEmployeeCount,
         (SELECT COUNT(*) FROM DepartmentLocation dl WHERE dl.DepartmentID = d.DepartmentID AND dl.IsDeleted = 0) AS LocationCount
       FROM Department d
+      LEFT JOIN BusinessPark bp ON d.BusinessParkID = bp.BusinessParkID
       LEFT JOIN \`User\` u ON d.ManagerUserID = u.UserID
       WHERE d.IsDeleted = 0
     `;
     const params = [];
+
+    if (departmentId) {
+      sql += ` AND d.DepartmentID = ?`;
+      params.push(Number(departmentId));
+    }
 
     if (search) {
       sql += ` AND (d.DepartmentName LIKE ? OR d.DepartmentCode LIKE ?)`;
@@ -33,6 +39,10 @@ export const departmentRepository = {
       WHERE d.IsDeleted = 0
     `;
     const countParams = [];
+    if (departmentId) {
+      countSql += ` AND d.DepartmentID = ?`;
+      countParams.push(Number(departmentId));
+    }
     if (search) {
       countSql += ` AND (d.DepartmentName LIKE ? OR d.DepartmentCode LIKE ?)`;
       countParams.push(`%${search}%`, `%${search}%`);
@@ -50,13 +60,14 @@ export const departmentRepository = {
   async findById(id) {
     const sql = `
       SELECT d.*,
-        (SELECT bp.BusinessParkName FROM BusinessPark bp WHERE bp.IsDeleted = 0 LIMIT 1) AS BusinessParkName,
-        (SELECT bp.BusinessParkCode FROM BusinessPark bp WHERE bp.IsDeleted = 0 LIMIT 1) AS BusinessParkCode,
+        COALESCE(bp.BusinessParkName, 'Ethiopian IT Park') AS BusinessParkName,
+        COALESCE(bp.BusinessParkCode, 'ICT_PARK_AA') AS BusinessParkCode,
         u.Email AS ManagerEmail,
         CONCAT(COALESCE(u.FirstName, ''), ' ', COALESCE(u.LastName, '')) AS ManagerFullName,
         (SELECT COUNT(*) FROM Team t WHERE t.DepartmentID = d.DepartmentID AND t.IsDeleted = 0) AS TeamCount,
         (SELECT COUNT(*) FROM EmployeeAssignment ea WHERE ea.DepartmentID = d.DepartmentID AND ea.IsActive = 1 AND ea.IsDeleted = 0) AS ActiveEmployeeCount
       FROM Department d
+      LEFT JOIN BusinessPark bp ON d.BusinessParkID = bp.BusinessParkID
       LEFT JOIN \`User\` u ON d.ManagerUserID = u.UserID
       WHERE d.DepartmentID = ? AND d.IsDeleted = 0
       LIMIT 1
@@ -79,13 +90,15 @@ export const departmentRepository = {
   },
 
   async create(data) {
+    const parkId = data.BusinessParkID || 1;
     const orgUnitId = data.OrganizationUnitID || 1;
     const sql = `
       INSERT INTO Department (
-        OrganizationUnitID, DepartmentCode, DepartmentName, ManagerUserID, IsActive, CreatedBy
-      ) VALUES (?, ?, ?, ?, ?, ?)
+        BusinessParkID, OrganizationUnitID, DepartmentCode, DepartmentName, ManagerUserID, IsActive, CreatedBy
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await query(sql, [
+      parkId,
       orgUnitId,
       data.DepartmentCode,
       data.DepartmentName,
@@ -99,6 +112,7 @@ export const departmentRepository = {
   async update(id, data) {
     const sql = `
       UPDATE Department SET
+        BusinessParkID = COALESCE(?, BusinessParkID),
         DepartmentName = COALESCE(?, DepartmentName),
         ManagerUserID = COALESCE(?, ManagerUserID),
         IsActive = COALESCE(?, IsActive),
@@ -107,6 +121,7 @@ export const departmentRepository = {
       WHERE DepartmentID = ? AND IsDeleted = 0
     `;
     await query(sql, [
+      data.BusinessParkID,
       data.DepartmentName,
       data.ManagerUserID,
       data.IsActive,

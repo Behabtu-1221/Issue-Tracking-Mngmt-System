@@ -6,6 +6,8 @@ import authenticate from './authenticate.js';
  * Supports both /api/auth/... and /auth/... patterns to accommodate reverse proxies.
  */
 export const PUBLIC_ROUTES = [
+  { method: 'GET', pattern: /^\/?$/ },
+  { method: 'GET', pattern: /^\/api\/?$/i },
   { method: 'GET', pattern: /^(\/api)?\/health(\/(live|ready))?\/?$/i },
   { method: 'POST', pattern: /^(\/api)?\/auth\/login\/?$/i },
   { method: 'POST', pattern: /^(\/api)?\/auth\/refresh\/?$/i },
@@ -17,14 +19,18 @@ export const PUBLIC_ROUTES = [
 
 /**
  * Checks if the request method and path match the explicit allowlist.
+ * Allows HEAD requests on GET-allowlisted routes for cloud probes and load balancers.
  */
 export const isPublicRoute = (method, path) => {
   if (!path) return false;
   const normalizedMethod = (method || '').toUpperCase();
   const normalizedPath = (path || '').split('?')[0];
-  return PUBLIC_ROUTES.some(
-    (route) => route.method === normalizedMethod && route.pattern.test(normalizedPath)
-  );
+  return PUBLIC_ROUTES.some((route) => {
+    const methodMatches =
+      route.method === normalizedMethod ||
+      (route.method === 'GET' && normalizedMethod === 'HEAD');
+    return methodMatches && route.pattern.test(normalizedPath);
+  });
 };
 
 /**

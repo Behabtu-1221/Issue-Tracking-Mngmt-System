@@ -35,7 +35,16 @@ export function PermissionProvider({ children }) {
 
         // Get the preset permissions for this role
         let presetPerms = [];
-        if (typeCode === 'SUPER_ADMIN' || typeCode === 'PARK_ADMIN' || typeCode === 'PARK_SUPER_ADMIN' || typeCode === 'BUSINESS_PARK_ADMIN') {
+        if (
+          typeCode === 'SUPER_ADMIN' ||
+          typeCode === 'PARK_ADMIN' ||
+          typeCode === 'PARK_SUPER_ADMIN' ||
+          typeCode === 'BUSINESS_PARK_ADMIN' ||
+          typeCode === 'PARK_ADMINISTRATOR' ||
+          typeCode === 'SYSTEM_ADMIN' ||
+          typeCode === 'SYSTEM_ADMINISTRATOR' ||
+          typeCode === 'SYSADMIN'
+        ) {
           presetPerms = DEFAULT_ROLE_PRESETS.BUSINESS_PARK_ADMIN.permissions;
         } else if (typeCode === 'TENANT_REPRESENTATIVE' || typeCode === 'TENANT_ADMIN' || typeCode === 'COMPANY_ADMIN' || typeCode === 'ADMIN') {
           presetPerms = DEFAULT_ROLE_PRESETS.TENANT_REPRESENTATIVE.permissions;

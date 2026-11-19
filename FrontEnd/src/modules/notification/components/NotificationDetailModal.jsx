@@ -63,6 +63,9 @@ export default function NotificationDetailModal({
   const closeButtonRef = useRef(null);
   const prevActiveElement = useRef(null);
   const copyTimeoutRef = useRef(null);
+  const hasFocusedInitialRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   // Sync local read state with incoming notification
   useEffect(() => {
@@ -76,26 +79,61 @@ export default function NotificationDetailModal({
   useEffect(() => {
     return () => {
       if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      if (prevActiveElement.current && typeof prevActiveElement.current.focus === 'function') {
+        try {
+          prevActiveElement.current.focus();
+        } catch {
+          // ignore
+        }
+      }
     };
   }, []);
 
   // Accessibility: Focus management, focus trap, and Escape key listener
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      if (hasFocusedInitialRef.current) {
+        if (prevActiveElement.current && typeof prevActiveElement.current.focus === 'function') {
+          try {
+            prevActiveElement.current.focus();
+          } catch {
+            // ignore
+          }
+        }
+        hasFocusedInitialRef.current = false;
+      }
+      return;
+    }
 
-    prevActiveElement.current = document.activeElement;
+    if (!hasFocusedInitialRef.current) {
+      prevActiveElement.current = document.activeElement;
+      hasFocusedInitialRef.current = true;
+
+      const modalElement = modalRef.current;
+      if (modalElement) {
+        const focusTimer = setTimeout(() => {
+          if (modalElement.contains(document.activeElement) && document.activeElement !== modalElement) {
+            return;
+          }
+          if (closeButtonRef.current) {
+            closeButtonRef.current.focus();
+          } else {
+            modalElement.focus();
+          }
+        }, 50);
+
+        return () => {
+          clearTimeout(focusTimer);
+        };
+      }
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
 
     const modalElement = modalRef.current;
     if (!modalElement) return;
-
-    // Focus the modal or the close button initially
-    const focusTimer = setTimeout(() => {
-      if (closeButtonRef.current) {
-        closeButtonRef.current.focus();
-      } else {
-        modalElement.focus();
-      }
-    }, 50);
 
     const focusableSelectors = [
       'button:not([disabled])',
@@ -109,7 +147,7 @@ export default function NotificationDetailModal({
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
 
@@ -139,17 +177,9 @@ export default function NotificationDetailModal({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
-      clearTimeout(focusTimer);
       window.removeEventListener('keydown', handleKeyDown);
-      if (prevActiveElement.current && typeof prevActiveElement.current.focus === 'function') {
-        try {
-          prevActiveElement.current.focus();
-        } catch {
-          // ignore potential detached node
-        }
-      }
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen || !notification) return null;
 

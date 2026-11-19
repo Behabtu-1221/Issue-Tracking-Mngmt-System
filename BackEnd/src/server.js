@@ -6,8 +6,7 @@ import { appLifecycle } from './shared/routes/health.routes.js';
 import outboxWorker from './shared/outbox/outbox-worker.js';
 import slaScheduler from './modules/sla/services/sla-scheduler.js';
 import logger from './shared/utils/logger.js';
-import { enforceSingleBusinessPark } from './database/seeders/enforce-single-business-park.js';
-import { initServiceCategoryMappingTable } from './database/seeders/init-category-mapping-table.js';
+import { ensureBaseSchema } from './database/schema-bootstrapper.js';
 
 const PORT = env.PORT;
 
@@ -24,27 +23,27 @@ const startServer = async () => {
       process.exit(1);
     }
 
-    // 2. Verify Schema Migrations at Head (Fail-fast)
+    // 2. Auto-bootstrap Database Master Schema, Tables, Seeds & Migrations
     try {
-      const headCheck = await migrator.checkHead();
-      if (!headCheck.isAtHead) {
-        logger.error(
-          `[FATAL] Database schema is not at head! ${headCheck.pendingCount} pending migration(s) detected. Execute 'npm run migrate' before starting the application.`
-        );
-        process.exit(1);
-      }
-      logger.info(`✓ Database migrations verified at head version: ${headCheck.latestAppliedVersion}`);
-    } catch (migErr) {
-      logger.error(`[FATAL] Migration head verification failed: ${migErr.message}`);
+      await ensureBaseSchema();
+      logger.info('✓ Database master schema, seed data, and invariant seeders verified.');
+    } catch (schemaErr) {
+      logger.error(`[FATAL] Database auto-bootstrap failed: ${schemaErr.message}`);
       process.exit(1);
     }
 
-    // 3. Invariant checks & baseline domain seeders
+    // 3. Verify Schema Migrations at Head (Fail-fast)
     try {
-      await enforceSingleBusinessPark();
-      await initServiceCategoryMappingTable();
-    } catch (seedErr) {
-      logger.warn(`Baseline seeder notice: ${seedErr.message}`);
+      const headCheck = await migrator.checkHead();
+      if (!headCheck.isAtHead) {
+        logger.warn(`Pending migrations detected (${headCheck.pendingCount}). Applying pending migrations...`);
+        await migrator.migrate();
+      }
+      const finalHead = await migrator.checkHead();
+      logger.info(`✓ Database migrations verified at head version: ${finalHead.latestAppliedVersion}`);
+    } catch (migErr) {
+      logger.error(`[FATAL] Migration head verification failed: ${migErr.message}`);
+      process.exit(1);
     }
 
     // 4. Start Background Workers

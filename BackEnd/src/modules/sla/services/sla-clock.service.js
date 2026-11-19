@@ -4,8 +4,8 @@ import { notificationService } from '../../notification/services/notification.se
 import AppError from '../../../shared/errors/AppError.js';
 
 export const slaClockService = {
-  async getOverviewMetrics(tenantId) {
-    return slaClockRepository.getOverviewMetrics(tenantId);
+  async getOverviewMetrics(tenantId, departmentId) {
+    return slaClockRepository.getOverviewMetrics(tenantId, departmentId);
   },
 
   async findAllClocks(params) {

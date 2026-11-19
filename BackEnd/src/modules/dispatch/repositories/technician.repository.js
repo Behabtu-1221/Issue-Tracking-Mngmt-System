@@ -8,17 +8,22 @@ export const technicianRepository = {
         CONCAT(u.FirstName, ' ', u.LastName) AS FullName,
         u.Email,
         u.PhoneNumber,
-        ea.DepartmentID,
+        COALESCE(u.DepartmentID, ea.DepartmentID) AS DepartmentID,
         COALESCE(ta.AvailabilityStatusCode, 'AVAILABLE') AS AvailabilityStatusCode,
         ta.LastStatusChangeDateTime,
         (SELECT COUNT(*) FROM Assignment a WHERE a.AssignedUserID = u.UserID AND a.AssignmentStatusCode IN ('ASSIGNED', 'ACCEPTED', 'IN_PROGRESS', 'PAUSED') AND a.IsDeleted = 0) AS ActiveWorkloadCount
       FROM \`User\` u
       LEFT JOIN EmployeeAssignment ea ON u.UserID = ea.UserID AND ea.IsActive = 1 AND ea.IsDeleted = 0
-      LEFT JOIN UserRole ur ON u.UserID = ur.UserID
-      LEFT JOIN Role r ON ur.RoleID = r.RoleID
       LEFT JOIN TechnicianAvailability ta ON u.UserID = ta.UserID
       WHERE u.IsActive = 1 AND u.IsDeleted = 0
-        AND (u.UserTypeCode IN ('TECHNICIAN', 'PARK_TECHNICIAN') OR r.RoleCode = 'TECHNICIAN')
+        AND (
+          u.UserTypeCode IN ('TECHNICIAN', 'PARK_TECHNICIAN')
+          OR EXISTS (
+            SELECT 1 FROM UserRole ur
+            JOIN Role r ON ur.RoleID = r.RoleID
+            WHERE ur.UserID = u.UserID AND ur.IsActive = 1 AND ur.IsDeleted = 0 AND r.RoleCode = 'TECHNICIAN'
+          )
+        )
     `;
 
     const params = [];
@@ -27,8 +32,8 @@ export const technicianRepository = {
       params.push(Number(tenantId));
     }
     if (departmentId) {
-      sql += ` AND ea.DepartmentID = ?`;
-      params.push(Number(departmentId));
+      sql += ` AND (ea.DepartmentID = ? OR u.DepartmentID = ?)`;
+      params.push(Number(departmentId), Number(departmentId));
     }
     if (search) {
       sql += ` AND (u.FirstName LIKE ? OR u.LastName LIKE ? OR u.Email LIKE ?)`;
@@ -39,7 +44,7 @@ export const technicianRepository = {
       params.push(availabilityStatus);
     }
 
-    sql += ` ORDER BY FullName ASC LIMIT ? OFFSET ?`;
+    sql += ` GROUP BY u.UserID ORDER BY FullName ASC LIMIT ? OFFSET ?`;
     params.push(limit, offset);
 
     const technicians = await query(sql, params);

@@ -4,19 +4,35 @@ import AppError from '../../../shared/errors/AppError.js';
 import { query } from '../../../database/connection.js';
 
 export const employeeAssignmentService = {
-  async getAssignments(params) {
-    return employeeAssignmentRepository.findAll(params);
+  async getAssignments(params = {}, dataScope) {
+    const filters = { ...params };
+    if (dataScope && dataScope.type === 'DEPARTMENT' && dataScope.departmentId) {
+      filters.departmentId = Number(dataScope.departmentId);
+    }
+    return employeeAssignmentRepository.findAll(filters);
   },
 
-  async getAssignmentById(id) {
+  async getAssignmentById(id, dataScope) {
     const assignment = await employeeAssignmentRepository.findById(id);
     if (!assignment) {
       throw new AppError(`Employee assignment with ID ${id} not found`, 404);
     }
+
+    if (dataScope && dataScope.type === 'DEPARTMENT' && dataScope.departmentId) {
+      if (Number(assignment.DepartmentID) !== Number(dataScope.departmentId)) {
+        throw new AppError('Access denied: Assignment belongs to another department', 403);
+      }
+    }
+
     return assignment;
   },
 
-  async createAssignment(data, userId) {
+  async createAssignment(data, userId, dataScope) {
+    // If scoped to department, enforce department ID
+    if (dataScope && dataScope.type === 'DEPARTMENT' && dataScope.departmentId) {
+      data.DepartmentID = Number(dataScope.departmentId);
+    }
+
     // Validate User exists
     const userRows = await query(`SELECT * FROM \`User\` WHERE UserID = ? AND IsDeleted = 0`, [data.UserID]);
     if (userRows.length === 0) {
@@ -38,10 +54,17 @@ export const employeeAssignmentService = {
     return employeeAssignmentRepository.findById(newId);
   },
 
-  async updateAssignment(id, data, userId) {
+  async updateAssignment(id, data, userId, dataScope) {
     const assignment = await employeeAssignmentRepository.findById(id);
     if (!assignment) {
       throw new AppError(`Employee assignment with ID ${id} not found`, 404);
+    }
+
+    if (dataScope && dataScope.type === 'DEPARTMENT' && dataScope.departmentId) {
+      if (Number(assignment.DepartmentID) !== Number(dataScope.departmentId)) {
+        throw new AppError('Access denied: Cannot modify assignment of another department', 403);
+      }
+      data.DepartmentID = Number(dataScope.departmentId);
     }
 
     // Auto-clear existing primary flag if set to primary
@@ -52,10 +75,16 @@ export const employeeAssignmentService = {
     return employeeAssignmentRepository.update(id, { ...data, ModifiedBy: userId });
   },
 
-  async deleteAssignment(id, userId) {
+  async deleteAssignment(id, userId, dataScope) {
     const assignment = await employeeAssignmentRepository.findById(id);
     if (!assignment) {
       throw new AppError(`Employee assignment with ID ${id} not found`, 404);
+    }
+
+    if (dataScope && dataScope.type === 'DEPARTMENT' && dataScope.departmentId) {
+      if (Number(assignment.DepartmentID) !== Number(dataScope.departmentId)) {
+        throw new AppError('Access denied: Cannot delete assignment of another department', 403);
+      }
     }
 
     await employeeAssignmentRepository.softDelete(id, userId);

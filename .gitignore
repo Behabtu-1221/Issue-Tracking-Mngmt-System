@@ -38,3 +38,4 @@ coverage/
 scratch/
 tmp/
 temp/
+BackEnd/src/storage/uploads/

@@ -22,14 +22,24 @@ const glassModalStyle = {
 
 const IT_PARK_ROLES = [
   {
-    code: 'EMPLOYEE',
-    roleCode: 'EMPLOYEE',
-    label: 'Employee',
-    desc: 'Standard requester & service catalog consumer',
-    icon: UserIcon,
-    color: '#2563eb',
-    bg: 'rgba(37, 99, 235, 0.12)',
-    border: 'rgba(37, 99, 235, 0.3)'
+    code: 'ADMIN',
+    roleCode: 'SUPER_ADMIN',
+    label: 'Administrator',
+    desc: 'Full system administrator with unrestricted park-wide access',
+    icon: Shield,
+    color: '#dc2626',
+    bg: 'rgba(220, 38, 38, 0.12)',
+    border: 'rgba(220, 38, 38, 0.3)'
+  },
+  {
+    code: 'MANAGER',
+    roleCode: 'DEPARTMENT_MANAGER',
+    label: 'Department Manager',
+    desc: 'Department manager approving, dispatching & managing operations',
+    icon: ShieldCheck,
+    color: '#7c3aed',
+    bg: 'rgba(124, 58, 237, 0.12)',
+    border: 'rgba(124, 58, 237, 0.3)'
   },
   {
     code: 'TECHNICIAN',
@@ -42,14 +52,14 @@ const IT_PARK_ROLES = [
     border: 'rgba(5, 150, 105, 0.3)'
   },
   {
-    code: 'MANAGER',
-    roleCode: 'DEPARTMENT_MANAGER',
-    label: 'Department Manager',
-    desc: 'Department manager approving, dispatching & managing operations',
-    icon: ShieldCheck,
-    color: '#7c3aed',
-    bg: 'rgba(124, 58, 237, 0.12)',
-    border: 'rgba(124, 58, 237, 0.3)'
+    code: 'EMPLOYEE',
+    roleCode: 'EMPLOYEE',
+    label: 'Employee',
+    desc: 'Standard requester & service catalog consumer',
+    icon: UserIcon,
+    color: '#2563eb',
+    bg: 'rgba(37, 99, 235, 0.12)',
+    border: 'rgba(37, 99, 235, 0.3)'
   }
 ];
 
@@ -234,6 +244,8 @@ export default function UserRegistrationModal({
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [jobTitle, setJobTitle] = useState('');
+  const [age, setAge] = useState('');
+  const [gender, setGender] = useState('');
 
   // Organization & Access Fields
   const [departmentId, setDepartmentId] = useState('');
@@ -274,6 +286,8 @@ export default function UserRegistrationModal({
     setEmail('');
     setPhoneNumber('');
     setJobTitle('');
+    setAge('');
+    setGender('');
     setDepartmentId('');
     setItParkRoleCode('EMPLOYEE');
     setTenantId('');
@@ -372,6 +386,13 @@ export default function UserRegistrationModal({
       }
     }
 
+    if (age !== '' && age !== undefined && age !== null) {
+      const numAge = Number(age);
+      if (isNaN(numAge) || numAge < 18 || numAge > 120) {
+        errors.age = 'Age must be between 18 and 120.';
+      }
+    }
+
     if (userType === 'IT_PARK_USER') {
       if (!departmentId) {
         errors.departmentId = 'Select a department.';
@@ -404,7 +425,9 @@ export default function UserRegistrationModal({
         const repRole = roles.find(r => (r.RoleCode || r.roleCode || '').toUpperCase() === 'TENANT_REPRESENTATIVE');
         if (repRole) targetRoleId = repRole.RoleID || repRole.id;
       } else {
-        if (itParkRoleCode === 'TECHNICIAN') {
+        if (itParkRoleCode === 'ADMIN') {
+          targetUserTypeCode = 'SUPER_ADMIN';
+        } else if (itParkRoleCode === 'TECHNICIAN') {
           targetUserTypeCode = 'TECHNICIAN';
         } else if (itParkRoleCode === 'MANAGER') {
           targetUserTypeCode = 'MANAGER';
@@ -414,7 +437,10 @@ export default function UserRegistrationModal({
 
         const roleMatch = IT_PARK_ROLES.find(r => r.code === itParkRoleCode);
         if (roleMatch && roles && roles.length > 0) {
-          const found = roles.find(r => (r.RoleCode || r.roleCode || '').toUpperCase() === roleMatch.roleCode);
+          const found = roles.find(r => {
+            const rc = (r.RoleCode || r.roleCode || '').toUpperCase();
+            return rc === roleMatch.roleCode || (roleMatch.code === 'ADMIN' && (rc === 'SUPER_ADMIN' || rc === 'ADMINISTRATOR'));
+          });
           if (found) targetRoleId = found.RoleID || found.id;
         }
       }
@@ -426,15 +452,18 @@ export default function UserRegistrationModal({
       const payload = {
         tenantId: (userType === 'TENANT_REP' && tenantId) ? Number(tenantId) : undefined,
         departmentId: (userType === 'IT_PARK_USER' && departmentId) ? Number(departmentId) : undefined,
+        roleId: targetRoleId ? Number(targetRoleId) : undefined,
+        roleIds: targetRoleId ? [Number(targetRoleId)] : undefined,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),
         username: autoUsername,
         phoneNumber: phoneNumber.trim() || undefined,
+        age: age !== '' ? Number(age) : undefined,
+        gender: gender || undefined,
         jobTitle: fullJobTitle,
         userTypeCode: targetUserTypeCode,
-        accountStatusCode: 'MUST_CHANGE_PASSWORD',
-        roleIds: targetRoleId ? [Number(targetRoleId)] : undefined
+        accountStatusCode: 'MUST_CHANGE_PASSWORD'
       };
 
       const res = await identityApi.createUser(payload);
@@ -831,6 +860,42 @@ export default function UserRegistrationModal({
                     placeholder=""
                   />
                 </div>
+
+                {/* Age & Gender */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <FloatingInput
+                    id="input-age"
+                    type="number"
+                    label={t('identity.age') || 'Age'}
+                    optional
+                    value={age}
+                    onChange={(e) => {
+                      setAge(e.target.value);
+                      if (fieldErrors.age) setFieldErrors(prev => ({ ...prev, age: undefined }));
+                    }}
+                    error={fieldErrors.age}
+                    placeholder="e.g. 28"
+                  />
+                  <FloatingSelect
+                    id="select-gender"
+                    label={t('identity.gender') || 'Gender'}
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                  >
+                    <option value="" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {t('identity.selectGender') || 'Select Gender (optional)'}
+                    </option>
+                    <option value="MALE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      Male
+                    </option>
+                    <option value="FEMALE" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      Female
+                    </option>
+                    <option value="OTHER" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      Other
+                    </option>
+                  </FloatingSelect>
+                </div>
               </div>
             </div>
 
@@ -940,11 +1005,13 @@ export default function UserRegistrationModal({
                     onChange={(e) => setItParkRoleCode(e.target.value)}
                   >
                     {IT_PARK_ROLES.map(role => {
-                      const roleText = role.code === 'EMPLOYEE'
-                        ? `${t('identity.roleEmployeeLabel')} — ${t('identity.roleEmployeeDesc')}`
-                        : role.code === 'TECHNICIAN'
-                          ? `${t('identity.roleTechnicianLabel')} — ${t('identity.roleTechnicianDesc')}`
-                          : `${t('identity.roleManagerLabel')} — ${t('identity.roleManagerDesc')}`;
+                      const roleText = role.code === 'ADMIN'
+                        ? `${t('identity.roleAdminLabel') || 'Administrator'} — ${t('identity.roleAdminDesc') || 'Full system administrator with unrestricted park-wide access'}`
+                        : role.code === 'MANAGER'
+                          ? `${t('identity.roleManagerLabel') || 'Department Manager'} — ${t('identity.roleManagerDesc') || 'Department manager approving, dispatching & managing operations'}`
+                          : role.code === 'TECHNICIAN'
+                            ? `${t('identity.roleTechnicianLabel') || 'Technician'} — ${t('identity.roleTechnicianDesc') || 'Field maintenance worker executing assigned work orders'}`
+                            : `${t('identity.roleEmployeeLabel') || 'Employee'} — ${t('identity.roleEmployeeDesc') || 'Standard requester & service catalog consumer'}`;
                       return (
                         <option key={role.code} value={role.code} style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                           {roleText}

@@ -58,7 +58,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
-    TenantID: '',
+    BusinessParkID: '',
     CategoryCode: '',
     CategoryName: '',
     Description: '',
@@ -130,17 +130,17 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
     if (category) {
       setEditingCategory(category);
       setFormData({
-        TenantID: category.TenantID || '',
+        BusinessParkID: category.BusinessParkID || parks[0]?.BusinessParkID || '',
         CategoryCode: category.CategoryCode || '',
         CategoryName: category.CategoryName || '',
         Description: category.Description || '',
-        DepartmentID: category.RoutedDepartmentID || '',
+        DepartmentID: category.RoutedDepartmentID || category.DepartmentID || '',
         IsActive: category.IsActive !== undefined ? category.IsActive : 1
       });
     } else {
       setEditingCategory(null);
       setFormData({
-        TenantID: '',
+        BusinessParkID: parks[0]?.BusinessParkID || '',
         CategoryCode: '',
         CategoryName: '',
         Description: '',
@@ -170,7 +170,7 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
 
       if (editingCategory) {
         await serviceCatalogApi.updateCategory(editingCategory.ServiceCategoryID, {
-          TenantID: sanitized.TenantID,
+          BusinessParkID: sanitized.BusinessParkID,
           CategoryName: sanitized.CategoryName,
           Description: sanitized.Description,
           DepartmentID: sanitized.DepartmentID,
@@ -509,19 +509,19 @@ export default function ServiceCategoriesTab({ onCategoryUpdated }) {
               <div style={{ padding: 'clamp(16px, 3vw, 24px)', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 <FormField
                 label={t('catalog.categoriesTab.campusLabel', 'Target Business Park Campus')}
-                id="TenantID"
+                id="BusinessParkID"
                 icon={Building2}
-                error={fieldErrors.TenantID}
+                error={fieldErrors.BusinessParkID}
                 helpText={t('catalog.categoriesTab.campusHelp', 'Optional: Leave blank to make this category globally accessible park-wide.')}
               >
                 <select
-                  id="TenantID"
-                  value={formData.TenantID}
-                  onChange={(e) => handleFieldChange('TenantID', e.target.value)}
+                  id="BusinessParkID"
+                  value={formData.BusinessParkID}
+                  onChange={(e) => handleFieldChange('BusinessParkID', e.target.value)}
                   style={{
                     width: '100%', padding: '11px 14px',
                     background: 'var(--bg-tertiary)',
-                    border: fieldErrors.TenantID ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
+                    border: fieldErrors.BusinessParkID ? '1px solid var(--color-danger, #ef4444)' : '1px solid var(--glass-border)',
                     borderRadius: 'var(--border-radius-sm)', color: 'var(--text-primary)',
                     fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box'
                   }}

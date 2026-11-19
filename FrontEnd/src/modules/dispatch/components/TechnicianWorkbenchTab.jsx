@@ -15,7 +15,8 @@ import {
   FileText,
   X,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  TrendingUp
 } from 'lucide-react';
 import AlertDialogModal from '../../../components/common/AlertDialogModal';
 import { FormField } from '../../../components/common/FormField';

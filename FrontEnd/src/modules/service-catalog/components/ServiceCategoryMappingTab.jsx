@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Layers, Building2, Search, Filter, Plus, Edit2, Trash2, CheckCircle2,
   XCircle, AlertCircle, RefreshCw, ArrowRight, ShieldCheck, Info, HelpCircle,
-  AlertTriangle, ShieldAlert
+  AlertTriangle, ShieldAlert,
+  X
 } from 'lucide-react';
 import serviceCatalogApi from '../api/serviceCatalogApi';
 import orgApi from '../../organization/api/orgApi';

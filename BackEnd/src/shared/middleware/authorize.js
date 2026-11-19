@@ -10,7 +10,7 @@ export const authorizeRoles = (...allowedRoles) => {
 
     try {
       const typeCode = (req.actor.userTypeCode || '').toUpperCase();
-      if (typeCode === 'SUPER_ADMIN' || typeCode === 'PARK_ADMIN' || typeCode === 'PARK_SUPER_ADMIN') {
+      if (['SUPER_ADMIN', 'ADMIN', 'ADMINISTRATOR', 'PARK_ADMIN', 'PARK_SUPER_ADMIN'].includes(typeCode)) {
         return next();
       }
 
@@ -62,7 +62,7 @@ export const authorizePermissions = (...requiredPermissions) => {
 
     try {
       const typeCode = (req.actor.userTypeCode || '').toUpperCase();
-      if (typeCode === 'SUPER_ADMIN' || typeCode === 'PARK_ADMIN' || typeCode === 'PARK_SUPER_ADMIN') {
+      if (['SUPER_ADMIN', 'ADMIN', 'ADMINISTRATOR', 'PARK_ADMIN', 'PARK_SUPER_ADMIN'].includes(typeCode)) {
         return next();
       }
 

@@ -5,11 +5,6 @@ class RoleRepository {
     const whereConditions = ['r.IsDeleted = 0'];
     const queryParams = [];
 
-    if (tenantId !== undefined && tenantId !== null) {
-      whereConditions.push('(r.TenantID = ? OR r.TenantID IS NULL)');
-      queryParams.push(tenantId);
-    }
-
     if (search) {
       whereConditions.push('(r.RoleCode LIKE ? OR r.RoleName LIKE ? OR r.Description LIKE ?)');
       const pattern = `%${search}%`;
@@ -27,18 +22,18 @@ class RoleRepository {
     const roles = await db.query(
       `SELECT
          r.RoleID,
-         r.TenantID,
+         r.BusinessParkID,
          r.RoleCode,
          r.RoleName,
          r.Description,
          r.IsSystemRole,
          r.IsActive,
          r.CreatedDate,
-         t.CompanyName AS TenantName,
+         bp.BusinessParkName,
          (SELECT COUNT(*) FROM UserRole ur WHERE ur.RoleID = r.RoleID AND ur.IsDeleted = 0) AS AssignedUsersCount,
          (SELECT COUNT(*) FROM RolePermission rp WHERE rp.RoleID = r.RoleID AND rp.IsDeleted = 0) AS PermissionCount
        FROM \`Role\` r
-       LEFT JOIN Tenant t ON t.TenantID = r.TenantID AND t.IsDeleted = 0
+       LEFT JOIN BusinessPark bp ON bp.BusinessParkID = r.BusinessParkID AND bp.IsDeleted = 0
        WHERE ${whereClause}
        ORDER BY r.IsSystemRole DESC, r.RoleName ASC
        LIMIT ? OFFSET ?`,
@@ -52,7 +47,7 @@ class RoleRepository {
     const rows = await db.query(
       `SELECT
          r.RoleID,
-         r.TenantID,
+         r.BusinessParkID,
          r.RoleCode,
          r.RoleName,
          r.Description,
@@ -60,9 +55,9 @@ class RoleRepository {
          r.IsActive,
          r.CreatedDate,
          r.ModifiedDate,
-         t.CompanyName AS TenantName
+         bp.BusinessParkName
        FROM \`Role\` r
-       LEFT JOIN Tenant t ON t.TenantID = r.TenantID AND t.IsDeleted = 0
+       LEFT JOIN BusinessPark bp ON bp.BusinessParkID = r.BusinessParkID AND bp.IsDeleted = 0
        WHERE r.RoleID = ? AND r.IsDeleted = 0
        LIMIT 1`,
       [roleId]
@@ -94,10 +89,9 @@ class RoleRepository {
       `SELECT RoleID, RoleCode, IsSystemRole
        FROM \`Role\`
        WHERE RoleCode = ?
-         AND (TenantID = ? OR (TenantID IS NULL AND ? IS NULL))
          AND IsDeleted = 0
        LIMIT 1`,
-      [roleCode, tenantId, tenantId]
+      [roleCode]
     );
     return rows[0] || null;
   }
@@ -105,7 +99,7 @@ class RoleRepository {
   async createRole(roleData) {
     const result = await db.query(
       `INSERT INTO \`Role\` (
-         TenantID,
+         BusinessParkID,
          RoleCode,
          RoleName,
          Description,
@@ -113,12 +107,12 @@ class RoleRepository {
          CreatedBy
        ) VALUES (?, ?, ?, ?, ?, ?)`,
       [
-        roleData.tenantId || null,
+        roleData.businessParkId || 1,
         roleData.roleCode.toUpperCase(),
         roleData.roleName,
         roleData.description || null,
         roleData.isSystemRole ? 1 : 0,
-        roleData.actorUserId
+        roleData.actorUserId || 1
       ]
     );
     return result.insertId;

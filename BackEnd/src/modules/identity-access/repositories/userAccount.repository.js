@@ -43,12 +43,15 @@ class UserAccountRepository {
          ua.AccountStatusCode,
          ua.IsActive,
          u.TenantID,
+         COALESCE(u.DepartmentID, d_mgr.DepartmentID, ea.DepartmentID) AS DepartmentID,
          u.UserTypeCode,
          u.FirstName,
          u.LastName,
          u.Email
        FROM UserAccount ua
        INNER JOIN \`User\` u ON u.UserID = ua.UserID
+       LEFT JOIN Department d_mgr ON d_mgr.ManagerUserID = u.UserID AND d_mgr.IsDeleted = 0
+       LEFT JOIN EmployeeAssignment ea ON ea.UserID = u.UserID AND ea.IsPrimary = 1 AND ea.IsActive = 1 AND ea.IsDeleted = 0
        WHERE u.UserID = ?
          AND ua.IsDeleted = 0
          AND u.IsDeleted = 0
@@ -81,14 +84,17 @@ class UserAccountRepository {
          ua.LastLoginDateTime,
          t.TenantCode,
          t.CompanyName AS TenantName,
-         d.DepartmentID,
-         d.DepartmentName,
+         COALESCE(u.DepartmentID, d_mgr.DepartmentID, d.DepartmentID) AS DepartmentID,
+         COALESCE(d_direct.DepartmentCode, d_mgr.DepartmentCode, d.DepartmentCode) AS DepartmentCode,
+         COALESCE(d_direct.DepartmentName, d_mgr.DepartmentName, d.DepartmentName) AS DepartmentName,
          COALESCE(bp.BusinessParkName, (SELECT b.BusinessParkName FROM BusinessPark b WHERE b.IsDeleted = 0 LIMIT 1)) AS BusinessParkName,
          COALESCE(bp.BusinessParkID, (SELECT b.BusinessParkID FROM BusinessPark b WHERE b.IsDeleted = 0 LIMIT 1)) AS BusinessParkID
        FROM \`User\` u
        INNER JOIN UserAccount ua ON ua.UserID = u.UserID AND ua.IsDeleted = 0
        LEFT JOIN Tenant t ON t.TenantID = u.TenantID AND t.IsDeleted = 0
        LEFT JOIN BusinessPark bp ON bp.BusinessParkID = t.BusinessParkID AND bp.IsDeleted = 0
+       LEFT JOIN Department d_direct ON d_direct.DepartmentID = u.DepartmentID AND d_direct.IsDeleted = 0
+       LEFT JOIN Department d_mgr ON d_mgr.ManagerUserID = u.UserID AND d_mgr.IsDeleted = 0
        LEFT JOIN EmployeeAssignment ea ON ea.UserID = u.UserID AND ea.IsPrimary = 1 AND ea.IsActive = 1 AND ea.IsDeleted = 0
        LEFT JOIN Department d ON d.DepartmentID = ea.DepartmentID AND d.IsDeleted = 0
        WHERE u.UserID = ?

@@ -12,6 +12,13 @@ export const assignmentService = {
   async getUserDepartmentId(userId) {
     if (!userId || userId === 1) return null; // Super admin has global scope
 
+    // 0. Check User.DepartmentID
+    const [uRow] = await query(
+      `SELECT DepartmentID FROM \`User\` WHERE UserID = ? AND IsDeleted = 0 LIMIT 1`,
+      [userId]
+    );
+    if (uRow && uRow.DepartmentID) return uRow.DepartmentID;
+
     // 1. Check if user is designated Manager of any department
     const [dept] = await query(
       `SELECT DepartmentID FROM Department WHERE ManagerUserID = ? AND IsDeleted = 0 LIMIT 1`,
@@ -115,7 +122,7 @@ export const assignmentService = {
     let technicianName = '';
     if (AssignedUserID) {
       const [techUser] = await query(
-        `SELECT u.UserID, u.FirstName, u.LastName, u.IsActive, ea.DepartmentID, ea.IsActive AS AssignmentActive, r.RoleCode
+        `SELECT u.UserID, u.FirstName, u.LastName, u.IsActive, COALESCE(u.DepartmentID, ea.DepartmentID) AS DepartmentID, ea.IsActive AS AssignmentActive, r.RoleCode
          FROM \`User\` u
          LEFT JOIN EmployeeAssignment ea ON u.UserID = ea.UserID AND ea.IsActive = 1 AND ea.IsDeleted = 0
          LEFT JOIN UserRole ur ON u.UserID = ur.UserID

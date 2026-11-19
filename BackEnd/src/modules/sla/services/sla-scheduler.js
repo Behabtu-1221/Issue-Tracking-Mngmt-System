@@ -230,7 +230,6 @@ export class SlaScheduler {
       return processedCount;
     } catch (err) {
       await connection.rollback();
-      logger.error(`[SlaScheduler] Error in scheduler tick: ${err.message}`);
       throw err;
     } finally {
       connection.release();

@@ -6,7 +6,8 @@ export const approvalController = {
   async getMetrics(req, res, next) {
     try {
       const { tenantId } = getQuery(req);
-      const metrics = await approvalService.getMetrics(tenantId);
+      const departmentId = req.dataScope?.type === 'DEPARTMENT' ? req.dataScope.departmentId : req.query.departmentId;
+      const metrics = await approvalService.getMetrics(tenantId, departmentId);
       return sendSuccess(res, metrics);
     } catch (err) {
       next(err);
@@ -16,6 +17,9 @@ export const approvalController = {
   async getApprovals(req, res, next) {
     try {
       const params = getQuery(req);
+      if (req.dataScope?.type === 'DEPARTMENT' && req.dataScope.departmentId) {
+        params.departmentId = req.dataScope.departmentId;
+      }
       const result = await approvalService.getApprovals(params);
       return sendSuccess(res, result);
     } catch (err) {

@@ -89,6 +89,8 @@ export default function UsersTab() {
     lastName: '',
     phoneNumber: '',
     jobTitle: '',
+    age: '',
+    gender: '',
     userTypeCode: 'STAFF',
     roleId: ''
   });
@@ -176,6 +178,8 @@ export default function UsersTab() {
       lastName: '',
       phoneNumber: '',
       jobTitle: '',
+      age: '',
+      gender: '',
       userTypeCode: 'STAFF',
       roleId: ''
     });
@@ -240,8 +244,11 @@ export default function UsersTab() {
         email: validation.sanitized.Email,
         username: validation.sanitized.Username,
         phoneNumber: validation.sanitized.PhoneNumber || undefined,
+        age: validation.sanitized.Age || undefined,
+        gender: validation.sanitized.Gender || undefined,
         jobTitle: formData.jobTitle.trim() || undefined,
         userTypeCode: formData.userTypeCode,
+        roleId: formData.roleId ? Number(formData.roleId) : undefined,
         roleIds: formData.roleId ? [Number(formData.roleId)] : undefined
       };
 
@@ -263,6 +270,8 @@ export default function UsersTab() {
           lastName: '',
           phoneNumber: '',
           jobTitle: '',
+          age: '',
+          gender: '',
           userTypeCode: 'STAFF',
           roleId: ''
         });
@@ -542,6 +551,9 @@ export default function UsersTab() {
                           </div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                             {u.JobTitle || `ID: #${u.UserID}`}
+                            {(u.Age || u.Gender) && (
+                              <span> • {u.Age ? `${u.Age} yrs` : ''}{u.Age && u.Gender ? ', ' : ''}{u.Gender ? (u.Gender.charAt(0) + u.Gender.slice(1).toLowerCase()) : ''}</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1016,8 +1028,20 @@ export default function UsersTab() {
                   <div style={{ fontWeight: '600', marginTop: '4px' }}>{selectedUser.PhoneNumber || 'N/A'}</div>
                 </div>
                 <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Department / Organization</div>
+                  <div style={{ fontWeight: '600', marginTop: '4px', color: '#818cf8' }}>
+                    {selectedUser.DepartmentName ? `📂 ${selectedUser.DepartmentName}` : (selectedUser.TenantName ? `🏢 ${selectedUser.TenantName}` : 'Ethiopian IT Park')}
+                  </div>
+                </div>
+                <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Age & Gender</div>
+                  <div style={{ fontWeight: '600', marginTop: '4px' }}>
+                    {selectedUser.Age ? `${selectedUser.Age} yrs` : 'N/A'} • {selectedUser.Gender || 'N/A'}
+                  </div>
+                </div>
+                <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('identity.thAccountStatus')}</div>
-                  <div style={{ marginTop: '6px' }}>{getStatusBadge(selectedUser.Status)}</div>
+                  <div style={{ marginTop: '6px' }}>{getStatusBadge(selectedUser.Status || selectedUser.AccountStatusCode)}</div>
                 </div>
                 <div style={{ background: 'var(--bg-tertiary)', padding: '16px', borderRadius: 'var(--border-radius-sm)' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('identity.registrationDate')}</div>

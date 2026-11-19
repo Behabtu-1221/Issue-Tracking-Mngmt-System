@@ -7,18 +7,14 @@ export const budgetCostCenterRepository = {
     const offset = (page - 1) * limit;
     let sql = `
       SELECT cc.*,
-        t.CompanyName AS TenantName,
+        bp.BusinessParkName,
         (SELECT COUNT(*) FROM DepartmentBudget db WHERE db.CostCenterID = cc.CostCenterID AND db.IsDeleted = 0) AS BudgetCount
       FROM CostCenter cc
-      LEFT JOIN Tenant t ON cc.TenantID = t.TenantID
+      LEFT JOIN BusinessPark bp ON cc.BusinessParkID = bp.BusinessParkID
       WHERE cc.IsDeleted = 0
     `;
     const params = [];
 
-    if (tenantId) {
-      sql += ` AND cc.TenantID = ?`;
-      params.push(Number(tenantId));
-    }
     if (search) {
       sql += ` AND (cc.CostCenterName LIKE ? OR cc.CostCenterCode LIKE ?)`;
       params.push(`%${search}%`, `%${search}%`);
@@ -31,7 +27,6 @@ export const budgetCostCenterRepository = {
 
     let countSql = `SELECT COUNT(*) as total FROM CostCenter cc WHERE cc.IsDeleted = 0`;
     const countParams = [];
-    if (tenantId) { countSql += ` AND cc.TenantID = ?`; countParams.push(Number(tenantId)); }
     if (search) {
       countSql += ` AND (cc.CostCenterName LIKE ? OR cc.CostCenterCode LIKE ?)`;
       countParams.push(`%${search}%`, `%${search}%`);
@@ -48,9 +43,9 @@ export const budgetCostCenterRepository = {
 
   async findCostCenterById(id) {
     const sql = `
-      SELECT cc.*, t.CompanyName AS TenantName
+      SELECT cc.*, bp.BusinessParkName
       FROM CostCenter cc
-      LEFT JOIN Tenant t ON cc.TenantID = t.TenantID
+      LEFT JOIN BusinessPark bp ON cc.BusinessParkID = bp.BusinessParkID
       WHERE cc.CostCenterID = ? AND cc.IsDeleted = 0
     `;
     const rows = await query(sql, [id]);
@@ -60,12 +55,6 @@ export const budgetCostCenterRepository = {
   async findCostCenterByCode(tenantId, code) {
     let sql = `SELECT * FROM CostCenter WHERE CostCenterCode = ? AND IsDeleted = 0`;
     const params = [code];
-    if (tenantId) {
-      sql += ` AND TenantID = ?`;
-      params.push(tenantId);
-    } else {
-      sql += ` AND TenantID IS NULL`;
-    }
     const rows = await query(sql, params);
     return rows[0] || null;
   },
@@ -73,11 +62,11 @@ export const budgetCostCenterRepository = {
   async createCostCenter(data) {
     const sql = `
       INSERT INTO CostCenter (
-        TenantID, CostCenterCode, CostCenterName, Description, IsActive, CreatedBy
+        BusinessParkID, CostCenterCode, CostCenterName, Description, IsActive, CreatedBy
       ) VALUES (?, ?, ?, ?, ?, ?)
     `;
     const result = await query(sql, [
-      data.TenantID || null,
+      data.BusinessParkID || 1,
       data.CostCenterCode,
       data.CostCenterName,
       data.Description || null,

@@ -30,7 +30,15 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterId, setFilterId] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Modals
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
@@ -91,9 +99,9 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
   }, []);
 
   useEffect(() => {
-    if (subSection === 'teams') fetchTeams();
-    else fetchPositions();
-  }, [subSection, search, filterId]);
+    if (subSection === 'teams') fetchTeams(debouncedSearch, filterId);
+    else fetchPositions(debouncedSearch, filterId);
+  }, [subSection, debouncedSearch, filterId]);
 
   const fetchDepartments = async () => {
     try {
@@ -104,8 +112,6 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
     }
   };
 
-
-
   const fetchUsers = async () => {
     try {
       const res = await identityApi.getUsers({ limit: 300 });
@@ -115,10 +121,10 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
     }
   };
 
-  const fetchTeams = async () => {
+  const fetchTeams = async (searchTerm = debouncedSearch, deptId = filterId) => {
     try {
       setLoading(true);
-      const res = await orgApi.getTeams({ search, departmentId: filterId });
+      const res = await orgApi.getTeams({ search: searchTerm, departmentId: deptId });
       setTeams(res.data?.data?.teams || res.data?.data || []);
     } catch (err) {
       console.error('Failed to fetch teams', err);
@@ -127,10 +133,10 @@ export default function TeamsPositionsTab({ onRefreshMetrics }) {
     }
   };
 
-  const fetchPositions = async () => {
+  const fetchPositions = async (searchTerm = debouncedSearch, deptId = filterId) => {
     try {
       setLoading(true);
-      const res = await orgApi.getPositions({ search, orgUnitId: filterId });
+      const res = await orgApi.getPositions({ search: searchTerm, orgUnitId: deptId });
       setPositions(res.data?.data?.positions || res.data?.data || []);
     } catch (err) {
       console.error('Failed to fetch positions', err);

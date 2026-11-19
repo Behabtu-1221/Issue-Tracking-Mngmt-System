@@ -1,7 +1,7 @@
 import { query } from '../../../database/connection.js';
 
 export const approvalRepository = {
-  async getMetrics(tenantId) {
+  async getMetrics(tenantId, departmentId) {
     let sql = `
       SELECT
         COUNT(*) AS totalApprovals,
@@ -18,6 +18,10 @@ export const approvalRepository = {
       sql += ` AND ir.TenantID = ?`;
       params.push(Number(tenantId));
     }
+    if (departmentId) {
+      sql += ` AND ir.AssignedDepartmentID = ?`;
+      params.push(Number(departmentId));
+    }
     const rows = await query(sql, params);
     const r = rows[0] || {};
     return {
@@ -29,7 +33,7 @@ export const approvalRepository = {
     };
   },
 
-  async findAll({ search, statusCode, tenantId, page = 1, limit = 50 }) {
+  async findAll({ search, statusCode, tenantId, departmentId, page = 1, limit = 50 }) {
     const offset = (page - 1) * limit;
     let sql = `
       SELECT a.*,
@@ -48,6 +52,10 @@ export const approvalRepository = {
     if (tenantId) {
       sql += ` AND ir.TenantID = ?`;
       params.push(Number(tenantId));
+    }
+    if (departmentId) {
+      sql += ` AND ir.AssignedDepartmentID = ?`;
+      params.push(Number(departmentId));
     }
     if (statusCode) {
       sql += ` AND a.ApprovalStatusCode = ?`;
@@ -71,6 +79,7 @@ export const approvalRepository = {
     `;
     const countParams = [];
     if (tenantId) { countSql += ` AND ir.TenantID = ?`; countParams.push(Number(tenantId)); }
+    if (departmentId) { countSql += ` AND ir.AssignedDepartmentID = ?`; countParams.push(Number(departmentId)); }
     if (statusCode) { countSql += ` AND a.ApprovalStatusCode = ?`; countParams.push(statusCode); }
     if (search) {
       countSql += ` AND (a.Title LIKE ? OR ir.RequestNumber LIKE ? OR ir.Title LIKE ?)`;

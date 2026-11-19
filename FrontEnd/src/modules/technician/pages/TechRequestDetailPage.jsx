@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Clock, AlertTriangle, CheckCircle2, XCircle, Play, Pause,
   Wrench, Send, Paperclip, Upload, FileText, User, Building, Layers,
-  AlertCircle, ShieldAlert, Check, RefreshCw, MessageSquare, Info, ChevronRight, HelpCircle
+  AlertCircle, ShieldAlert, Check, RefreshCw, X, MessageSquare, Info, ChevronRight, HelpCircle
 } from 'lucide-react';
 import { usePermissionContext } from '../../role-permission-management/contexts/PermissionContext';
 import technicianApi from '../api/technicianApi';

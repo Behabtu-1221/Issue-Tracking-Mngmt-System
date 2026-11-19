@@ -100,7 +100,16 @@ export const authorizationService = {
       ? (typeof user.roles[0] === 'string' ? user.roles[0] : user.roles[0].RoleCode || user.roles[0].code || user.roles[0].name)
       : null;
     const typeCode = (assignedRoleCode || user.userTypeCode || user.roleCode || '').toUpperCase();
-    return typeCode === 'PARK_ADMIN' || typeCode === 'PARK_SUPER_ADMIN' || typeCode === 'SUPER_ADMIN' || typeCode === 'BUSINESS_PARK_ADMIN' || typeCode === 'PARK_ADMINISTRATOR';
+    return (
+      typeCode === 'PARK_ADMIN' ||
+      typeCode === 'PARK_SUPER_ADMIN' ||
+      typeCode === 'SUPER_ADMIN' ||
+      typeCode === 'BUSINESS_PARK_ADMIN' ||
+      typeCode === 'PARK_ADMINISTRATOR' ||
+      typeCode === 'SYSTEM_ADMIN' ||
+      typeCode === 'SYSTEM_ADMINISTRATOR' ||
+      typeCode === 'SYSADMIN'
+    );
   },
 
   /**

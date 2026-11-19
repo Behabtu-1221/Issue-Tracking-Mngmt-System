@@ -44,6 +44,7 @@ const authenticate = async (req, res, next) => {
       userId: account.UserID,
       userAccountId: account.UserAccountID,
       tenantId: account.TenantID,
+      departmentId: account.DepartmentID,
       username: account.Username,
       userTypeCode: account.UserTypeCode,
       sessionId: decoded.sessionId

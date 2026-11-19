@@ -1,13 +1,14 @@
 import { query } from '../../../database/connection.js';
 
 export const slaClockRepository = {
-  async getOverviewMetrics(tenantId) {
+  async getOverviewMetrics(tenantId, departmentId) {
+    const deptJoin = departmentId ? `JOIN IssueRequest ir ON c.IssueRequestID = ir.IssueRequestID AND ir.AssignedDepartmentID = ${Number(departmentId)}` : '';
     let sql = `
       SELECT
-        (SELECT COUNT(*) FROM SLAClock WHERE IsDeleted = 0) AS totalMonitoredClocks,
-        (SELECT COUNT(*) FROM SLAClock WHERE IsResponseBreached = 0 AND IsResolutionBreached = 0 AND IsDeleted = 0) AS compliantClocks,
-        (SELECT COUNT(*) FROM SLAClock WHERE IsResponseBreached = 1 AND IsDeleted = 0) AS responseBreachesCount,
-        (SELECT COUNT(*) FROM SLAClock WHERE IsResolutionBreached = 1 AND IsDeleted = 0) AS resolutionBreachesCount
+        (SELECT COUNT(*) FROM SLAClock c ${deptJoin} WHERE c.IsDeleted = 0) AS totalMonitoredClocks,
+        (SELECT COUNT(*) FROM SLAClock c ${deptJoin} WHERE c.IsResponseBreached = 0 AND c.IsResolutionBreached = 0 AND c.IsDeleted = 0) AS compliantClocks,
+        (SELECT COUNT(*) FROM SLAClock c ${deptJoin} WHERE c.IsResponseBreached = 1 AND c.IsDeleted = 0) AS responseBreachesCount,
+        (SELECT COUNT(*) FROM SLAClock c ${deptJoin} WHERE c.IsResolutionBreached = 1 AND c.IsDeleted = 0) AS resolutionBreachesCount
     `;
     const rows = await query(sql);
     const m = rows[0] || { totalMonitoredClocks: 0, compliantClocks: 0, responseBreachesCount: 0, resolutionBreachesCount: 0 };
@@ -15,7 +16,7 @@ export const slaClockRepository = {
     return { ...m, compliancePercent };
   },
 
-  async findAllClocks({ search, clockStatus, priorityCode, isBreached, page = 1, limit = 50 }) {
+  async findAllClocks({ search, clockStatus, priorityCode, isBreached, departmentId, page = 1, limit = 50 }) {
     const offset = (page - 1) * limit;
     let sql = `
       SELECT c.*,
@@ -34,6 +35,10 @@ export const slaClockRepository = {
     `;
 
     const params = [];
+    if (departmentId) {
+      sql += ` AND ir.AssignedDepartmentID = ?`;
+      params.push(Number(departmentId));
+    }
     if (search) {
       sql += ` AND (ir.Title LIKE ? OR ir.RequestNumber LIKE ?)`;
       params.push(`%${search}%`, `%${search}%`);

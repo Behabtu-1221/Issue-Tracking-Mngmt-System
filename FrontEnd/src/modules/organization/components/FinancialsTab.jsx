@@ -33,7 +33,15 @@ export default function FinancialsTab({ onRefreshMetrics }) {
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Modals
   const [isCCModalOpen, setIsCCModalOpen] = useState(false);
@@ -97,9 +105,9 @@ export default function FinancialsTab({ onRefreshMetrics }) {
   }, []);
 
   useEffect(() => {
-    if (subSection === 'cost-centers') fetchCostCenters();
-    else fetchBudgets();
-  }, [subSection, search, deptFilter]);
+    if (subSection === 'cost-centers') fetchCostCenters(debouncedSearch);
+    else fetchBudgets(deptFilter);
+  }, [subSection, debouncedSearch, deptFilter]);
 
   const fetchDepartments = async () => {
     try {
@@ -115,19 +123,19 @@ export default function FinancialsTab({ onRefreshMetrics }) {
     } catch (err) { console.error('Failed to fetch tenants', err); }
   };
 
-  const fetchCostCenters = async () => {
+  const fetchCostCenters = async (searchTerm = debouncedSearch) => {
     try {
       setLoading(true);
-      const res = await orgApi.getCostCenters({ search });
+      const res = await orgApi.getCostCenters({ search: searchTerm });
       setCostCenters(res.data?.data?.costCenters || res.data?.data || []);
     } catch (err) { console.error('Failed to fetch cost centers', err); }
     finally { setLoading(false); }
   };
 
-  const fetchBudgets = async () => {
+  const fetchBudgets = async (departmentId = deptFilter) => {
     try {
       setLoading(true);
-      const res = await orgApi.getBudgets({ departmentId: deptFilter });
+      const res = await orgApi.getBudgets({ departmentId });
       setBudgets(res.data?.data?.budgets || res.data?.data || []);
     } catch (err) { console.error('Failed to fetch budgets', err); }
     finally { setLoading(false); }

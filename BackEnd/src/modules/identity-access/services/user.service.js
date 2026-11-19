@@ -23,21 +23,46 @@ class UserService {
 
     let departmentId = params.departmentId || null;
 
-    // If Manager/Dispatcher actor, default to their authorized department if not explicitly set
-    if (actor && actor.userId) {
+    // If Manager/Dispatcher actor, strictly lock to their authorized department
+    if (actor && actor.userId && !isParkAdminActor(actor)) {
       const code = (actor.userTypeCode || '').toUpperCase();
-      if (['DEPARTMENT_MANAGER', 'DISPATCHER', 'MANAGER'].includes(code)) {
+      let mgrDeptId = actor.departmentId;
+
+      if (!mgrDeptId) {
+        const uRows = await db.query(`SELECT DepartmentID FROM \`User\` WHERE UserID = ? LIMIT 1`, [actor.userId]);
+        if (uRows[0]?.DepartmentID) mgrDeptId = uRows[0].DepartmentID;
+      }
+      if (!mgrDeptId) {
+        const dRows = await db.query(`SELECT DepartmentID FROM Department WHERE ManagerUserID = ? AND IsDeleted = 0 LIMIT 1`, [actor.userId]);
+        if (dRows[0]?.DepartmentID) mgrDeptId = dRows[0].DepartmentID;
+      }
+      if (!mgrDeptId) {
         try {
           const eaRows = await db.query(
             `SELECT DepartmentID FROM EmployeeAssignment WHERE UserID = ? AND IsPrimary = 1 AND IsDeleted = 0 LIMIT 1`,
             [actor.userId]
           );
           if (eaRows && eaRows[0] && eaRows[0].DepartmentID) {
-            departmentId = eaRows[0].DepartmentID;
+            mgrDeptId = eaRows[0].DepartmentID;
           }
         } catch {
           // Fallback if query fails
         }
+      }
+
+      // Check if user has Department Manager role
+      let isManager = ['DEPARTMENT_MANAGER', 'DISPATCHER', 'MANAGER', 'FACILITY_MANAGER'].includes(code);
+      if (!isManager) {
+        try {
+          const roles = await userAccountRepository.findRolesByUserId(actor.userId);
+          isManager = (roles || []).some(r => ['DEPARTMENT_MANAGER', 'DISPATCHER', 'MANAGER', 'FACILITY_MANAGER'].includes((r.RoleCode || '').toUpperCase()));
+        } catch {
+          // Ignore role check error
+        }
+      }
+
+      if (isManager && mgrDeptId) {
+        departmentId = mgrDeptId; // Strict department isolation: cannot be overridden by client query
       }
     }
 
@@ -59,12 +84,13 @@ class UserService {
       throw new AppError('User not found', 404);
     }
 
-    if (
-      !isParkAdminActor(actor) &&
-      user.TenantID !== actor.tenantId &&
-      user.UserID !== actor.userId
-    ) {
-      throw new AppError('User not found', 404);
+    if (!isParkAdminActor(actor)) {
+      if (user.TenantID && actor.tenantId && user.TenantID !== actor.tenantId && user.UserID !== actor.userId) {
+        throw new AppError('User not found', 404);
+      }
+      if (actor.departmentId && user.DepartmentID && Number(user.DepartmentID) !== Number(actor.departmentId) && user.UserID !== actor.userId) {
+        throw new AppError('User not found', 404);
+      }
     }
 
     return user;
@@ -116,10 +142,14 @@ class UserService {
     try {
       const userId = await userRepository.createUser(
         {
+          businessParkId: 1,
           tenantId,
+          departmentId: userData.departmentId ? Number(userData.departmentId) : null,
           userTypeCode: userData.userTypeCode || 'STAFF',
           firstName: userData.firstName,
           lastName: userData.lastName,
+          age: userData.age,
+          gender: userData.gender,
           email: userData.email,
           phoneNumber: userData.phoneNumber,
           mobileNumber: userData.mobileNumber,
@@ -149,13 +179,33 @@ class UserService {
         );
       }
 
-      if (userData.roleIds && userData.roleIds.length > 0) {
-        await roleRepository.assignUserRoles(userId, userData.roleIds, actor.userId, tx);
+      // Handle Tenant Representative link
+      const requestedCode = (userData.userTypeCode || '').toUpperCase();
+      if ((requestedCode === 'TENANT_REPRESENTATIVE' || requestedCode === 'TENANT_ADMIN') && tenantId) {
+        try {
+          await tx.query(
+            `INSERT INTO TenantRepresentative (TenantID, UserID, RepresentativeRole, IsPrimary, CreatedBy)
+             VALUES (?, ?, 'PRIMARY', 1, ?)`,
+            [Number(tenantId), userId, actor.userId || 1]
+          );
+        } catch {
+          // Ignore if already registered
+        }
+      }
+
+      // Resolve roles across the 5 core roles: SUPER_ADMIN, DEPARTMENT_MANAGER, TECHNICIAN, EMPLOYEE, TENANT_REPRESENTATIVE
+      let targetRoleIds = userData.roleIds ? [...userData.roleIds] : [];
+      if (userData.roleId && !targetRoleIds.includes(Number(userData.roleId))) {
+        targetRoleIds.push(Number(userData.roleId));
+      }
+
+      if (targetRoleIds.length > 0) {
+        await roleRepository.assignUserRoles(userId, targetRoleIds, actor.userId, tx);
       } else {
-        const code = (userData.userTypeCode || '').toUpperCase();
-        const defaultRoleCode = (code === 'PARK_ADMIN' || code === 'SUPER_ADMIN' || code === 'PARK_SUPER_ADMIN')
-          ? 'PARK_SUPER_ADMIN'
-          : (code === 'TENANT_REPRESENTATIVE' || code === 'TENANT_ADMIN' || code === 'COMPANY_ADMIN' || code === 'ADMIN')
+        const code = requestedCode;
+        const defaultRoleCode = (code === 'PARK_ADMIN' || code === 'SUPER_ADMIN' || code === 'PARK_SUPER_ADMIN' || code === 'ADMIN' || code === 'ADMINISTRATOR')
+          ? 'SUPER_ADMIN'
+          : (code === 'TENANT_REPRESENTATIVE' || code === 'TENANT_ADMIN' || code === 'COMPANY_ADMIN')
             ? 'TENANT_REPRESENTATIVE'
             : (code === 'TECHNICIAN' || code === 'PARK_TECHNICIAN')
               ? 'TECHNICIAN'
@@ -163,15 +213,18 @@ class UserService {
                 ? 'DEPARTMENT_MANAGER'
                 : 'EMPLOYEE';
         
-        let defaultRole = await roleRepository.findByCode(defaultRoleCode, tenantId, tx);
+        let defaultRole = await roleRepository.findByCode(defaultRoleCode, null, tx);
+        if (!defaultRole && defaultRoleCode === 'SUPER_ADMIN') {
+          defaultRole = await roleRepository.findByCode('PARK_SUPER_ADMIN', null, tx);
+        }
         if (!defaultRole && defaultRoleCode === 'DEPARTMENT_MANAGER') {
-          defaultRole = (await roleRepository.findByCode('MANAGER', tenantId, tx)) || (await roleRepository.findByCode('DISPATCHER', tenantId, tx));
+          defaultRole = (await roleRepository.findByCode('MANAGER', null, tx)) || (await roleRepository.findByCode('DISPATCHER', null, tx));
         }
         if (!defaultRole && defaultRoleCode === 'TENANT_REPRESENTATIVE') {
-          defaultRole = (await roleRepository.findByCode('TENANT_ADMIN', tenantId, tx)) || (await roleRepository.findByCode('COMPANY_ADMIN', tenantId, tx));
+          defaultRole = (await roleRepository.findByCode('TENANT_ADMIN', null, tx)) || (await roleRepository.findByCode('COMPANY_ADMIN', null, tx));
         }
         if (!defaultRole) {
-          defaultRole = await roleRepository.findByCode('EMPLOYEE', tenantId, tx);
+          defaultRole = await roleRepository.findByCode('EMPLOYEE', null, tx);
         }
         if (defaultRole) {
           await roleRepository.assignUserRoles(userId, [defaultRole.RoleID], actor.userId, tx);
@@ -267,6 +320,35 @@ class UserService {
     }
 
     await userRepository.updateUser(userId, userData, actor.userId);
+
+    if (userData.departmentId) {
+      try {
+        const [existingEa] = await db.query(
+          `SELECT EmployeeAssignmentID FROM EmployeeAssignment WHERE UserID = ? AND IsDeleted = 0 LIMIT 1`,
+          [userId]
+        );
+        if (existingEa) {
+          await db.query(
+            `UPDATE EmployeeAssignment SET DepartmentID = ?, ModifiedBy = ?, ModifiedDate = CURRENT_TIMESTAMP(6) WHERE EmployeeAssignmentID = ?`,
+            [Number(userData.departmentId), actor.userId || 1, existingEa.EmployeeAssignmentID]
+          );
+        } else {
+          await db.query(
+            `INSERT INTO EmployeeAssignment (UserID, DepartmentID, IsPrimary, JoinedDate, IsActive, CreatedBy)
+             VALUES (?, ?, 1, CURRENT_DATE(), 1, ?)`,
+            [userId, Number(userData.departmentId), actor.userId || 1]
+          );
+        }
+      } catch (eaErr) {
+        console.warn('Employee assignment update notice:', eaErr.message);
+      }
+    }
+
+    if (userData.roleId || (userData.roleIds && userData.roleIds.length > 0)) {
+      const rolesToAssign = userData.roleIds ? [...userData.roleIds] : [Number(userData.roleId)];
+      await roleRepository.assignUserRoles(userId, rolesToAssign, actor.userId);
+    }
+
     return userRepository.findById(userId);
   }
 

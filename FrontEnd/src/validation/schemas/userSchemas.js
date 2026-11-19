@@ -49,6 +49,18 @@ export const userSchemas = {
       errors.PhoneNumber = VALIDATION_MESSAGES.invalidPhone;
     }
 
+    const rawAge = formData.Age ?? formData.age;
+    const age = (rawAge !== undefined && rawAge !== null && rawAge !== '') ? Number(rawAge) : null;
+    if (age !== null && (isNaN(age) || age < 18 || age > 120)) {
+      errors.Age = 'Age must be between 18 and 120';
+    }
+
+    const rawGender = formData.Gender || formData.gender;
+    const gender = rawGender ? String(rawGender).trim().toUpperCase() : null;
+    if (gender && !['MALE', 'FEMALE', 'OTHER'].includes(gender)) {
+      errors.Gender = 'Gender must be MALE, FEMALE, or OTHER';
+    }
+
     if (!isEdit && !formData.Password) {
       errors.Password = VALIDATION_MESSAGES.required('Password');
     } else if (formData.Password && formData.Password.length < VALIDATION_LIMITS.PASSWORD_MIN_LENGTH) {
@@ -64,6 +76,8 @@ export const userSchemas = {
         FirstName: firstName,
         LastName: lastName,
         PhoneNumber: phoneNumber,
+        Age: age,
+        Gender: gender,
         Password: formData.Password,
         UserTypeCode: formData.UserTypeCode || 'EMPLOYEE',
         TenantID: formData.TenantID ? Number(formData.TenantID) : null,

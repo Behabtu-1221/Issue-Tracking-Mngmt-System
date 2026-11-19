@@ -4,31 +4,26 @@ export const serviceCategoryRepository = {
   /**
    * Find all service categories with service count aggregation and filters.
    */
-  async findAll({ tenantId, search, page = 1, limit = 50 }) {
+  async findAll({ search, page = 1, limit = 50 }) {
     const offset = (page - 1) * limit;
     let sql = `
       SELECT sc.*,
-        COALESCE(bp.BusinessParkName, t.CompanyName, 'Global Park Catalog') AS BusinessParkName,
-        COALESCE(bp.BusinessParkName, t.CompanyName, 'Global Park Catalog') AS TenantName,
+        COALESCE(bp.BusinessParkName, 'Ethiopian IT Park') AS BusinessParkName,
+        COALESCE(bp.BusinessParkCode, 'ICT_PARK_AA') AS BusinessParkCode,
         (SELECT COUNT(*) FROM Service s WHERE s.ServiceCategoryID = sc.ServiceCategoryID AND s.IsDeleted = 0) AS ServiceCount,
-        d.DepartmentID AS RoutedDepartmentID,
+        COALESCE(scdm.DepartmentID, sc.DepartmentID, d.DepartmentID) AS RoutedDepartmentID,
         d.DepartmentName AS RoutedDepartmentName,
         d.DepartmentCode AS RoutedDepartmentCode,
         scdm.MappingID,
         scdm.IsActive AS IsMappingActive
       FROM ServiceCategory sc
-      LEFT JOIN BusinessPark bp ON sc.TenantID = bp.BusinessParkID
-      LEFT JOIN Tenant t ON sc.TenantID = t.TenantID
+      LEFT JOIN BusinessPark bp ON sc.BusinessParkID = bp.BusinessParkID
       LEFT JOIN ServiceCategoryDepartmentMapping scdm ON scdm.ServiceCategoryID = sc.ServiceCategoryID AND scdm.IsDeleted = 0
-      LEFT JOIN Department d ON scdm.DepartmentID = d.DepartmentID AND d.IsDeleted = 0
+      LEFT JOIN Department d ON (COALESCE(scdm.DepartmentID, sc.DepartmentID) = d.DepartmentID) AND d.IsDeleted = 0
       WHERE sc.IsDeleted = 0
     `;
     const params = [];
 
-    if (tenantId) {
-      sql += ` AND sc.TenantID = ?`;
-      params.push(Number(tenantId));
-    }
     if (search) {
       sql += ` AND (sc.CategoryName LIKE ? OR sc.CategoryCode LIKE ? OR sc.Description LIKE ? OR bp.BusinessParkName LIKE ? OR d.DepartmentName LIKE ?)`;
       params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
@@ -41,13 +36,12 @@ export const serviceCategoryRepository = {
     let countSql = `
       SELECT COUNT(*) as total
       FROM ServiceCategory sc
-      LEFT JOIN BusinessPark bp ON sc.TenantID = bp.BusinessParkID
+      LEFT JOIN BusinessPark bp ON sc.BusinessParkID = bp.BusinessParkID
       LEFT JOIN ServiceCategoryDepartmentMapping scdm ON scdm.ServiceCategoryID = sc.ServiceCategoryID AND scdm.IsDeleted = 0
-      LEFT JOIN Department d ON scdm.DepartmentID = d.DepartmentID AND d.IsDeleted = 0
+      LEFT JOIN Department d ON (COALESCE(scdm.DepartmentID, sc.DepartmentID) = d.DepartmentID) AND d.IsDeleted = 0
       WHERE sc.IsDeleted = 0
     `;
     const countParams = [];
-    if (tenantId) { countSql += ` AND sc.TenantID = ?`; countParams.push(Number(tenantId)); }
     if (search) {
       countSql += ` AND (sc.CategoryName LIKE ? OR sc.CategoryCode LIKE ? OR sc.Description LIKE ? OR bp.BusinessParkName LIKE ? OR d.DepartmentName LIKE ?)`;
       countParams.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
@@ -68,19 +62,18 @@ export const serviceCategoryRepository = {
   async findById(id) {
     const sql = `
       SELECT sc.*,
-        COALESCE(bp.BusinessParkName, t.CompanyName, 'Global Park Catalog') AS BusinessParkName,
-        COALESCE(bp.BusinessParkName, t.CompanyName, 'Global Park Catalog') AS TenantName,
+        COALESCE(bp.BusinessParkName, 'Ethiopian IT Park') AS BusinessParkName,
+        COALESCE(bp.BusinessParkCode, 'ICT_PARK_AA') AS BusinessParkCode,
         (SELECT COUNT(*) FROM Service s WHERE s.ServiceCategoryID = sc.ServiceCategoryID AND s.IsDeleted = 0) AS ServiceCount,
-        d.DepartmentID AS RoutedDepartmentID,
+        COALESCE(scdm.DepartmentID, sc.DepartmentID, d.DepartmentID) AS RoutedDepartmentID,
         d.DepartmentName AS RoutedDepartmentName,
         d.DepartmentCode AS RoutedDepartmentCode,
         scdm.MappingID,
         scdm.IsActive AS IsMappingActive
       FROM ServiceCategory sc
-      LEFT JOIN BusinessPark bp ON sc.TenantID = bp.BusinessParkID
-      LEFT JOIN Tenant t ON sc.TenantID = t.TenantID
+      LEFT JOIN BusinessPark bp ON sc.BusinessParkID = bp.BusinessParkID
       LEFT JOIN ServiceCategoryDepartmentMapping scdm ON scdm.ServiceCategoryID = sc.ServiceCategoryID AND scdm.IsDeleted = 0
-      LEFT JOIN Department d ON scdm.DepartmentID = d.DepartmentID AND d.IsDeleted = 0
+      LEFT JOIN Department d ON (COALESCE(scdm.DepartmentID, sc.DepartmentID) = d.DepartmentID) AND d.IsDeleted = 0
       WHERE sc.ServiceCategoryID = ? AND sc.IsDeleted = 0
     `;
     const rows = await query(sql, [id]);
@@ -88,19 +81,19 @@ export const serviceCategoryRepository = {
   },
 
   /**
-   * Find by code and tenant scope for uniqueness checking.
+   * Find by code for park-wide uniqueness checking.
+   */
+  async findByCode(categoryCode) {
+    const sql = `SELECT * FROM ServiceCategory WHERE CategoryCode = ? AND IsDeleted = 0 LIMIT 1`;
+    const rows = await query(sql, [categoryCode]);
+    return rows[0] || null;
+  },
+
+  /**
+   * Backward-compatible alias for findByCode.
    */
   async findByTenantAndCode(tenantId, categoryCode) {
-    let sql = `SELECT * FROM ServiceCategory WHERE CategoryCode = ? AND IsDeleted = 0`;
-    const params = [categoryCode];
-    if (tenantId) {
-      sql += ` AND TenantID = ?`;
-      params.push(tenantId);
-    } else {
-      sql += ` AND TenantID IS NULL`;
-    }
-    const rows = await query(sql, params);
-    return rows[0] || null;
+    return this.findByCode(categoryCode);
   },
 
   /**
@@ -109,11 +102,12 @@ export const serviceCategoryRepository = {
   async create(data) {
     const sql = `
       INSERT INTO ServiceCategory (
-        TenantID, CategoryCode, CategoryName, Description, IsActive, CreatedBy
-      ) VALUES (?, ?, ?, ?, ?, ?)
+        BusinessParkID, DepartmentID, CategoryCode, CategoryName, Description, IsActive, CreatedBy
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await query(sql, [
-      data.TenantID || null,
+      data.BusinessParkID || 1,
+      data.DepartmentID || null,
       data.CategoryCode,
       data.CategoryName,
       data.Description || null,
@@ -130,9 +124,13 @@ export const serviceCategoryRepository = {
     const fields = [];
     const params = [];
 
-    if (data.TenantID !== undefined) {
-      fields.push('TenantID = ?');
-      params.push(data.TenantID || null);
+    if (data.BusinessParkID !== undefined) {
+      fields.push('BusinessParkID = ?');
+      params.push(data.BusinessParkID || 1);
+    }
+    if (data.DepartmentID !== undefined) {
+      fields.push('DepartmentID = ?');
+      params.push(data.DepartmentID || null);
     }
     if (data.CategoryName !== undefined) {
       fields.push('CategoryName = ?');

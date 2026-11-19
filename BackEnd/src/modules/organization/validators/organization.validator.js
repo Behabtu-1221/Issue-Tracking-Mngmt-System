@@ -2,9 +2,11 @@ import Joi from 'joi';
 
 // Department
 export const createDepartmentSchema = Joi.object({
+  BusinessParkID: Joi.number().integer().positive().allow(null, '').default(1),
   OrganizationUnitID: Joi.number().integer().positive().allow(null, ''),
   DepartmentCode: Joi.string().max(30).required(),
   DepartmentName: Joi.string().max(150).required(),
+  Description: Joi.string().max(1000).allow('', null),
   ManagerUserID: Joi.number().integer().positive().allow(null, ''),
   IsActive: Joi.number().valid(0, 1).default(1)
 });

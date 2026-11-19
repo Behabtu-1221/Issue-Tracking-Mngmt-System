@@ -183,7 +183,17 @@ export const teamRepository = {
     return true;
   },
 
-  async findEligibleTechnicians({ tenantId, departmentId }) {
+  async findEligibleTechnicians(tenantIdOrObj, maybeDeptId) {
+    let tenantId = null;
+    let departmentId = null;
+
+    if (typeof tenantIdOrObj === 'object' && tenantIdOrObj !== null) {
+      tenantId = tenantIdOrObj.tenantId;
+      departmentId = tenantIdOrObj.departmentId;
+    } else {
+      tenantId = tenantIdOrObj;
+      departmentId = maybeDeptId;
+    }
     let sql = `
       SELECT DISTINCT u.UserID, u.FirstName, u.LastName, u.Email, u.UserTypeCode,
         d.DepartmentName, ea.DepartmentID, ea.TeamID, tm.TeamName
@@ -203,12 +213,23 @@ export const teamRepository = {
       params.push(Number(tenantId));
     }
     if (departmentId) {
-      sql += ` AND (ea.DepartmentID = ? OR ea.DepartmentID IS NULL)`;
-      params.push(Number(departmentId));
+      sql += ` AND (ea.DepartmentID = ? OR u.DepartmentID = ?)`;
+      params.push(Number(departmentId), Number(departmentId));
     }
 
     sql += ` ORDER BY u.FirstName ASC`;
     return query(sql, params);
+  },
+
+  async getUserDepartment(userId) {
+    const rows = await query(
+      `SELECT u.UserID, COALESCE(u.DepartmentID, ea.DepartmentID) AS DepartmentID
+       FROM \`User\` u
+       LEFT JOIN EmployeeAssignment ea ON ea.UserID = u.UserID AND ea.IsPrimary = 1 AND ea.IsDeleted = 0
+       WHERE u.UserID = ? AND u.IsDeleted = 0 LIMIT 1`,
+      [userId]
+    );
+    return rows[0] || null;
   },
 
   async getTeamWorkloadSummary({ tenantId, departmentId }) {

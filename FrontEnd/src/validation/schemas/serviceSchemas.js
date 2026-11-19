@@ -8,16 +8,16 @@ const EXTENSION_LIST_REGEX = /^[a-zA-Z0-9]+(,\s*[a-zA-Z0-9]+)*$/;
 export const serviceSchemas = {
   /**
    * 1. Service Category Form Schema
-   * Validates Category Name, Code, Description, and Tenant Scoping.
+   * Validates Category Name, Code, Description, Department, and Business Park Campus.
    */
   categoryForm: (formData, isEditing = false) => {
     const errors = {};
     const categoryName = inputSanitizer.normalizeText(formData.CategoryName || '');
     const categoryCode = inputSanitizer.normalizeText(formData.CategoryCode || '').toUpperCase();
     const description = inputSanitizer.normalizeText(formData.Description || '');
-    const tenantId = formData.TenantID !== '' && formData.TenantID !== null && formData.TenantID !== undefined
-      ? Number(formData.TenantID)
-      : null;
+    const businessParkId = formData.BusinessParkID !== '' && formData.BusinessParkID !== null && formData.BusinessParkID !== undefined
+      ? Number(formData.BusinessParkID)
+      : (formData.TenantID ? Number(formData.TenantID) : 1);
 
     // Category Name
     if (!categoryName) {
@@ -40,11 +40,6 @@ export const serviceSchemas = {
       errors.Description = SERVICE_CATALOG_MESSAGES.category.descriptionMaxLength(1000);
     }
 
-    // Tenant Scoping check
-    if (tenantId !== null && (isNaN(tenantId) || tenantId <= 0)) {
-      errors.TenantID = SERVICE_CATALOG_MESSAGES.category.tenantInvalid;
-    }
-
     const departmentId = formData.DepartmentID !== '' && formData.DepartmentID !== null && formData.DepartmentID !== undefined
       ? Number(formData.DepartmentID)
       : null;
@@ -56,7 +51,7 @@ export const serviceSchemas = {
         CategoryName: categoryName,
         CategoryCode: categoryCode,
         Description: description || null,
-        TenantID: tenantId,
+        BusinessParkID: businessParkId || 1,
         DepartmentID: departmentId,
         IsActive: formData.IsActive !== undefined ? Number(formData.IsActive) : 1
       }

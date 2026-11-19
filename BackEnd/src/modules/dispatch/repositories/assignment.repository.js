@@ -307,7 +307,7 @@ export const assignmentRepository = {
       SELECT u.UserID, CONCAT(u.FirstName, ' ', u.LastName) AS FullName,
         COUNT(a.AssignmentID) AS ActiveWorkload
       FROM \`User\` u
-      JOIN EmployeeAssignment ea ON u.UserID = ea.UserID AND ea.IsActive = 1 AND ea.IsDeleted = 0
+      LEFT JOIN EmployeeAssignment ea ON u.UserID = ea.UserID AND ea.IsActive = 1 AND ea.IsDeleted = 0
       LEFT JOIN UserRole ur ON u.UserID = ur.UserID
       LEFT JOIN Role r ON ur.RoleID = r.RoleID
       LEFT JOIN TechnicianAvailability ta ON u.UserID = ta.UserID
@@ -318,7 +318,7 @@ export const assignmentRepository = {
     `;
     const params = [];
     if (departmentId) {
-      sql += ` AND ea.DepartmentID = ?`;
+      sql += ` AND COALESCE(ea.DepartmentID, u.DepartmentID) = ?`;
       params.push(Number(departmentId));
     }
     sql += `

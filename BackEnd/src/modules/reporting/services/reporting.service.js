@@ -47,8 +47,8 @@ function resolveDateRange(dateRange, startDate, endDate) {
  * Enforces strict multi-tenant isolation and role-aware restrictions.
  */
 function resolveScope(actor, queryFilters = {}) {
-  const userType = actor?.userTypeCode || '';
-  const isParkAdmin = userType === 'SUPER_ADMIN' || userType === 'PARK_ADMIN' || userType === 'PARK_SUPER_ADMIN';
+  const userType = (actor?.userTypeCode || '').toUpperCase();
+  const isParkAdmin = ['SUPER_ADMIN', 'ADMIN', 'ADMINISTRATOR', 'PARK_ADMIN', 'PARK_SUPER_ADMIN', 'BUSINESS_PARK_ADMIN'].includes(userType) || actor?.isParkAdmin;
 
   let tenantId = queryFilters.tenantId ? Number(queryFilters.tenantId) : undefined;
   let departmentId = queryFilters.departmentId ? Number(queryFilters.departmentId) : undefined;
@@ -57,8 +57,15 @@ function resolveScope(actor, queryFilters = {}) {
   let requesterUserId = queryFilters.requesterUserId ? Number(queryFilters.requesterUserId) : undefined;
 
   if (!isParkAdmin) {
-    // Non-park-admins are strictly isolated to their own Tenant
-    if (actor?.tenantId) {
+    const isDeptManager = ['DEPARTMENT_MANAGER', 'MANAGER', 'DISPATCHER', 'FACILITY_MANAGER'].includes(userType) ||
+      Boolean(actor?.departmentId && !actor?.tenantId);
+
+    if (isDeptManager && actor?.departmentId) {
+      // Department managers are strictly locked to their assigned department across all tenants
+      departmentId = Number(actor.departmentId);
+      tenantId = undefined;
+    } else if (actor?.tenantId) {
+      // Tenant users are strictly isolated to their own Tenant
       tenantId = Number(actor.tenantId);
     }
 

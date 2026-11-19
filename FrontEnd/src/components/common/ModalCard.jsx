@@ -39,23 +39,79 @@ export const ModalCard = ({
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
   const prevActiveElement = useRef(null);
+  const hasFocusedInitialRef = useRef(false);
 
-  // Focus management: Trap focus inside modal & restore on close
+  // Keep fresh references for callbacks without re-triggering focus effects
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const submittingRef = useRef(submitting);
+  submittingRef.current = submitting;
+
+  // Focus management: Set initial focus ONLY when modal opens, and restore on close
+  useEffect(() => {
+    if (!isOpen) {
+      if (hasFocusedInitialRef.current) {
+        if (prevActiveElement.current && typeof prevActiveElement.current.focus === 'function') {
+          try {
+            prevActiveElement.current.focus();
+          } catch {
+            // ignore
+          }
+        }
+        hasFocusedInitialRef.current = false;
+      }
+      return;
+    }
+
+    // Modal just opened: run initial focus once
+    if (!hasFocusedInitialRef.current) {
+      prevActiveElement.current = document.activeElement;
+      hasFocusedInitialRef.current = true;
+
+      const modalElement = modalRef.current;
+      if (modalElement) {
+        const focusTimer = setTimeout(() => {
+          // If an element inside the modal is already focused, do NOT steal focus
+          if (modalElement.contains(document.activeElement) && document.activeElement !== modalElement) {
+            return;
+          }
+          // Prioritize first editable input/select/textarea if present
+          const firstInput = modalElement.querySelector('input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])');
+          if (firstInput && typeof firstInput.focus === 'function') {
+            firstInput.focus();
+          } else if (closeButtonRef.current) {
+            closeButtonRef.current.focus();
+          } else {
+            modalElement.focus();
+          }
+        }, 50);
+
+        return () => {
+          clearTimeout(focusTimer);
+        };
+      }
+    }
+  }, [isOpen]);
+
+  // Restore focus if component unmounts while open
+  useEffect(() => {
+    return () => {
+      if (prevActiveElement.current && typeof prevActiveElement.current.focus === 'function') {
+        try {
+          prevActiveElement.current.focus();
+        } catch {
+          // ignore
+        }
+      }
+    };
+  }, []);
+
+  // Keyboard navigation & focus trap: Escape and Tab key handling
   useEffect(() => {
     if (!isOpen) return;
 
-    prevActiveElement.current = document.activeElement;
-
     const modalElement = modalRef.current;
     if (!modalElement) return;
-
-    const focusTimer = setTimeout(() => {
-      if (closeButtonRef.current) {
-        closeButtonRef.current.focus();
-      } else {
-        modalElement.focus();
-      }
-    }, 50);
 
     const focusableSelectors = [
       'button:not([disabled])',
@@ -67,9 +123,9 @@ export const ModalCard = ({
     ].join(', ');
 
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && onClose && !submitting) {
+      if (e.key === 'Escape' && onCloseRef.current && !submittingRef.current) {
         e.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -99,17 +155,9 @@ export const ModalCard = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
-      clearTimeout(focusTimer);
       window.removeEventListener('keydown', handleKeyDown);
-      if (prevActiveElement.current && typeof prevActiveElement.current.focus === 'function') {
-        try {
-          prevActiveElement.current.focus();
-        } catch {
-          // ignore
-        }
-      }
     };
-  }, [isOpen, onClose, submitting]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

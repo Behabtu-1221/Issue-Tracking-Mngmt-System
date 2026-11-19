@@ -106,6 +106,17 @@ app.use(globalAuth);
 app.use(dataScope);
 app.use(idempotency());
 
+app.get(['/', '/api'], (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    service: 'Enterprise Issue Tracking & Service Request Management System (ITMS)',
+    version: '1.0.0',
+    environment: env.NODE_ENV,
+    uptimeSeconds: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/health', healthRouter);
 app.use('/api/health', healthRouter);
 

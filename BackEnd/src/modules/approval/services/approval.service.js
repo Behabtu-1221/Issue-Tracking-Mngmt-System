@@ -14,8 +14,8 @@ import unitOfWork from '../../../shared/database/unitOfWork.js';
 import outboxService from '../../../shared/outbox/outbox.service.js';
 
 export const approvalService = {
-  async getMetrics(tenantId) {
-    return approvalRepository.getMetrics(tenantId);
+  async getMetrics(tenantId, departmentId) {
+    return approvalRepository.getMetrics(tenantId, departmentId);
   },
 
   async getApprovals(params) {
