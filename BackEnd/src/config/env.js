@@ -21,6 +21,8 @@ const envSchema = Joi.object({
   DB_PASSWORD: Joi.string().allow('').default(''),
   DB_NAME: Joi.string().required().description('MySQL Database Name'),
   DB_CONNECTION_LIMIT: Joi.number().min(1).max(100).default(10),
+  DB_SSL: Joi.string().valid('true', 'false', 'require', 'disable', '1', '0').optional().allow(''),
+  DB_SSL_REJECT_UNAUTHORIZED: Joi.string().valid('true', 'false', '1', '0').optional().allow(''),
 
   // JWT Security
   JWT_SECRET: Joi.string().min(32).required().messages({
@@ -82,14 +84,51 @@ export const env = {
   HOST: validatedEnv.HOST,
 
   // Database Configuration
-  db: {
-    host: validatedEnv.DB_HOST,
-    port: validatedEnv.DB_PORT,
-    user: validatedEnv.DB_USER,
-    password: validatedEnv.DB_PASSWORD,
-    database: validatedEnv.DB_NAME,
-    connectionLimit: validatedEnv.DB_CONNECTION_LIMIT
-  },
+  db: (() => {
+    const isCloudHost = Boolean(
+      validatedEnv.DB_HOST && (
+        validatedEnv.DB_HOST.includes('tidbcloud.com') ||
+        validatedEnv.DB_HOST.includes('aivencloud.com') ||
+        validatedEnv.DB_HOST.includes('planetscale.com') ||
+        validatedEnv.DB_HOST.includes('psdb.cloud') ||
+        validatedEnv.DB_HOST.includes('rds.amazonaws.com') ||
+        validatedEnv.DB_HOST.includes('clever-cloud.com') ||
+        validatedEnv.DB_HOST.includes('render.com')
+      )
+    );
+
+    const isLocalHost = Boolean(
+      !validatedEnv.DB_HOST ||
+      validatedEnv.DB_HOST === 'localhost' ||
+      validatedEnv.DB_HOST === '127.0.0.1' ||
+      validatedEnv.DB_HOST === 'mysql'
+    );
+
+    const shouldEnableSsl =
+      validatedEnv.DB_SSL === 'true' ||
+      validatedEnv.DB_SSL === 'require' ||
+      validatedEnv.DB_SSL === '1' ||
+      (validatedEnv.DB_SSL !== 'false' && validatedEnv.DB_SSL !== 'disable' && validatedEnv.DB_SSL !== '0' && (
+        isCloudHost || (validatedEnv.NODE_ENV === 'production' && !isLocalHost)
+      ));
+
+    const rejectUnauthorized =
+      validatedEnv.DB_SSL_REJECT_UNAUTHORIZED !== 'false' &&
+      validatedEnv.DB_SSL_REJECT_UNAUTHORIZED !== '0';
+
+    return {
+      host: validatedEnv.DB_HOST,
+      port: validatedEnv.DB_PORT,
+      user: validatedEnv.DB_USER,
+      password: validatedEnv.DB_PASSWORD,
+      database: validatedEnv.DB_NAME,
+      connectionLimit: validatedEnv.DB_CONNECTION_LIMIT,
+      ssl: shouldEnableSsl ? {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized
+      } : undefined
+    };
+  })(),
 
   // JWT & Cryptographic Security
   jwt: {

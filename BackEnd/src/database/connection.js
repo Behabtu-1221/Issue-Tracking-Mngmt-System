@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise';
 import env from '../config/env.js';
 import logger from '../shared/utils/logger.js';
 
-const pool = mysql.createPool({
+const poolConfig = {
   host: env.db.host,
   user: env.db.user,
   password: env.db.password,
@@ -13,7 +13,14 @@ const pool = mysql.createPool({
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000
-});
+};
+
+if (env.db.ssl) {
+  poolConfig.ssl = env.db.ssl;
+  logger.info(`🔒 [DATABASE] Secure transport (SSL/TLS v1.2+) enabled for host: ${env.db.host}`);
+}
+
+const pool = mysql.createPool(poolConfig);
 
 const query = async (sql, params = []) => {
   try {
