@@ -10,6 +10,7 @@ import { useTranslation, LanguageSelector } from '../../../i18n';
 import NeuronLogo from '../../../components/common/NeuronLogo';
 
 import { authSchemas } from '../../../validation';
+import { getApiBaseUrl } from '../../../api/client';
 
 const DEMO_ROLES = [
   { label: 'IT Park Admin', user: 'superadmin', pass: 'Password123!', icon: '🛡️', roleDesc: 'IT Park Administrator' },
@@ -93,8 +94,12 @@ export default function LoginPage() {
         navigate(dest, { replace: true });
       }
     } catch (err) {
+      console.error('Login request failed:', err);
+      const isNetworkErr = err?.message === 'Network Error' || err?.code === 'ERR_NETWORK';
       const msg = err?.response?.data?.message || err.message || 'Authentication failed';
-      if (msg.toLowerCase().includes('locked')) {
+      if (isNetworkErr) {
+        setError(`Network Error: Unable to connect to backend at ${getApiBaseUrl()}. Please verify your backend server is online on Render.`);
+      } else if (msg.toLowerCase().includes('locked')) {
         setError(msg);
       } else if (msg.includes('suspended') || msg.includes('inactive')) {
         setError(t('auth.accountSuspended', 'Account suspended. Please contact your system administrator.'));

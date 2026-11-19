@@ -70,6 +70,11 @@ app.use(cors({
       return callback(null, true);
     }
 
+    // Automatically allow any Vercel deployment domain (*.vercel.app) or Render domain (*.onrender.com)
+    if (normalizedOrigin.endsWith('.vercel.app') || normalizedOrigin.endsWith('.onrender.com')) {
+      return callback(null, true);
+    }
+
     if (isDev && localNetworkPattern.test(normalizedOrigin)) {
       return callback(null, true);
     }
