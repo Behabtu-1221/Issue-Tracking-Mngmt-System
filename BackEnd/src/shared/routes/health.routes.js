@@ -4,7 +4,8 @@ import migrator from '../../database/migrator.js';
 
 export const appLifecycle = {
   isShuttingDown: false,
-  isReady: false
+  isReady: false,
+  initError: null
 };
 
 const router = Router();
@@ -30,6 +31,13 @@ router.get('/ready', async (req, res) => {
     return res.status(503).json({
       status: 'DOWN',
       reason: 'Server is shutting down'
+    });
+  }
+
+  if (appLifecycle.initError) {
+    return res.status(503).json({
+      status: 'DOWN',
+      reason: `Initialization failed: ${appLifecycle.initError}`
     });
   }
 

@@ -11,6 +11,7 @@ const poolConfig = {
   waitForConnections: true,
   connectionLimit: env.db.connectionLimit,
   queueLimit: 0,
+  connectTimeout: 15000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000
 };

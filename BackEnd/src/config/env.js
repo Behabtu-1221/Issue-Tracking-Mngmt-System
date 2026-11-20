@@ -116,9 +116,15 @@ export const env = {
       validatedEnv.DB_SSL_REJECT_UNAUTHORIZED !== 'false' &&
       validatedEnv.DB_SSL_REJECT_UNAUTHORIZED !== '0';
 
+    // Auto-detect TiDB Cloud default port (4000) if user left it as default 3306 or unset
+    const resolvedPort = (
+      (!process.env.DB_PORT || String(process.env.DB_PORT).trim() === '3306') &&
+      validatedEnv.DB_HOST && validatedEnv.DB_HOST.includes('tidbcloud.com')
+    ) ? 4000 : validatedEnv.DB_PORT;
+
     return {
       host: validatedEnv.DB_HOST,
-      port: validatedEnv.DB_PORT,
+      port: resolvedPort,
       user: validatedEnv.DB_USER,
       password: validatedEnv.DB_PASSWORD,
       database: validatedEnv.DB_NAME,

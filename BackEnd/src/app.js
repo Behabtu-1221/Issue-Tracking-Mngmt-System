@@ -102,7 +102,7 @@ app.use(morgan(morganFormat, {
   stream: { write: (message) => logger.info(message.trim()) }
 }));
 
-import healthRouter from './shared/routes/health.routes.js';
+import healthRouter, { appLifecycle } from './shared/routes/health.routes.js';
 import idempotency from './shared/middleware/idempotency.js';
 
 app.use(globalLimiter);
@@ -124,6 +124,22 @@ app.get(['/', '/api'], (req, res) => {
 
 app.use('/health', healthRouter);
 app.use('/api/health', healthRouter);
+
+// Initialization guard: If database or startup failed, return clean 503 error immediately rather than timing out
+app.use((req, res, next) => {
+  const isHealthOrRoot = req.path === '/' || req.path === '/api' || req.path.startsWith('/health') || req.path.startsWith('/api/health');
+  if (isHealthOrRoot) return next();
+
+  if (appLifecycle.initError) {
+    return res.status(503).json({
+      status: 'error',
+      code: 'BACKEND_INITIALIZATION_FAILED',
+      message: `Database initialization failed: ${appLifecycle.initError}. Please verify DB credentials on Render.`,
+      timestamp: new Date().toISOString()
+    });
+  }
+  next();
+});
 
 const modules = [
   configurationModule,

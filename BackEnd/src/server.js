@@ -11,55 +11,18 @@ import { ensureBaseSchema } from './database/schema-bootstrapper.js';
 const PORT = env.PORT;
 
 const startServer = async () => {
+  const HOST = env.HOST || '0.0.0.0';
+  let server;
+
   try {
     logger.info('Starting Enterprise ITMS backend server...');
 
-    // 1. Verify Database Connectivity (Fail-fast)
-    try {
-      await pool.query('SELECT 1');
-      logger.info('✓ Database connection verified.');
-    } catch (dbErr) {
-      logger.error(`[FATAL] Database connection failed: ${dbErr.message}`);
-      process.exit(1);
-    }
-
-    // 2. Auto-bootstrap Database Master Schema, Tables, Seeds & Migrations
-    try {
-      await ensureBaseSchema();
-      logger.info('✓ Database master schema, seed data, and invariant seeders verified.');
-    } catch (schemaErr) {
-      logger.error(`[FATAL] Database auto-bootstrap failed: ${schemaErr.message}`);
-      process.exit(1);
-    }
-
-    // 3. Verify Schema Migrations at Head (Fail-fast)
-    try {
-      const headCheck = await migrator.checkHead();
-      if (!headCheck.isAtHead) {
-        logger.warn(`Pending migrations detected (${headCheck.pendingCount}). Applying pending migrations...`);
-        await migrator.migrate();
-      }
-      const finalHead = await migrator.checkHead();
-      logger.info(`✓ Database migrations verified at head version: ${finalHead.latestAppliedVersion}`);
-    } catch (migErr) {
-      logger.error(`[FATAL] Migration head verification failed: ${migErr.message}`);
-      process.exit(1);
-    }
-
-    // 4. Start Background Workers
-    outboxWorker.start(5000);
-    slaScheduler.start(30000);
-
-    // 5. Mark system as ready for traffic
-    appLifecycle.isReady = true;
-
-    // 6. Bind HTTP listener
-    const HOST = env.HOST || '0.0.0.0';
-    const server = app.listen(PORT, HOST, () => {
-      logger.info(`🚀 Server running in ${env.NODE_ENV} mode on port ${PORT} (host: ${HOST})`);
+    // 1. Immediately bind HTTP listener so Render/PaaS platforms detect the open port and pass health checks
+    server = app.listen(PORT, HOST, () => {
+      logger.info(`🚀 Server listening on port ${PORT} (host: ${HOST}) [Initializing dependencies...]`);
     });
 
-    // 7. Register Graceful Shutdown Handlers (SIGTERM / SIGINT)
+    // 2. Register Graceful Shutdown Handlers (SIGTERM / SIGINT)
     const gracefulShutdown = async (signal) => {
       logger.info(`\nReceived ${signal}. Initiating graceful shutdown...`);
       appLifecycle.isShuttingDown = true;
@@ -100,10 +63,53 @@ const startServer = async () => {
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
+    // 3. Verify Database Connectivity (with timeout)
+    try {
+      await pool.query('SELECT 1');
+      logger.info('✓ Database connection verified.');
+    } catch (dbErr) {
+      logger.error(`[FATAL] Database connection failed: ${dbErr.message}`);
+      appLifecycle.initError = `Database connection failed: ${dbErr.message}`;
+      return server;
+    }
+
+    // 4. Auto-bootstrap Database Master Schema, Tables, Seeds & Migrations
+    try {
+      await ensureBaseSchema();
+      logger.info('✓ Database master schema, seed data, and invariant seeders verified.');
+    } catch (schemaErr) {
+      logger.error(`[FATAL] Database auto-bootstrap failed: ${schemaErr.message}`);
+      appLifecycle.initError = `Database schema bootstrap failed: ${schemaErr.message}`;
+      return server;
+    }
+
+    // 5. Verify Schema Migrations at Head
+    try {
+      const headCheck = await migrator.checkHead();
+      if (!headCheck.isAtHead) {
+        logger.warn(`Pending migrations detected (${headCheck.pendingCount}). Applying pending migrations...`);
+        await migrator.migrate();
+      }
+      const finalHead = await migrator.checkHead();
+      logger.info(`✓ Database migrations verified at head version: ${finalHead.latestAppliedVersion}`);
+    } catch (migErr) {
+      logger.error(`[FATAL] Migration head verification failed: ${migErr.message}`);
+      appLifecycle.initError = `Migration head verification failed: ${migErr.message}`;
+      return server;
+    }
+
+    // 6. Start Background Workers
+    outboxWorker.start(5000);
+    slaScheduler.start(30000);
+
+    // 7. Mark system as ready for traffic
+    appLifecycle.isReady = true;
+    logger.info(`🚀 Enterprise ITMS server initialized and accepting production traffic on port ${PORT}`);
+
     return server;
   } catch (startupErr) {
     logger.error(`[FATAL] Unexpected startup failure: ${startupErr.message}`);
-    process.exit(1);
+    appLifecycle.initError = startupErr.message;
   }
 };
 

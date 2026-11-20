@@ -9,7 +9,8 @@ const poolConfig = {
   port: env.db.port,
   waitForConnections: true,
   connectionLimit: env.db.connectionLimit,
-  queueLimit: 0
+  queueLimit: 0,
+  connectTimeout: 15000
 };
 
 if (env.db.ssl) {
