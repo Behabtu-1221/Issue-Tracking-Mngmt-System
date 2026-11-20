@@ -113,21 +113,42 @@ export const env = {
       ));
 
     const rejectUnauthorized =
-      validatedEnv.DB_SSL_REJECT_UNAUTHORIZED !== 'false' &&
-      validatedEnv.DB_SSL_REJECT_UNAUTHORIZED !== '0';
+      validatedEnv.DB_SSL_REJECT_UNAUTHORIZED === 'true' ||
+      validatedEnv.DB_SSL_REJECT_UNAUTHORIZED === '1';
+
+    let host = (validatedEnv.DB_HOST || '').trim().replace(/\.+$/, '');
+    let port = validatedEnv.DB_PORT;
+    let user = validatedEnv.DB_USER;
+    let password = validatedEnv.DB_PASSWORD;
+    let database = validatedEnv.DB_NAME;
+
+    // Handle full connection URI pasted into DB_HOST (e.g. mysql://avnadmin:pass@host:port/dbname)
+    if (host.includes('://')) {
+      try {
+        const parsed = new URL(host);
+        host = parsed.hostname;
+        if (parsed.port) port = Number(parsed.port);
+        if (parsed.username) user = decodeURIComponent(parsed.username);
+        if (parsed.password) password = decodeURIComponent(parsed.password);
+        if (parsed.pathname && parsed.pathname.length > 1) {
+          database = parsed.pathname.slice(1).split('?')[0];
+        }
+      } catch {
+        // Fall back to raw host
+      }
+    }
 
     // Auto-detect TiDB Cloud default port (4000) if user left it as default 3306 or unset
-    const resolvedPort = (
-      (!process.env.DB_PORT || String(process.env.DB_PORT).trim() === '3306') &&
-      validatedEnv.DB_HOST && validatedEnv.DB_HOST.includes('tidbcloud.com')
-    ) ? 4000 : validatedEnv.DB_PORT;
+    if ((!process.env.DB_PORT || String(process.env.DB_PORT).trim() === '3306') && host.includes('tidbcloud.com')) {
+      port = 4000;
+    }
 
     return {
-      host: validatedEnv.DB_HOST,
-      port: resolvedPort,
-      user: validatedEnv.DB_USER,
-      password: validatedEnv.DB_PASSWORD,
-      database: validatedEnv.DB_NAME,
+      host,
+      port,
+      user,
+      password,
+      database,
       connectionLimit: validatedEnv.DB_CONNECTION_LIMIT,
       ssl: shouldEnableSsl ? {
         minVersion: 'TLSv1.2',
