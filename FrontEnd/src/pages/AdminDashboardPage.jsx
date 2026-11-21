@@ -118,6 +118,138 @@ function KpiSpark({ stroke }) {
 }
 
 /**
+ * Micro-Chart 1: Workload Trend Area Sparkline (Zero external deps, smooth bezier curve)
+ */
+function WorkloadSparkline() {
+  return (
+    <div className="w-full h-8 flex items-center overflow-hidden my-1">
+      <svg className="w-full h-full overflow-visible" viewBox="0 0 160 32" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="workloadSparkGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 24 C 20 24, 30 14, 50 17 C 70 20, 80 6, 100 10 C 120 14, 135 4, 160 6 L 160 32 L 0 32 Z"
+          fill="url(#workloadSparkGrad)"
+        />
+        <path
+          d="M0 24 C 20 24, 30 14, 50 17 C 70 20, 80 6, 100 10 C 120 14, 135 4, 160 6"
+          fill="none"
+          stroke="#3b82f6"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <circle cx="160" cy="6" r="3.2" fill="#2563eb" className="animate-pulse" />
+      </svg>
+    </div>
+  );
+}
+
+/**
+ * Micro-Chart 2: SLA Radial Arc Gauge with Benchmark Tick
+ */
+function SlaRadialArc({ value = 96.2, target = 90 }) {
+  const radius = 21;
+  const strokeWidth = 4.5;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.min(100, Math.max(0, value));
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center shrink-0 w-12 h-12" title={`SLA Compliance: ${value}% (Benchmark ≥${target}%)`}>
+      <svg className="w-12 h-12 -rotate-90" viewBox="0 0 50 50">
+        <circle
+          cx="25"
+          cy="25"
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-slate-200 dark:text-slate-700/80"
+        />
+        <circle
+          cx="25"
+          cy="25"
+          r={radius}
+          fill="none"
+          stroke="url(#slaArcGradient)"
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className="transition-all duration-1000 ease-out"
+        />
+        <defs>
+          <linearGradient id="slaArcGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#10b981" />
+            <stop offset="100%" stopColor="#06b6d4" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-[11px] font-black text-slate-800 dark:text-slate-100 tabular-nums leading-none">
+          {Math.round(value)}%
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Micro-Chart 3: 3-Stage Governance Pipeline Progress Flow
+ */
+function PipelineStepsMeter({ stage1 = 4, stage2 = 2, completed = 36 }) {
+  return (
+    <div className="w-full bg-slate-100/90 dark:bg-slate-800/80 rounded-xl p-1.5 border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-1 text-[11px] font-bold my-1">
+      <div className="flex-1 flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+        <span className="truncate">Dept: {stage1}</span>
+      </div>
+      <ChevronRight size={11} className="text-slate-400 shrink-0" />
+      <div className="flex-1 flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-700 dark:text-orange-300">
+        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
+        <span className="truncate">Admin: {stage2}</span>
+      </div>
+      <ChevronRight size={11} className="text-slate-400 shrink-0" />
+      <div className="flex-1 flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300">
+        <Check size={10} className="shrink-0" strokeWidth={3} />
+        <span className="truncate">Pass: {completed}</span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Micro-Chart 4: Technician Capacity Multi-Segment Battery Bar
+ */
+function WorkforceBatteryMeter({ available = 14, active = 22, total = 36 }) {
+  const percentage = Math.round((active / Math.max(1, total)) * 100);
+  return (
+    <div className="w-full space-y-1 my-1">
+      <div className="flex items-center justify-between text-[11px] font-bold">
+        <span className="text-slate-600 dark:text-slate-300 flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-indigo-500" /> Fleet Capacity
+        </span>
+        <span className="font-mono text-indigo-600 dark:text-indigo-400">{percentage}% Engaged</span>
+      </div>
+      <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 p-0.5 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-0.5 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 transition-all duration-700"
+          style={{ width: `${percentage}%` }}
+        />
+        <div
+          className="h-full rounded-full bg-emerald-500/60 transition-all duration-700"
+          style={{ width: `${100 - percentage}%` }}
+          title={`${available} Standby Technicians`}
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
  * 8 UX Laws Metadata for Interactive Educational / Operational Inspector
  */
 const UX_LAWS = [
@@ -228,6 +360,37 @@ export default function AdminDashboardPage() {
   // Command Palette (Ctrl+K / ⌘K) Modal state
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [commandSearch, setCommandSearch] = useState('');
+
+  // Slide-Over Quick Action Drawer state (Operational Priority Queue)
+  const [selectedTriageItem, setSelectedTriageItem] = useState(null);
+  const [drawerActionNotes, setDrawerActionNotes] = useState('');
+  const [drawerSubmitting, setDrawerSubmitting] = useState(false);
+
+  const handleOpenDrawer = (item, type) => {
+    setSelectedTriageItem({ ...item, triageType: type });
+    setDrawerActionNotes('');
+  };
+
+  const handleCloseDrawer = () => {
+    setSelectedTriageItem(null);
+    setDrawerActionNotes('');
+  };
+
+  // Keyboard accessibility: ESC closes open drawer/modal; Ctrl+K / Cmd+K toggles command bar
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        if (selectedTriageItem) setSelectedTriageItem(null);
+        else if (isCommandPaletteOpen) setIsCommandPaletteOpen(false);
+        else if (isUxLawsModalOpen) setIsUxLawsModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedTriageItem, isCommandPaletteOpen, isUxLawsModalOpen]);
 
   const toggleKpi = (key) => {
     setFlippedKpi((prev) => ({
@@ -691,6 +854,24 @@ export default function AdminDashboardPage() {
       dispatch: { ...prev.dispatch, unassignedCount: Math.max(0, prev.dispatch.unassignedCount - 1), activeTasks: prev.dispatch.activeTasks + 1 }
     }));
     showToast(`✓ Auto-dispatched ${code} to on-duty specialist Daniel Worku.`, 'success');
+  };
+
+  const handleDrawerAction = async () => {
+    if (!selectedTriageItem) return;
+    setDrawerSubmitting(true);
+    const { triageType, id, code } = selectedTriageItem;
+    try {
+      if (triageType === 'sla') {
+        handleQuickAcknowledgeSla(id, code);
+      } else if (triageType === 'approvals') {
+        handleQuickApprove(id, code);
+      } else if (triageType === 'dispatch') {
+        handleQuickDispatch(id, code);
+      }
+      handleCloseDrawer();
+    } finally {
+      setDrawerSubmitting(false);
+    }
   };
 
   // Filtered Attention Hub Triage Items (Cognitive Load & Hick's Law)
@@ -1203,111 +1384,108 @@ export default function AdminDashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-6">
           {/* ── KPI 1: Open Requests (Active Workload) ── */}
-          <div className="flip-card-3d-wrapper interactive-lift" style={{ minHeight: '395px', height: '395px' }}>
+          <div className="flip-card-3d-wrapper ops-tone-blue interactive-lift h-[440px] min-h-[440px]">
             <div className={`flip-card-3d-inner ${flippedKpi.workload ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(37,99,235,0.25)] hover:border-blue-500/60 dark:hover:border-blue-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group"
+                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(37,99,235,0.25)] hover:border-blue-500/60 dark:hover:border-blue-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
                 onClick={() => toggleKpi('workload')}
               >
                 <div>
-                  {/* Top Gradient Banner / Cap (Reference Style) */}
-                  <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 px-6 py-4 flex items-center justify-between text-white shadow-xs">
-                    {/* Top-Left Pill Badge */}
+                  {/* Top Gradient Banner / Cap */}
+                  <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-blue-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       WORKLOAD
                     </span>
-
-                    {/* Center Hero Icon */}
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                      <Activity className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                      <Activity className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-
-                    {/* Top-Right Index Circle */}
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       01
                     </div>
                   </div>
 
                   {/* Card Body */}
-                  <div className="px-6 py-4 flex flex-col">
-                    {/* Title & Description */}
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div>
                       <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                         Open Service Requests
                       </h3>
-                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-                        Campus-wide incident backlog & resolution lifecycle
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                        Backlog & resolution lifecycle
                       </p>
                     </div>
 
-                    {/* High-Impact Metric Strip */}
-                    <div className="my-3 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
+                    {/* Metric Strip */}
+                    <div className="my-2.5 px-3.5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
                           {animatedOpen}
                         </span>
-                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
                           In-Flight
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 font-mono">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 font-mono">
                         {data.kpis.resolvedRequests} / {data.kpis.totalRequests} Resolved
                       </span>
                     </div>
 
-                    {/* Itemized Telemetry Points (Clean, Non-truncated, Generous Spacing) */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-blue-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                    {/* Embedded Micro-Chart: Area Sparkline */}
+                    <WorkloadSparkline />
+
+                    {/* Itemized Telemetry Points */}
+                    <div className="space-y-1.5 mt-1">
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-blue-600 dark:group-hover/item:text-blue-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             P1 Critical Incidents
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50 shrink-0">
                           4 tickets
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-blue-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-blue-600 dark:group-hover/item:text-blue-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             High Priority Queue
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50 shrink-0">
                           18 tickets
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-blue-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-blue-600 dark:group-hover/item:text-blue-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Routine Maintenance
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 shrink-0">
                           16 requests
                         </span>
                       </div>
                     </div>
 
                     {/* Integrated Resolution Velocity Progress Meter */}
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                      <div className="flex items-center justify-between text-xs font-bold mb-1">
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between text-[11px] font-bold mb-1">
                         <span className="text-slate-700 dark:text-slate-300">Resolution Velocity</span>
                         <span className="font-mono text-blue-600 dark:text-blue-400">{data.kpis.resolutionRate}% Rate</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 transition-all duration-1000 ease-out"
                           style={{ width: `${Math.min(100, Math.max(10, data.kpis.resolutionRate))}%` }}
@@ -1318,7 +1496,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="px-6 py-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -1328,7 +1506,7 @@ export default function AdminDashboardPage() {
                     className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 transition-colors cursor-pointer group/link"
                   >
                     <span>View Active Queue</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1.5 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </button>
                   <button
                     type="button"
@@ -1336,10 +1514,10 @@ export default function AdminDashboardPage() {
                       e.stopPropagation();
                       toggleKpi('workload');
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/40 dark:hover:text-blue-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/40 dark:hover:text-blue-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                     title="Flip for detailed 3D diagnostics"
                   >
-                    <RotateCw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500" />
                     <span>3D Audit</span>
                   </button>
                 </div>
@@ -1347,28 +1525,28 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[28px] border border-blue-300/80 dark:border-blue-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden"
+                className="flip-card-3d-back rounded-[28px] border border-blue-300/80 dark:border-blue-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden h-full"
               >
                 <div>
-                  <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 px-6 py-4 flex items-center justify-between text-white shadow-xs">
+                  <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-blue-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       WORKLOAD AUDIT
                     </span>
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
-                      <Activity className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
+                      <Activity className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       01
                     </div>
                   </div>
 
-                  <div className="px-6 py-4">
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                       <div>
-                        <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                           Workload Diagnostics
                         </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Deep telemetry & cycle analysis</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">Subsystem distribution & cycle analysis</p>
                       </div>
                       <button
                         type="button"
@@ -1380,34 +1558,68 @@ export default function AdminDashboardPage() {
                       </button>
                     </div>
 
-                    <div className="mt-3 space-y-2">
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
-                        <span className="text-slate-600 dark:text-slate-300">Total Lifecycle Logged:</span>
-                        <span className="font-mono font-bold text-slate-900 dark:text-white">{data.kpis.totalRequests} tickets</span>
+                    {/* Subsystem Distribution Bars */}
+                    <div className="mt-2.5 space-y-1.5">
+                      <div>
+                        <div className="flex justify-between text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-0.5">
+                          <span>HVAC & Climate Systems</span>
+                          <span className="font-mono font-bold text-blue-600 dark:text-blue-400">35%</span>
+                        </div>
+                        <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-blue-600 rounded-full" style={{ width: '35%' }} />
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
-                        <span className="text-slate-600 dark:text-slate-300">Awaiting Sign-Off:</span>
-                        <span className="font-mono font-bold text-amber-600 dark:text-amber-400">{pendingApprovalsCount} Approvals</span>
+
+                      <div>
+                        <div className="flex justify-between text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-0.5">
+                          <span>IT & Network Infrastructure</span>
+                          <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">28%</span>
+                        </div>
+                        <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: '28%' }} />
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
-                        <span className="text-slate-600 dark:text-slate-300">Avg Turnaround:</span>
-                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{data.kpis.avgResolutionHours} hrs</span>
+
+                      <div>
+                        <div className="flex justify-between text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-0.5">
+                          <span>Electrical & Lighting</span>
+                          <span className="font-mono font-bold text-amber-600 dark:text-amber-400">22%</span>
+                        </div>
+                        <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-amber-500 rounded-full" style={{ width: '22%' }} />
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
-                        <span className="text-slate-600 dark:text-slate-300">At-Risk Deadlines:</span>
-                        <span className="font-mono font-bold text-rose-600 dark:text-rose-400">{slaAtRiskCount} tickets</span>
+                    </div>
+
+                    {/* Telemetry 2x2 Strip */}
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex flex-col">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Total Logged</span>
+                        <span className="font-mono font-bold text-xs sm:text-sm text-slate-900 dark:text-white mt-0.5">{data.kpis.totalRequests}</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex flex-col">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Awaiting Sign-Off</span>
+                        <span className="font-mono font-bold text-xs sm:text-sm text-amber-600 dark:text-amber-400 mt-0.5">{pendingApprovalsCount}</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex flex-col">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Avg Turnaround</span>
+                        <span className="font-mono font-bold text-xs sm:text-sm text-blue-600 dark:text-blue-400 mt-0.5">{data.kpis.avgResolutionHours}h</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex flex-col">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">At-Risk SLA</span>
+                        <span className="font-mono font-bold text-xs sm:text-sm text-rose-600 dark:text-rose-400 mt-0.5">{slaAtRiskCount}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
                   <button
                     type="button"
                     onClick={() => navigate('/issues/tracker')}
-                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
                   >
-                    Inspect Issue Tracker <ArrowRight className="w-4 h-4" />
+                    Inspect Issue Tracker <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -1415,111 +1627,112 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* ── KPI 2: SLA Target Compliance ── */}
-          <div className="flip-card-3d-wrapper interactive-lift" style={{ minHeight: '395px', height: '395px' }}>
+          <div className="flip-card-3d-wrapper ops-tone-emerald interactive-lift h-[440px] min-h-[440px]">
             <div className={`flip-card-3d-inner ${flippedKpi.sla ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(16,185,129,0.25)] hover:border-emerald-500/60 dark:hover:border-emerald-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group"
+                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(16,185,129,0.25)] hover:border-emerald-500/60 dark:hover:border-emerald-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
                 onClick={() => toggleKpi('sla')}
               >
                 <div>
                   {/* Top Gradient Banner / Cap */}
-                  <div className="relative bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 px-6 py-4 flex items-center justify-between text-white shadow-xs">
+                  <div className="relative bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-emerald-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       SLA TARGET
                     </span>
-
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                      <ShieldCheck className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                      <ShieldCheck className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       02
                     </div>
                   </div>
 
                   {/* Card Body */}
-                  <div className="px-6 py-4 flex flex-col">
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div>
                       <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                         SLA Compliance Rate
                       </h3>
-                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-                        Adherence to campus performance benchmarks
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                        Campus benchmark performance
                       </p>
                     </div>
 
-                    {/* Metric Strip */}
-                    <div className="my-3 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
-                          {animatedSla}%
-                        </span>
-                        <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                          effectiveSlaRate >= 90
-                            ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
-                            : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
-                        }`}>
-                          {effectiveSlaRate >= 90 ? 'Passed (≥90%)' : 'Attention (<90%)'}
+                    {/* Metric Strip with Embedded Arc Gauge */}
+                    <div className="my-2.5 px-3.5 py-1.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
+                      <div className="flex flex-col">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
+                            {animatedSla}%
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            effectiveSlaRate >= 90
+                              ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
+                              : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
+                          }`}>
+                            {effectiveSlaRate >= 90 ? 'Passed (≥90%)' : 'Attention (<90%)'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                          {data.kpis.breachedCount} Breached • {slaAtRiskCount} At-Risk
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 font-mono">
-                        {data.kpis.breachedCount} Breached • {slaAtRiskCount} At-Risk
-                      </span>
+                      <SlaRadialArc value={effectiveSlaRate} target={90} />
                     </div>
 
                     {/* Itemized Points */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-emerald-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                    <div className="space-y-1.5 mt-1">
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             First Response Speed
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50 shrink-0">
                           {data.kpis.firstResponseMins}m (≤30m)
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-emerald-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Avg Resolution Speed
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-900/50 shrink-0">
                           {data.kpis.avgResolutionHours}h (≤8h)
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-emerald-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-rose-600 dark:group-hover/item:text-rose-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Breached Violations
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50 shrink-0">
                           {data.kpis.breachedCount} tickets
                         </span>
                       </div>
                     </div>
 
                     {/* Integrated Campus Reliability Benchmark Meter */}
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                      <div className="flex items-center justify-between text-xs font-bold mb-1">
-                        <span className="text-slate-700 dark:text-slate-300">Campus Reliability Benchmark</span>
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between text-[11px] font-bold mb-1">
+                        <span className="text-slate-700 dark:text-slate-300">Reliability Benchmark</span>
                         <span className="font-mono text-emerald-600 dark:text-emerald-400">{effectiveSlaRate}% (≥90%)</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-400 transition-all duration-1000 ease-out"
                           style={{ width: `${Math.min(100, Math.max(10, effectiveSlaRate))}%` }}
@@ -1530,7 +1743,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="px-6 py-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -1540,7 +1753,7 @@ export default function AdminDashboardPage() {
                     className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1.5 transition-colors cursor-pointer group/link"
                   >
                     <span>Inspect Breaches</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1.5 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </button>
                   <button
                     type="button"
@@ -1548,10 +1761,10 @@ export default function AdminDashboardPage() {
                       e.stopPropagation();
                       toggleKpi('sla');
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                     title="Flip for detailed 3D diagnostics"
                   >
-                    <RotateCw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500" />
                     <span>3D Audit</span>
                   </button>
                 </div>
@@ -1559,28 +1772,28 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[28px] border border-emerald-300/80 dark:border-emerald-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden"
+                className="flip-card-3d-back rounded-[28px] border border-emerald-300/80 dark:border-emerald-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden h-full"
               >
                 <div>
-                  <div className="relative bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 px-6 py-4 flex items-center justify-between text-white shadow-xs">
+                  <div className="relative bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-emerald-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       SLA DIAGNOSTICS
                     </span>
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
-                      <ShieldCheck className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
+                      <ShieldCheck className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       02
                     </div>
                   </div>
 
-                  <div className="px-6 py-4">
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                       <div>
-                        <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                           SLA Performance Radar
                         </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Compliance & response audit</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">Target compliance & MTTR matrix</p>
                       </div>
                       <button
                         type="button"
@@ -1592,34 +1805,34 @@ export default function AdminDashboardPage() {
                       </button>
                     </div>
 
-                    <div className="mt-3 space-y-2">
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                    <div className="mt-2.5 space-y-2">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">P1 MTTR Resolution:</span>
                         <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">3.4 hrs (Target ≤4h)</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">P2 High Incidents:</span>
                         <span className="font-mono font-bold text-slate-900 dark:text-white">5.8 hrs (Target ≤8h)</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
-                        <span className="text-slate-600 dark:text-slate-300">Escalation Count:</span>
-                        <span className="font-mono font-bold text-rose-600 dark:text-rose-400">{data.kpis.breachedCount} breached</span>
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
+                        <span className="text-slate-600 dark:text-slate-300">P3 Routine Maintenance:</span>
+                        <span className="font-mono font-bold text-slate-900 dark:text-white">18.2 hrs (Target ≤24h)</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Overall Benchmark:</span>
-                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{effectiveSlaRate >= 90 ? 'PASSED' : 'ACTION REQUIRED'}</span>
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{effectiveSlaRate >= 90 ? 'PASSED (≥90%)' : 'ACTION REQUIRED'}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
                   <button
                     type="button"
                     onClick={() => navigate('/sla/clocks')}
-                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
                   >
-                    Manage SLA Thresholds <ArrowRight className="w-4 h-4" />
+                    Manage SLA Thresholds <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -1627,47 +1840,45 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* ── KPI 3: Pending Approvals (Gatekeeper Pipeline) ── */}
-          <div className="flip-card-3d-wrapper interactive-lift" style={{ minHeight: '395px', height: '395px' }}>
+          <div className="flip-card-3d-wrapper ops-tone-amber interactive-lift h-[440px] min-h-[440px]">
             <div className={`flip-card-3d-inner ${flippedKpi.approvals ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(245,158,11,0.25)] hover:border-amber-500/60 dark:hover:border-amber-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group"
+                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(245,158,11,0.25)] hover:border-amber-500/60 dark:hover:border-amber-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
                 onClick={() => toggleKpi('approvals')}
               >
                 <div>
                   {/* Top Gradient Banner / Cap */}
-                  <div className="relative bg-gradient-to-r from-amber-600 via-orange-500 to-amber-400 px-6 py-4 flex items-center justify-between text-white shadow-xs">
+                  <div className="relative bg-gradient-to-r from-amber-600 via-orange-500 to-amber-400 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-amber-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       GOVERNANCE
                     </span>
-
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                      <FileText className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                      <FileText className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       03
                     </div>
                   </div>
 
                   {/* Card Body */}
-                  <div className="px-6 py-4 flex flex-col">
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div>
                       <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                         Pending Approvals
                       </h3>
-                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
                         Stage 1 & 2 operational sign-off pipeline
                       </p>
                     </div>
 
                     {/* Metric Strip */}
-                    <div className="my-3 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
+                    <div className="my-2.5 px-3.5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
+                        <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
                           {animatedApprovals}
                         </span>
-                        <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                           pendingApprovalsCount > 0
                             ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
                             : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
@@ -1675,63 +1886,70 @@ export default function AdminDashboardPage() {
                           {pendingApprovalsCount > 0 ? 'Awaiting Review' : 'Queue Clear'}
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 font-mono">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 font-mono">
                         {data.approvals.totalCount || 42} Total Logged
                       </span>
                     </div>
 
+                    {/* Embedded Micro-Chart: Pipeline Flow */}
+                    <PipelineStepsMeter
+                      stage1={Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))}
+                      stage2={Math.max(1, Math.floor(pendingApprovalsCount * 0.5))}
+                      completed={Math.max(10, (data.approvals.totalCount || 42) - pendingApprovalsCount)}
+                    />
+
                     {/* Itemized Points */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-amber-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                    <div className="space-y-1.5 mt-1">
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-amber-600 dark:group-hover/item:text-amber-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Stage 1 Dept Review
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50 shrink-0">
                           {Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))} pending
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-amber-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-orange-600 dark:group-hover/item:text-orange-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Stage 2 Admin Sign-Off
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-orange-50 dark:bg-orange-950/70 text-orange-700 dark:text-orange-300 border border-orange-200/80 dark:border-orange-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-orange-50 dark:bg-orange-950/70 text-orange-700 dark:text-orange-300 border border-orange-200/80 dark:border-orange-900/50 shrink-0">
                           {Math.max(1, Math.floor(pendingApprovalsCount * 0.5))} pending
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-amber-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-amber-600 dark:group-hover/item:text-amber-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Financial Exposure
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 shrink-0">
                           Est: $6,050
                         </span>
                       </div>
                     </div>
 
                     {/* Integrated Sign-Off Turnaround Progress Meter */}
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                      <div className="flex items-center justify-between text-xs font-bold mb-1">
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between text-[11px] font-bold mb-1">
                         <span className="text-slate-700 dark:text-slate-300">Sign-Off Turnaround</span>
                         <span className="font-mono text-amber-600 dark:text-amber-400">~2.2 hrs (Target ≤4h)</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-out"
                           style={{ width: '75%' }}
@@ -1742,7 +1960,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="px-6 py-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -1752,7 +1970,7 @@ export default function AdminDashboardPage() {
                     className="font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-1.5 transition-colors cursor-pointer group/link"
                   >
                     <span>Open Approval Queue</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1.5 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </button>
                   <button
                     type="button"
@@ -1760,10 +1978,10 @@ export default function AdminDashboardPage() {
                       e.stopPropagation();
                       toggleKpi('approvals');
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                     title="Flip for detailed 3D diagnostics"
                   >
-                    <RotateCw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500" />
                     <span>3D Audit</span>
                   </button>
                 </div>
@@ -1771,28 +1989,28 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[28px] border border-amber-300/80 dark:border-amber-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden"
+                className="flip-card-3d-back rounded-[28px] border border-amber-300/80 dark:border-amber-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden h-full"
               >
                 <div>
-                  <div className="relative bg-gradient-to-r from-amber-600 via-orange-500 to-amber-400 px-6 py-4 flex items-center justify-between text-white shadow-xs">
+                  <div className="relative bg-gradient-to-r from-amber-600 via-orange-500 to-amber-400 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-amber-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       GOVERNANCE LOG
                     </span>
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
-                      <FileText className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
+                      <FileText className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       03
                     </div>
                   </div>
 
-                  <div className="px-6 py-4">
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                       <div>
-                        <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                           Governance Diagnostics
                         </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Multi-tier sign-off metrics</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">Multi-tier sign-off metrics & budget audit</p>
                       </div>
                       <button
                         type="button"
@@ -1804,20 +2022,20 @@ export default function AdminDashboardPage() {
                       </button>
                     </div>
 
-                    <div className="mt-3 space-y-2">
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                    <div className="mt-2.5 space-y-2">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Stage 1 Dept Pending:</span>
                         <span className="font-mono font-bold text-amber-600 dark:text-amber-400">{Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))} requests</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Stage 2 Admin Pending:</span>
                         <span className="font-mono font-bold text-orange-600 dark:text-orange-400">{Math.max(1, Math.floor(pendingApprovalsCount * 0.5))} requests</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Budget Clearance:</span>
                         <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">92.4% Approved</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Avg Decision Cycle:</span>
                         <span className="font-mono font-bold text-slate-900 dark:text-white">2.2 hours</span>
                       </div>
@@ -1825,13 +2043,13 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
                   <button
                     type="button"
                     onClick={() => navigate('/approvals/queue')}
-                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 active:scale-95 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 active:scale-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
                   >
-                    Open Approvals Console <ArrowRight className="w-4 h-4" />
+                    Open Approvals Console <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -1839,107 +2057,112 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* ── KPI 4: Awaiting Field Dispatch (Workforce Readiness) ── */}
-          <div className="flip-card-3d-wrapper interactive-lift" style={{ minHeight: '395px', height: '395px' }}>
+          <div className="flip-card-3d-wrapper ops-tone-indigo interactive-lift h-[440px] min-h-[440px]">
             <div className={`flip-card-3d-inner ${flippedKpi.dispatch ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(99,102,241,0.25)] hover:border-indigo-500/60 dark:hover:border-indigo-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group"
+                className="flip-card-3d-front rounded-[28px] border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-[#0b1727] shadow-lg hover:shadow-[0_20px_40px_-12px_rgba(99,102,241,0.25)] hover:border-indigo-500/60 dark:hover:border-indigo-500/60 transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
                 onClick={() => toggleKpi('dispatch')}
               >
                 <div>
                   {/* Top Gradient Banner / Cap */}
-                  <div className="relative bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-500 px-6 py-4 flex items-center justify-between text-white shadow-xs">
+                  <div className="relative bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-500 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-indigo-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       DISPATCH
                     </span>
-
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                      <Users className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                      <Users className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       04
                     </div>
                   </div>
 
                   {/* Card Body */}
-                  <div className="px-6 py-4 flex flex-col">
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div>
                       <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                         Awaiting Field Dispatch
                       </h3>
-                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-                        Technician workload & active routing readiness
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                        Workload & active routing readiness
                       </p>
                     </div>
 
                     {/* Metric Strip */}
-                    <div className="my-3 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
+                    <div className="my-2.5 px-3.5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between shadow-2xs">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
+                        <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
                           {animatedDispatch}
                         </span>
-                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">
                           {unassignedDispatchCount} Unassigned
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 font-mono">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 font-mono">
                         {data.dispatch.availableTechs || 2} / {data.dispatch.totalTechs || 4} On-Duty
                       </span>
                     </div>
 
+                    {/* Embedded Micro-Chart: Capacity Battery */}
+                    <WorkforceBatteryMeter
+                      available={data.dispatch.availableTechs || 14}
+                      active={data.dispatch.activeTasks || 22}
+                      total={(data.dispatch.availableTechs || 14) + (data.dispatch.activeTasks || 22)}
+                    />
+
                     {/* Itemized Points */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-indigo-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                    <div className="space-y-1.5 mt-1">
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-indigo-600 dark:group-hover/item:text-indigo-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Available Specialists
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50 shrink-0">
                           {data.dispatch.availableTechs || 2} active
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-indigo-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-indigo-600 dark:group-hover/item:text-indigo-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Dispatched Field Tasks
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-900/50 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-900/50 shrink-0">
                           {data.dispatch.activeTasks || 2} active
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item cursor-pointer">
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span className="w-5.5 h-5.5 rounded-full bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover/item:scale-110 group-hover/item:shadow-indigo-500/40 group-hover/item:shadow-sm transition-all">
-                            <Check size={12} strokeWidth={3.5} />
+                      <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all duration-200 group/item">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="w-5 h-5 rounded-full bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <Check size={11} strokeWidth={3.5} />
                           </span>
-                          <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug group-hover/item:text-indigo-600 dark:group-hover/item:text-indigo-400 transition-colors">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                             Operational Teams
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 shadow-2xs shrink-0">
+                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 shrink-0">
                           {data.departments.length || 5} units
                         </span>
                       </div>
                     </div>
 
                     {/* Integrated Workforce Readiness Progress Meter */}
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                      <div className="flex items-center justify-between text-xs font-bold mb-1">
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between text-[11px] font-bold mb-1">
                         <span className="text-slate-700 dark:text-slate-300">Workforce Readiness</span>
                         <span className="font-mono text-indigo-600 dark:text-indigo-400">50% Ready (Route &lt;15m)</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 transition-all duration-1000 ease-out"
                           style={{ width: '50%' }}
@@ -1950,7 +2173,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="px-6 py-3 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between text-xs">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -1960,7 +2183,7 @@ export default function AdminDashboardPage() {
                     className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1.5 transition-colors cursor-pointer group/link"
                   >
                     <span>Open Workbench</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1.5 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
                   </button>
                   <button
                     type="button"
@@ -1968,10 +2191,10 @@ export default function AdminDashboardPage() {
                       e.stopPropagation();
                       toggleKpi('dispatch');
                     }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-400 border border-slate-200/90 dark:border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                     title="Flip for detailed 3D diagnostics"
                   >
-                    <RotateCw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500" />
                     <span>3D Audit</span>
                   </button>
                 </div>
@@ -1979,28 +2202,28 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[28px] border border-indigo-300/80 dark:border-indigo-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden"
+                className="flip-card-3d-back rounded-[28px] border border-indigo-300/80 dark:border-indigo-700/80 bg-white dark:bg-[#0b1727] shadow-xl flex flex-col justify-between overflow-hidden h-full"
               >
                 <div>
-                  <div className="relative bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-500 px-6 py-4 flex items-center justify-between text-white shadow-xs">
+                  <div className="relative bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-500 px-6 py-3.5 flex items-center justify-between text-white shadow-xs">
                     <span className="bg-white/95 text-indigo-950 font-black px-3.5 py-1 rounded-full text-[11px] uppercase tracking-wider shadow-sm">
                       DISPATCH AUDIT
                     </span>
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
-                      <Users className="w-5.5 h-5.5 text-white stroke-[2.3] drop-shadow-sm" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-sm">
+                      <Users className="w-5 h-5 text-white stroke-[2.3] drop-shadow-sm" />
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur-md border border-white/35 text-white font-black text-xs flex items-center justify-center shadow-xs">
                       04
                     </div>
                   </div>
 
-                  <div className="px-6 py-4">
+                  <div className="px-6 py-3.5 flex flex-col">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                       <div>
-                        <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                           Workforce Capacity Diagnostics
                         </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">On-duty technician deployment telemetry</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">On-duty technician deployment telemetry</p>
                       </div>
                       <button
                         type="button"
@@ -2012,20 +2235,20 @@ export default function AdminDashboardPage() {
                       </button>
                     </div>
 
-                    <div className="mt-3 space-y-2">
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                    <div className="mt-2.5 space-y-2">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Available Techs:</span>
                         <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{data.dispatch.availableTechs || 2} of {data.dispatch.totalTechs || 4} Active</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Active Tasks:</span>
                         <span className="font-mono font-bold text-slate-900 dark:text-white">{data.dispatch.activeTasks || 2} In-Flight</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Disciplines:</span>
                         <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{data.departments.length || 5} operational</span>
                       </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-semibold">
                         <span className="text-slate-600 dark:text-slate-300">Dispatch Latency:</span>
                         <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">&lt; 15 mins</span>
                       </div>
@@ -2033,13 +2256,13 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
+                <div className="px-6 py-2.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
                   <button
                     type="button"
                     onClick={() => navigate('/dispatch/workbench')}
-                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 active:scale-95 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 active:scale-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
                   >
-                    Open Dispatch Workbench <ArrowRight className="w-4 h-4" />
+                    Open Dispatch Workbench <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -2196,23 +2419,28 @@ export default function AdminDashboardPage() {
                 filteredTriageList.map((item) => (
                   <div
                     key={item.id}
-                    className={`ops-triage-row group relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs ${
+                    onClick={() => handleOpenDrawer(item, 'sla')}
+                    className={`ops-triage-row group relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 hover:border-rose-400/60 dark:hover:border-rose-500/50 hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs cursor-pointer ${
                       item.isBreached ? 'ring-1 ring-rose-500/40 ops-glow-pulse-red' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3 min-w-0">
                       {/* Modern Clean Inset Accent Indicator */}
-                      <div className={`w-1 self-stretch rounded-full shrink-0 my-0.5 ${
+                      <div className={`w-1.5 self-stretch rounded-full shrink-0 my-0.5 ${
                         item.isBreached ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.7)]' : 'bg-rose-400'
                       }`} />
 
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                          <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
                             {item.code}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-200/80 dark:border-rose-800/60">
-                            {item.priority}
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/30">
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                            </span>
+                            <span>{item.priority}</span>
                           </span>
                           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                             {item.department} <span className="text-slate-300 dark:text-slate-600">•</span> <strong className="font-semibold text-slate-700 dark:text-slate-300">{item.service}</strong>
@@ -2236,7 +2464,10 @@ export default function AdminDashboardPage() {
                       </span>
 
                       <button
-                        onClick={() => handleQuickAcknowledgeSla(item.id, item.code)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickAcknowledgeSla(item.id, item.code);
+                        }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white transition-all cursor-pointer shadow-2xs hover:shadow-xs"
                         title="Acknowledge breach & dispatch mitigation protocol"
                       >
@@ -2245,8 +2476,12 @@ export default function AdminDashboardPage() {
                       </button>
 
                       <button
-                        onClick={() => navigate('/issues/tracker')}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 active:scale-95 transition-all cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDrawer(item, 'sla');
+                        }}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 active:scale-95 transition-all cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                        title="Open Quick Action Drawer"
                       >
                         <span>Inspect</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -2275,28 +2510,30 @@ export default function AdminDashboardPage() {
                 filteredTriageList.map((appr) => (
                   <div
                     key={appr.id}
-                    className={`ops-triage-row group relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs ${
+                    onClick={() => handleOpenDrawer(appr, 'approvals')}
+                    className={`ops-triage-row group relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 hover:border-amber-400/60 dark:hover:border-amber-500/50 hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs cursor-pointer ${
                       appr.priority === 'CRITICAL' || appr.priority === 'HIGH' ? 'ring-1 ring-amber-500/30' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3 min-w-0">
                       {/* Modern Clean Inset Accent Indicator */}
-                      <div className="w-1 self-stretch rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] shrink-0 my-0.5" />
+                      <div className="w-1.5 self-stretch rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] shrink-0 my-0.5" />
 
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                          <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
                             {appr.code}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60">
-                            {appr.stage}
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span>{appr.stage}</span>
                           </span>
                           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                             Estimated Cost: <strong className="font-bold text-slate-800 dark:text-slate-200 font-mono">{appr.estimatedCost}</strong>
                           </span>
                         </div>
 
-                        <div className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <div className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                           {appr.title}
                         </div>
 
@@ -2308,7 +2545,10 @@ export default function AdminDashboardPage() {
 
                     <div className="flex items-center justify-between lg:justify-end gap-2.5 shrink-0 pt-2.5 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800/80 pl-4 lg:pl-0">
                       <button
-                        onClick={() => handleQuickApprove(appr.id, appr.code)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickApprove(appr.id, appr.code);
+                        }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white transition-all cursor-pointer shadow-2xs hover:shadow-xs"
                         title="Authorize request and route to dispatch workbench"
                       >
@@ -2317,10 +2557,14 @@ export default function AdminDashboardPage() {
                       </button>
 
                       <button
-                        onClick={() => navigate('/approvals/queue')}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 active:scale-95 transition-all cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDrawer(appr, 'approvals');
+                        }}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 active:scale-95 transition-all cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                        title="Open Quick Action Drawer"
                       >
-                        <span>Review</span>
+                        <span>Inspect</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -2347,21 +2591,22 @@ export default function AdminDashboardPage() {
                 filteredTriageList.map((req) => (
                   <div
                     key={req.id}
-                    className={`ops-triage-row group relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs ${
+                    onClick={() => handleOpenDrawer(req, 'dispatch')}
+                    className={`ops-triage-row group relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-850 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 hover:border-blue-400/60 dark:hover:border-blue-500/50 hover:shadow-md transition-all p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs cursor-pointer ${
                       req.priority === 'CRITICAL' || req.priority === 'HIGH' ? 'ring-1 ring-blue-500/30' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3 min-w-0">
                       {/* Modern Clean Inset Accent Indicator */}
-                      <div className="w-1 self-stretch rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)] shrink-0 my-0.5" />
+                      <div className="w-1.5 self-stretch rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)] shrink-0 my-0.5" />
 
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                          <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
                             {req.code}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/60">
-                            {req.department}
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/30">
+                            <span>{req.department}</span>
                           </span>
                           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                             Facility: <strong className="font-semibold text-slate-700 dark:text-slate-300">{req.building}</strong>
@@ -2380,7 +2625,10 @@ export default function AdminDashboardPage() {
 
                     <div className="flex items-center justify-between lg:justify-end gap-2.5 shrink-0 pt-2.5 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800/80 pl-4 lg:pl-0">
                       <button
-                        onClick={() => handleQuickDispatch(req.id, req.code)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickDispatch(req.id, req.code);
+                        }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white transition-all cursor-pointer shadow-2xs hover:shadow-xs"
                         title="Auto-dispatch to best available on-duty technician"
                       >
@@ -2389,10 +2637,14 @@ export default function AdminDashboardPage() {
                       </button>
 
                       <button
-                        onClick={() => navigate('/dispatch/workbench')}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 active:scale-95 transition-all cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDrawer(req, 'dispatch');
+                        }}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 active:scale-95 transition-all cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                        title="Open Quick Action Drawer"
                       >
-                        <span>Workbench</span>
+                        <span>Inspect</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -2670,6 +2922,245 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SLIDE-OVER QUICK ACTION DRAWER (Operational Priority Queue Triage)
+      ───────────────────────────────────────────────────────────── */}
+      {selectedTriageItem && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Backdrop Blur Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            onClick={handleCloseDrawer}
+          />
+
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div
+              className="w-screen max-w-lg sm:max-w-xl bg-white dark:bg-[#0b1727] border-l border-slate-200/90 dark:border-slate-800 shadow-2xl flex flex-col h-full transform transition-all ease-in-out duration-300 animate-in slide-in-from-right"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drawer Top Color Cap & Header */}
+              <div>
+                <div className={`h-2.5 w-full bg-gradient-to-r ${
+                  selectedTriageItem.triageType === 'sla'
+                    ? 'from-rose-600 via-rose-500 to-amber-500'
+                    : selectedTriageItem.triageType === 'approvals'
+                    ? 'from-amber-500 via-orange-500 to-amber-400'
+                    : 'from-blue-600 via-indigo-600 to-cyan-500'
+                }`} />
+
+                <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/40">
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono font-bold text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs">
+                        {selectedTriageItem.code}
+                      </span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                        selectedTriageItem.triageType === 'sla'
+                          ? 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/30'
+                          : selectedTriageItem.triageType === 'approvals'
+                          ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30'
+                          : 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/30'
+                      }`}>
+                        {selectedTriageItem.triageType === 'sla' ? 'SLA MITIGATION' : selectedTriageItem.triageType === 'approvals' ? 'MANAGERIAL APPROVAL' : 'FIELD DISPATCH'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                        {selectedTriageItem.priority}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-1 leading-snug">
+                      {selectedTriageItem.title}
+                    </h3>
+                  </div>
+
+                  <button
+                    onClick={handleCloseDrawer}
+                    className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                    title="Close Drawer (ESC)"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Drawer Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
+                {/* Status / Urgency Alert Card */}
+                {selectedTriageItem.triageType === 'sla' && (
+                  <div className="p-4 rounded-2xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50 flex items-start gap-3">
+                    <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                    <div className="text-xs">
+                      <div className="font-bold text-rose-900 dark:text-rose-200 text-sm">
+                        {selectedTriageItem.isBreached ? 'Critical Target Breached' : 'Resolution Approaching Deadline'}
+                      </div>
+                      <div className="text-rose-700 dark:text-rose-300 mt-1">
+                        Resolution Target: <strong className="font-semibold">{selectedTriageItem.deadline}</strong>. Standard Campus SLA benchmark is currently exceeded or nearing escalation tier.
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedTriageItem.triageType === 'approvals' && (
+                  <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <div className="text-xs">
+                      <div className="font-bold text-amber-900 dark:text-amber-200 text-sm">
+                        Authorization Required: {selectedTriageItem.stage}
+                      </div>
+                      <div className="text-amber-700 dark:text-amber-300 mt-1">
+                        Estimated Financial Liability: <strong className="font-semibold font-mono text-slate-900 dark:text-white">{selectedTriageItem.estimatedCost}</strong>. Managerial approval releases this work order to field execution.
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedTriageItem.triageType === 'dispatch' && (
+                  <div className="p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/50 flex items-start gap-3">
+                    <Send className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                    <div className="text-xs">
+                      <div className="font-bold text-blue-900 dark:text-blue-200 text-sm">
+                        Technician Routing Ready
+                      </div>
+                      <div className="text-blue-700 dark:text-blue-300 mt-1">
+                        Assigned to Department: <strong className="font-semibold">{selectedTriageItem.department}</strong> at facility <strong className="font-semibold">{selectedTriageItem.building}</strong>. On-duty specialists currently available.
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metadata Specifications Grid */}
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                    Work Order Specifications
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800">
+                      <span className="text-[11px] text-slate-400 font-medium">Department</span>
+                      <div className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                        {selectedTriageItem.department || 'Operations'}
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800">
+                      <span className="text-[11px] text-slate-400 font-medium">Service Catalog</span>
+                      <div className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                        {selectedTriageItem.service || 'General Facilities'}
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800">
+                      <span className="text-[11px] text-slate-400 font-medium">Requester</span>
+                      <div className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                        {selectedTriageItem.requester || 'Enterprise Tenant'}
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800">
+                      <span className="text-[11px] text-slate-400 font-medium">Facility / Location</span>
+                      <div className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 mt-0.5 truncate">
+                        {selectedTriageItem.building || 'Campus Core'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Action Notes Input */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                    Administrative Action Notes
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={drawerActionNotes}
+                    onChange={(e) => setDrawerActionNotes(e.target.value)}
+                    placeholder="Enter dispatch directives, approval conditions, or SLA mitigation reasoning..."
+                    className="w-full p-3 rounded-xl text-xs bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                  {/* Quick-Fill Suggestion Chips */}
+                  <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                    {[
+                      'Expedited sign-off granted',
+                      'Mitigation verified with lead',
+                      'Immediate dispatch approved'
+                    ].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setDrawerActionNotes(preset)}
+                        className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                      >
+                        + {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Drawer Footer Actions */}
+              <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const type = selectedTriageItem.triageType;
+                    handleCloseDrawer();
+                    if (type === 'sla') navigate('/sla/clocks');
+                    else if (type === 'approvals') navigate('/approvals/queue');
+                    else navigate('/dispatch/workbench');
+                  }}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <span>Open Full View</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCloseDrawer}
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={drawerSubmitting}
+                    onClick={handleDrawerAction}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 ${
+                      selectedTriageItem.triageType === 'sla'
+                        ? 'bg-rose-600 hover:bg-rose-700'
+                        : selectedTriageItem.triageType === 'approvals'
+                        ? 'bg-amber-500 hover:bg-amber-600'
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
+                  >
+                    {drawerSubmitting ? (
+                      <span>Executing...</span>
+                    ) : selectedTriageItem.triageType === 'sla' ? (
+                      <>
+                        <ShieldAlert className="w-3.5 h-3.5" />
+                        <span>Mitigate & Close</span>
+                      </>
+                    ) : selectedTriageItem.triageType === 'approvals' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Authorize & Sign-Off</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Confirm Dispatch</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─────────────────────────────────────────────────────────────
           MODAL 1: COMMAND PALETTE MODAL (Ctrl+K / ⌘K)
