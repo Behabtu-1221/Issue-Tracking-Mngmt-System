@@ -3531,7 +3531,7 @@ textarea:focus-visible {
 .flip-card-3d-wrapper {
   perspective: 1200px;
   -webkit-perspective: 1200px;
-  border-radius: 28px !important;
+  border-radius: 20px !important;
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -3547,7 +3547,7 @@ textarea:focus-visible {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 28px !important;
+  border-radius: 20px !important;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   transition: transform 0.62s cubic-bezier(0.34, 1.25, 0.64, 1);
@@ -3566,7 +3566,7 @@ textarea:focus-visible {
   height: 100%;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  border-radius: 28px !important;
+  border-radius: 20px !important;
   overflow: hidden !important;
   box-sizing: border-box;
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3786,7 +3786,7 @@ textarea:focus-visible {
 .ops-canvas > section:nth-of-type(4) { animation-delay: 0.38s; }
 
 .ops-hero {
-  border-radius: 28px !important;
+  border-radius: 24px !important;
   overflow: hidden !important;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.88) 55%, rgba(239, 246, 255, 0.9) 100%) !important;
@@ -3881,7 +3881,7 @@ textarea:focus-visible {
 }
 
 .ops-ribbon {
-  border-radius: 24px !important;
+  border-radius: 20px !important;
   position: relative;
   overflow: hidden !important;
   box-shadow: 0 14px 32px -24px rgba(245, 158, 11, 0.95);
@@ -4081,7 +4081,7 @@ textarea:focus-visible {
 }
 
 .ops-panel {
-  border-radius: 28px !important;
+  border-radius: 24px !important;
   position: relative;
   overflow: hidden !important;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.32s ease;
@@ -4107,7 +4107,7 @@ textarea:focus-visible {
 }
 
 .ops-triage-row {
-  border-radius: 22px !important;
+  border-radius: 16px !important;
   overflow: hidden;
   animation: opsRise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
@@ -4151,7 +4151,7 @@ textarea:focus-visible {
 }
 
 .ops-tile {
-  border-radius: 22px !important;
+  border-radius: 16px !important;
   position: relative;
   overflow: hidden !important;
 }
