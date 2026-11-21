@@ -1384,93 +1384,96 @@ export default function AdminDashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-6">
           {/* ── KPI 1: Open Requests (Active Workload) ── */}
-          <div className="flip-card-3d-wrapper ops-tone-blue interactive-lift rounded-[20px] h-[470px] min-h-[470px]">
+          <div className="flip-card-3d-wrapper ops-tone-blue interactive-lift rounded-[20px] h-[490px] min-h-[490px]">
             <div className={`flip-card-3d-inner rounded-[20px] ${flippedKpi.workload ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-blue-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-blue-500 bg-white dark:bg-[#0b1727] p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
                 onClick={() => toggleKpi('workload')}
               >
-                {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
-                <div className="flex items-center justify-between shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                      <Activity className="w-4.5 h-4.5 stroke-[2.2]" />
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
+                  <div className="flex items-center justify-between shrink-0 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                        <Activity className="w-4.5 h-4.5 stroke-[2.2]" />
+                      </div>
+                      <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
+                        WORKLOAD
+                      </span>
                     </div>
-                    <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
-                      WORKLOAD
-                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleKpi('workload');
+                      }}
+                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                      title="Flip for detailed 3D diagnostics"
+                    >
+                      <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-blue-600 dark:text-blue-400" />
+                      <span>3D Audit</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleKpi('workload');
-                    }}
-                    className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                    title="Flip for detailed 3D diagnostics"
-                  >
-                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-blue-600 dark:text-blue-400" />
-                    <span>3D Audit</span>
-                  </button>
-                </div>
 
-                {/* Primary Metric & Title Block */}
-                <div className="mt-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Open Service Requests
-                  </h3>
-                  <div className="flex items-baseline gap-2.5 mt-1">
-                    <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
-                      {animatedOpen}
-                    </span>
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
-                      In-Flight
-                    </span>
+                  {/* Primary Metric & Title Block */}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Open Service Requests
+                    </h3>
+                    <div className="flex items-baseline gap-2.5 mt-1">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
+                        {animatedOpen}
+                      </span>
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
+                        In-Flight
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
+                      {data.kpis.resolvedRequests} of {data.kpis.totalRequests} resolved this cycle
+                    </p>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
-                    {data.kpis.resolvedRequests} of {data.kpis.totalRequests} resolved this cycle
-                  </p>
-                </div>
 
-                {/* Embedded Micro-Chart: Area Sparkline */}
-                <div className="my-2">
-                  <WorkloadSparkline />
-                </div>
+                  {/* Embedded Micro-Chart: Area Sparkline */}
+                  <div className="my-2">
+                    <WorkloadSparkline />
+                  </div>
 
-                {/* Itemized Telemetry Rows spanning full width */}
-                <div className="space-y-1.5 my-1">
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">P1 Critical Incidents</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50">
-                      4 tickets
-                    </span>
+                  {/* Itemized Telemetry Rows spanning full width */}
+                  <div className="space-y-1.5 my-2">
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">P1 Critical Incidents</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50">
+                        4 tickets
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">High Priority Queue</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50">
+                        18 tickets
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Routine Maintenance</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        16 requests
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">High Priority Queue</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50">
-                      18 tickets
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Routine Maintenance</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                      16 requests
-                    </span>
-                  </div>
-                </div>
 
-                {/* Integrated Resolution Velocity Progress Meter */}
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <div className="flex items-center justify-between text-xs font-bold mb-1">
-                    <span className="text-slate-700 dark:text-slate-300">Resolution Velocity</span>
-                    <span className="font-mono text-blue-600 dark:text-blue-400">{data.kpis.resolutionRate}% Rate</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 transition-all duration-1000 ease-out"
-                      style={{ width: `${Math.min(100, Math.max(10, data.kpis.resolutionRate))}%` }}
-                    />
+                  {/* Integrated Resolution Velocity Progress Meter */}
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 mt-auto">
+                    <div className="flex items-center justify-between text-xs font-bold mb-1">
+                      <span className="text-slate-700 dark:text-slate-300">Resolution Velocity</span>
+                      <span className="font-mono text-blue-600 dark:text-blue-400">{data.kpis.resolutionRate}% Rate</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 transition-all duration-1000 ease-out"
+                        style={{ width: `${Math.min(100, Math.max(10, data.kpis.resolutionRate))}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1493,9 +1496,11 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[20px] border border-blue-300/80 dark:border-blue-700/80 border-t-4 border-t-blue-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                className="flip-card-3d-back rounded-[20px] border border-blue-300/80 dark:border-blue-700/80 border-t-4 border-t-blue-500 bg-white dark:bg-[#0b1727] p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
               >
-                {/* Back Top Header */}
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Back Top Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white">
@@ -1565,6 +1570,7 @@ export default function AdminDashboardPage() {
                     <span className="font-mono font-bold text-sm text-rose-600 dark:text-rose-400 mt-1">{slaAtRiskCount}</span>
                   </div>
                 </div>
+              </div>
 
                 {/* Back Footer Action */}
                 <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0">
@@ -1581,97 +1587,100 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* ── KPI 2: SLA Target Compliance ── */}
-          <div className="flip-card-3d-wrapper ops-tone-emerald interactive-lift rounded-[20px] h-[470px] min-h-[470px]">
+          <div className="flip-card-3d-wrapper ops-tone-emerald interactive-lift rounded-[20px] h-[490px] min-h-[490px]">
             <div className={`flip-card-3d-inner rounded-[20px] ${flippedKpi.sla ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-emerald-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-emerald-500 bg-white dark:bg-[#0b1727] p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
                 onClick={() => toggleKpi('sla')}
               >
-                {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
-                <div className="flex items-center justify-between shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                      <ShieldCheck className="w-4.5 h-4.5 stroke-[2.2]" />
-                    </div>
-                    <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
-                      SLA TARGET
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleKpi('sla');
-                    }}
-                    className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                    title="Flip for detailed 3D diagnostics"
-                  >
-                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-emerald-600 dark:text-emerald-400" />
-                    <span>3D Audit</span>
-                  </button>
-                </div>
-
-                {/* Primary Metric & Title Block */}
-                <div className="mt-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    SLA Compliance Rate
-                  </h3>
-                  <div className="flex items-baseline justify-between gap-2 mt-1">
-                    <div className="flex items-baseline gap-2.5">
-                      <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
-                        {animatedSla}%
-                      </span>
-                      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                        effectiveSlaRate >= 90
-                          ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
-                          : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
-                      }`}>
-                        {effectiveSlaRate >= 90 ? 'Passed (≥90%)' : 'Attention (<90%)'}
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
+                  <div className="flex items-center justify-between shrink-0 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                        <ShieldCheck className="w-4.5 h-4.5 stroke-[2.2]" />
+                      </div>
+                      <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                        SLA TARGET
                       </span>
                     </div>
-                    <div className="shrink-0 scale-90 sm:scale-100 origin-right">
-                      <SlaRadialArc value={effectiveSlaRate} target={90} />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleKpi('sla');
+                      }}
+                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                      title="Flip for detailed 3D diagnostics"
+                    >
+                      <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-emerald-600 dark:text-emerald-400" />
+                      <span>3D Audit</span>
+                    </button>
+                  </div>
+
+                  {/* Primary Metric & Title Block */}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      SLA Compliance Rate
+                    </h3>
+                    <div className="flex items-baseline justify-between gap-2 mt-1">
+                      <div className="flex items-baseline gap-2.5">
+                        <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
+                          {animatedSla}%
+                        </span>
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                          effectiveSlaRate >= 90
+                            ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
+                            : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
+                        }`}>
+                          {effectiveSlaRate >= 90 ? 'Passed (≥90%)' : 'Attention (<90%)'}
+                        </span>
+                      </div>
+                      <div className="shrink-0 scale-90 sm:scale-100 origin-right">
+                        <SlaRadialArc value={effectiveSlaRate} target={90} />
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
+                      {data.kpis.breachedCount} Breached • {slaAtRiskCount} At-Risk
+                    </p>
+                  </div>
+
+                  {/* Itemized Telemetry Rows spanning full width */}
+                  <div className="space-y-1.5 my-2">
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">First Response Speed</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50">
+                        {data.kpis.firstResponseMins}m (≤30m)
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Avg Resolution Speed</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-900/50">
+                        {data.kpis.avgResolutionHours}h (≤8h)
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Breached Violations</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50">
+                        {data.kpis.breachedCount} tickets
+                      </span>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
-                    {data.kpis.breachedCount} Breached • {slaAtRiskCount} At-Risk
-                  </p>
-                </div>
 
-                {/* Itemized Telemetry Rows spanning full width */}
-                <div className="space-y-1.5 my-1">
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">First Response Speed</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50">
-                      {data.kpis.firstResponseMins}m (≤30m)
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Avg Resolution Speed</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-900/50">
-                      {data.kpis.avgResolutionHours}h (≤8h)
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Breached Violations</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200/80 dark:border-rose-900/50">
-                      {data.kpis.breachedCount} tickets
-                    </span>
-                  </div>
-                </div>
-
-                {/* Integrated Campus Reliability Benchmark Meter */}
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <div className="flex items-center justify-between text-xs font-bold mb-1">
-                    <span className="text-slate-700 dark:text-slate-300">Reliability Benchmark</span>
-                    <span className="font-mono text-emerald-600 dark:text-emerald-400">{effectiveSlaRate}% (≥90%)</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-400 transition-all duration-1000 ease-out"
-                      style={{ width: `${Math.min(100, Math.max(10, effectiveSlaRate))}%` }}
-                    />
+                  {/* Integrated Campus Reliability Benchmark Meter */}
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 mt-auto">
+                    <div className="flex items-center justify-between text-xs font-bold mb-1">
+                      <span className="text-slate-700 dark:text-slate-300">Reliability Benchmark</span>
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400">{effectiveSlaRate}% (≥90%)</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-400 transition-all duration-1000 ease-out"
+                        style={{ width: `${Math.min(100, Math.max(10, effectiveSlaRate))}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1694,42 +1703,45 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[20px] border border-emerald-300/80 dark:border-emerald-700/80 border-t-4 border-t-emerald-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                className="flip-card-3d-back rounded-[20px] border border-emerald-300/80 dark:border-emerald-700/80 border-t-4 border-t-emerald-500 bg-white dark:bg-[#0b1727] p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
               >
-                {/* Back Top Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                      SLA Performance Radar
-                    </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Target compliance & MTTR matrix</p>
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Back Top Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0 mb-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                        SLA Performance Radar
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Target compliance & MTTR matrix</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="flip-trigger-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"
+                      onClick={() => toggleKpi('sla')}
+                      title="Flip back to KPI overview"
+                    >
+                      <RotateCcw size={11} /> <span>Overview</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    className="flip-trigger-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"
-                    onClick={() => toggleKpi('sla')}
-                    title="Flip back to KPI overview"
-                  >
-                    <RotateCcw size={11} /> <span>Overview</span>
-                  </button>
-                </div>
 
-                <div className="space-y-2.5 my-2">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">P1 MTTR Resolution:</span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">3.4 hrs (Target ≤4h)</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">P2 High Incidents:</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">5.8 hrs (Target ≤8h)</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">P3 Routine Maintenance:</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">18.2 hrs (Target ≤24h)</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Overall Benchmark:</span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{effectiveSlaRate >= 90 ? 'PASSED (≥90%)' : 'ACTION REQUIRED'}</span>
+                  <div className="space-y-2.5 my-auto">
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">P1 MTTR Resolution:</span>
+                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">3.4 hrs (Target ≤4h)</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">P2 High Incidents:</span>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">5.8 hrs (Target ≤8h)</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">P3 Routine Maintenance:</span>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">18.2 hrs (Target ≤24h)</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Overall Benchmark:</span>
+                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{effectiveSlaRate >= 90 ? 'PASSED (≥90%)' : 'ACTION REQUIRED'}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -1748,101 +1760,104 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* ── KPI 3: Pending Approvals (Gatekeeper Pipeline) ── */}
-          <div className="flip-card-3d-wrapper ops-tone-amber interactive-lift rounded-[20px] h-[470px] min-h-[470px]">
+          <div className="flip-card-3d-wrapper ops-tone-amber interactive-lift rounded-[20px] h-[490px] min-h-[490px]">
             <div className={`flip-card-3d-inner rounded-[20px] ${flippedKpi.approvals ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-amber-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-amber-500 bg-white dark:bg-[#0b1727] p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
                 onClick={() => toggleKpi('approvals')}
               >
-                {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
-                <div className="flex items-center justify-between shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                      <FileText className="w-4.5 h-4.5 stroke-[2.2]" />
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
+                  <div className="flex items-center justify-between shrink-0 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                        <FileText className="w-4.5 h-4.5 stroke-[2.2]" />
+                      </div>
+                      <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60">
+                        GOVERNANCE
+                      </span>
                     </div>
-                    <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60">
-                      GOVERNANCE
-                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleKpi('approvals');
+                      }}
+                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                      title="Flip for detailed 3D diagnostics"
+                    >
+                      <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-amber-600 dark:text-amber-400" />
+                      <span>3D Audit</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleKpi('approvals');
-                    }}
-                    className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                    title="Flip for detailed 3D diagnostics"
-                  >
-                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-amber-600 dark:text-amber-400" />
-                    <span>3D Audit</span>
-                  </button>
-                </div>
 
-                {/* Primary Metric & Title Block */}
-                <div className="mt-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Pending Approvals
-                  </h3>
-                  <div className="flex items-baseline gap-2.5 mt-1">
-                    <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
-                      {animatedApprovals}
-                    </span>
-                    <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                      pendingApprovalsCount > 0
-                        ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
-                        : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
-                    }`}>
-                      {pendingApprovalsCount > 0 ? 'Awaiting Review' : 'Queue Clear'}
-                    </span>
+                  {/* Primary Metric & Title Block */}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Pending Approvals
+                    </h3>
+                    <div className="flex items-baseline gap-2.5 mt-1">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
+                        {animatedApprovals}
+                      </span>
+                      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                        pendingApprovalsCount > 0
+                          ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
+                          : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
+                      }`}>
+                        {pendingApprovalsCount > 0 ? 'Awaiting Review' : 'Queue Clear'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
+                      {data.approvals.totalCount || 42} Total Requests Logged
+                    </p>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
-                    {data.approvals.totalCount || 42} Total Requests Logged
-                  </p>
-                </div>
 
-                {/* Embedded Micro-Chart: Pipeline Flow */}
-                <div className="my-2">
-                  <PipelineStepsMeter
-                    stage1={Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))}
-                    stage2={Math.max(1, Math.floor(pendingApprovalsCount * 0.5))}
-                    completed={Math.max(10, (data.approvals.totalCount || 42) - pendingApprovalsCount)}
-                  />
-                </div>
-
-                {/* Itemized Telemetry Rows spanning full width */}
-                <div className="space-y-1.5 my-1">
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Stage 1 Dept Review</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50">
-                      {Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))} pending
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Stage 2 Admin Sign-Off</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-orange-50 dark:bg-orange-950/70 text-orange-700 dark:text-orange-300 border border-orange-200/80 dark:border-orange-900/50">
-                      {Math.max(1, Math.floor(pendingApprovalsCount * 0.5))} pending
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Financial Exposure</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                      Est: $6,050
-                    </span>
-                  </div>
-                </div>
-
-                {/* Integrated Sign-Off Turnaround Progress Meter */}
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <div className="flex items-center justify-between text-xs font-bold mb-1">
-                    <span className="text-slate-700 dark:text-slate-300">Sign-Off Turnaround</span>
-                    <span className="font-mono text-amber-600 dark:text-amber-400">~2.2 hrs (Target ≤4h)</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-out"
-                      style={{ width: '75%' }}
+                  {/* Embedded Micro-Chart: Pipeline Flow */}
+                  <div className="my-2">
+                    <PipelineStepsMeter
+                      stage1={Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))}
+                      stage2={Math.max(1, Math.floor(pendingApprovalsCount * 0.5))}
+                      completed={Math.max(10, (data.approvals.totalCount || 42) - pendingApprovalsCount)}
                     />
+                  </div>
+
+                  {/* Itemized Telemetry Rows spanning full width */}
+                  <div className="space-y-1.5 my-2">
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Stage 1 Dept Review</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/50">
+                        {Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))} pending
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Stage 2 Admin Sign-Off</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-orange-50 dark:bg-orange-950/70 text-orange-700 dark:text-orange-300 border border-orange-200/80 dark:border-orange-900/50">
+                        {Math.max(1, Math.floor(pendingApprovalsCount * 0.5))} pending
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Financial Exposure</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        Est: $6,050
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Integrated Sign-Off Turnaround Progress Meter */}
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 mt-auto">
+                    <div className="flex items-center justify-between text-xs font-bold mb-1">
+                      <span className="text-slate-700 dark:text-slate-300">Sign-Off Turnaround</span>
+                      <span className="font-mono text-amber-600 dark:text-amber-400">~2.2 hrs (Target ≤4h)</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-out"
+                        style={{ width: '75%' }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1865,42 +1880,45 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[20px] border border-amber-300/80 dark:border-amber-700/80 border-t-4 border-t-amber-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                className="flip-card-3d-back rounded-[20px] border border-amber-300/80 dark:border-amber-700/80 border-t-4 border-t-amber-500 bg-white dark:bg-[#0b1727] p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
               >
-                {/* Back Top Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                      Governance Diagnostics
-                    </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Multi-tier sign-off metrics & budget audit</p>
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Back Top Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0 mb-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                        Governance Diagnostics
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Multi-tier sign-off metrics & budget audit</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="flip-trigger-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"
+                      onClick={() => toggleKpi('approvals')}
+                      title="Flip back to KPI overview"
+                    >
+                      <RotateCcw size={11} /> <span>Overview</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    className="flip-trigger-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"
-                    onClick={() => toggleKpi('approvals')}
-                    title="Flip back to KPI overview"
-                  >
-                    <RotateCcw size={11} /> <span>Overview</span>
-                  </button>
-                </div>
 
-                <div className="space-y-2.5 my-2">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Stage 1 Dept Pending:</span>
-                    <span className="font-mono font-bold text-amber-600 dark:text-amber-400">{Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))} requests</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Stage 2 Admin Pending:</span>
-                    <span className="font-mono font-bold text-orange-600 dark:text-orange-400">{Math.max(1, Math.floor(pendingApprovalsCount * 0.5))} requests</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Budget Clearance:</span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">92.4% Approved</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Avg Decision Cycle:</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">2.2 hours</span>
+                  <div className="space-y-2.5 my-auto">
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Stage 1 Dept Pending:</span>
+                      <span className="font-mono font-bold text-amber-600 dark:text-amber-400">{Math.max(1, Math.ceil(pendingApprovalsCount * 0.5))} requests</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Stage 2 Admin Pending:</span>
+                      <span className="font-mono font-bold text-orange-600 dark:text-orange-400">{Math.max(1, Math.floor(pendingApprovalsCount * 0.5))} requests</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Budget Clearance:</span>
+                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">92.4% Approved</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Avg Decision Cycle:</span>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">2.2 hours</span>
+                    </div>
                   </div>
                 </div>
 
@@ -1919,97 +1937,100 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* ── KPI 4: Awaiting Field Dispatch (Workforce Readiness) ── */}
-          <div className="flip-card-3d-wrapper ops-tone-indigo interactive-lift rounded-[20px] h-[470px] min-h-[470px]">
+          <div className="flip-card-3d-wrapper ops-tone-indigo interactive-lift rounded-[20px] h-[490px] min-h-[490px]">
             <div className={`flip-card-3d-inner rounded-[20px] ${flippedKpi.dispatch ? 'flipped' : ''}`}>
               {/* FRONT */}
               <div
-                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-indigo-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                className="flip-card-3d-front rounded-[20px] border border-slate-200/90 dark:border-slate-800/90 border-t-4 border-t-indigo-500 bg-white dark:bg-[#0b1727] p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer overflow-hidden group h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
                 onClick={() => toggleKpi('dispatch')}
               >
-                {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
-                <div className="flex items-center justify-between shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                      <Users className="w-4.5 h-4.5 stroke-[2.2]" />
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Top Header Row with Icon, Tag & 3D Flip trigger */}
+                  <div className="flex items-center justify-between shrink-0 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                        <Users className="w-4.5 h-4.5 stroke-[2.2]" />
+                      </div>
+                      <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+                        DISPATCH
+                      </span>
                     </div>
-                    <span className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
-                      DISPATCH
-                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleKpi('dispatch');
+                      }}
+                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                      title="Flip for detailed 3D diagnostics"
+                    >
+                      <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-indigo-600 dark:text-indigo-400" />
+                      <span>3D Audit</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleKpi('dispatch');
-                    }}
-                    className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                    title="Flip for detailed 3D diagnostics"
-                  >
-                    <RotateCw size={11} className="group-hover:rotate-180 transition-transform duration-500 text-indigo-600 dark:text-indigo-400" />
-                    <span>3D Audit</span>
-                  </button>
-                </div>
 
-                {/* Primary Metric & Title Block */}
-                <div className="mt-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Awaiting Field Dispatch
-                  </h3>
-                  <div className="flex items-baseline gap-2.5 mt-1">
-                    <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
-                      {animatedDispatch}
-                    </span>
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">
-                      {unassignedDispatchCount} Unassigned
-                    </span>
+                  {/* Primary Metric & Title Block */}
+                  <div className="mb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Awaiting Field Dispatch
+                    </h3>
+                    <div className="flex items-baseline gap-2.5 mt-1">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
+                        {animatedDispatch}
+                      </span>
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">
+                        {unassignedDispatchCount} Unassigned
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
+                      {data.dispatch.availableTechs || 2} of {data.dispatch.totalTechs || 4} Technicians On-Duty
+                    </p>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium truncate">
-                    {data.dispatch.availableTechs || 2} of {data.dispatch.totalTechs || 4} Technicians On-Duty
-                  </p>
-                </div>
 
-                {/* Embedded Micro-Chart: Capacity Battery */}
-                <div className="my-2">
-                  <WorkforceBatteryMeter
-                    available={data.dispatch.availableTechs || 14}
-                    active={data.dispatch.activeTasks || 22}
-                    total={(data.dispatch.availableTechs || 14) + (data.dispatch.activeTasks || 22)}
-                  />
-                </div>
-
-                {/* Itemized Telemetry Rows spanning full width */}
-                <div className="space-y-1.5 my-1">
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Available Specialists</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50">
-                      {data.dispatch.availableTechs || 2} active
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Dispatched Field Tasks</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-900/50">
-                      {data.dispatch.activeTasks || 2} active
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Operational Teams</span>
-                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                      {data.departments.length || 5} units
-                    </span>
-                  </div>
-                </div>
-
-                {/* Integrated Workforce Readiness Progress Meter */}
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <div className="flex items-center justify-between text-xs font-bold mb-1">
-                    <span className="text-slate-700 dark:text-slate-300">Workforce Readiness</span>
-                    <span className="font-mono text-indigo-600 dark:text-indigo-400">50% Ready (Route &lt;15m)</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 transition-all duration-1000 ease-out"
-                      style={{ width: '50%' }}
+                  {/* Embedded Micro-Chart: Capacity Battery */}
+                  <div className="my-2">
+                    <WorkforceBatteryMeter
+                      available={data.dispatch.availableTechs || 14}
+                      active={data.dispatch.activeTasks || 22}
+                      total={(data.dispatch.availableTechs || 14) + (data.dispatch.activeTasks || 22)}
                     />
+                  </div>
+
+                  {/* Itemized Telemetry Rows spanning full width */}
+                  <div className="space-y-1.5 my-2">
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Available Specialists</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/50">
+                        {data.dispatch.availableTechs || 2} active
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Dispatched Field Tasks</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-900/50">
+                        {data.dispatch.activeTasks || 2} active
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Operational Teams</span>
+                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        {data.departments.length || 5} units
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Integrated Workforce Readiness Progress Meter */}
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 mt-auto">
+                    <div className="flex items-center justify-between text-xs font-bold mb-1">
+                      <span className="text-slate-700 dark:text-slate-300">Workforce Readiness</span>
+                      <span className="font-mono text-indigo-600 dark:text-indigo-400">50% Ready (Route &lt;15m)</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-500 transition-all duration-1000 ease-out"
+                        style={{ width: '50%' }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -2032,42 +2053,45 @@ export default function AdminDashboardPage() {
 
               {/* BACK */}
               <div
-                className="flip-card-3d-back rounded-[20px] border border-indigo-300/80 dark:border-indigo-700/80 border-t-4 border-t-indigo-500 bg-white dark:bg-[#0b1727] p-5 sm:p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                className="flip-card-3d-back rounded-[20px] border border-indigo-300/80 dark:border-indigo-700/80 border-t-4 border-t-indigo-500 bg-white dark:bg-[#0b1727] p-6 shadow-xl flex flex-col justify-between overflow-hidden h-full"
+                style={{ padding: '24px', boxSizing: 'border-box' }}
               >
-                {/* Back Top Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                      Workforce Capacity Diagnostics
-                    </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">On-duty technician deployment telemetry</p>
+                <div className="flex flex-col flex-1 min-h-0">
+                  {/* Back Top Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0 mb-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                        Workforce Capacity Diagnostics
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">On-duty technician deployment telemetry</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="flip-trigger-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"
+                      onClick={() => toggleKpi('dispatch')}
+                      title="Flip back to KPI overview"
+                    >
+                      <RotateCcw size={11} /> <span>Overview</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    className="flip-trigger-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"
-                    onClick={() => toggleKpi('dispatch')}
-                    title="Flip back to KPI overview"
-                  >
-                    <RotateCcw size={11} /> <span>Overview</span>
-                  </button>
-                </div>
 
-                <div className="space-y-2.5 my-2">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Available Techs:</span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{data.dispatch.availableTechs || 2} of {data.dispatch.totalTechs || 4} Active</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Active Tasks:</span>
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">{data.dispatch.activeTasks || 2} In-Flight</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Disciplines:</span>
-                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{data.departments.length || 5} operational</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">Dispatch Latency:</span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">&lt; 15 mins</span>
+                  <div className="space-y-2.5 my-auto">
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Available Techs:</span>
+                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{data.dispatch.availableTechs || 2} of {data.dispatch.totalTechs || 4} Active</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Active Tasks:</span>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">{data.dispatch.activeTasks || 2} In-Flight</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Disciplines:</span>
+                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{data.departments.length || 5} operational</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Dispatch Latency:</span>
+                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">&lt; 15 mins</span>
+                    </div>
                   </div>
                 </div>
 

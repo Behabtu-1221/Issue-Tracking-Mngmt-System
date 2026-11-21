@@ -429,10 +429,10 @@
    GLOBAL BASE STYLES
    ═══════════════════════════════════════════════════════════════════════════ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
 }
 
 body {
@@ -3568,8 +3568,19 @@ textarea:focus-visible {
   -webkit-backface-visibility: hidden;
   border-radius: 20px !important;
   overflow: hidden !important;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 640px) {
+  .flip-card-3d-front,
+  .flip-card-3d-back {
+    padding: 18px !important;
+  }
 }
 
 .flip-card-3d-front {
@@ -3788,6 +3799,8 @@ textarea:focus-visible {
 .ops-hero {
   border-radius: 24px !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
+  padding: 24px !important;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.88) 55%, rgba(239, 246, 255, 0.9) 100%) !important;
   box-shadow:
@@ -3795,6 +3808,18 @@ textarea:focus-visible {
     0 1px 2px rgba(15, 23, 42, 0.04),
     0 24px 50px -32px rgba(37, 99, 235, 0.55) !important;
   backdrop-filter: blur(10px);
+}
+
+@media (min-width: 640px) {
+  .ops-hero {
+    padding: 28px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ops-hero {
+    padding: 32px !important;
+  }
 }
 
 .dark .ops-hero {
@@ -3884,6 +3909,8 @@ textarea:focus-visible {
   border-radius: 20px !important;
   position: relative;
   overflow: hidden !important;
+  box-sizing: border-box !important;
+  padding: 20px 24px !important;
   box-shadow: 0 14px 32px -24px rgba(245, 158, 11, 0.95);
 }
 
@@ -4084,7 +4111,21 @@ textarea:focus-visible {
   border-radius: 24px !important;
   position: relative;
   overflow: hidden !important;
+  box-sizing: border-box !important;
+  padding: 24px !important;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.32s ease;
+}
+
+@media (min-width: 640px) {
+  .ops-panel {
+    padding: 28px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ops-panel {
+    padding: 32px !important;
+  }
 }
 
 .ops-panel::before {
